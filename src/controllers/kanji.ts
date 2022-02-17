@@ -19,6 +19,23 @@ router.post('/', upload.single('image'), urlencodedParser, (req, res) => {
     return res.status(200).send(kanjiService.addOne({ ...parsedBody, image }));
 });
 
+/**
+ * @swagger
+ * /kanji/{id}/image:
+ *    get:
+ *       summary: Get a character image
+ *       tags: [Kanji]
+ *       parameters:
+ *          - in: path
+ *            name: id
+ *            schema:
+ *               type: string
+ *            required: true
+ *            description: Character ID
+ *       responses:
+ *          200:
+ *             description: Image of a Kanji
+ */
 router.get('/:id/image', async (req, res) => {
     const img: CharacterType = await kanjiService.getOne(req.params.id);
     res.set('Content-Type', img.image.contentType);

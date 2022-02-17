@@ -1,23 +1,27 @@
 import express, {Express} from 'express';
 import bodyParser from "body-parser";
+import cors from 'cors';
+import swaggerUi from 'swagger-ui-express';
 
-import connectToDatabase from './config/mongo';
+import { mongoConfig, specs } from './config';
 import kanjiController from "./controllers/kanji";
 
 const app: Express = express();
-const port = 8080;
+const port = process.env.PORT || 8080;
 
 // Database connection
-connectToDatabase()
+mongoConfig()
     .then(() => console.log('DB: OK'))
     .catch(() => console.warn('DB: KO'));
 
 // Middlewares
+app.use(cors());
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 // API Endpoints
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 app.use('/kanji', kanjiController);
 
 app.listen(port, () => {
