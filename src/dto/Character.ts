@@ -6,9 +6,11 @@ export default class Character {
     private _meaning: Array<string>;
     private _onyomi: Array<string>;
     private _kunyomi: Array<string>;
+    private _strokes: number;
     private _image: { data: Buffer, contentType: string };
 
-    constructor(character, meaning, onyomi, kunyomi, image) {
+    constructor(character: string, meaning: Array<string>, onyomi: Array<string>, kunyomi: Array<string>, image: any, strokes: number) {
+        this._strokes=strokes;
         this._character=character;
         this._image=image;
         this._onyomi=onyomi;
@@ -26,6 +28,7 @@ export default class Character {
     public toDTO(): Partial<CharacterType> {
         return {
             id: this._id,
+            strokes: this._strokes,
             character: this._character,
             meaning: this._meaning,
             onyomi: this._onyomi,

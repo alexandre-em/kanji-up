@@ -1,5 +1,3 @@
-import {Promise} from "mongoose";
-
 import {CharacterModel} from "../models";
 import {CharacterType} from "../utils";
 import Character from "../dto/Character";
@@ -13,7 +11,7 @@ export const getAll = (req, res) => {
 }
 
 export const addOne = (body): Partial<CharacterType> => {
-    const character = new Character(body.character, body.meaning, body.onyomi, body.kunyomi, body.image);
+    const character = new Character(body.character, body.meaning, body.onyomi, body.kunyomi, body.image, body.strokes);
     CharacterModel.create(body, (err, res) => {
         if (err) {
             console.log('[POST] Error: ' + err);

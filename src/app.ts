@@ -12,7 +12,7 @@ const port = process.env.PORT || 8080;
 // Database connection
 mongoConfig()
     .then(() => console.log('DB: OK'))
-    .catch(() => console.warn('DB: KO'));
+    .catch((err) => console.warn('DB: KO ' + err));
 
 // Middlewares
 app.use(cors());
@@ -27,3 +27,4 @@ app.use('/kanji', kanjiController);
 app.listen(port, () => {
   console.log(`Express is listening at http://localhost:${port}`);
 });
+
