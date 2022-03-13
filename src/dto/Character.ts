@@ -10,6 +10,7 @@ export default class Character {
     private _image: { data: Buffer, contentType: string };
 
     constructor(character: string, meaning: Array<string>, onyomi: Array<string>, kunyomi: Array<string>, image: any, strokes: number) {
+        if (!character || !meaning || !strokes) throw new Error('One or some of arguments are missing');
         this._strokes=strokes;
         this._character=character;
         this._image=image;
