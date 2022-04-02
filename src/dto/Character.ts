@@ -1,5 +1,3 @@
-import {CharacterType} from "../utils/types";
-
 export default class Character {
     private _id: string;
     private _character: string;
@@ -10,7 +8,7 @@ export default class Character {
     private _image: { data: Buffer, contentType: string };
 
     constructor(character: string, meaning: Array<string>, onyomi: Array<string>, kunyomi: Array<string>, image: any, strokes: number) {
-        if (!character || !meaning || !strokes) throw new Error('One or some of arguments are missing');
+        if (!character || !meaning || !strokes) throw new Error('Character: One or some of arguments are missing `character`, `meaning`, `strokes`');
         this._strokes=strokes;
         this._character=character;
         this._image=image;
@@ -26,7 +24,7 @@ export default class Character {
         this._id=newId;
     }
 
-    public toDTO(): Partial<CharacterType> {
+    public toDTO() {
         return {
             id: this._id,
             strokes: this._strokes,

@@ -16,13 +16,19 @@ export default class Radical {
   private _meaning: Array<string>;
 
 	constructor(character: string, stroke: number, image: any, name: any, meaning: Array<string>) {
-    if (!character || !stroke || !name) throw new InvalidError('One or some of these arguments are missing: `character`, `stroke`, `name`');
+    if (!character || !stroke || !name) throw new InvalidError('Radicals: One or some of these arguments are missing: `character`, `stroke`, `name`');
 		this._character=character;
 		this._image=image;
 		this._meaning=meaning;
 		this._name=name;
 		this._stroke=stroke;
 	}
+
+	
+	public get id() : string {
+		return this._id;
+	}
+	
 
 	public set id(newId: string) {
 		if (!newId) {

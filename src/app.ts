@@ -27,4 +27,3 @@ app.use('/kanji', kanjiController);
 app.listen(port, () => {
   console.log(`Express is listening at http://localhost:${port}`);
 });
-

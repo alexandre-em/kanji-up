@@ -2,5 +2,4 @@ node_modules
 dist
 .env
 .idea
-uploads/*.png
-uploads/*.jpg
+uploads/

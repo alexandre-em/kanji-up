@@ -1,5 +1,5 @@
 export type CharacterType = {
-    id: string;
+    character_id: string;
     character: string;
     meaning: Array<string>;
     onyomi: Array<string>;
@@ -9,4 +9,26 @@ export type CharacterType = {
         contentType: string;
         data: Buffer;
     };
+}
+
+export type RadicalType = {
+  radical_id: string,
+  character: string,
+  stroke: number,
+  image: {
+    data: Buffer,
+    contentType: string,
+  },
+  name: {
+    hiragana: string,
+    romaji: string,
+  },
+  meaning: [string],
+}
+
+export type ReferenceType = {
+  reference_id: string,
+  grade: string,
+  kodansha: string,
+  classic_nelson: string,
 }
