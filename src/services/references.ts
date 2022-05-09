@@ -8,7 +8,7 @@ export const getOneById = (id: string): Promise<ReferenceType> => {
 }
 
 export const addOne = async (body): Promise<Partial<ReferenceType>> => {
-	const reference = new References(body.grade, body.kodansha, body.classic_nelson);
+	const reference = new References(body.grade, body.kodansha, body.classicNelson);
 
 	const r: ReferenceType = await new Promise((resolve, reject) => {
 		ReferenceModel.create(body, (err, res) => {
@@ -25,7 +25,5 @@ export const addOne = async (body): Promise<Partial<ReferenceType>> => {
 		throw r;
 	}
 
-	reference.id = r.reference_id;
-
-	return reference.toDTO();
+	return reference.toDTO(r.reference_id);
 }

@@ -9,7 +9,7 @@ export type CharacterType = {
         contentType: string;
         data: Buffer;
     };
-}
+};
 
 export type RadicalType = {
   radical_id: string,
@@ -24,11 +24,23 @@ export type RadicalType = {
     romaji: string,
   },
   meaning: [string],
-}
+};
 
 export type ReferenceType = {
   reference_id: string,
   grade: string,
   kodansha: string,
   classic_nelson: string,
-}
+};
+
+export type KanjiType = {
+  kanji_id: string,
+  kanji: CharacterType,
+  radical: RadicalType,
+  reference: ReferenceType,
+  creation_date: string,
+  examples: {
+    japanese: string,
+    meaning: string,
+  },
+};
