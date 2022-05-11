@@ -1,6 +1,5 @@
 import {Schema, model} from 'mongoose';
 import {util} from 'mongoose-uuid-parser';
-import {uuid} from '../utils';
 
 const radicalSchema = new Schema({
   radical_id: { type: String, unique: true, immutable: true, default: util.v4 },

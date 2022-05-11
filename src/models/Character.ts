@@ -1,6 +1,5 @@
 import { Schema, model } from 'mongoose';
 import {util} from 'mongoose-uuid-parser';
-import { uuid } from '../utils';
 
 const characterSchema = new Schema({
   character_id: { type: String, trim: true, unique: true, immutable: true, default: util.v4 },

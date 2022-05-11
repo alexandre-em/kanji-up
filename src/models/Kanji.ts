@@ -1,6 +1,5 @@
 import {Schema, model} from 'mongoose';
 import {util} from 'mongoose-uuid-parser';
-import {uuid} from '../utils';
 
 const ObjectId = Schema.Types.ObjectId;
 const kanjiSchema = new Schema({
