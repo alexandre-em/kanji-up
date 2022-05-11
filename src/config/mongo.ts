@@ -1,5 +1,8 @@
 import mongoose, {Connection} from 'mongoose';
+import { injectUUID } from 'mongoose-uuid-parser';
 import dotenv from 'dotenv';
+
+injectUUID(mongoose);
 
 export async function connectToDatabase(): Promise<void> {
   dotenv.config();

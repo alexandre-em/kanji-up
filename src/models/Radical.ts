@@ -1,10 +1,11 @@
 import {Schema, model} from 'mongoose';
+import {util} from 'mongoose-uuid-parser';
 import {uuid} from '../utils';
 
 const radicalSchema = new Schema({
-  radical_id: { type: String, unique: true, immutable: true, default: uuid() },
-  character: { type: String, required: true, index: true },
-  stroke: { type: Number, required: true },
+  radical_id: { type: String, unique: true, immutable: true, default: util.v4 },
+  character: { type: String, required: true, index: true, unique: true },
+  strokes: { type: Number, required: true },
   image: {
     data: Buffer,
     contentType: String,

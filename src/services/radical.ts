@@ -8,7 +8,7 @@ export const getOneById = (id: string) => {
 }
 
 export const addOne = async (body) => {
-	const radical = new Radical(body.character, body.stroke, body.image, body.name, body.meaning);
+	const radical = new Radical(body.character, body.strokes, body.image, body.name, body.meaning);
 	
 	const r: RadicalType = await new Promise((resolve, reject) => {
 		RadicalModel.create(body, (err, res) => {

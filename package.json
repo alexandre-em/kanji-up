@@ -6,6 +6,7 @@
   "scripts": {
     "build": "tsc && node dist/app.js",
     "dev:server": "nodemon --watch './**/*.ts' --exec 'ts-node' src/app.ts",
+    "migrate:kanjiapi": "ts-node ./migrate/index.ts",
     "lint": "eslint . --ext .ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -25,11 +26,13 @@
     "typescript": "^4.5.5"
   },
   "dependencies": {
+    "axios": "^0.27.2",
     "body-parser": "^1.19.2",
     "cors": "^2.8.5",
     "dotenv": "^16.0.0",
     "express": "^4.17.1",
     "mongoose": "^6.2.1",
+    "mongoose-uuid-parser": "^0.1.0",
     "multer": "^1.4.4",
     "swagger-jsdoc": "^6.1.0",
     "swagger-ui-express": "^4.3.0"
