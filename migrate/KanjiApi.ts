@@ -1,10 +1,12 @@
 import axios from 'axios';
 import dotenv from 'dotenv';
+import cliProgress from 'cli-progress';
+import colors from 'ansi-colors'
 
 import { CharacterModel, KanjiModel, RadicalModel, ReferenceModel } from '../src/models';
-import { CharacterType, KanjiType, RadicalType, ReferenceType } from '../src/utils';
+import { CharacterType, RadicalType, ReferenceType } from '../src/utils';
 
-const addData = async (kanjiDetail) => {
+const addData = async (kanjiDetail, progressBar) => {
 	try {
 		const kanjiPromises = [];
 		kanjiPromises.push(new Promise((resolve, reject) => {
@@ -81,22 +83,15 @@ const addData = async (kanjiDetail) => {
 		const promisesResult = await Promise.allSettled(kanjiPromises);
 		const isInvalid = promisesResult.find((promise) => promise.status === 'rejected');
 
-		console.log(isInvalid);
-		
 		if (isInvalid)
 			throw new Error('Invalid input');
-
-		console.log('All promise are settled !');
-		console.log('Adding all Kanji details...');
-
-
 
 		const fulfilledChar = promisesResult[0] as PromiseFulfilledResult<CharacterType>;
 		const fulfilledRad = promisesResult[1] as PromiseFulfilledResult<RadicalType>;
 		const fulfilledRef = promisesResult[2] as PromiseFulfilledResult<ReferenceType>;
 		const examples = kanjiDetail.examples.map((example) => ({ japanese: example.japanese, meaning: example.meaning.english }));
 
-		const kanjiRes: KanjiType = await new Promise((resolve, reject) => {
+		await new Promise((resolve, reject) => {
 			KanjiModel.create({
 				kanji: fulfilledChar.value,
 				radical: fulfilledRad.value,
@@ -111,7 +106,7 @@ const addData = async (kanjiDetail) => {
 			});
 		});
 
-		console.log(kanjiRes.kanji_id);
+		progressBar.increment();
 	} catch (err) {
 		console.error(err);
 		process.exit(1);
@@ -121,32 +116,40 @@ const addData = async (kanjiDetail) => {
 export const migrateFromKanjiApi = async () => {
 	dotenv.config();
 	console.log('Fetching data from  KanjiApi...');
-
-	const kanjiList = await axios.get(`https://${process.env.KANJI_ALIVE_API_DOMAIN}/api/public/kanji/all`, {
-		headers: {
-			'x-rapidapi-host': process.env.KANJI_ALIVE_API_DOMAIN,
-			'x-rapidapi-key': process.env.KANJI_ALIVE_API_KEY,
-			'useQueryString': 'true',
-		}
+	const b2 = new cliProgress.SingleBar({
+		format: 'Kanji Migration |' + colors.cyan('{bar}') + '| {percentage}% || {value}/{total} Chunks',
+		barCompleteChar: '\u2588',
+		barIncompleteChar: '\u2591',
+		hideCursor: true
 	});
 
-	console.log('Adding fetched data into MongoDB...');
-
 	try {
+		const kanjiList = await axios.get(`https://${process.env.KANJI_ALIVE_API_DOMAIN}/api/public/kanji/all`, {
+			headers: {
+				'x-rapidapi-host': process.env.KANJI_ALIVE_API_DOMAIN,
+				'x-rapidapi-key': process.env.KANJI_ALIVE_API_KEY,
+				'useQueryString': 'true',
+			},
+		});
+
+		console.log('Adding fetched data into MongoDB...');
+
 		let queue = [];
-		for (let i = 0; i < kanjiList.data.length - 6; i += 5) {
+		b2.start(kanjiList.data.length - 1, 0);
+		for (let i = 0; i < kanjiList.data.length; i += 5) {
 			for (let j = 0; j < 5; j++) {
-				console.log(`index ${i+j}`);
-				
-				queue.push(addData(kanjiList.data[i + j]));
+				if ((i + j) < kanjiList.data.length) {
+					queue.push(addData(kanjiList.data[i + j], b2));
+				}
 			}
 			await Promise.allSettled(queue);
 			queue = [];
 		}
-		console.log('Migration has been completed !!');
+		console.log('\n Migration has been completed !!');
 	} catch (e) {
 		console.error(e);
 	} finally {
+		b2.stop();
 		process.exit(1)
 	}
 }

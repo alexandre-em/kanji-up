@@ -19,6 +19,8 @@
     "@types/multer": "^1.4.7",
     "@typescript-eslint/eslint-plugin": "^5.11.0",
     "@typescript-eslint/parser": "^5.11.0",
+    "ansi-colors": "^4.1.1",
+    "cli-progress": "^3.11.0",
     "eslint": "^8.8.0",
     "eslint-plugin-tsdoc": "^0.2.14",
     "nodemon": "^2.0.15",
