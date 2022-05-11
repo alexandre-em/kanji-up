@@ -1,4 +1,6 @@
 import axios from 'axios';
+import dotenv from 'dotenv';
+
 import { CharacterModel, KanjiModel, RadicalModel, ReferenceModel } from '../src/models';
 import { CharacterType, KanjiType, RadicalType, ReferenceType } from '../src/utils';
 
@@ -117,12 +119,13 @@ const addData = async (kanjiDetail) => {
 }
 
 export const migrateFromKanjiApi = async () => {
+	dotenv.config();
 	console.log('Fetching data from  KanjiApi...');
 
-	const kanjiList = await axios.get('https://kanjialive-api.p.rapidapi.com/api/public/kanji/all', {
+	const kanjiList = await axios.get(`https://${process.env.KANJI_ALIVE_API_DOMAIN}/api/public/kanji/all`, {
 		headers: {
-			'x-rapidapi-host': 'kanjialive-api.p.rapidapi.com',
-			'x-rapidapi-key': '4961accbaamsh89fdb991f6675c2p1d7481jsncbe8e40aac9b',
+			'x-rapidapi-host': process.env.KANJI_ALIVE_API_DOMAIN,
+			'x-rapidapi-key': process.env.KANJI_ALIVE_API_KEY,
 			'useQueryString': 'true',
 		}
 	});

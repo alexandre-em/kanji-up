@@ -2,9 +2,12 @@ import express, {Express} from 'express';
 import bodyParser from "body-parser";
 import cors from 'cors';
 import swaggerUi from 'swagger-ui-express';
+import dotenv from 'dotenv';
 
 import { mongoConfig, specs } from './config';
 import kanjiController from "./controllers/kanji";
+
+dotenv.config();
 
 const app: Express = express();
 const port = process.env.PORT || 8080;
