@@ -2,9 +2,16 @@ import axios from 'axios';
 import dotenv from 'dotenv';
 import cliProgress from 'cli-progress';
 import colors from 'ansi-colors'
+import { convert } from 'convert-svg-to-png';
 
 import { CharacterModel, KanjiModel, RadicalModel, ReferenceModel } from '../src/models';
 import { CharacterType, RadicalType, ReferenceType } from '../src/utils';
+import { uploadFile } from '../src/config/aws';
+
+/**
+ * Number of thread that are asynchronously launched to fill the DB
+ */
+const N = 3;
 
 const addData = async (kanjiDetail, progressBar) => {
 	try {
@@ -15,16 +22,22 @@ const addData = async (kanjiDetail, progressBar) => {
 
 			axios.get(imageUrl, { responseType: 'arraybuffer' })
 				.then(({ data }) => {
-					CharacterModel.create({ character, strokes: strokes.count, image: { data, contentType: 'image/svg' }, onyomi: onyomi.katakana, kunyomi: kunyomi.hiragana, meaning: meaning.english }, (err, res) => {
-						if (err) {
-							CharacterModel.find({ character }).exec()
-								.then((characterRes) => resolve(characterRes[0]))
-								.catch(reject)
-						}
-						else {
-							resolve(res);
-						}
-					})
+					convert(data).then((png: Buffer) => {
+						const filename = imageUrl.split('/');
+						uploadFile(`characters/${Math.round(new Date().getTime()/1000)}-${filename[filename.length-1].split('.')[0]}.png`, png)
+							.then(({ Location }: AWS.S3.ManagedUpload.SendData) => {
+								CharacterModel.create({ character, strokes: strokes.count, image: Location, onyomi: onyomi.katakana, kunyomi: kunyomi.hiragana, meaning: meaning.english }, (err, res) => {
+									if (err) {
+										CharacterModel.find({ character }).exec()
+											.then((characterRes) => resolve(characterRes[0]))
+											.catch(reject)
+									}
+									else {
+										resolve(res);
+									}
+								});
+							}).catch(console.log);
+					}).catch(console.log);
 				})
 				.catch(() => {
 					CharacterModel.create({ character, strokes: strokes.count, onyomi: onyomi.katakana, kunyomi: kunyomi.hiragana, meaning: meaning.english }, (err, res) => {
@@ -44,16 +57,21 @@ const addData = async (kanjiDetail, progressBar) => {
 
 			axios.get(imageUrl, { responseType: 'arraybuffer' })
 				.then(({ data }) => {
-					RadicalModel.create({ character, strokes, image: { data, contentType: 'image/svg' }, name, meaning: meaning.english }, (err, res) => {
-						if (err) {
-							RadicalModel.find({ character }).exec()
-								.then((radicalRes) => resolve(radicalRes[0]))
-								.catch(reject)
-						}
-						else {
-							resolve(res);
-						}
-					})
+					convert(data).then((png: Buffer) => {
+						const filename = imageUrl.split('/');
+						uploadFile(`radicals/${Math.round(new Date().getTime()/1000)}-${filename[filename.length-1].split('.')[0]}.png`, png).then(({ Location }: AWS.S3.ManagedUpload.SendData) => {
+							RadicalModel.create({ character, strokes, image: Location, name, meaning: meaning.english }, (err, res) => {
+								if (err) {
+									RadicalModel.find({ character }).exec()
+										.then((radicalRes) => resolve(radicalRes[0]))
+										.catch(reject)
+								}
+								else {
+									resolve(res);
+								}
+							});
+						}).catch(console.log)
+					}).catch(console.log)
 				})
 				.catch(() => {
 					RadicalModel.create({ character, strokes, name, meaning: meaning.english }, (err, res) => {
@@ -136,8 +154,8 @@ export const migrateFromKanjiApi = async () => {
 
 		let queue = [];
 		b2.start(kanjiList.data.length - 1, 0);
-		for (let i = 0; i < kanjiList.data.length; i += 5) {
-			for (let j = 0; j < 5; j++) {
+		for (let i = 0; i < kanjiList.data.length; i += N) {
+			for (let j = 0; j < N; j++) {
 				if ((i + j) < kanjiList.data.length) {
 					queue.push(addData(kanjiList.data[i + j], b2));
 				}
