@@ -1,4 +1,5 @@
 import InvalidError from "../error/invalid";
+import { RadicalType } from "../utils";
 
 
 export default class Radical {
@@ -9,6 +10,7 @@ export default class Radical {
     data: Buffer;
     contentType: string;
   };
+	private _imageUrl: string;
   private _name: {
     hiragana: string;
     romaji: string;
@@ -37,9 +39,14 @@ export default class Radical {
 		this._id=newId;
 	}
 
-	public toDTO() {
+	public set imageUrl(url: string) {
+		this._imageUrl=url;
+	}
+
+	public toDTO() : Partial<RadicalType> {
 		return {
 			id: this._id,
+			image: this._imageUrl,
 			character: this._character,
 			meaning: this._meaning,
 			name: this._name,

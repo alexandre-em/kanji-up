@@ -1,32 +1,40 @@
+export type ExampleType = {
+  japanese: string,
+  meaning: string,
+};
+
+export type ImageType = {
+  filename?: string,
+  contentType: string;
+  data: Buffer;
+}
+
 export type CharacterType = {
-    character_id: string;
-    character: string;
-    meaning: Array<string>;
-    onyomi: Array<string>;
-    kunyomi: Array<string>;
-    strokes: number;
-    image: {
-        contentType: string;
-        data: Buffer;
-    };
+  id?: string,
+  character_id: string;
+  character: string;
+  meaning: Array<string>;
+  onyomi: Array<string>;
+  kunyomi: Array<string>;
+  strokes: number;
+  image: ImageType | string;
 };
 
 export type RadicalType = {
+  id?: string,
   radical_id: string,
   character: string,
-  stroke: number,
-  image: {
-    data: Buffer,
-    contentType: string,
-  },
+  strokes: number,
+  image: ImageType | string,
   name: {
     hiragana: string,
     romaji: string,
   },
-  meaning: [string],
+  meaning: Array<string>,
 };
 
 export type ReferenceType = {
+  id?: string,
   reference_id: string,
   grade: string,
   kodansha: string,
@@ -34,13 +42,11 @@ export type ReferenceType = {
 };
 
 export type KanjiType = {
+  id?: string,
+  creation_date: string,
   kanji_id: string,
   kanji: CharacterType,
   radical: RadicalType,
   reference: ReferenceType,
-  creation_date: string,
-  examples: {
-    japanese: string,
-    meaning: string,
-  },
+  examples: [ExampleType],
 };

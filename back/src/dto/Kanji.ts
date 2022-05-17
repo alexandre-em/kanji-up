@@ -4,8 +4,8 @@ const formatCharacter = ({ character_id, character, strokes, meaning, onyomi, ku
 	character_id, character, strokes, meaning, onyomi, kunyomi,
 })
 
-const formatRadical = ({ radical_id, character, stroke, name, meaning }: RadicalType) => ({
-	radical_id, character, stroke, name, meaning,
+const formatRadical = ({ radical_id, character, strokes, name, meaning }: RadicalType) => ({
+	radical_id, character, strokes, name, meaning,
 })
 
 export default class Kanji {

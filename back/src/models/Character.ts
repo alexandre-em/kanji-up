@@ -8,10 +8,11 @@ const characterSchema = new Schema({
   meaning: [String],
   onyomi: [String],
   kunyomi: [String],
-  image: {
-    data: Buffer,
-    contentType: String,
-  },
+  image: { type: String },
+  // image: {
+  //   data: Buffer,
+  //   contentType: String,
+  // },
 });
 
 export default model("Character", characterSchema);
