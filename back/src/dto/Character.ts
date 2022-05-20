@@ -1,4 +1,4 @@
-import { CharacterType } from "../utils";
+import InvalidError from "../error/invalid";
 
 export default class Character {
     private _id: string;
@@ -11,7 +11,7 @@ export default class Character {
 	private _imageUrl: string;
 
     constructor(character: string, meaning: Array<string>, onyomi: Array<string>, kunyomi: Array<string>, image: any, strokes: number) {
-        if (!character || !meaning || !strokes) throw new Error('Character: One or some of arguments are missing `character`, `meaning`, `strokes`');
+        if (!character || !meaning || !strokes) throw new InvalidError('Character: One or some of arguments are missing `character`, `meaning`, `strokes`');
         this._strokes = strokes;
         this._character = character;
         this._image = image;

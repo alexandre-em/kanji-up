@@ -4,7 +4,6 @@ import { deleteFile, uploadFile } from "../config/aws";
 import Character from "../dto/Character";
 import InvalidError from "../error/invalid";
 import { CharacterModel } from "../models";
-import { CharacterType, ImageType } from "../utils";
 
 export const getOneById = (id: string): Promise<CharacterType> => {
     return CharacterModel.findOne({ character_id: id }).exec();

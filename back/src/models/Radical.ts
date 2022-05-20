@@ -1,5 +1,6 @@
-import {Schema, model} from 'mongoose';
+import { Schema, model, Document, PaginateModel } from 'mongoose';
 import {util} from 'mongoose-uuid-parser';
+import mongoosePaginate from 'mongoose-paginate-v2';
 
 const radicalSchema = new Schema({
   radical_id: { type: String, unique: true, immutable: true, default: util.v4 },
@@ -16,6 +17,10 @@ const radicalSchema = new Schema({
   },
   meaning: [String],
 });
+
+radicalSchema.plugin(mongoosePaginate);
+
+interface RadicalDocument<T extends Document> extends PaginateModel<T> {}
 
 export default model("Radical", radicalSchema);
 

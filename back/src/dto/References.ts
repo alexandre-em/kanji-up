@@ -22,7 +22,7 @@ export default class References {
 		this.id = newId;
 	}
 
-	public toDTO(id) {
+	public toDTO(id: string) {
 		return {
 			id,
 			grade: this._grade,

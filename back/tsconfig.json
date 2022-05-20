@@ -1,4 +1,11 @@
 {
+  "ts-node": {
+    "files": true
+  },
+  "files": [
+    "src/utils/types.d.ts",
+    "src/utils/enums.d.ts"
+  ],
   "compilerOptions": {
     "module": "commonjs",
     "esModuleInterop": true,

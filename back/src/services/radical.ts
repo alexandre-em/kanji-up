@@ -1,7 +1,6 @@
 import InvalidError from '../error/invalid';
 import Radical from '../dto/Radical';
 import { RadicalModel } from '../models';
-import { ImageType, RadicalType } from '../utils';
 import { deleteFile, uploadFile } from '../config/aws';
 
 export const getOneById = (id: string) => {

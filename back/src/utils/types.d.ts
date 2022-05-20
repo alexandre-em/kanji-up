@@ -1,15 +1,15 @@
-export type ExampleType = {
+type ExampleType = {
   japanese: string,
   meaning: string,
 };
 
-export type ImageType = {
+type ImageType = {
   filename?: string,
   contentType: string;
   data: Buffer;
 }
 
-export type CharacterType = {
+type CharacterType = {
   id?: string,
   character_id: string;
   character: string;
@@ -20,7 +20,7 @@ export type CharacterType = {
   image: ImageType | string;
 };
 
-export type RadicalType = {
+type RadicalType = {
   id?: string,
   radical_id: string,
   character: string,
@@ -33,7 +33,7 @@ export type RadicalType = {
   meaning: Array<string>,
 };
 
-export type ReferenceType = {
+type ReferenceType = {
   id?: string,
   reference_id: string,
   grade: string,
@@ -41,7 +41,7 @@ export type ReferenceType = {
   classic_nelson: string,
 };
 
-export type KanjiType = {
+type KanjiType = {
   id?: string,
   creation_date: string,
   kanji_id: string,

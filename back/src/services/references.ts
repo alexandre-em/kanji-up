@@ -1,7 +1,6 @@
 import References from "../dto/References";
 import InvalidError from "../error/invalid";
 import { ReferenceModel } from "../models";
-import { ReferenceType } from "../utils";
 
 export const getOneById = (id: string): Promise<ReferenceType> => {
 	return ReferenceModel.findOne({ reference_id: id }).exec();

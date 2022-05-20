@@ -1,4 +1,4 @@
-import { CharacterType, RadicalType, ReferenceType } from "../utils";
+import InvalidError from "../error/invalid";
 
 const formatCharacter = ({ character_id, character, strokes, meaning, onyomi, kunyomi }: CharacterType) => ({
 	character_id, character, strokes, meaning, onyomi, kunyomi,
@@ -17,7 +17,7 @@ export default class Kanji {
 	private _examples: Array<{ japanese: string, meaning: string }>;
 
 	constructor(character: CharacterType, radical: RadicalType, reference: ReferenceType, examples: Array<{ japanese: string, meaning: string }>) {
-		if (!character || !radical || !reference) throw new Error('Character: One or some of arguments id are missing `character`, `radical`, `reference`');
+		if (!character || !radical || !reference) throw new InvalidError('Character: One or some of arguments id are missing `character`, `radical`, `reference`');
 		this._character = formatCharacter(character);
 		this._radical = formatRadical(radical);
 		this._reference = reference;

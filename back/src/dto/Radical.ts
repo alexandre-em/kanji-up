@@ -1,6 +1,4 @@
 import InvalidError from "../error/invalid";
-import { RadicalType } from "../utils";
-
 
 export default class Radical {
   private _id: string;

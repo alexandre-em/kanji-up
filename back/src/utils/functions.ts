@@ -1,12 +1,18 @@
-import multer, {Multer, StorageEngine} from "multer";
+import multer, { Multer, StorageEngine } from "multer";
 import express from "express";
 import path from 'path';
 
-export function uuid(): string {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        const r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-    });
+export const selectElement = (type: UpdateKanjiProps, data: CharacterType | RadicalType | ReferenceType): Partial<KanjiType> => {
+    switch (type) {
+        case UpdateKanjiProps.UPDATE_CHARACTER:
+            return { kanji: data as CharacterType };
+        case UpdateKanjiProps.UPDATE_RADICAL:
+            return { radical: data as RadicalType };
+        case UpdateKanjiProps.UPDATE_REFERENCE:
+            return { reference: data as ReferenceType };
+        default:
+            return null;
+    }
 }
 
 // Local File storage configuration
