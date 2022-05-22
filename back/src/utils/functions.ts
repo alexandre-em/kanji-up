@@ -2,6 +2,8 @@ import multer, { Multer, StorageEngine } from "multer";
 import express from "express";
 import path from 'path';
 
+import { UpdateKanjiProps } from "../types/enums";
+
 export const selectElement = (type: UpdateKanjiProps, data: CharacterType | RadicalType | ReferenceType): Partial<KanjiType> => {
     switch (type) {
         case UpdateKanjiProps.UPDATE_CHARACTER:
