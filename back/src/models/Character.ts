@@ -1,5 +1,16 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model, AggregatePaginateModel, Document } from 'mongoose';
 import {util} from 'mongoose-uuid-parser';
+import mongooseAggregatePaginate from 'mongoose-aggregate-paginate-v2';
+
+type CharacterModelType = {
+  character_id: string;
+  character: string;
+  meaning: Array<string>;
+  onyomi: Array<string>;
+  kunyomi: Array<string>;
+  strokes: number;
+  image: ImageType | string;
+};
 
 const characterSchema = new Schema({
   character_id: { type: String, trim: true, unique: true, immutable: true, default: util.v4 },
@@ -15,4 +26,8 @@ const characterSchema = new Schema({
   // },
 });
 
-export default model("Character", characterSchema);
+characterSchema.plugin(mongooseAggregatePaginate);
+
+export interface CharacterDocument extends Document, CharacterModelType {}
+
+export default model<CharacterDocument, AggregatePaginateModel<CharacterDocument>>("Character", characterSchema);

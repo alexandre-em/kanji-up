@@ -1,7 +1,6 @@
 import {Schema, model, Document, PaginateModel} from 'mongoose';
 import {util} from 'mongoose-uuid-parser';
 import mongoosePaginate from 'mongoose-paginate-v2';
-import { typeName } from 'aws-sdk/clients/customerprofiles';
 
 type KanjiModelType = {
   kanji_id: string,
@@ -12,7 +11,8 @@ type KanjiModelType = {
   examples: [{
     japanese: string,
     meaning: string,
-  }]
+  }],
+  deleted_at: string,
 }
 
 const ObjectId = Schema.Types.ObjectId;
@@ -25,7 +25,8 @@ const kanjiSchema = new Schema({
   examples: [{
     japanese: { type: String, required: true },
     meaning: { type: String, required: true },
-  }]
+  }],
+  deleted_at: { type: Date, default: null },
 });
 
 kanjiSchema.plugin(mongoosePaginate);

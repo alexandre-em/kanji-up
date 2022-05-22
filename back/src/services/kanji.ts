@@ -1,8 +1,11 @@
 import { CharacterModel, KanjiModel, RadicalModel, ReferenceModel } from "../models";
+import { Aggregate, PopulateOptions } from "mongoose";
+
 import InvalidError from "../error/invalid";
 import Kanji from "../dto/Kanji";
-import { selectElement } from "../utils";
-import { PopulateOptions } from "mongoose";
+import { selectElement } from '../utils'
+import { UpdateKanjiProps } from "../types/enums";
+import { CharacterDocument } from "../models/Character";
 
 export const getOne = (id: string) => {
 	return KanjiModel
@@ -12,10 +15,10 @@ export const getOne = (id: string) => {
 		.populate('radical', '-_id -__v')
 		.populate('reference', '-_id -__v')
 		.exec();
-}
+};
 
 export const getAll = async (page: number, limit: number, grade: string) => {
-	const query = {};
+	const query = { deleted_at: null };
 	if (grade)
 		query['reference'] = {
 			$in: await ReferenceModel.find({ grade })
@@ -30,7 +33,22 @@ export const getAll = async (page: number, limit: number, grade: string) => {
 	]
 	return KanjiModel
 		.paginate(query, { limit, page, populate, select: '-_id -__v -examples' })
-}
+};
+
+export const searchCharacter = async (query: string, page: number, limit: number) => {
+	const charactersAggregate: Aggregate<CharacterDocument[]> = (await CharacterModel.aggregate()
+		.search({
+			index: 'search kanji',
+			text: {
+				query,
+				path: {
+					wildcard: '*',
+				},
+			},
+		})) as unknown as Aggregate<CharacterDocument[]>;
+
+	return CharacterModel.aggregatePaginate(charactersAggregate, { limit, page, select: '-_id -__v' });
+};
 
 export const addOne = async (body) => {
 	const promiseArray = [];
@@ -71,7 +89,7 @@ export const addOne = async (body) => {
 	}
 
 	return kanji.toDTO(r.kanji_id, r.creation_date);
-}
+};
 
 export const updateOne = async (id: string, type: UpdateKanjiProps, elementId: string) => {
 	const updatedRef: CharacterType | RadicalType | ReferenceType | InvalidError = await new Promise((resolve, reject) => {
@@ -102,8 +120,11 @@ export const updateOne = async (id: string, type: UpdateKanjiProps, elementId: s
 		.findOneAndUpdate({ kanji_id: id }, selectElement(type, updatedRef))
 		.select('-_id -__v -examples._id')
 		.exec();
-}
+};
 
-export const deleteOne = (res, req) => {
-
-}
+export const deleteOne = (id: string) => {
+	return KanjiModel
+		.findOneAndUpdate({ kanji_id: id }, { deleted_at: new Date() })
+		.select('-_id -__v -examples._id')
+		.exec();
+};

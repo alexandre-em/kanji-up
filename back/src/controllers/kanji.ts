@@ -1,15 +1,9 @@
-import e, { Router } from 'express';
-
+import { Router } from 'express';
 import { kanjiService } from '../services';
 import InvalidError from '../error/invalid';
+import { PAGINATION_LIMIT, UpdateKanjiProps } from '../types/enums';
 
 const router: Router = Router();
-
-router.get('/:id', async (req, res) => {
-  const kanji = await kanjiService.getOne(req.params.id);
-
-  res.status(200).send(kanji);
-});
 
 router.get('', (req, res) => {
   const page = req.query.page ? parseInt(req.query.page as string) : 1;
@@ -25,6 +19,26 @@ router.get('', (req, res) => {
     });
 });
 
+router.get('/kanji/:id', async (req, res) => {
+  const kanji = await kanjiService.getOne(req.params.id);
+
+  res.status(200).send(kanji);
+});
+
+router.get('/search', (req, res) => {
+  const query = req.query.query;
+  const page = req.query.page && isNaN(parseInt(req.query.page as string)) ? parseInt(req.query.page as string) : 1;
+  const limit = req.query.limit && isNaN(parseInt(req.query.limit as string)) ? parseInt(req.query.limit as string) : PAGINATION_LIMIT.LITTLE;
+
+  console.log('Test');
+
+  if (!query) return new InvalidError('Search input is empty. Please type a keyword to run a search.').sendResponse(res);
+  kanjiService.searchCharacter(query as string, page, limit)
+    .then((queryResult) => {
+      res.status(200).send(queryResult);
+    })
+});
+
 // router.get('/:id/image', async (req, res) => {
 //     const img = await kanjiService.getOneImage(req.params.id);
 
@@ -32,7 +46,7 @@ router.get('', (req, res) => {
 //     res.status(200).send(img.data);
 // });
 
-router.post('/kanji', (req, res) => {
+router.post('/', (req, res) => {
   kanjiService
     .addOne(req.body)
     .then((response) => {
@@ -110,5 +124,11 @@ router.patch('/:id/reference/:referenceId', (req, res) => {
     res.status(500).send(e);
   }
 });
+
+router.delete('/:id', (req, res) => {
+  kanjiService.deleteOne(req.params.id as string)
+    .then((deletedChar) => res.status(200).send(deletedChar))
+    .catch((err) => res.status(400).send(err));
+})
 
 export default router;

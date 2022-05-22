@@ -25,7 +25,7 @@ app.use(bodyParser.json());
 
 // API Endpoints
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
-app.use('/kanji', kanjiController);
+app.use('/kanjis', kanjiController);
 
 app.listen(port, () => {
   console.log(`Express is listening at http://localhost:${port}`);
