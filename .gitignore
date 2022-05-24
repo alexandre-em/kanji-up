@@ -2,6 +2,5 @@
 .idea
 dist
 node_modules
-uploads/
 env
 ml

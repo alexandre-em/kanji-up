@@ -5,7 +5,7 @@ import swaggerUi from 'swagger-ui-express';
 import dotenv from 'dotenv';
 
 import { mongoConfig, specs } from './config';
-import kanjiController from "./controllers/kanji";
+import { KanjiController, CharacterController, RadicalController, ReferenceController, RecognitionController } from "./controllers";
 
 dotenv.config();
 
@@ -25,7 +25,11 @@ app.use(bodyParser.json());
 
 // API Endpoints
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
-app.use('/kanjis', kanjiController);
+app.use('/kanjis', KanjiController);
+app.use('/characters', CharacterController);
+app.use('/radicals', RadicalController);
+app.use('/references', ReferenceController);
+app.use('/recognition', RecognitionController);
 
 app.listen(port, () => {
   console.log(`Express is listening at http://localhost:${port}`);
