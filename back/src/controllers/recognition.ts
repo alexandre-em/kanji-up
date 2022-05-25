@@ -31,10 +31,14 @@ router.post('/', upload.single('image'), urlencodedParser, (req, res) => {
 	const tensorImage = tfjs.node.decodeImage(view, 1);
 	const resizedImage = tfjs.image.resizeBilinear(tensorImage, [modelInputHeight, modelInputWidth]);
 	const loadedModel = module_vars.model;
-	const prediction = loadedModel.predict(tfjs.cast(tfjs.expandDims(resizedImage, 0), 'float32'));
+	const prediction = loadedModel.predict(tfjs.expandDims(tfjs.div(resizedImage, 255), 0));
 	const predictionArray = prediction.arraySync();
-	const indexes = predictionArray[0].map((confidence: number, index: number) => confidence === 1 ? index : 0).filter((index: number) => index !== 0);
+	const indexes = predictionArray[0]
+		.map((v:number, indice:number) => indice)
+		.filter((iconfidence: number) => (predictionArray[0][iconfidence] >= 0.005))
 	const kanjiPredicted = indexes.map((index: number) => label[index]);
+	console.log(indexes.map((i) => predictionArray[0][i]));
+	
 	console.log(kanjiPredicted);
 	
 	res.status(200).send(prediction.arraySync());
