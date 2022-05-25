@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { readFileSync } from "fs";
+import { readFileSync, unlinkSync } from "fs";
 import bodyParser from "body-parser";
 import path from "path";
 
@@ -13,18 +13,21 @@ const urlencodedParser = bodyParser.urlencoded({ extended: false });
 router.post('/character', upload.single('image'), urlencodedParser, (req, res) => {
   const parsedBody = JSON.parse(req.body.json);
   const ext = path.extname(req.file.filename).split('\.')[1];
+  const filePath = path.join('uploads/' + req.file.filename);
   const image = {
     filename: req.file.filename,
-    data: readFileSync(path.join('uploads/' + req.file.filename)),
+    data: readFileSync(filePath),
     contentType: `image/${ext}`,
   }
   characterService
     .addOne({ ...parsedBody, image })
     .then((response) => {
+      unlinkSync(filePath);
       res.status(201).send(response);
     })
     .catch((err: InvalidError) => {
       console.error(err);
+      unlinkSync(filePath);
       return err.sendResponse(res);
     });
 });
@@ -40,22 +43,25 @@ router.patch('/:id/info', (req, res) => {
     .catch((err) => res.status(400).send(err));
 })
 
-router.put('/:id/image', upload.single('image'), urlencodedParser,  (req, res) => {
+router.put('/:id/image', upload.single('image'), urlencodedParser, (req, res) => {
   const characterId: string = req.params.id;
   const ext = path.extname(req.file.filename).split('\.')[1];
+  const filePath = path.join('uploads/' + req.file.filename);
   const image = {
     filename: req.file.filename,
-    data: readFileSync(path.join('uploads/' + req.file.filename)),
+    data: readFileSync(filePath),
     contentType: `image/${ext}`,
   }
 
-  try {
-    characterService.updateOneImage(characterId, image)
-      .then((before) => { res.status(200).send(before); })
-      .catch((err) => res.status(400).send(err));
-  } catch (err) {
-    res.status(400).send(err);
-  }
+  characterService.updateOneImage(characterId, image)
+    .then((before) => {
+      unlinkSync(filePath);
+      res.status(200).send(before);
+    })
+    .catch((err) => {
+      unlinkSync(filePath);
+      res.status(400).send(err)
+    });
 })
 
 export default router;

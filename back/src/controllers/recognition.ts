@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import { Router } from 'express';
-import { readFileSync } from "fs";
+import { readFileSync, unlinkSync } from "fs";
 import bodyParser from "body-parser";
 import path from "path";
 
@@ -21,9 +21,10 @@ const init = async () => {
 
 router.post('/', upload.single('image'), urlencodedParser, (req, res) => {
 	const ext = path.extname(req.file.filename).split('\.')[1];
+	const filePath = path.join('uploads/' + req.file.filename);
 	const image = {
 		filename: req.file.filename,
-		data: readFileSync(path.join('uploads/' + req.file.filename)),
+		data: readFileSync(filePath),
 		contentType: `image/${ext}`,
 	}
 
@@ -40,6 +41,7 @@ router.post('/', upload.single('image'), urlencodedParser, (req, res) => {
 	console.log(indexes.map((i) => predictionArray[0][i]));
 	
 	console.log(kanjiPredicted);
+	unlinkSync(filePath);
 	
 	res.status(200).send(prediction.arraySync());
 });
