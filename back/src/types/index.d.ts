@@ -50,3 +50,15 @@ type KanjiType = {
   reference: ReferenceType,
   examples: [ExampleType],
 };
+
+type PredictionResultType = {
+  prediction: string,
+  confidence: number,
+};
+
+type RecognitionType = {
+  image: string,
+  kanji: string,
+  is_valid: boolean,
+  predictions: Array<PredictionResultType>,
+}

@@ -9,4 +9,3 @@ const referenceSchema = new Schema({
 });
 
 export default model("Reference", referenceSchema);
-
