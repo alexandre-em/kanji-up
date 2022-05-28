@@ -5,7 +5,6 @@ import colors from 'ansi-colors'
 import { convert } from 'convert-svg-to-png';
 
 import { CharacterModel, KanjiModel, RadicalModel, ReferenceModel } from '../src/models';
-import { CharacterType, RadicalType, ReferenceType } from '../src/utils';
 import { uploadFile } from '../src/config/aws';
 
 /**

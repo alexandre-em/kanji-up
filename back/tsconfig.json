@@ -8,6 +8,7 @@
     "outDir": "dist",
     "types": ["./src/types"],
     "typeRoots": ["./@types", "./src/types", "./node_modules/@types"],
+    "resolveJsonModule": true
   },
   "lib": ["es2015"]
 }
