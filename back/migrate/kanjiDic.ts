@@ -4,7 +4,7 @@ import cliProgress from 'cli-progress';
 import colors from 'ansi-colors'
 
 import { CharacterModel, KanjiModel, ReferenceModel } from '../src/models';
-import kanji from './kanjiapi_kanji.json';
+// import kanji from './kanjiapi_kanji.json';
 
 type DataType = {
 	kanjis: any,
@@ -14,6 +14,7 @@ type DataType = {
  * Number of thread that are asynchronously launched to fill the DB
  */
 const N = 10;
+const kanji = {}; // TODO: to remove if kanji is already imported
 
 const addData = async (kanjiDetail, progressBar) => {
 	try {

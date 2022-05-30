@@ -5,7 +5,9 @@ import { migrateFromKanjiDic } from './kanjiDic';
 // Database connection
 mongoConfig()
 	.then(() => {
-		// migrateFromKanjiApi()
-		migrateFromKanjiDic()
+		(async () => {
+			await migrateFromKanjiApi();
+			await migrateFromKanjiDic();
+		})();
 	})
 	.catch((err) => console.warn('DB: KO ' + err));

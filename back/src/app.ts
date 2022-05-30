@@ -10,7 +10,7 @@ import { KanjiController, CharacterController, RadicalController, ReferenceContr
 dotenv.config();
 
 const app: Express = express();
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 5000;
 
 // Database connection
 mongoConfig()

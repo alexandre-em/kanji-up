@@ -6,3 +6,6 @@ env
 ml
 uploads/*.png
 uploads/*.jpg
+ignore
+kanji_saved_model
+
