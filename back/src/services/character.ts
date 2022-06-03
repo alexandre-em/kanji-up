@@ -55,7 +55,7 @@ export const updateOne = (id: string, body: Partial<CharacterType>): Promise<Cha
 
 export const updateOneImage = async (id: string, image: ImageType): Promise<CharacterType> => {
   try {
-    const uploadedImage: AWS.S3.ManagedUpload.SendData = await uploadFile(image.filename, image.data) as AWS.S3.ManagedUpload.SendData;
+    const uploadedImage: AWS.S3.ManagedUpload.SendData = await uploadFile(`characters/${image.filename}`, image.data) as AWS.S3.ManagedUpload.SendData;
     const imageUrl = uploadedImage.Location;
 
     return CharacterModel.findOneAndUpdate({ character_id: id }, { image: imageUrl }).exec();

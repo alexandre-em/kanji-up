@@ -4,7 +4,7 @@ import { RecognitionModel } from "../models";
 import { label } from "../utils";
 
 const tfjs = require('@tensorflow/tfjs-node');
-const [modelInputHeight, modelInputWidth] = [48, 48];
+const [modelInputHeight, modelInputWidth] = [64, 64];
 
 export const predictKanji = (image: ImageType, loadedModel) => {
 	const view: Uint8Array = new Uint8Array(image.data);
@@ -21,7 +21,7 @@ export const predictKanji = (image: ImageType, loadedModel) => {
 
 export const addOne = async (kanji: string, image: ImageType, predictions: PredictionResultType[]) => {
 	try {
-		const uploadedImage: AWS.S3.ManagedUpload.SendData = await uploadFile(image.filename, image.data) as AWS.S3.ManagedUpload.SendData;
+		const uploadedImage: AWS.S3.ManagedUpload.SendData = await uploadFile(`uploads/${image.filename}`, image.data) as AWS.S3.ManagedUpload.SendData;
 
 		return RecognitionModel.create({ image: uploadedImage.Location, kanji, predictions });
 	} catch (err) {

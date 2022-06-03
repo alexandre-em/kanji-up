@@ -12,7 +12,7 @@ export const addOne = async (body: Partial<RadicalType>): Promise<Partial<Radica
 	const image = body.image as ImageType;
 
 	try {
-		const uploadedImage: AWS.S3.ManagedUpload.SendData = await uploadFile(image.filename, image.data) as AWS.S3.ManagedUpload.SendData;
+		const uploadedImage: AWS.S3.ManagedUpload.SendData = await uploadFile(`radicals/${image.filename}`, image.data) as AWS.S3.ManagedUpload.SendData;
 		radical.imageUrl = uploadedImage.Location;
 	} catch (err) {
 		throw err;

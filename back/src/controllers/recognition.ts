@@ -46,7 +46,8 @@ router.post('/', upload.single('image'), urlencodedParser, (req, res) => {
 				throw e;
 			});
 	} catch (e) {
-		res.status(400).send(e);
+		console.log(e.message);
+		res.status(400).send(e.message);
 	}
 });
 
@@ -64,7 +65,7 @@ router.patch('/validation/:id', (req, res) => {
 				throw new Error(err);
 			})
 	} catch (e) {
-		res.status(400).send(e);
+		res.status(400).send(e.message);
 	}
 });
 
