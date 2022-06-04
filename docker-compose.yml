@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  api:
+    build: ./back
+    environment:
+      - AWS_ACCESS_ID=${AWS_ACCESS_ID}
+      - AWS_ACCESS_SECRET=${AWS_ACCESS_SECRET}
+      - AWS_BUCKET_NAME=${AWS_BUCKET_NAME}
+      - MONGO_URI=${MONGO_URI}
+      - MONGO_DB_NAME=${MONGO_DB_NAME}
+      - MONGO_COLLECTION=${MONGO_COLLECTION}
+      - KANJI_ALIVE_API_DOMAIN=${KANJI_ALIVE_API_DOMAIN}
+      - KANJI_ALIVE_API_KEY=${KANJI_ALIVE_API_KEY}
+      - PORT=${PORT}
