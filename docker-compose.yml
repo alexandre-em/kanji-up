@@ -2,7 +2,10 @@ version: '3.8'
 
 services:
   api:
-    build: ./back
+    build:
+      context: ./back
+      args:
+        - SAVED_MODEL_URL=${SAVED_MODEL_URL}
     environment:
       - AWS_ACCESS_ID=${AWS_ACCESS_ID}
       - AWS_ACCESS_SECRET=${AWS_ACCESS_SECRET}
