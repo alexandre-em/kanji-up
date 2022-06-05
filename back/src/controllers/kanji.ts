@@ -8,7 +8,7 @@ const router: Router = Router();
 router.get('', (req, res) => {
   const page = req.query.page ? parseInt(req.query.page as string) : 1;
   const limit = req.query.limit ? parseInt(req.query.limit as string) : PAGINATION_LIMIT.LITTLE;
-  const grade = (req.query.grade as string) || null;
+  const grade = (req.query.grade as string) || undefined;
 
   kanjiService.getAll(page, limit, grade)
     .then((kanjis) => {

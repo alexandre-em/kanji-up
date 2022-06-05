@@ -1,11 +1,10 @@
-import { CharacterModel, KanjiModel, RadicalModel, ReferenceModel } from "../models";
-import { Aggregate, PopulateOptions } from "mongoose";
+import { Aggregate, PopulateOptions, UpdateQuery } from "mongoose";
 
 import InvalidError from "../error/invalid";
 import Kanji from "../dto/Kanji";
 import { selectElement } from '../utils'
 import { UpdateKanjiProps } from "../types/enums";
-import { CharacterDocument } from "../models/Character";
+import { CharacterModel, CharacterDocument, KanjiModel, KanjiDocument, RadicalModel, ReferenceModel } from "../models";
 
 export const getOne = (id: string) => {
 	return KanjiModel
@@ -17,8 +16,8 @@ export const getOne = (id: string) => {
 		.exec();
 };
 
-export const getAll = async (page: number, limit: number, grade: string) => {
-	const query = { deleted_at: null };
+export const getAll = async (page: number, limit: number, grade?: string) => {
+	const query: Partial<{ deleted_at: string | null, reference: { $in: string[] } | null }> = { deleted_at: null };
 	if (grade)
 		query['reference'] = {
 			$in: await ReferenceModel.find({ grade })
@@ -50,11 +49,11 @@ export const searchCharacter = async (query: string, page: number, limit: number
 	return CharacterModel.aggregatePaginate(charactersAggregate, { limit, page, select: '-_id -__v' });
 };
 
-export const addOne = async (body) => {
+export const addOne = async (body: KanjiType) => {
 	const promiseArray = [];
-	promiseArray.push(CharacterModel.find({ character_id: body.characterId }).exec());
-	promiseArray.push(RadicalModel.find({ radical_id: body.radicalId }).exec());
-	promiseArray.push(ReferenceModel.find({ reference_id: body.referenceId }).exec());
+	promiseArray.push(CharacterModel.find({ character_id: body.kanji }).exec());
+	promiseArray.push(RadicalModel.find({ radical_id: body.radical }).exec());
+	promiseArray.push(ReferenceModel.find({ reference_id: body.reference }).exec());
 
 	const promisesResult = await Promise.allSettled(promiseArray);
 	const isInvalid = promisesResult.some((promise) => promise.status === 'rejected');
@@ -62,9 +61,9 @@ export const addOne = async (body) => {
 	if (isInvalid)
 		throw new Error('Invalid input')
 
-	const fulfilledChar = promisesResult[0] as PromiseFulfilledResult<CharacterType>;
-	const fulfilledRad = promisesResult[1] as PromiseFulfilledResult<RadicalType>;
-	const fulfilledRef = promisesResult[2] as PromiseFulfilledResult<ReferenceType>;
+	const fulfilledChar = promisesResult[0] as unknown as PromiseFulfilledResult<CharacterType[]>;
+	const fulfilledRad = promisesResult[1] as unknown as PromiseFulfilledResult<RadicalType[]>;
+	const fulfilledRef = promisesResult[2] as unknown as PromiseFulfilledResult<ReferenceType[]>;
 
 	const kanji = new Kanji(fulfilledChar.value[0], fulfilledRad.value[0], fulfilledRef.value[0], body.examples);
 
@@ -97,17 +96,17 @@ export const updateOne = async (id: string, type: UpdateKanjiProps, elementId: s
 		if (type === UpdateKanjiProps.UPDATE_CHARACTER)
 			CharacterModel.findOne({ character_id: elementId })
 				.exec()
-				.then(resolve)
+				.then((characterRes) => resolve(characterRes as CharacterType))
 				.catch(reject);
 		else if (type === UpdateKanjiProps.UPDATE_RADICAL)
 			RadicalModel.findOne({ radical_id: elementId })
 				.exec()
-				.then(resolve)
+				.then((radicalRes) => resolve(radicalRes as RadicalType))
 				.catch(reject);
 		else if (type === UpdateKanjiProps.UPDATE_REFERENCE)
 			ReferenceModel.findOne({ reference_id: elementId })
 				.exec()
-				.then(resolve)
+				.then((referenceRes) => resolve(referenceRes as ReferenceType))
 				.catch(reject);
 		else
 			reject(new InvalidError("Invalid UpdateKanjiProps"));
@@ -117,7 +116,7 @@ export const updateOne = async (id: string, type: UpdateKanjiProps, elementId: s
 		throw updatedRef;
 
 	return KanjiModel
-		.findOneAndUpdate({ kanji_id: id }, selectElement(type, updatedRef))
+		.findOneAndUpdate({ kanji_id: id }, (selectElement(type, updatedRef) as UpdateQuery<KanjiDocument>))
 		.select('-_id -__v -examples._id')
 		.exec();
 };

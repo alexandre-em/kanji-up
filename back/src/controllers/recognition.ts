@@ -21,6 +21,8 @@ const init = async () => {
 }
 
 router.post('/', upload.single('image'), urlencodedParser, (req, res) => {
+  if (!req.file) return new InvalidError('Recognition\'s picture is missing !').sendResponse(res);
+  if (!module_vars.model) return new InvalidError('Recognition model is missing !').sendResponse(res);
 	try {
 		const ext = path.extname(req.file.filename).split('\.')[1];
 		const { kanji } = JSON.parse(req.body.json);

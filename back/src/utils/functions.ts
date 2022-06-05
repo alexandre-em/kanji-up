@@ -4,7 +4,7 @@ import path from 'path';
 
 import { UpdateKanjiProps } from "../types/enums";
 
-export const selectElement = (type: UpdateKanjiProps, data: CharacterType | RadicalType | ReferenceType): Partial<KanjiType> => {
+export const selectElement = (type: UpdateKanjiProps, data: CharacterType | RadicalType | ReferenceType): Partial<KanjiType> | null => {
     switch (type) {
         case UpdateKanjiProps.UPDATE_CHARACTER:
             return { kanji: data as CharacterType };

@@ -12,7 +12,7 @@ import { uploadFile } from '../src/config/aws';
  */
 const N = 3;
 
-const addData = async (kanjiDetail, progressBar) => {
+const addData = async (kanjiDetail: any, progressBar: cliProgress.SingleBar) => {
 	try {
 		const kanjiPromises = [];
 		kanjiPromises.push(new Promise((resolve, reject) => {
@@ -23,7 +23,7 @@ const addData = async (kanjiDetail, progressBar) => {
 				.then(({ data }) => {
 					convert(data).then((png: Buffer) => {
 						const filename = imageUrl.split('/');
-						uploadFile(`characters/${Math.round(new Date().getTime()/1000)}-${filename[filename.length-1].split('.')[0]}.png`, png)
+						uploadFile(`characters/${Math.round(new Date().getTime() / 1000)}-${filename[filename.length - 1].split('.')[0]}.png`, png)
 							.then(({ Location }: AWS.S3.ManagedUpload.SendData) => {
 								CharacterModel.create({ character, strokes: strokes.count, image: Location, onyomi: onyomi.katakana, kunyomi: kunyomi.hiragana, meaning: meaning.english }, (err, res) => {
 									if (err) {
@@ -58,7 +58,7 @@ const addData = async (kanjiDetail, progressBar) => {
 				.then(({ data }) => {
 					convert(data).then((png: Buffer) => {
 						const filename = imageUrl.split('/');
-						uploadFile(`radicals/${Math.round(new Date().getTime()/1000)}-${filename[filename.length-1].split('.')[0]}.png`, png).then(({ Location }: AWS.S3.ManagedUpload.SendData) => {
+						uploadFile(`radicals/${Math.round(new Date().getTime() / 1000)}-${filename[filename.length - 1].split('.')[0]}.png`, png).then(({ Location }: AWS.S3.ManagedUpload.SendData) => {
 							RadicalModel.create({ character, strokes, image: Location, name, meaning: meaning.english }, (err, res) => {
 								if (err) {
 									RadicalModel.find({ character }).exec()
@@ -106,7 +106,9 @@ const addData = async (kanjiDetail, progressBar) => {
 		const fulfilledChar = promisesResult[0] as PromiseFulfilledResult<CharacterType>;
 		const fulfilledRad = promisesResult[1] as PromiseFulfilledResult<RadicalType>;
 		const fulfilledRef = promisesResult[2] as PromiseFulfilledResult<ReferenceType>;
-		const examples = kanjiDetail.examples.map((example) => ({ japanese: example.japanese, meaning: example.meaning.english }));
+		const examples = kanjiDetail.examples.map((example: { japanese: string; meaning: { english: string; }; }) => (
+			{ japanese: example.japanese, meaning: example.meaning.english }
+		));
 
 		await new Promise((resolve, reject) => {
 			KanjiModel.create({
@@ -143,8 +145,8 @@ export const migrateFromKanjiApi = async () => {
 	try {
 		const kanjiList = await axios.get(`https://${process.env.KANJI_ALIVE_API_DOMAIN}/api/public/kanji/all`, {
 			headers: {
-				'x-rapidapi-host': process.env.KANJI_ALIVE_API_DOMAIN,
-				'x-rapidapi-key': process.env.KANJI_ALIVE_API_KEY,
+				'x-rapidapi-host': process.env.KANJI_ALIVE_API_DOMAIN || '',
+				'x-rapidapi-key': process.env.KANJI_ALIVE_API_KEY || '',
 				'useQueryString': 'true',
 			},
 		});

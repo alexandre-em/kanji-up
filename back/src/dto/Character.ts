@@ -10,7 +10,7 @@ export default class Character {
     private _image: { data: Buffer, contentType: string };
 	private _imageUrl: string;
 
-    constructor(character: string, meaning: Array<string>, onyomi: Array<string>, kunyomi: Array<string>, image: any, strokes: number) {
+    constructor(character: string, meaning: Array<string>, onyomi: Array<string>, kunyomi: Array<string>, image: ImageType, strokes: number) {
         if (!character || !meaning || !strokes) throw new InvalidError('Character: One or some of arguments are missing `character`, `meaning`, `strokes`');
         this._strokes = strokes;
         this._character = character;

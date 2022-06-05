@@ -17,7 +17,7 @@ export default class Kanji {
 	private _examples: Array<{ japanese: string, meaning: string }>;
 
 	constructor(character: CharacterType, radical: RadicalType, reference: ReferenceType, examples: Array<{ japanese: string, meaning: string }>) {
-		if (!character || !radical || !reference) throw new InvalidError('Character: One or some of arguments id are missing `character`, `radical`, `reference`');
+		if (!character || !radical || !reference) throw new InvalidError(`Character: One or some of arguments id are missing: ${character ? '' : '`character`,'} ${radical ? '' : '`radical`,'} ${reference ? '' : '`reference`'}`);
 		this._character = formatCharacter(character);
 		this._radical = formatRadical(radical);
 		this._reference = reference;

@@ -16,7 +16,7 @@ type DataType = {
 const N = 10;
 const kanji = {}; // TODO: to remove if kanji is already imported
 
-const addData = async (kanjiDetail, progressBar) => {
+const addData = async (kanjiDetail: string, progressBar: cliProgress.SingleBar) => {
 	try {
 		const t = await CharacterModel.findOne({ character: kanjiDetail });
 		if (t !== null) {
@@ -43,7 +43,7 @@ const addData = async (kanjiDetail, progressBar) => {
 			const query = encodeURI(kanjiDetail);
 			axios.get(`http://localhost:8000/words/?kanji=${query}`)
 				.then((words) => {
-					resolve(words.data.map(({ variants, meanings }) => ({
+					resolve(words.data.map(({ variants, meanings }: { variants: Array<{ written: string, pronounced: string }>, meanings: Array<{ glosses: string[] }> }) => ({
 						japanese: `${variants[0].written} (${variants[0].pronounced})`,
 						meaning: meanings.reduce((prev, current) => current.glosses.join(', ') + prev, ''),
 					})));

@@ -31,7 +31,7 @@ const kanjiSchema = new Schema({
 
 kanjiSchema.plugin(mongoosePaginate);
 
-interface KanjiDocument extends Document, KanjiModelType {}
+export interface KanjiDocument extends Document, KanjiModelType {}
 
 export default model<KanjiDocument, PaginateModel<KanjiDocument>>("Kanji", kanjiSchema);
 

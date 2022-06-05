@@ -35,7 +35,7 @@ export const uploadFile = (fileName: string, content: Buffer, customParams: Part
 	const s3 = createS3();
 
 	const params: AWS.S3.PutObjectRequest = {
-		Bucket: process.env.AWS_BUCKET_NAME,
+		Bucket: process.env.AWS_BUCKET_NAME || '',
 		Key: fileName,
 		Body: content,
 		...customParams,
@@ -56,7 +56,7 @@ export const deleteFile = (fileName: string, customParams: Partial<AWS.S3.Delete
 	const s3 = createS3();
 
 	const params: AWS.S3.DeleteObjectRequest = {
-		Bucket: process.env.AWS_BUCKET_NAME,
+		Bucket: process.env.AWS_BUCKET_NAME || '',
 		Key: fileName,
 		...customParams,
 	};

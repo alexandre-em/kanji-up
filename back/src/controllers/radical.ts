@@ -10,7 +10,8 @@ import InvalidError from '../error/invalid';
 const router: Router = Router();
 const urlencodedParser = bodyParser.urlencoded({ extended: false });
 
-router.post('/radical', upload.single('image'), urlencodedParser, (req, res) => {
+router.post('/', upload.single('image'), urlencodedParser, (req, res) => {
+  if (!req.file) return new InvalidError('Radical\'s picture is missing !').sendResponse(res);
     const parsedBody = JSON.parse(req.body.json);
     const ext = path.extname(req.file.filename).split('\.')[1];
     const filePath = path.join('uploads/' + req.file.filename);

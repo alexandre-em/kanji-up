@@ -7,7 +7,7 @@ injectUUID(mongoose);
 export async function connectToDatabase(): Promise<void> {
   dotenv.config();
   const uri = process.env.MONGO_URI;
-  return mongoose.connect(uri, {}, (err) => {
+  return mongoose.connect(uri || '', {}, (err) => {
     if (err) {
       console.log('Connection to the database failed');
     } else {

@@ -5,15 +5,16 @@ import InvalidError from '../error/invalid';
 
 const router: Router = Router();
 
-router.post('/reference', (req, res) => {
+router.post('/', (req, res) => {
     referenceService
         .addOne(req.body)
         .then((response) => {
             res.status(201).send(response);
         })
-        .catch((err: InvalidError) => {
+        .catch((err: Error) => {
             console.log(err);
-            return err.sendResponse(res);
+            if (err instanceof InvalidError) return err.sendResponse(res);
+            res.status(400).send(err.message);
         })
     
 })

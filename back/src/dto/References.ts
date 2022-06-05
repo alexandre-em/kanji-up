@@ -6,10 +6,10 @@ export default class References {
 	private _kodansha: string;
 	private _classic_nelson: string;
 
-	constructor(grade: string, kodansha: string, classicNelson: string) {
-		if (!grade || !kodansha || !classicNelson) throw new InvalidError('References: One or some of these arguments are missing: `kodansha`, `grade`, `classicNelson`');
+	constructor(grade: string, kodansha: string, classic_nelson: string) {
+		if (!grade || !kodansha || !classic_nelson) throw new InvalidError('References: One or some of these arguments are missing: `kodansha`, `grade`, `classic_nelson`');
 		
-		this._classic_nelson=classicNelson;
+		this._classic_nelson=classic_nelson;
 		this._grade=grade;
 		this._kodansha=kodansha;
 	}

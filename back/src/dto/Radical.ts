@@ -1,5 +1,9 @@
 import InvalidError from "../error/invalid";
 
+type nameType = {
+    hiragana: string;
+    romaji: string;
+}
 export default class Radical {
   private _id: string;
   private _character: string;
@@ -9,13 +13,10 @@ export default class Radical {
     contentType: string;
   };
 	private _imageUrl: string;
-  private _name: {
-    hiragana: string;
-    romaji: string;
-  };
+  private _name: nameType;
   private _meaning: Array<string>;
 
-	constructor(character: string, strokes: number, image: any, name: any, meaning: Array<string>) {
+	constructor(character: string, strokes: number, image: ImageType, name: nameType, meaning: Array<string>) {
     if (!character || !strokes || !name) throw new InvalidError('Radicals: One or some of these arguments are missing: `character`, `stroke`, `name`');
 		this._character=character;
 		this._image=image;

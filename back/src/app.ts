@@ -24,12 +24,12 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 // API Endpoints
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 app.use('/kanjis', KanjiController);
 app.use('/characters', CharacterController);
 app.use('/radicals', RadicalController);
 app.use('/references', ReferenceController);
 app.use('/recognition', RecognitionController);
+app.use('/', swaggerUi.serve, swaggerUi.setup(specs));
 
 app.listen(port, () => {
   console.log(`Express is listening at http://localhost:${port}`);

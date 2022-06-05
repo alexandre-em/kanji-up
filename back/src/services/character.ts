@@ -5,25 +5,25 @@ import Character from "../dto/Character";
 import InvalidError from "../error/invalid";
 import { CharacterModel } from "../models";
 
-export const getOneById = (id: string): Promise<CharacterType> => {
+export const getOneById = (id: string) => {
   return CharacterModel.findOne({ character_id: id }).exec();
 }
 
-export const addOne = async (body: Partial<CharacterType>): Promise<Partial<CharacterType>> => {
-  const character = new Character(body.character, body.meaning, body.onyomi, body.kunyomi, body.image, body.strokes);
+export const addOne = async (body: CharacterType): Promise<Partial<CharacterType>> => {
+  const character = new Character(body.character, body.meaning, body.onyomi, body.kunyomi, body.image as ImageType, body.strokes);
   const image = body.image as ImageType;
 
   try {
-    const uploadedImage: AWS.S3.ManagedUpload.SendData = await uploadFile(image.filename, image.data) as AWS.S3.ManagedUpload.SendData;
+    const uploadedImage: AWS.S3.ManagedUpload.SendData = await uploadFile(`characters/${image.filename}` || '', image.data) as AWS.S3.ManagedUpload.SendData;
     character.imageUrl = uploadedImage.Location;
   } catch (err) {
     throw err;
   }
 
   const r: CharacterType = await new Promise((resolve, reject) => {
-    CharacterModel.create(body, (err, res) => {
+    CharacterModel.create({...body, image: character.imageUrl }, (err, res) => {
       if (err) {
-        deleteFile(image.filename)
+        deleteFile(image.filename || '')
           .then(() => reject(new InvalidError(err.message)))
           .catch((e) => reject(e));
       } else {
@@ -42,7 +42,7 @@ export const addOne = async (body: Partial<CharacterType>): Promise<Partial<Char
   return character.toDTO();
 }
 
-export const updateOne = (id: string, body: Partial<CharacterType>): Promise<CharacterType> => {
+export const updateOne = (id: string, body: Partial<CharacterType>) => {
   const query: Partial<CharacterType> = {};
   if (body.kunyomi) query['kunyomi'] = body.kunyomi;
   if (body.onyomi) query['onyomi'] = body.onyomi;
@@ -53,7 +53,7 @@ export const updateOne = (id: string, body: Partial<CharacterType>): Promise<Cha
   return CharacterModel.findOneAndUpdate({ character_id: id }, query).exec();
 }
 
-export const updateOneImage = async (id: string, image: ImageType): Promise<CharacterType> => {
+export const updateOneImage = async (id: string, image: ImageType) => {
   try {
     const uploadedImage: AWS.S3.ManagedUpload.SendData = await uploadFile(`characters/${image.filename}`, image.data) as AWS.S3.ManagedUpload.SendData;
     const imageUrl = uploadedImage.Location;

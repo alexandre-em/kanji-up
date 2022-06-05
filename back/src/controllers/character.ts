@@ -10,12 +10,13 @@ import InvalidError from '../error/invalid';
 const router: Router = Router();
 const urlencodedParser = bodyParser.urlencoded({ extended: false });
 
-router.post('/character', upload.single('image'), urlencodedParser, (req, res) => {
+router.post('/', upload.single('image'), urlencodedParser, (req, res) => {
+  if (!req.file) return new InvalidError('Character\'s picture is missing !').sendResponse(res);
   const parsedBody = JSON.parse(req.body.json);
-  const ext = path.extname(req.file.filename).split('\.')[1];
-  const filePath = path.join('uploads/' + req.file.filename);
+  const ext = path.extname((req.file?.filename) as string).split('\.')[1];
+  const filePath = path.join('uploads/' + req.file?.filename);
   const image = {
-    filename: req.file.filename,
+    filename: req.file?.filename,
     data: readFileSync(filePath),
     contentType: `image/${ext}`,
   }
@@ -44,6 +45,7 @@ router.patch('/:id/info', (req, res) => {
 })
 
 router.put('/:id/image', upload.single('image'), urlencodedParser, (req, res) => {
+  if (!req.file) return new InvalidError('Character\'s picture is missing !').sendResponse(res);
   const characterId: string = req.params.id;
   const ext = path.extname(req.file.filename).split('\.')[1];
   const filePath = path.join('uploads/' + req.file.filename);
