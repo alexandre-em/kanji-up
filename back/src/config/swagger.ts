@@ -5,9 +5,14 @@ const options = {
     definition: {
         openapi: '3.0.0',
         info: {
-            title: 'Anki API',
+            title: 'Kanji-Up API',
             version: '0.0.1',
-            description: 'An api of japanese kanji for the anki application',
+            description: 'An api of japanese kanji for the Kanji-Up application',
+            contact: {
+                name: "Alexandre Em",
+                url: "https://alexandre-em.fr",
+                email: "alexandre.em@pm.me"
+            },
         },
         servers: [{ url: '/' }],
     },

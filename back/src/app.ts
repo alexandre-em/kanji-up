@@ -23,6 +23,16 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+/**
+ * @openapi
+ * tags:
+ * - Reference
+ * - Character
+ * - Radical
+ * - Recognition
+ * - Kanji
+ */
+
 // API Endpoints
 app.use('/kanjis', KanjiController);
 app.use('/characters', CharacterController);

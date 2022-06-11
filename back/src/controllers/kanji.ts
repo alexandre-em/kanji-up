@@ -19,7 +19,7 @@ router.get('', (req, res) => {
     });
 });
 
-router.get('/kanji/:id', async (req, res) => {
+router.get('/detail/:id', async (req, res) => {
   const kanji = await kanjiService.getOne(req.params.id);
 
   res.status(200).send(kanji);
@@ -38,13 +38,6 @@ router.get('/search', (req, res) => {
       res.status(200).send(queryResult);
     })
 });
-
-// router.get('/:id/image', async (req, res) => {
-//     const img = await kanjiService.getOneImage(req.params.id);
-
-//     res.set('Content-Type', img.contentType);
-//     res.status(200).send(img.data);
-// });
 
 router.post('/', (req, res) => {
   kanjiService
@@ -130,5 +123,71 @@ router.delete('/:id', (req, res) => {
     .then((deletedChar) => res.status(200).send(deletedChar))
     .catch((err) => res.status(400).send(err));
 })
+
+/**
+ * @openapi
+ * components:
+ *    schemas:
+ *        CharacterPatchBody:
+ *            type: object
+ *            properties:
+ *                character:
+ *                    type: string
+ *                meaning:
+ *                    type: array
+ *                    items:
+ *                        type: string
+ *                onyomi:
+ *                    type: array
+ *                    items:
+ *                        type: string
+ *                kunyomi:
+ *                    type: array
+ *                    items:
+ *                        type: string
+ *                strokes:
+ *                    type: array
+ *                    items:
+ *                        type: string
+ *        CharacterPostBody:
+ *            required:
+ *                - json
+ *                - image
+ *            type: object
+ *            properties:
+ *                json:
+ *                    type: string
+ *                image:
+ *                    type: string
+ *                    format: binary
+ *        KanjiResponse:
+ *            type: object
+ *            properties:
+ *                kanji_id:
+ *                    type: string
+ *                creation_date:
+ *                    type: string
+ *                kanji:
+ *                    oneOf:
+ *                        - type: string
+ *                        - $ref: '#/components/schemas/CharacterResponse'
+ *                radical:
+ *                    oneOf:
+ *                        - type: string
+ *                        - $ref: '#/components/schemas/ReferenceResponse'
+ *                reference:
+ *                    oneOf:
+ *                        - type: string
+ *                        - $ref: '#/components/schemas/RadicalResponse'
+ *                examples:
+ *                    type: array
+ *                    items:
+ *                        type: object
+ *                        properties:
+ *                            japanese:
+ *                                type: string
+ *                            meaning:
+ *                                type: string
+ */
 
 export default router;

@@ -34,4 +34,65 @@ router.post('/', upload.single('image'), urlencodedParser, (req, res) => {
         });
 });
 
+/**
+ * @openapi
+ * components:
+ *    schemas:
+ *        CharacterPatchBody:
+ *            type: object
+ *            properties:
+ *                character:
+ *                    type: string
+ *                meaning:
+ *                    type: array
+ *                    items:
+ *                        type: string
+ *                onyomi:
+ *                    type: array
+ *                    items:
+ *                        type: string
+ *                kunyomi:
+ *                    type: array
+ *                    items:
+ *                        type: string
+ *                strokes:
+ *                    type: array
+ *                    items:
+ *                        type: string
+ *        CharacterPostBody:
+ *            required:
+ *                - json
+ *                - image
+ *            type: object
+ *            properties:
+ *                json:
+ *                    type: string
+ *                image:
+ *                    type: string
+ *                    format: binary
+ *        RadicalResponse:
+ *            type: object
+ *            properties:
+ *                radical_id:
+ *                    type: string
+ *                character:
+ *                    type: string
+ *                image:
+ *                    type: string
+ *                strokes:
+ *                    type: integer
+ *                    minimum: 1
+ *                name:
+ *                    type: object
+ *                    properties:
+ *                          hiragana:
+ *                                  type: string
+ *                          romaji:
+ *                                  type: string
+ *                meaning:
+ *                    type: array
+ *                    items:
+ *                        type: string
+ */
+
 export default router;
