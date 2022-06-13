@@ -1,3 +1,4 @@
+/* eslint-disable tsdoc/syntax */
 import { Router } from 'express';
 import { kanjiService } from '../services';
 import InvalidError from '../error/invalid';

@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable tsdoc/syntax */
 import { Router } from 'express';
 import { readFileSync, unlinkSync } from "fs";
 import bodyParser from "body-parser";

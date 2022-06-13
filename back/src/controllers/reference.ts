@@ -1,3 +1,4 @@
+/* eslint-disable tsdoc/syntax */
 import { Router } from 'express';
 
 import { referenceService } from '../services';
