@@ -88,7 +88,7 @@ router.post('/', upload.single('image'), urlencodedParser, (req, res) => {
  *                      required: true
  *                      $ref: '#/components/schemas/CharacterPatchBody'
  *      responses:
- *          201:
+ *          200:
  *              description: Returns the created reference
  *              content:
  *                  application/json:
