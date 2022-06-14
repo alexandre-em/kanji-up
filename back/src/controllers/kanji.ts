@@ -8,7 +8,7 @@ const router: Router = Router();
 
 /**
  * @openapi
- * /kanji:
+ * /kanjis:
  *  get:
  *      tags:
  *          - Kanji
@@ -65,7 +65,7 @@ router.get('', (req, res) => {
 
 /**
  * @openapi
- * /kanji/detail/{id}:
+ * /kanjis/detail/{id}:
  *  get:
  *      tags:
  *          - Kanji
@@ -105,7 +105,7 @@ router.get('/detail/:id', async (req, res) => {
 
 /**
  * @openapi
- * /kanji/search:
+ * /kanjis/search:
  *  get:
  *      tags:
  *          - Kanji
@@ -162,7 +162,7 @@ router.get('/search', (req, res) => {
 
 /**
  * @openapi
- * /kanji:
+ * /kanjis:
  *  post:
  *      tags:
  *          - Kanji
@@ -207,7 +207,7 @@ router.post('/', (req, res) => {
 
 /**
  * @openapi
- * /kanji/{id}/character/{characterId}:
+ * /kanjis/{id}/character/{characterId}:
  *  patch:
  *      tags:
  *          - Kanji
@@ -267,7 +267,7 @@ router.patch('/:id/character/:characterId', (req, res) => {
 
 /**
  * @openapi
- * /kanji/{id}/radical/{radicalId}:
+ * /kanjis/{id}/radical/{radicalId}:
  *  patch:
  *      tags:
  *          - Kanji
@@ -329,7 +329,7 @@ router.patch('/:id/radical/:radicalId', (req, res) => {
 
 /**
  * @openapi
- * /kanji/{id}/reference/{referenceId}:
+ * /kanjis/{id}/reference/{referenceId}:
  *  patch:
  *      tags:
  *          - Kanji
@@ -391,7 +391,7 @@ router.patch('/:id/reference/:referenceId', (req, res) => {
 
 /**
  * @openapi
- * /kanji/{id}:
+ * /kanjis/{id}:
  *  delete:
  *      tags:
  *          - Kanji
@@ -486,6 +486,8 @@ router.delete('/:id', (req, res) => {
  *            type: object
  *            properties:
  *                totalDocs:
+ *                    type: integer
+ *                deleted_at:
  *                    type: integer
  *                limit:
  *                    type: integer

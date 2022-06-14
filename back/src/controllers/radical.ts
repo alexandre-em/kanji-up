@@ -11,6 +11,40 @@ import InvalidError from '../error/invalid';
 const router: Router = Router();
 const urlencodedParser = bodyParser.urlencoded({ extended: false });
 
+/**
+ * @openapi
+ * /radicals:
+ *  post:
+ *      tags:
+ *          - Radical
+ *      description: Create a radical object for a kanji
+ *      requestBody:
+ *          content:
+ *              multipart/form-data:
+ *                  schema:
+ *                      $ref: '#/components/schemas/RadicalPostBody'
+ *                  example:
+ *                      json: '{ "character": "一", "meaning": ["one"], "onyomi": ["イチ"], "kunyomi": ["ひと"], "strokes": 1 }'
+ *      responses:
+ *          201:
+ *              description: Returns the created radical
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/CharacterResponse'
+ *          400:
+ *              description: Bad request Error
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/Error'
+ *          500:
+ *              description: Internal Error
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/Error'
+ */
 router.post('/', upload.single('image'), urlencodedParser, (req, res) => {
   if (!req.file) return new InvalidError('Radical\'s picture is missing !').sendResponse(res);
     const parsedBody = JSON.parse(req.body.json);
@@ -39,28 +73,7 @@ router.post('/', upload.single('image'), urlencodedParser, (req, res) => {
  * @openapi
  * components:
  *    schemas:
- *        CharacterPatchBody:
- *            type: object
- *            properties:
- *                character:
- *                    type: string
- *                meaning:
- *                    type: array
- *                    items:
- *                        type: string
- *                onyomi:
- *                    type: array
- *                    items:
- *                        type: string
- *                kunyomi:
- *                    type: array
- *                    items:
- *                        type: string
- *                strokes:
- *                    type: array
- *                    items:
- *                        type: string
- *        CharacterPostBody:
+ *        RadicalPostBody:
  *            required:
  *                - json
  *                - image
