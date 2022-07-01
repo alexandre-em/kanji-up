@@ -3,9 +3,15 @@
 dist
 node_modules
 env
-ml
+model/ETL
+model/ETL9B
+model/*.h5
+model/extract
+model/my_saved_model
+kanji_saved_model
+model/kanji_dataset
 uploads/*.png
 uploads/*.jpg
 ignore
-kanji_saved_model
+__pycache__
 
