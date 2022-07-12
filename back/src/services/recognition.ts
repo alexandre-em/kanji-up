@@ -13,7 +13,7 @@ export const predictKanji = (image: ImageType, loadedModel: TFSavedModel) => {
 	const tensorImage = tfjs.node.decodeImage(view, 1);
 	const resizedImage = tfjs.image.resizeBilinear(tensorImage, [modelInputHeight, modelInputWidth]);
 	const prediction = loadedModel.predict(tfjs.expandDims(tfjs.div(resizedImage, 255), 0)) as Tensor;
-	const predictionArray: number[][] = prediction.arraySync() as number [][];
+	const predictionArray: number[][] = prediction.arraySync() as number[][];
 	const indexes = predictionArray[0]
 		.map((v: number, indice: number) => indice)
 		.filter((iconfidence: number) => (predictionArray[0][iconfidence] >= 0.005));
@@ -31,6 +31,9 @@ export const addOne = async (kanji: string, image: ImageType, predictions: Predi
 	}
 }
 
-export const updateOne = (recognition_id: string, updatedData: Partial<RecognitionType>) => {
-	return RecognitionModel.findOneAndUpdate({ recognition_id }, updatedData);
-}
+export const updateOne = (recognition_id: string, updatedData: Partial<RecognitionType>) => (
+	RecognitionModel
+		.findOneAndUpdate({ recognition_id }, updatedData)
+		.select('-_id -__v -predictions._id')
+		.exec()
+)

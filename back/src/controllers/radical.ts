@@ -31,7 +31,7 @@ const urlencodedParser = bodyParser.urlencoded({ extended: false });
  *              content:
  *                  application/json:
  *                      schema:
- *                          $ref: '#/components/schemas/CharacterResponse'
+ *                          $ref: '#/components/schemas/RadicalResponse'
  *          400:
  *              description: Bad request Error
  *              content:

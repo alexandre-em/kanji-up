@@ -8,6 +8,7 @@ import path from "path";
 import { upload } from "../utils";
 import { recognitionService } from '../services';
 import InvalidError from '../error/invalid';
+import NotFoundError from '../error/notFound';
 
 const router: Router = Router();
 const urlencodedParser = bodyParser.urlencoded({ extended: false });
@@ -21,6 +22,40 @@ const init = async () => {
 	module_vars.model = await tfjs.node.loadSavedModel(modelPath);
 }
 
+/**
+ * @openapi
+ * /recognition:
+ *  post:
+ *      tags:
+ *          - Recognition
+ *      description: Upload the picture then predict the drawn kanji
+ *      requestBody:
+ *          content:
+ *              multipart/form-data:
+ *                  schema:
+ *                      $ref: '#/components/schemas/RecognitionPostBody'
+ *                  example:
+ *                      json: '{ "kanji": "和" }'
+ *      responses:
+ *          201:
+ *              description: Returns the predicted kanjis with their score and the link of the uploaded drawing (picture)
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/RecognitionResponse'
+ *          400:
+ *              description: Bad request Error
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/Error'
+ *          500:
+ *              description: Internal Error
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/Error'
+ */
 router.post('/', upload.single('image'), urlencodedParser, (req, res) => {
   if (!req.file) return new InvalidError('Recognition\'s picture is missing !').sendResponse(res);
   if (!module_vars.model) return new InvalidError('Recognition model is missing !').sendResponse(res);
@@ -54,6 +89,47 @@ router.post('/', upload.single('image'), urlencodedParser, (req, res) => {
 	}
 });
 
+/**
+ * @openapi
+ * /recognition/validation/{id}:
+ *  patch:
+ *      tags:
+ *          - Recognition
+ *      parameters:
+ *          - name: id
+ *            in: path
+ *            description: Recognition Id
+ *            required: true
+ *            schema:
+ *                type: string
+ *      description: Validation of the predicted kanji
+ *      requestBody:
+ *          content:
+ *              application/json:
+ *                  schema:
+ *                      $ref: '#/components/schemas/RecognitionPatchBody'
+ *                  example:
+ *                      is_valid: true
+ *      responses:
+ *          200:
+ *              description: Returns the validated or non-validated prediction
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/RecognitionResponse'
+ *          400:
+ *              description: Bad request Error
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/Error'
+ *          500:
+ *              description: Internal Error
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/Error'
+ */
 router.patch('/validation/:id', (req, res) => {
 	const { id } = req.params;
 	try {
@@ -62,6 +138,8 @@ router.patch('/validation/:id', (req, res) => {
 
 		recognitionService.updateOne(id, { is_valid })
 			.then((before) => {
+				if (before === null) new NotFoundError(`Recognition_id not found: ${id}`).sendResponse(res);
+
 				res.status(200).send(before);
 			})
 			.catch((err) => {
@@ -73,5 +151,49 @@ router.patch('/validation/:id', (req, res) => {
 });
 
 init();
+
+/**
+ * @openapi
+ * components:
+ *    schemas:
+ *        Prediction:
+ *            type: object
+ *            properties:
+ *                prediction:
+ *                    type: string
+ *                confidence:
+ *                    type: number
+ *        RecognitionPostBody:
+ *            required:
+ *                - json
+ *                - image
+ *            type: object
+ *            properties:
+ *                image:
+ *                    type: string
+ *                    format: binary
+ *                json:
+ *                    type: string
+ *        RecognitionPatchBody:
+ *            required:
+ *                - is_valid
+ *            type: object
+ *            properties:
+ *                is_valid:
+ *                    type: boolean
+ *        RecognitionResponse:
+ *            type: object
+ *            properties:
+ *                recognition_id:
+ *                    type: string
+ *                image:
+ *                    type: string
+ *                kanji:
+ *                    type: string
+ *                prediction:
+ *                    type: array
+ *                    items:
+ *                        $ref: '#/components/schemas/Prediction'
+ */
 
 export default router;
