@@ -1,73 +1,22 @@
-name: Deploy API to Amazon ECS
+name: Deploy API on Heroku
 
 on:
   push:
     branches:
-      - "production"
-
-env:
-  AWS_REGION: eu-west-3                   # set this to your preferred AWS region, e.g. us-west-1
-  ECR_REPOSITORY: kanjiup-api           # set this to your Amazon ECR repository name
-  ECS_SERVICE: kanji-up-api-container-service                # set this to your Amazon ECS service name
-  ECS_CLUSTER: kanji-up-api-cluster                 # set this to your Amazon ECS cluster name
-                                               # file, e.g. .aws/task-definition.json
-  CONTAINER_NAME: kanji-up-api-container           # set this to the name of the container in the
-                                               # containerDefinitions section of your task definition
-
-permissions:
-  contents: read
+      - "api"
 
 jobs:
-  deploy:
-    name: Deploy
+  build:
     runs-on: ubuntu-latest
-    environment: production
-
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ env.AWS_REGION }}
-
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
-
-    - name: Build, tag, and push image to Amazon ECR
-      id: build-image
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        IMAGE_TAG: ${{ github.sha }}
-        SAVED_MODEL_URL: ${{ secrets.SAVED_MODEL_URL }}
-      run: |
-        # Build a docker container and
-        # push it to ECR so that it can
-        # be deployed to ECS.
-        docker build --build-arg SAVED_MODEL_URL=$SAVED_MODEL_URL -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./back
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-
-    - name: Download task definition
-      run: |
-        aws ecs describe-task-definition --task-definition kanji-up-api-task-definition --query taskDefinition  > kanji-up-api-task-definition.json
-
-    - name: Fill in the new image ID in the Amazon ECS task definition
-      id: task-def
-      uses: aws-actions/amazon-ecs-render-task-definition@v1
-      with:
-        task-definition: kanji-up-api-task-definition.json
-        container-name: ${{ env.CONTAINER_NAME }}
-        image: ${{ steps.build-image.outputs.image }}
-
-    - name: Deploy Amazon ECS task definition
-      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-      with:
-        task-definition: ${{ steps.task-def.outputs.task-definition }}
-        service: ${{ env.ECS_SERVICE }}
-        cluster: ${{ env.ECS_CLUSTER }}
-        wait-for-service-stability: true
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Build, Push and Deploy to Heroku # set whatever name you want to this step
+        id: heroku
+        uses: jctaveras/heroku-deploy@v1.0.0 # use the latest version of the action
+        with:
+          email: ${{ secrets.HEROKU_EMAIL }} # your heroku email
+          api_key: ${{ secrets.HEROKU_API_KEY }} # your heroku api key
+          app_name: ${{ secrets.HEROKU_APP_NAME }} # you aplication name
+          dockerfile_path: './back' # set the path to the folder where the Dockerfile is located
+          process_type: 'web' # Specify the process type you want to build and release
