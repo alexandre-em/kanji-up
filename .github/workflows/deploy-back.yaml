@@ -1,73 +1,40 @@
-name: Deploy API to Amazon ECS
+# Your workflow name.
+name: Deploy to heroku.
 
+# Run workflow on every push to master branch.
 on:
   push:
-    branches:
-      - "production"
+    branches: [api]
 
-env:
-  AWS_REGION: eu-west-3                   # set this to your preferred AWS region, e.g. us-west-1
-  ECR_REPOSITORY: kanjiup-api           # set this to your Amazon ECR repository name
-  ECS_SERVICE: kanji-up-api-container-service                # set this to your Amazon ECS service name
-  ECS_CLUSTER: kanji-up-api-cluster                 # set this to your Amazon ECS cluster name
-                                               # file, e.g. .aws/task-definition.json
-  CONTAINER_NAME: kanji-up-api-container           # set this to the name of the container in the
-                                               # containerDefinitions section of your task definition
-
-permissions:
-  contents: read
-
+# Your workflows jobs.
 jobs:
-  deploy:
-    name: Deploy
+  build:
     runs-on: ubuntu-latest
-    environment: production
-
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
+      - uses: actions/checkout@v2
+      - uses: akhileshns/heroku-deploy@v3.12.12
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: ${{ secrets.HEROKU_APP_NAME }}
+          heroku_email: ${{ secrets.HEROKU_EMAIL }}
+          usedocker: true
+          appdir: "back"
+          docker_build_args: |
+            SAVED_MODEL_URL
+            AWS_ACCESS_ID
+            AWS_ACCESS_SECRET
+            AWS_BUCKET_NAME
+            MONGO_URI
+            MONGO_DB_NAME
+            MONGO_COLLECTION
+            PORT
 
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ env.AWS_REGION }}
-
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
-
-    - name: Build, tag, and push image to Amazon ECR
-      id: build-image
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        IMAGE_TAG: ${{ github.sha }}
-        SAVED_MODEL_URL: ${{ secrets.SAVED_MODEL_URL }}
-      run: |
-        # Build a docker container and
-        # push it to ECR so that it can
-        # be deployed to ECS.
-        docker build --build-arg SAVED_MODEL_URL=$SAVED_MODEL_URL -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./back
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-
-    - name: Download task definition
-      run: |
-        aws ecs describe-task-definition --task-definition kanji-up-api-task-definition --query taskDefinition  > kanji-up-api-task-definition.json
-
-    - name: Fill in the new image ID in the Amazon ECS task definition
-      id: task-def
-      uses: aws-actions/amazon-ecs-render-task-definition@v1
-      with:
-        task-definition: kanji-up-api-task-definition.json
-        container-name: ${{ env.CONTAINER_NAME }}
-        image: ${{ steps.build-image.outputs.image }}
-
-    - name: Deploy Amazon ECS task definition
-      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-      with:
-        task-definition: ${{ steps.task-def.outputs.task-definition }}
-        service: ${{ env.ECS_SERVICE }}
-        cluster: ${{ env.ECS_CLUSTER }}
-        wait-for-service-stability: true
+        env:
+          SAVED_MODEL_URL: ${{ secrets.SAVED_MODEL_URL }}
+          AWS_ACCESS_ID: ${{ secrets.AWS_ACCESS_ID }}
+          AWS_ACCESS_SECRET: ${{ secrets.AWS_ACCESS_SECRET }}
+          AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
+          MONGO_URI: ${{ secrets.MONK_URI }}
+          MONGO_DB_NAME: ${{ secrets.MONGO_DB_NAME }}
+          MONGO_COLLECTION: ${{ secrets.MONGO_COLLECTION }}
+          PORT: 80
