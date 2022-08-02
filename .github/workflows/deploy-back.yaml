@@ -1,22 +1,57 @@
-name: Deploy API on Heroku
+name: Deploy Infrastructure
 
 on:
   push:
     branches:
-      - "api"
+      - api
 
 jobs:
-  build:
+  terraform:
+    name: "Terraform"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
-      - name: Build, Push and Deploy to Heroku # set whatever name you want to this step
-        id: heroku
-        uses: jctaveras/heroku-deploy@v1.0.0 # use the latest version of the action
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
         with:
-          email: ${{ secrets.HEROKU_EMAIL }} # your heroku email
-          api_key: ${{ secrets.HEROKU_API_KEY }} # your heroku api key
-          app_name: ${{ secrets.HEROKU_APP_NAME }} # you aplication name
-          dockerfile_path: './back' # set the path to the folder where the Dockerfile is located
-          process_type: 'web' # Specify the process type you want to build and release
+          # terraform_version: 0.13.0:
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      - name: Terraform Format
+        id: fmt
+        run: terraform fmt -check
+
+      - name: Terraform Init
+        id: init
+        run: terraform init
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          AWS_ACCESS_ID: ${{ secrets.AWS_ACCESS_ID }}
+          AWS_ACCESS_SECRET: ${{ secrets.AWS_ACCESS_SECRET }}
+          AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
+          MONGO_URI: ${{ secrets.MONK_URI }}
+          MONGO_DB_NAME: ${{ secrets.MONGO_DB_NAME }}
+          MONGO_COLLECTION: ${{ secrets.MONGO_COLLECTION }}
+      
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
+
+      - name: Terraform Plan Status
+        if: steps.plan.outcome == 'failure'
+        run: exit 1
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve -input=false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          AWS_ACCESS_ID: ${{ secrets.AWS_ACCESS_ID }}
+          AWS_ACCESS_SECRET: ${{ secrets.AWS_ACCESS_SECRET }}
+          AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
+          MONGO_URI: ${{ secrets.MONK_URI }}
+          MONGO_DB_NAME: ${{ secrets.MONGO_DB_NAME }}
+          MONGO_COLLECTION: ${{ secrets.MONGO_COLLECTION }}
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+          HEROKU_EMAIL: ${{ secrets.HEROKU_EMAIL }}
