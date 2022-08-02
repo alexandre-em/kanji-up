@@ -7,5 +7,13 @@ terraform {
   }
 
   required_version = ">= 0.14"
+
+  cloud {
+    organization = "emalex"
+
+    workspaces {
+      name = "gh-kanji-up-api-actions"
+    }
+  }
 }
 
