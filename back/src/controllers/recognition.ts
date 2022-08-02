@@ -13,22 +13,13 @@ import NotFoundError from '../error/notFound';
 const router: Router = Router();
 const urlencodedParser = bodyParser.urlencoded({ extended: false });
 
-// Loading model
-const tfjs = require('@tensorflow/tfjs-node');
-const modelPath = 'kanji_saved_model/';
-const module_vars = { model: null }
-
-const init = async () => {
-	module_vars.model = await tfjs.node.loadSavedModel(modelPath);
-}
-
 /**
  * @openapi
  * /recognition:
  *  post:
  *      tags:
  *          - Recognition
- *      description: Upload the picture then predict the drawn kanji
+ *      description: Upload the picture and kanji prediction of the drawn kanji
  *      requestBody:
  *          content:
  *              multipart/form-data:
@@ -58,10 +49,9 @@ const init = async () => {
  */
 router.post('/', upload.single('image'), urlencodedParser, (req, res) => {
   if (!req.file) return new InvalidError('Recognition\'s picture is missing !').sendResponse(res);
-  if (!module_vars.model) return new InvalidError('Recognition model is missing !').sendResponse(res);
 	try {
 		const ext = path.extname(req.file.filename).split('\.')[1];
-		const { kanji } = JSON.parse(req.body.json);
+		const { kanji, predictions } = JSON.parse(req.body.json);
 		const filePath = path.join('uploads/' + req.file.filename);
 		const image = {
 			filename: req.file.filename,
@@ -69,10 +59,7 @@ router.post('/', upload.single('image'), urlencodedParser, (req, res) => {
 			contentType: `image/${ext}`,
 		}
 
-		const loadedModel = module_vars.model;
-		const kanjiPredicted = recognitionService.predictKanji(image, loadedModel);
-
-		recognitionService.addOne(kanji, image, kanjiPredicted)
+		recognitionService.addOne(kanji, image, predictions)
 			.then((recognition) => {
 				unlinkSync(filePath);
 
@@ -149,8 +136,6 @@ router.patch('/validation/:id', (req, res) => {
 		res.status(400).send(e.message);
 	}
 });
-
-init();
 
 /**
  * @openapi

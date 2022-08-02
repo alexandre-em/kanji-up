@@ -15,3 +15,8 @@ uploads/*.jpg
 ignore
 __pycache__
 
+.terraform
+.terraform_env
+terraform.tfstate
+terraform.tfstate.backup
+
