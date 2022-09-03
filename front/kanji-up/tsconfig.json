@@ -9,6 +9,8 @@
 		"noEmit": true,
 		"esModuleInterop": true,
 		"lib": ["DOM", "ESNext"],
+    "types": ["./src/types"],
+    "typeRoots": ["./src/types", "./node_modules/@types"],
 		"resolveJsonModule": true,
 		"target": "ESNext"
   }

@@ -1,6 +1,8 @@
 {
   "name": "kanji-up",
   "version": "1.0.0",
+  "author": "Alexandre Em",
+  "license": "MIT",
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "start": "expo start",
@@ -10,13 +12,17 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "@react-native-async-storage/async-storage": "^1.17.7",
     "expo": "~45.0.0",
     "expo-status-bar": "~1.3.0",
     "node": "^16.13.1",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-native": "0.68.2",
-    "react-native-web": "0.17.7"
+    "react-native-canvas": "^0.1.38",
+    "react-native-svg": "^12.4.3",
+    "react-native-web": "0.17.7",
+    "react-redux": "^8.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
@@ -24,6 +30,7 @@
     "@types/react-native": "~0.66.13",
     "@typescript-eslint/eslint-plugin": "^5.31.0",
     "@typescript-eslint/parser": "^5.31.0",
+    "babel-plugin-inline-import": "^3.0.0",
     "eslint": "^7.32.0 || ^8.2.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-airbnb-typescript": "^17.0.0",
@@ -31,6 +38,7 @@
     "eslint-plugin-jsx-a11y": "^6.5.1",
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.3.0",
+    "react-native-svg-transformer": "^1.0.0",
     "typescript": "~4.3.5"
   },
   "private": true
