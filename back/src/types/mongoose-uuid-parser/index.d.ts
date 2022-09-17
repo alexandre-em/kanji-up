@@ -1,1 +1,2 @@
-declare module "mongoose-uuid-parser";
+declare module 'mongoose-uuid-parser';
+

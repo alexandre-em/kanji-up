@@ -1,3 +1,5 @@
+declare module 'mongoose-uuid-parser';
+
 type ExampleType = {
   japanese: string,
   meaning: string,

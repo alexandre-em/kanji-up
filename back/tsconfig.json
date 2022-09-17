@@ -15,5 +15,9 @@
     "typeRoots": ["./@types", "./src/types", "./node_modules/@types"],
     "resolveJsonModule": true
   },
+  "include": [
+    "src/**/*",
+    "index.d.ts"
+  ],
   "lib": ["es2015"]
 }
