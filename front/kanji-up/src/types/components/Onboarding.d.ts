@@ -9,3 +9,8 @@ type OnboardingItemProps = {
   item: OnboardingItem,
 }
 
+type PaginatorProps = {
+  data: OnboardingItem[],
+  scrollX: Animated.Value,
+}
+
