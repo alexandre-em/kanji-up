@@ -4,10 +4,9 @@ type SvgProps = {
 };
 
 type ButtonProps = {
-  colors: Array<string>,
-  style: any,
-  titleStyle: any,
+  style?: any,
+  titleStyle?: any,
   title: string,
-  onPress: function,
+  onPress?: function,
 }
 

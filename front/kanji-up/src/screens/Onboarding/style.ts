@@ -36,8 +36,6 @@ export const onboardingStyle = StyleSheet.create({
     alignItems: 'center',
   },
   button: {
-    position: 'absolute',
-    bottom: 0,
     width: '100%',
   },
 });

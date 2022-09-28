@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {View} from 'react-native';
+import {Platform, View} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -17,7 +17,7 @@ export default function Navigation() {
   useEffect(() => {
     AsyncStorage.getItem(AsyncStorageKeys.FIRST_TIME)
       .then((res) => {
-        if (res !== null) {
+      if (res !== null) {
           setIsFirstTime(JSON.parse(res as string));
         } else { setIsFirstTime(true); }
       })
@@ -32,7 +32,7 @@ export default function Navigation() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName={isFirstTime ? 'Onboarding' : 'Home'} screenOptions={{ headerShown: false }}>
+      <Stack.Navigator initialRouteName={isFirstTime && Platform.OS !== 'web' ? 'Onboarding' : 'Home'} screenOptions={{ headerShown: false }}>
         <Stack.Screen name={'Home'} component={HomeScreen} />
         <Stack.Screen name={'Onboarding'} component={OnboardingScreen} />
       </Stack.Navigator>
