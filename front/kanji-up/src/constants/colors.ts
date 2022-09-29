@@ -6,5 +6,6 @@ export default {
   info: '#2baeda',
   secondary: '#da2b82',
   secondaryDark: '#981b59',
+  text: '#3F3D56',
 };
 

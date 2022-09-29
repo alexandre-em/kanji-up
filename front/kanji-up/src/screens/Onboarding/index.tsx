@@ -12,7 +12,7 @@ import {OnboardingProps} from '../../types/screens';
 
 export default function Onboarding({ navigation }: OnboardingProps) {
   const scrollX = useRef(new Animated.Value(0)).current;
-  const [currentIndex, setCurrentIndex] = useState<Number>(0);
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
   const slidesRef = useRef<FlatList<any>>(null);
 
   const viewableItemsChanged = useRef(({ viewableItems }: { viewableItems: Array<ViewToken> }) => {

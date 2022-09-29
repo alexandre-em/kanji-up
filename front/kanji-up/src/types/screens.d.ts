@@ -6,7 +6,7 @@ type RootStackParamList = {
   Category: undefined,
   Search: undefined,
   Settings: undefined,
-  Flashcard: undefined,
+  Flashcard: { evaluation: boolean },
 };
 
 type OnboardingProps = NativeStackScreenProps<RootStackParamList, 'Onboarding'>;

@@ -1,23 +1,33 @@
 export default [
   {
-    title: 'Select',
+    label: 'Select',
     screen: 'Category',
     icon: 'cards',
+    navOpt: null,
   },
   {
-    title: 'Flashcard',
+    label: 'Train',
     screen: 'Flashcard',
     icon: 'cards-playing-heart-multiple',
+    navOpt: { evaluation: false },
   },
   {
-    title: 'Search',
+    label: 'Evaluate',
+    screen: 'Flashcard',
+    icon: 'cards-playing-heart-multiple',
+    navOpt: { evaluation: false },
+  },
+  {
+    label: 'Search',
     screen: 'Search',
     icon: 'book-search',
+    navOpt: null,
   },
   {
-    title: 'Settings',
+    label: 'Settings',
     screen: 'Settings',
     icon: 'application-settings',
+    navOpt: null,
   },
 ];
 
