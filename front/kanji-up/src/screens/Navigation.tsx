@@ -33,7 +33,7 @@ export default function Navigation() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName={isFirstTime && Platform.OS !== 'web' ? 'Onboarding' : 'Category'} screenOptions={{ headerShown: false }}>
+      <Stack.Navigator initialRouteName={isFirstTime && Platform.OS !== 'web' ? 'Onboarding' : 'Home'} screenOptions={{ headerShown: false }}>
         <Stack.Screen name={'Home'} component={HomeScreen} />
         <Stack.Screen name={'Onboarding'} component={OnboardingScreen} />
         <Stack.Screen name={'Category'} component={CategoryScreen} />

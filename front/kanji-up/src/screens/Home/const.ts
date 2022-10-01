@@ -1,4 +1,4 @@
-export default [
+export const menu = [
   {
     label: 'Select',
     screen: 'Category',
@@ -28,6 +28,39 @@ export default [
     screen: 'Settings',
     icon: 'application-settings',
     navOpt: null,
+  },
+];
+
+
+export const labels = ['4000', '10000', '25000']; 
+
+export const list = [
+  {
+    id: 'select',
+    image: require('./select.jpg'),
+    title: 'Select',
+    subtitle: 'Select the kanji you want to study',
+    buttonTitle: 'Select',
+    screen: 'Category',
+    screenOptions: { evaluation: false },
+  },
+  {
+    id: 'flashcard',
+    image: require('./flashcard.jpg'),
+    title: 'Memorizing Kanji',
+    subtitle: 'Practice your memory or learn new kanji with a flashcard system game',
+    buttonTitle: 'Begin',
+    screen: 'Flashcard',
+    screenOptions: { evaluation: false },
+  },
+  {
+    id: 'evaluation',
+    image: require('./evaluateBG.jpg'),
+    title: 'Evaluate',
+    subtitle: 'Evaluate your current level by drawing kanji',
+    buttonTitle: 'Start',
+    screen: 'Flashcard',
+    screenOptions: { evaluation: true },
   },
 ];
 

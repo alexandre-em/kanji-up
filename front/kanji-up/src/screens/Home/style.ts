@@ -1,8 +1,10 @@
 import { StyleSheet } from "react-native";
+import colors from "../../constants/colors";
 
 export default StyleSheet.create({
   main: {
     flex: 1,
+    width: '100%',
     maxWidth: 700,
     alignSelf: 'center',
     justifyContent: 'space-between',
@@ -18,45 +20,30 @@ export default StyleSheet.create({
     flexWrap: 'wrap',
   },
   headerTitle: {
-    display: 'flex',
-    flexWrap: 'wrap',
-  },
-  menu: {
-    display: 'flex',
-    flex: 0.2,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-  },
-  button: {
-    width: '45%',
-    display: 'flex',
-    justifyContent: 'center',
-    margin: 5,
-    borderRadius: 5,
-    boxShadow: 'rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px',
+    backgroundColor: colors.primary,
+    padding: 5,
+    borderRadius: 25,
   },
   search: {
-    flex: 0.1,
     display: 'flex',
     alignItems: 'center',
+  },
+  stepper: {
+    marginVertical: 10,
+  },
+  title: {
+    fontSize: 25,
+    fontWeight: '800',
+    margin: 10,
+    marginLeft: 20,
+    color: colors.text,
   },
   cardGroup: {
     flex: 0.6,
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
-  },
-  card: {
-    backgroundColor: '#efefef',
-    height: 300,
-    alignSelf: 'center',
-    alignItems: 'center',
-    justifyContent: 'space-around',
-    borderRadius: 15,
-    boxShadow: 'rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px',
-    padding: 10,
-    margin: 10,
+    marginBottom: 20,
   },
 });
 

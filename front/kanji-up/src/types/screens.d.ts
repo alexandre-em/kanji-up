@@ -4,6 +4,7 @@ type RootStackParamList = {
   Home: undefined,
   Onboarding: undefined,
   Category: undefined,
+  KanjiList: { grade: string },
   Search: undefined,
   Settings: undefined,
   Flashcard: { evaluation: boolean },
@@ -12,3 +13,6 @@ type RootStackParamList = {
 type OnboardingProps = NativeStackScreenProps<RootStackParamList, 'Onboarding'>;
 
 type HomeProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
+
+type CategoryProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
+

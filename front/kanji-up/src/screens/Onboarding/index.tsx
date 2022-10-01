@@ -24,24 +24,11 @@ export default function Onboarding({ navigation }: OnboardingProps) {
   const renderItem = ({ item }: OnboardingItemProps) => (<OnboardingItem item={item} />);
 
   const handlePress = useCallback(async () => {
-    if (currentIndex !== data.length - 1) {
-      console.log('Next');
-      if (slidesRef && slidesRef.current) {
-        try {
-          slidesRef.current.scrollToIndex({ index: 1 });
-        } catch (e) {
-          console.error(e);
-        }
-      } else {
-        console.log('slidesRef is null booouuuuh');
-      }
-    } else {
-      try {
-        await AsyncStorage.setItem(AsyncStorageKeys.FIRST_TIME, 'false');
-        navigation.navigate('Home');
-      } catch {
-        console.error('An error occured, please try later...');
-      }
+    try {
+      await AsyncStorage.setItem(AsyncStorageKeys.FIRST_TIME, 'false');
+      navigation.navigate('Home');
+    } catch {
+      console.error('An error occured, please try later...');
     }
   }, [navigation, slidesRef]);
 
@@ -66,7 +53,7 @@ export default function Onboarding({ navigation }: OnboardingProps) {
         />
       </View>
       <Paginator data={data} scrollX={scrollX} />
-      <Button mode="contained" onPress={handlePress} style={onboardingStyle.button}>{currentIndex !== (data.length - 1) ? 'Next' : 'Begin'}</Button>
+      {currentIndex === (data.length - 1) && <Button mode="contained" onPress={handlePress} style={onboardingStyle.button}>Begin</Button>}
     </View>
   );
 }

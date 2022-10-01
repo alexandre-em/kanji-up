@@ -1,24 +1,63 @@
-import React, {useState} from 'react';
-import {Image, SafeAreaView, ScrollView, Text, TouchableOpacity, View} from 'react-native';
+import React, {useCallback, useState} from 'react';
+import {FlatList, Platform, SafeAreaView, ScrollView, Text, TouchableOpacity, View} from 'react-native';
+import StepIndicator from 'react-native-step-indicator';
+import {SvgUri} from 'react-native-svg';
 
 import styles from './style';
-import menu from './const';
-import {Avatar, Button, Divider, FAB, Searchbar} from 'react-native-paper';
+import { menu, list, labels } from './const';
+import {ActivityIndicator, Avatar, Button, Divider, FAB, List, Searchbar} from 'react-native-paper';
 import colors from '../../constants/colors';
 import {HomeProps} from '../../types/screens';
-import Studying from '../../svg/Studying';
-import Certification from '../../svg/Certification';
+import GradientCard from '../../components/GradientCard';
+
+const stepperStyles = {
+  stepIndicatorSize: 25,
+  currentStepIndicatorSize: 30,
+  separatorStrokeWidth: 2,
+  currentStepStrokeWidth: 3,
+  stepStrokeCurrentColor: colors.primary,
+  stepStrokeWidth: 3,
+  stepStrokeFinishedColor: colors.primary,
+  stepStrokeUnFinishedColor: '#dedede',
+  separatorFinishedColor: colors.primary,
+  separatorUnFinishedColor: '#dedede',
+  stepIndicatorFinishedColor: colors.primary,
+  stepIndicatorUnFinishedColor: '#ffffff',
+  stepIndicatorCurrentColor: '#ffffff',
+  stepIndicatorLabelFontSize: 0,
+  currentStepIndicatorLabelFontSize: 0,
+  stepIndicatorLabelCurrentColor: 'transparent',
+  stepIndicatorLabelFinishedColor: 'transparent',
+  stepIndicatorLabelUnFinishedColor: 'transparent',
+  labelColor: '#999999',
+  labelSize: 13,
+  currentStepLabelColor: colors.primary,
+};
 
 export default function Home({ navigation }: HomeProps) {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [open, setOpen] = useState({ open: false });
 
+  const randomKanjiIcon = useCallback((props) => false
+    ? <ActivityIndicator style={{ marginRight: 15 }} />
+    : Platform.select({
+    web: <List.Icon {...props} icon={{ uri: `https://www.miraisoft.de/anikanjivgx/?svg=%E3%80%85` }} />,
+    native: <SvgUri width={32} height={32} uri={`https://www.miraisoft.de/anikanjivgx/?svg=%E3%80%85`} />,
+  }), []);
+
+  const renderItem = ({ item }: any) => {
+    return <GradientCard
+      onPress={() => navigation.navigate(item.screen, item.screenOptions)}
+      image={item.image}
+      title={item.title}
+      subtitle={item.subtitle}
+      buttonTitle={item.buttonTitle}
+    />
+  }
+
   return (<SafeAreaView style={styles.main}>
     <View style={styles.header}>
-      <View style={styles.headerTitle}>
-        <Text style={{ fontSize: 18, fontWeight: '600', color: colors.text }}>Hello Alexandre !</Text>
-        <Text style={{ fontSize: 15, color: colors.primary, fontWeight: '700' }}>4000pts</Text>
-      </View>
+      <Button mode="contained" style={{ borderRadius: 25 }}>4000</Button>
       <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
         <Avatar.Text size={40} label="A" />
       </TouchableOpacity>
@@ -38,35 +77,27 @@ export default function Home({ navigation }: HomeProps) {
         />
       </View>
 
-      <View style={{ flex: 0.5, justifyContent: 'center', alignItems: 'center' }}>
-        <Image source={require('./chart.png')} style={{ width: 250, height: 250 }} />
+      <View style={styles.stepper}>
+        <Text style={styles.title}>Today's objectives</Text>
+        <StepIndicator
+          stepCount={3}
+          customStyles={stepperStyles}
+          currentPosition={1}
+          labels={labels}
+        />
       </View>
 
-      <View style={styles.cardGroup}>
-        <View style={styles.card}>
-          <Studying width={190} height={190} />
-          <Button
-            mode="contained"
-            onPress={() => navigation.navigate('Flashcard', { evaluation: false })}
-            icon={menu[1].icon}
-            style={{ borderRadius: 25 }}
-          >
-            Start learning
-          </Button>
-        </View>
+      <Text style={styles.title}>Random</Text>
+      <List.Item title="test" description="description" left={randomKanjiIcon} style={{ marginHorizontal: 20 }} />
 
-        <View style={styles.card}>
-          <Certification width={190} height={190} />
-          <Button
-            mode="contained"
-            onPress={() => navigation.navigate('Flashcard', { evaluation: true })}
-            icon="check-circle"
-            style={{ borderRadius: 25 }}
-          >
-            Evaluate
-          </Button>
-        </View>
-      </View>
+      <Text style={styles.title}>Quick start</Text>
+      <FlatList
+        horizontal
+        style={{ marginHorizontal: 20 }}
+        data={list}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id}
+      />
     </ScrollView>
 
     <FAB.Group
