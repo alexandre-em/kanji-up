@@ -9,6 +9,8 @@ import AsyncStorageKeys from '../constants/asyncstorageKeys';
 import OnboardingScreen from './Onboarding';
 import HomeScreen from './Home';
 import CategoryScreen from './Category';
+import KanjiListScreen from './KanjiList';
+import KanjiDetailScreen from './KanjiDetail';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -33,10 +35,12 @@ export default function Navigation() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName={isFirstTime && Platform.OS !== 'web' ? 'Onboarding' : 'Home'} screenOptions={{ headerShown: false }}>
+      <Stack.Navigator initialRouteName={isFirstTime && Platform.OS !== 'web' ? 'Onboarding' : 'KanjiDetail'} screenOptions={{ headerShown: false }}>
         <Stack.Screen name={'Home'} component={HomeScreen} />
         <Stack.Screen name={'Onboarding'} component={OnboardingScreen} />
         <Stack.Screen name={'Category'} component={CategoryScreen} />
+        <Stack.Screen name={'KanjiList'} component={KanjiListScreen} />
+        <Stack.Screen name={'KanjiDetail'} component={KanjiDetailScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
