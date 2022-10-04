@@ -3,7 +3,7 @@ import {Platform, View} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {ActivityIndicator} from 'react-native-paper';
+import {ActivityIndicator, Snackbar} from 'react-native-paper';
 
 import AsyncStorageKeys from '../constants/asyncstorageKeys';
 import OnboardingScreen from './Onboarding';
@@ -35,13 +35,14 @@ export default function Navigation() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName={isFirstTime && Platform.OS !== 'web' ? 'Onboarding' : 'KanjiDetail'} screenOptions={{ headerShown: false }}>
+      <Stack.Navigator initialRouteName={isFirstTime && Platform.OS !== 'web' ? 'Onboarding' : 'Home'} screenOptions={{ headerShown: false }}>
         <Stack.Screen name={'Home'} component={HomeScreen} />
         <Stack.Screen name={'Onboarding'} component={OnboardingScreen} />
         <Stack.Screen name={'Category'} component={CategoryScreen} />
         <Stack.Screen name={'KanjiList'} component={KanjiListScreen} />
         <Stack.Screen name={'KanjiDetail'} component={KanjiDetailScreen} />
       </Stack.Navigator>
+      <Snackbar visible={false} onDismiss={console.log} action={{ label: 'undo', onPress: console.log }}>OK</Snackbar>
     </NavigationContainer>
   );
 };

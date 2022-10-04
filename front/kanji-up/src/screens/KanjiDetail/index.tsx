@@ -1,13 +1,18 @@
 import React, {useEffect, useState} from 'react';
-import {Text, View} from 'react-native';
-import {Appbar} from 'react-native-paper';
+import {ActivityIndicator, ScrollView, Text, useWindowDimensions, View} from 'react-native';
+import {Appbar, Button, Chip, DataTable, Divider, List} from 'react-native-paper';
+
+import styles from './style';
 import {kanjiService} from '../../service';
+import SvgUriPlatform from '../../components/SVGUriPlatform';
 import {KanjiDetailProps} from '../../types/screens';
+import colors from '../../constants/colors';
 
 export default function KanjiDetail({ navigation, route }: KanjiDetailProps) {
-  // const { id } = route.params;
-  const id = '90ddd5c6-d7dd-4e5a-b371-3bfd2a2404c9';
-  const [details, setDetails] = useState(null);
+  const { width } = useWindowDimensions()
+  const imgSize = width < 700 ? width * 0.5 : 250;
+  const { id } = route.params;
+  const [details, setDetails] = useState<KanjiType | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -15,19 +20,118 @@ export default function KanjiDetail({ navigation, route }: KanjiDetailProps) {
         .getKanjiDetail({ id })
         .then((res) => setDetails(res.data))
         .catch((err) => console.error(err));
+
     }
   }, [id]);
 
-  console.log(id);
+  if (!details) {
+    return <ActivityIndicator animating />;
+  }
 
   return (
-    <View>
+    <View style={styles.main}>
       <Appbar.Header>
         <Appbar.BackAction onPress={() => navigation.goBack()} />
-        <Appbar.Content title={`Detail of ${details?.kanji?.character}`} titleStyle={{ color: '#fff', fontWeight: '700', fontSize: 17 }} />
+        <Appbar.Content title={`Detail of ${details.kanji.character}`} titleStyle={{ color: '#fff', fontWeight: '700', fontSize: 17 }} />
       </Appbar.Header>
-      <Text>KanjiDetail</Text>
-    </View>
-  );
+      <ScrollView>
+        <View style={styles.content}>
+          <SvgUriPlatform width={imgSize} height={imgSize} uri={`https://www.miraisoft.de/anikanjivgx/?svg=${encodeURI(details.kanji.character as string)}`} />
+          <View style={{ width: (width < 700 ? width : 680) - imgSize }}>
+            <Text style={styles.title}>Onyomi</Text>
+            <View style={styles.tags}>
+              {(details.kanji.onyomi || [])
+                .join('|')
+                .split(/,|\||、/)
+                .map((k) => (<Chip key={`on-${k}`} textStyle={{ color: '#fff' }} style={styles.tag}>{k}</Chip>))
+              }
+            </View>
+            <Text style={styles.title}>Kunyomi</Text>
+            <View style={styles.tags}>
+              {(details.kanji.kunyomi || [])
+                .join('|')
+                .split(/,|\||、/)
+                .map((k) => (<Chip key={`kun-${k}`} textStyle={{ color: '#fff' }} style={styles.tag}>{k}</Chip>))
+              }
+            </View>
+          </View>
+        </View>
+        <Button mode="contained" style={styles.button}>Select</Button>
+        <View style={styles.details}>
+          <List.Accordion title="Details" description="number of stroke, meanings, etc.">
+            <DataTable.Row>
+              <DataTable.Cell>id</DataTable.Cell>
+              <DataTable.Cell>{details.kanji_id}</DataTable.Cell>
+            </DataTable.Row>
+            <DataTable.Row>
+              <DataTable.Cell>stroke</DataTable.Cell>
+              <DataTable.Cell>{details.kanji.strokes}</DataTable.Cell>
+            </DataTable.Row>
+            <DataTable.Row>
+              <DataTable.Cell>on</DataTable.Cell>
+              <DataTable.Cell>{details.kanji.onyomi}</DataTable.Cell>
+            </DataTable.Row>
+            <DataTable.Row>
+              <DataTable.Cell>kun</DataTable.Cell>
+              <DataTable.Cell>{details.kanji.kunyomi}</DataTable.Cell>
+            </DataTable.Row>
+            <DataTable.Row>
+              <DataTable.Cell>meanings</DataTable.Cell>
+              <DataTable.Cell>{details.kanji.meaning}</DataTable.Cell>
+            </DataTable.Row>
+            <DataTable.Row>
+              <DataTable.Cell>Grade</DataTable.Cell>
+              <DataTable.Cell>{details.reference?.grade || '/'}</DataTable.Cell>
+            </DataTable.Row>
+          </List.Accordion>
+        </View>
+        {details.radical &&
+        <View style={styles.details}>
+          <List.Accordion title="Radical" description="character, number of strokes, name, etc.">
+            <DataTable.Row>
+              <DataTable.Cell>id</DataTable.Cell>
+              <DataTable.Cell>{details.radical.radical_id}</DataTable.Cell>
+            </DataTable.Row>
+            <DataTable.Row>
+              <DataTable.Cell>character</DataTable.Cell>
+              <DataTable.Cell>{details.radical.character}</DataTable.Cell>
+            </DataTable.Row>
+            <DataTable.Row>
+              <DataTable.Cell>stroke</DataTable.Cell>
+              <DataTable.Cell>{details.radical.strokes}</DataTable.Cell>
+            </DataTable.Row>
+            <DataTable.Row>
+              <DataTable.Cell>hiragana</DataTable.Cell>
+              <DataTable.Cell>{details.radical.name?.hiragana || '/'}</DataTable.Cell>
+            </DataTable.Row>
+            <DataTable.Row>
+              <DataTable.Cell>romaji</DataTable.Cell>
+              <DataTable.Cell>{details.radical.name?.romaji || '/'}</DataTable.Cell>
+            </DataTable.Row>
+            <DataTable.Row>
+              <DataTable.Cell>meanings</DataTable.Cell>
+              <DataTable.Cell>{details.radical.meaning}</DataTable.Cell>
+            </DataTable.Row>
+          </List.Accordion>
+        </View>
+      }
+        {details.examples &&
+        <View style={styles.details}>
+          <List.Accordion title="Examples" description={`Sentences/Words using the "${details.kanji.character}" character`}>
+            {details.examples.map(({ japanese, meaning }) => {
+              return <View key={japanese}>
+                <View style={{ margin: 10 }}>
+                  <Text style={{ color: colors.text }}>{japanese}</Text>
+                  <Text style={{ color: colors.text, opacity: 0.5 }}>{meaning}</Text>
+                </View>
+                <Divider />
+              </View>
+            })}
+          </List.Accordion>
+        </View>
+      }
+    </ScrollView>
+  </View>
+);
 };
 
