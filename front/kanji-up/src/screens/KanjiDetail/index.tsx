@@ -1,15 +1,18 @@
 import React, {useEffect, useState} from 'react';
 import {ActivityIndicator, ScrollView, Text, useWindowDimensions, View} from 'react-native';
 import {Appbar, Button, Chip, DataTable, Divider, List} from 'react-native-paper';
+import {useDispatch} from 'react-redux';
 
 import styles from './style';
 import {kanjiService} from '../../service';
 import SvgUriPlatform from '../../components/SVGUriPlatform';
 import {KanjiDetailProps} from '../../types/screens';
 import colors from '../../constants/colors';
+import {error} from '../../store/slices';
 
 export default function KanjiDetail({ navigation, route }: KanjiDetailProps) {
   const { width } = useWindowDimensions()
+  const dispatch = useDispatch();
   const imgSize = width < 700 ? width * 0.5 : 250;
   const { id } = route.params;
   const [details, setDetails] = useState<KanjiType | null>(null);
@@ -19,7 +22,7 @@ export default function KanjiDetail({ navigation, route }: KanjiDetailProps) {
       kanjiService
         .getKanjiDetail({ id })
         .then((res) => setDetails(res.data))
-        .catch((err) => console.error(err));
+        .catch((err) => dispatch(error.actions.update(err.message)));
 
     }
   }, [id]);

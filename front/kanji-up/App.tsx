@@ -1,9 +1,11 @@
 import React from 'react';
 
-import { Provider as PaperProvider, DefaultTheme, Portal } from 'react-native-paper';
+import { Provider as PaperProvider, DefaultTheme } from 'react-native-paper';
+import { Provider } from 'react-redux';
 
 import colors from './src/constants/colors';
 import Navigation from './src/screens/Navigation';
+import store from './src/store';
 
 const theme = {
   ...DefaultTheme,
@@ -21,9 +23,9 @@ export type ThemeOverride = typeof theme;
 export default function App() {
   return (
     <PaperProvider theme={theme}>
-      <Portal>
+      <Provider store={store}>
         <Navigation />
-      </Portal>
+      </Provider>
     </PaperProvider>
   );
 }

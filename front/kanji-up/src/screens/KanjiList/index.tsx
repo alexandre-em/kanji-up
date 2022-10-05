@@ -1,19 +1,21 @@
-import {AxiosResponse} from 'axios';
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {ActivityIndicator, Platform, SafeAreaView, ScrollView, Text, TouchableOpacity} from 'react-native';
 import {Appbar, DataTable, Divider, IconButton, Menu, Surface} from 'react-native-paper';
+import {useDispatch} from 'react-redux';
+import {AxiosResponse} from 'axios';
 
 import styles from './style';
 import {kanjiService} from '../../service';
 import colors from '../../constants/colors';
 import {KanjiListProps} from '../../types/screens';
+import {error} from '../../store/slices';
 
 const MORE_ICON = Platform.OS === 'ios' ? 'dots-horizontal' : 'dots-vertical';
 const numberOfItemsPerPageList = [30, 50, 100, 200];
 
 export default function KanjiList({ navigation, route }: KanjiListProps) {
-  // const { grade } = route.params;
-  const grade = 'custom';
+  const { grade } = route.params;
+  const dispatch = useDispatch();
   const [data, setData] = useState<Pagination<KanjiType> | null>(null);
   const [limit, setLimit] = useState<number>(30);
   const [selection, setSelection] = useState<boolean>(false);
@@ -37,7 +39,7 @@ export default function KanjiList({ navigation, route }: KanjiListProps) {
           setData(res.data);
           setLoading(false);
         })
-        .catch((err) => console.error(err.message));
+        .catch((err) => dispatch(error.actions.update(err.message)));
     }
   }, [limit, loading]);
 

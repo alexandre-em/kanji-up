@@ -2,6 +2,7 @@ import React, { useCallback, useRef, useState } from 'react';
 import { FlatList, Animated, View, ViewToken } from 'react-native';
 import { Button } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useDispatch} from 'react-redux';
 
 import data from './data';
 import AsyncStorageKeys from '../../constants/asyncstorageKeys';
@@ -9,11 +10,13 @@ import OnboardingItem from './OnboardingItem';
 import Paginator from './Paginator';
 import {onboardingStyle} from './style';
 import {OnboardingProps} from '../../types/screens';
+import {error} from '../../store/slices';
 
 export default function Onboarding({ navigation }: OnboardingProps) {
   const scrollX = useRef(new Animated.Value(0)).current;
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const slidesRef = useRef<FlatList<any>>(null);
+  const dispatch = useDispatch();
 
   const viewableItemsChanged = useRef(({ viewableItems }: { viewableItems: Array<ViewToken> }) => {
     setCurrentIndex(viewableItems[0].index || 0);
@@ -28,7 +31,7 @@ export default function Onboarding({ navigation }: OnboardingProps) {
       await AsyncStorage.setItem(AsyncStorageKeys.FIRST_TIME, 'false');
       navigation.navigate('Home');
     } catch {
-      console.error('An error occured, please try later...');
+      dispatch(error.actions.update('An error occured, please try later...'));
     }
   }, [navigation, slidesRef]);
 
