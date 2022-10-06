@@ -19,19 +19,19 @@ export default function KanjiDetail({ navigation, route }: KanjiDetailProps) {
   const { id } = route.params;
   const [details, setDetails] = useState<KanjiType | null>(null);
 
+  const isSelected = useMemo(() => (
+    (kanjiState.selectedKanji[id] && !kanjiState.toRemove[id]) || kanjiState.toAdd[id]
+  ),[kanjiState])
+
   const handlePress = useCallback(() => {
     if (details) {
-      if (kanjiState.toAdd[details.kanji_id] || (kanjiState.selectedKanji[details.kanji_id] && !kanjiState.toRemove[details.kanji_id])) {
+      if (isSelected) {
         dispatch(kanji.actions.unSelectKanji(details));
       } else {
         dispatch(kanji.actions.selectKanji(details));
       }
     }
-  }, [kanjiState, details]);
-
-  const isSelected = useMemo(() => (
-    kanjiState.selectedKanji[id] || kanjiState.toAdd[id]
-  ),[kanjiState])
+  }, [isSelected, details]);
 
   useEffect(() => {
     if (id) {

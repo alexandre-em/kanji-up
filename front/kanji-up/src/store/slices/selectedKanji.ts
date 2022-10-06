@@ -21,14 +21,16 @@ const updateStatus = (state: SelectedKanjiState, action: PayloadAction<'done' | 
 };
 
 const selectKanji = (state: SelectedKanjiState, action: PayloadAction<KanjiType>) => {
-  if (state.selectedKanji[action.payload.kanji_id]) { return state; }
+  if (state.selectedKanji[action.payload.kanji_id] && !state.toRemove[action.payload.kanji_id]) { return state; }
 
-  const toRemove = state.toRemove;
-  if (state.toRemove[action.payload.kanji_id]) {
-    delete toRemove[action.payload.kanji_id];
-  }
+  const toRemove: { [id: string]: Partial<KanjiType> } = {};
+  Object.keys(state.toRemove).forEach((kId) => {
+    if (kId !== action.payload.kanji_id) {
+      toRemove[kId] = state.toRemove[kId];
+    }
+  });
 
-  return { ...state, toAdd: { ...state.toAdd, [action.payload.kanji_id]: action.payload, toRemove } };
+  return { ...state, toAdd: { ...state.toAdd, [action.payload.kanji_id]: action.payload }, toRemove };
 };
 
 const unSelectKanji = (state: SelectedKanjiState, action: PayloadAction<KanjiType>) => {

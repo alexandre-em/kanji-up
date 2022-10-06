@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {ActivityIndicator, Platform, SafeAreaView, ScrollView, Text, TouchableOpacity} from 'react-native';
-import {Appbar, DataTable, Divider, IconButton, Menu, Surface} from 'react-native-paper';
+import {Appbar, Button, DataTable, Dialog, Divider, IconButton, Menu, Paragraph, Portal, Surface} from 'react-native-paper';
 import {useDispatch, useSelector} from 'react-redux';
 import {AxiosResponse} from 'axios';
 
@@ -24,11 +24,11 @@ export default function KanjiList({ navigation, route }: KanjiListProps) {
   const [selectionMode, setSelection] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [visible, setVisible] = useState<boolean>(false);
+  const [dialog, setDialog] = useState<boolean>(false);
 
   const handlePress = useCallback((selectedKanji: KanjiType) => {
     if (selectionMode) {
       if (kanjiState.toAdd[selectedKanji.kanji_id] || (kanjiState.selectedKanji[selectedKanji.kanji_id] && !kanjiState.toRemove[selectedKanji.kanji_id])) {
-        console.warn('Unselect kanji')
         dispatch(kanji.actions.unSelectKanji(selectedKanji));
       } else {
         dispatch(kanji.actions.selectKanji(selectedKanji));
@@ -49,6 +49,13 @@ export default function KanjiList({ navigation, route }: KanjiListProps) {
   const handleSave = useCallback(() => {
     dispatch(kanji.actions.save((selectedKanji: KanjiType) => writeFile(fileNames.SELECTED_KANJI, JSON.stringify(selectedKanji))));
   }, []);
+
+  const handleBack = useCallback(() => {
+    const hasModifs = Object.keys(kanjiState.toRemove).length + Object.keys(kanjiState.toAdd).length > 0;
+
+    if (hasModifs) { setDialog(true); }
+    else { navigation.goBack() }
+  }, [kanjiState]);
 
   const surfaceStyle = useCallback((kanjiId: string) => {
     if (kanjiState.toRemove[kanjiId]) { return { backgroundColor: colors.warning, color: '#fff' }; }
@@ -96,11 +103,26 @@ export default function KanjiList({ navigation, route }: KanjiListProps) {
   )
   }, [data, loading, selectionMode, kanjiState]);
 
+  const saveWarning = useMemo(() => (
+    <Portal>
+      <Dialog visible={dialog} onDismiss={() => setDialog(false)}>
+        <Dialog.Title>Before quitting</Dialog.Title>
+        <Dialog.Content>
+          <Paragraph>Do you want to save your selection ?</Paragraph>
+        </Dialog.Content>
+        <Dialog.Actions style={{ flexWrap: 'wrap' }}>
+          <Button onPress={() => { handleCancel(); navigation.goBack(); }}>Don't save</Button>
+          <Button mode="contained" onPress={() => { handleSave(); navigation.goBack(); }}>Save</Button>
+        </Dialog.Actions>
+      </Dialog>
+    </Portal>
+  ), [dialog, kanjiState]);
+
   return (
     <SafeAreaView style={styles.main}>
       <Appbar.Header style={{ backgroundColor: selectionMode ? colors.secondary : colors.primary }}>
-        <Appbar.BackAction onPress={() => navigation.goBack()} />
-        <Appbar.Content title={`Grade: ${grade}`} titleStyle={{ color: '#fff', fontWeight: '700', fontSize: 17 }} />
+        <Appbar.BackAction onPress={handleBack} />
+        <Appbar.Content title={`Grade: ${grade}`} subtitle="Click on the right menu to switch to selection mode and don't forget to save your modification." titleStyle={{ color: '#fff', fontWeight: '700', fontSize: 17 }} />
         <Menu
           visible={visible}
           onDismiss={() => setVisible(false)}
@@ -110,9 +132,10 @@ export default function KanjiList({ navigation, route }: KanjiListProps) {
           <Divider />
           <Menu.Item onPress={handleCancel} title="Cancel selection" />
           <Menu.Item onPress={handleReset} title="Reset selection" />
-          <Menu.Item onPress={handleSave} title="Save selection" />
+          <Menu.Item onPress={handleSave} title="Save modification" />
         </Menu>
       </Appbar.Header>
+      {saveWarning}
       {content}
       <DataTable.Pagination
         page={data?.page || 1}
@@ -126,6 +149,6 @@ export default function KanjiList({ navigation, route }: KanjiListProps) {
       />
 
   </SafeAreaView>
-  );
+);
 };
 
