@@ -1,5 +1,6 @@
 export const fileNames = {
   SELECTED_KANJI: 'selectedKanji',
+  USER_SCORES: 'userScores',
 };
 
 export const readFile = (name: string): Promise<string> => {

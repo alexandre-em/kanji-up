@@ -1,14 +1,16 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useMemo, useState} from 'react';
 import {FlatList, Platform, SafeAreaView, ScrollView, Text, TouchableOpacity, View} from 'react-native';
+import {Avatar, Button, Divider, FAB, List, Searchbar} from 'react-native-paper';
 import StepIndicator from 'react-native-step-indicator';
 import {SvgUri} from 'react-native-svg';
+import {useSelector} from 'react-redux';
 
 import styles from './style';
 import { menu, list, labels } from './const';
-import {ActivityIndicator, Avatar, Button, Divider, FAB, List, Searchbar} from 'react-native-paper';
 import colors from '../../constants/colors';
 import {HomeProps} from '../../types/screens';
 import GradientCard from '../../components/GradientCard';
+import {RootState} from '../../store';
 
 const stepperStyles = {
   stepIndicatorSize: 25,
@@ -36,14 +38,27 @@ const stepperStyles = {
 
 export default function Home({ navigation }: HomeProps) {
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const kanjiState = useSelector((state: RootState) => state.kanji);
   const [open, setOpen] = useState({ open: false });
 
-  const randomKanjiIcon = useCallback((props) => false
-    ? <ActivityIndicator style={{ marginRight: 15 }} />
-    : Platform.select({
-    web: <List.Icon {...props} icon={{ uri: `https://www.miraisoft.de/anikanjivgx/?svg=%E3%80%85` }} />,
-    native: <SvgUri width={32} height={32} uri={`https://www.miraisoft.de/anikanjivgx/?svg=%E3%80%85`} />,
-  }), []);
+  const randomKanji = useMemo(() => {
+    if (kanjiState.selectedKanji && Object.keys(kanjiState.selectedKanji).length > 0) {
+      const kanjiKeys: Array<string> = Object.keys(kanjiState.selectedKanji);
+      const random: number = Math.floor(Math.random() * kanjiKeys.length);
+      const choosenKanji: Partial<KanjiType> = kanjiState.selectedKanji[kanjiKeys[random]];
+
+
+      const icon = (props: any) => choosenKanji.kanji?.character && Platform.select({
+        web: <List.Icon {...props} icon={{ uri: `https://www.miraisoft.de/anikanjivgx/?svg=${encodeURI(choosenKanji.kanji?.character)}` }} />,
+        native: <SvgUri width={32} height={32} uri={`https://www.miraisoft.de/anikanjivgx/?svg=${encodeURI(choosenKanji.kanji?.character)}`} />,
+      })
+
+      return (
+        <List.Item title={choosenKanji.kanji?.character} description="See details" left={icon} onPress={() => navigation.navigate('KanjiDetail', { id: choosenKanji.kanji_id as string })} style={{ marginHorizontal: 20 }} />
+        );
+    }
+    return null;
+  }, [kanjiState]);
 
   const renderItem = ({ item }: any) => {
     return <GradientCard
@@ -88,27 +103,27 @@ export default function Home({ navigation }: HomeProps) {
       </View>
 
       <Text style={styles.title}>Random</Text>
-      <List.Item title="test" description="description" left={randomKanjiIcon} style={{ marginHorizontal: 20 }} />
+    {randomKanji}
 
-      <Text style={styles.title}>Quick start</Text>
-      <FlatList
-        horizontal
-        style={{ marginHorizontal: 20 }}
-        data={list}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-      />
-    </ScrollView>
-
-    <FAB.Group
-      visible
-      open={open.open}
-      icon={open.open ? 'close' : 'menu'}
-      color="white"
-      fabStyle={{ backgroundColor: colors.secondary }}
-      actions={menu.map((m) => ({ ...m, onPress: () => navigation.navigate(m.screen, m.navOpt) }))}
-      onStateChange={setOpen}
+    <Text style={styles.title}>Quick start</Text>
+    <FlatList
+      horizontal
+      style={{ marginHorizontal: 20 }}
+      data={list}
+      renderItem={renderItem}
+      keyExtractor={(item) => item.id}
     />
-  </SafeAreaView>);
+  </ScrollView>
+
+  <FAB.Group
+    visible
+    open={open.open}
+    icon={open.open ? 'close' : 'menu'}
+    color="white"
+    fabStyle={{ backgroundColor: colors.secondary }}
+    actions={menu.map((m) => ({ ...m, onPress: () => navigation.navigate(m.screen, m.navOpt) }))}
+    onStateChange={setOpen}
+  />
+</SafeAreaView>);
 };
 
