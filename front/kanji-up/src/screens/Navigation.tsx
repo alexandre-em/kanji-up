@@ -29,7 +29,7 @@ export default function Navigation() {
       const contents = await readFile(fileNames.SELECTED_KANJI);
       dispatch(kanji.actions.initialize(contents));
     } catch (err) {
-      dispatch(error.actions.update(err.message));
+      dispatch(error.actions.update(err instanceof Error ? err.message : 'An error occurred'));
       dispatch(kanji.actions.updateStatus('error'));
     }
   }, []);
@@ -66,7 +66,7 @@ export default function Navigation() {
         <Stack.Screen name={'KanjiList'} component={KanjiListScreen} />
         <Stack.Screen name={'KanjiDetail'} component={KanjiDetailScreen} />
       </Stack.Navigator>
-      <Snackbar visible={errorState.isErrorTriggered} onDismiss={() => {}} action={{ label: 'close', onPress: handleCloseSnack }}>{errorState.message}</Snackbar>
+      <Snackbar duration={1500} visible={errorState.isErrorTriggered} onDismiss={handleCloseSnack} action={{ label: 'close', onPress: handleCloseSnack }}>{errorState.message}</Snackbar>
     </NavigationContainer>
   );
 };

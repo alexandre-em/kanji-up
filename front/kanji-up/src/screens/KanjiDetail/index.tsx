@@ -1,21 +1,37 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {ActivityIndicator, ScrollView, Text, useWindowDimensions, View} from 'react-native';
 import {Appbar, Button, Chip, DataTable, Divider, List} from 'react-native-paper';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 
 import styles from './style';
 import {kanjiService} from '../../service';
 import SvgUriPlatform from '../../components/SVGUriPlatform';
 import {KanjiDetailProps} from '../../types/screens';
 import colors from '../../constants/colors';
-import {error} from '../../store/slices';
+import {error, kanji} from '../../store/slices';
+import {RootState} from '../../store';
 
 export default function KanjiDetail({ navigation, route }: KanjiDetailProps) {
   const { width } = useWindowDimensions()
   const dispatch = useDispatch();
+  const kanjiState = useSelector((state: RootState) => state.kanji);
   const imgSize = width < 700 ? width * 0.5 : 250;
   const { id } = route.params;
   const [details, setDetails] = useState<KanjiType | null>(null);
+
+  const handlePress = useCallback(() => {
+    if (details) {
+      if (kanjiState.toAdd[details.kanji_id] || (kanjiState.selectedKanji[details.kanji_id] && !kanjiState.toRemove[details.kanji_id])) {
+        dispatch(kanji.actions.unSelectKanji(details));
+      } else {
+        dispatch(kanji.actions.selectKanji(details));
+      }
+    }
+  }, [kanjiState, details]);
+
+  const isSelected = useMemo(() => (
+    kanjiState.selectedKanji[id] || kanjiState.toAdd[id]
+  ),[kanjiState])
 
   useEffect(() => {
     if (id) {
@@ -59,7 +75,7 @@ export default function KanjiDetail({ navigation, route }: KanjiDetailProps) {
             </View>
           </View>
         </View>
-        <Button mode="contained" style={styles.button}>Select</Button>
+        <Button mode={isSelected ? "outlined" : "contained"} onPress={handlePress} style={styles.button}>{isSelected ? "Unselect" : "Select"}</Button>
         <View style={styles.details}>
           <List.Accordion title="Details" description="number of stroke, meanings, etc.">
             <DataTable.Row>

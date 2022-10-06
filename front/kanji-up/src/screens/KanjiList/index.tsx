@@ -1,14 +1,16 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {ActivityIndicator, Platform, SafeAreaView, ScrollView, Text, TouchableOpacity} from 'react-native';
 import {Appbar, DataTable, Divider, IconButton, Menu, Surface} from 'react-native-paper';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {AxiosResponse} from 'axios';
 
 import styles from './style';
 import {kanjiService} from '../../service';
 import colors from '../../constants/colors';
 import {KanjiListProps} from '../../types/screens';
-import {error} from '../../store/slices';
+import {error, kanji} from '../../store/slices';
+import {RootState} from '../../store';
+import {fileNames, writeFile} from '../../service/file';
 
 const MORE_ICON = Platform.OS === 'ios' ? 'dots-horizontal' : 'dots-vertical';
 const numberOfItemsPerPageList = [30, 50, 100, 200];
@@ -16,19 +18,43 @@ const numberOfItemsPerPageList = [30, 50, 100, 200];
 export default function KanjiList({ navigation, route }: KanjiListProps) {
   const { grade } = route.params;
   const dispatch = useDispatch();
+  const kanjiState = useSelector((s: RootState) => s.kanji);
   const [data, setData] = useState<Pagination<KanjiType> | null>(null);
   const [limit, setLimit] = useState<number>(30);
-  const [selection, setSelection] = useState<boolean>(false);
+  const [selectionMode, setSelection] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [visible, setVisible] = useState<boolean>(false);
 
-  const handlePress = useCallback((kanjiId: string) => {
-    if (selection) {
-      console.log('Selection mode');
+  const handlePress = useCallback((selectedKanji: KanjiType) => {
+    if (selectionMode) {
+      if (kanjiState.toAdd[selectedKanji.kanji_id] || (kanjiState.selectedKanji[selectedKanji.kanji_id] && !kanjiState.toRemove[selectedKanji.kanji_id])) {
+        console.warn('Unselect kanji')
+        dispatch(kanji.actions.unSelectKanji(selectedKanji));
+      } else {
+        dispatch(kanji.actions.selectKanji(selectedKanji));
+      }
     } else {
-      navigation.navigate('KanjiDetail', { id: kanjiId });
+      navigation.navigate('KanjiDetail', { id: selectedKanji.kanji_id });
     }
-  }, [selection]);
+  }, [selectionMode, kanjiState]);
+
+  const handleReset = useCallback(() => {
+    dispatch(kanji.actions.reset());
+  }, []);
+
+  const handleCancel = useCallback(() => {
+    dispatch(kanji.actions.cancel());
+  }, []);
+
+  const handleSave = useCallback(() => {
+    dispatch(kanji.actions.save((selectedKanji: KanjiType) => writeFile(fileNames.SELECTED_KANJI, JSON.stringify(selectedKanji))));
+  }, []);
+
+  const surfaceStyle = useCallback((kanjiId: string) => {
+    if (kanjiState.toRemove[kanjiId]) { return { backgroundColor: colors.warning, color: '#fff' }; }
+    if (kanjiState.toAdd[kanjiId]) { return { backgroundColor: colors.info, color: '#fff' }; }
+    if (kanjiState.selectedKanji[kanjiId]) { return { backgroundColor: '#ebebeb', color: '#fff' }; }
+  }, [kanjiState]);
   
   const getKanjis = useCallback(({ page }) => {
     if (!loading) {
@@ -58,21 +84,21 @@ export default function KanjiList({ navigation, route }: KanjiListProps) {
     return (
       <ScrollView>
         <SafeAreaView style={styles.grid}>{
-          data.docs.map(({ kanji, kanji_id }) => (
-            <TouchableOpacity key={kanji?.character_id} onPress={() => handlePress(kanji_id)}>
-              <Surface style={styles.kanjiSurface}>
-                <Text style={styles.kanjiText}>{kanji?.character}</Text>
+          data.docs.map((k) => (
+            <TouchableOpacity key={k.kanji?.character_id} onPress={() => handlePress(k)}>
+              <Surface style={[styles.kanjiSurface, surfaceStyle(k.kanji_id)]}>
+                <Text style={styles.kanjiText}>{k.kanji?.character}</Text>
               </Surface>
             </TouchableOpacity>
           ))
         }</SafeAreaView>
     </ScrollView>
   )
-  }, [data, loading]);
+  }, [data, loading, selectionMode, kanjiState]);
 
   return (
     <SafeAreaView style={styles.main}>
-      <Appbar.Header>
+      <Appbar.Header style={{ backgroundColor: selectionMode ? colors.secondary : colors.primary }}>
         <Appbar.BackAction onPress={() => navigation.goBack()} />
         <Appbar.Content title={`Grade: ${grade}`} titleStyle={{ color: '#fff', fontWeight: '700', fontSize: 17 }} />
         <Menu
@@ -80,10 +106,11 @@ export default function KanjiList({ navigation, route }: KanjiListProps) {
           onDismiss={() => setVisible(false)}
           anchor={<IconButton onPress={() => setVisible(true)} icon={MORE_ICON} color="#fff" />}
         >
-          <Menu.Item onPress={() => {}} title="Item 1" />
-          <Menu.Item onPress={() => {}} title="Item 2" />
+          <Menu.Item onPress={() => { setSelection((prevState: boolean) => !prevState); }} title={!selectionMode ? 'Selection mode' : 'Close selection mode'} />
           <Divider />
-          <Menu.Item onPress={() => {}} title="Select" />
+          <Menu.Item onPress={handleCancel} title="Cancel selection" />
+          <Menu.Item onPress={handleReset} title="Reset selection" />
+          <Menu.Item onPress={handleSave} title="Save selection" />
         </Menu>
       </Appbar.Header>
       {content}
