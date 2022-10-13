@@ -1,4 +1,4 @@
-import React, {useCallback, useMemo, useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {FlatList, Platform, SafeAreaView, ScrollView, Text, TouchableOpacity, View} from 'react-native';
 import {Avatar, Button, Divider, FAB, List, Searchbar} from 'react-native-paper';
 import StepIndicator from 'react-native-step-indicator';
@@ -46,7 +46,6 @@ export default function Home({ navigation }: HomeProps) {
       const kanjiKeys: Array<string> = Object.keys(kanjiState.selectedKanji);
       const random: number = Math.floor(Math.random() * kanjiKeys.length);
       const choosenKanji: Partial<KanjiType> = kanjiState.selectedKanji[kanjiKeys[random]];
-
 
       const icon = (props: any) => choosenKanji.kanji?.character && Platform.select({
         web: <List.Icon {...props} icon={{ uri: `https://www.miraisoft.de/anikanjivgx/?svg=${encodeURI(choosenKanji.kanji?.character)}` }} />,
@@ -121,7 +120,7 @@ export default function Home({ navigation }: HomeProps) {
     icon={open.open ? 'close' : 'menu'}
     color="white"
     fabStyle={{ backgroundColor: colors.secondary }}
-    actions={menu.map((m) => ({ ...m, onPress: () => navigation.navigate(m.screen, m.navOpt) }))}
+    actions={menu.map((m) => ({ ...m, onPress: () => navigation.navigate(m.screen, navOpt) }))}
     onStateChange={setOpen}
   />
 </SafeAreaView>);

@@ -8,9 +8,9 @@ interface SvgUriPlatformProps {
   style: any;
 }
 
-export default function SvgUriPlatform({ width, height, uri, style }: SvgUriPlatformProps) {
+export default function SvgUriPlatform({ width, height, uri }: SvgUriPlatformProps) {
   return (
-    <SvgUri uri={uri} width={width} height={height} style={[style]} />
+    <SvgUri uri={uri} width={width} height={height} />
     );
 };
 

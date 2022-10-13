@@ -2,7 +2,7 @@ import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {ActivityIndicator, Platform, SafeAreaView, ScrollView, Text, TouchableOpacity} from 'react-native';
 import {Appbar, Button, DataTable, Dialog, Divider, IconButton, Menu, Paragraph, Portal, Surface} from 'react-native-paper';
 import {useDispatch, useSelector} from 'react-redux';
-import {AxiosResponse} from 'axios';
+import axios, {AxiosRequestConfig, AxiosResponse} from 'axios';
 
 import styles from './style';
 import {kanjiService} from '../../service';
@@ -63,21 +63,24 @@ export default function KanjiList({ navigation, route }: KanjiListProps) {
     if (kanjiState.selectedKanji[kanjiId]) { return { backgroundColor: '#ebebeb', color: '#fff' }; }
   }, [kanjiState]);
   
-  const getKanjis = useCallback(({ page }) => {
+  const getKanjis = useCallback(({ page }, options : AxiosRequestConfig = {}) => {
     if (!loading) {
       setLoading(true);
       kanjiService
-        .getKanjis({ grade, limit, page: page ?? {} })
+        .getKanjis({ grade, limit, page: page ?? {} }, options)
         .then((res: AxiosResponse<Pagination<KanjiType>>) => {
           setData(res.data);
           setLoading(false);
         })
-        .catch((err) => dispatch(error.actions.update(err.message)));
+        .catch((err) => dispatch(error.actions.update(axios.isCancel(err) ? 'Previous action cancelled.' : err.message)));
     }
   }, [limit, loading]);
 
   useEffect(() => {
-    getKanjis({ limit, page: 1 });
+    const cancelToken = axios.CancelToken.source();
+    getKanjis({ page: 1 }, { cancelToken: cancelToken.token });
+
+    return () => { cancelToken.cancel(); }
   }, [limit]);
 
   const content = useMemo(() => {
@@ -93,7 +96,7 @@ export default function KanjiList({ navigation, route }: KanjiListProps) {
         <SafeAreaView style={styles.grid}>{
           data.docs.map((k) => (
             <TouchableOpacity key={k.kanji?.character_id} onPress={() => handlePress(k)}>
-              <Surface style={[styles.kanjiSurface, surfaceStyle(k.kanji_id)]}>
+              <Surface style={[styles.kanjiSurface, surfaceStyle(k.kanji_id)]} elevation={4}>
                 <Text style={styles.kanjiText}>{k.kanji?.character}</Text>
               </Surface>
             </TouchableOpacity>
