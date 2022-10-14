@@ -1,7 +1,7 @@
 import React from 'react';
-import SvgPlatform from '../../components/SvgPlatform';
+import {Image} from 'react-native';
 
 export default function Cancel({ width, height } : SvgProps) {
-  return <SvgPlatform width={width} height={height} source={require('./undraw_cancel_re_pkdm.svg')} />
+  return <Image style={{ width, height }} source={require('./undraw_cancel_re_pkdm.svg')} />
 };
 

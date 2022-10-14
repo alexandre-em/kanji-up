@@ -1,7 +1,7 @@
 import React from 'react';
-import SvgPlatform from '../../components/SvgPlatform';
+import {Image} from 'react-native';
 
 export default function PageNotFound({ width, height } : SvgProps) {
-  return <SvgPlatform width={width} height={height} source={require('./undraw_page_not_found_re_e9o6.svg')} />
+  return <Image style={{ width, height }} source={require('./undraw_page_not_found_re_e9o6.svg')} />
 };
 

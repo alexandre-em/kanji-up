@@ -1,7 +1,7 @@
 import React from "react";
-import SvgPlatform from '../../components/SvgPlatform';
+import {Image} from "react-native";
 
 export default function Alert({ width, height } : SvgProps) {
-  return <SvgPlatform width={width} height={height} source={require('./undraw_alert_re_j2op.svg')} />
+  return <Image style={{ width, height }} source={require('./undraw_alert_re_j2op.svg')} />
 }
 

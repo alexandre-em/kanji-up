@@ -1,7 +1,7 @@
 import React from 'react';
-import SvgPlatform from '../../components/SvgPlatform';
+import {Image} from 'react-native';
 
 export default function Sunlight({ width, height } : SvgProps) {
-  return <SvgPlatform width={width} height={height} source={require('./undraw_sunlight_re_0usx.svg')} />
+  return <Image style={{ width, height }} source={require('./undraw_sunlight_re_0usx.svg')} />
 };
 

@@ -1,7 +1,7 @@
 import React from 'react';
-import SvgPlatform from '../../components/SvgPlatform';
+import {Image} from 'react-native';
 
 export default function HomeScreen({ width, height } : SvgProps) {
-  return <SvgPlatform width={width} height={height} source={require('./undraw_home_screen_re_640d.svg')} />
+  return <Image style={{ width, height }} source={require('./undraw_home_screen_re_640d.svg')} />
 };
 
