@@ -1,6 +1,6 @@
 import React, {useMemo, useState} from 'react';
 import {FlatList, Platform, SafeAreaView, ScrollView, Text, TouchableOpacity, View} from 'react-native';
-import {Avatar, Button, Divider, FAB, List, Searchbar} from 'react-native-paper';
+import {Avatar, Button, FAB, List, Searchbar} from 'react-native-paper';
 import StepIndicator from 'react-native-step-indicator';
 import {SvgUri} from 'react-native-svg';
 import {useSelector} from 'react-redux';
@@ -11,6 +11,10 @@ import colors from '../../constants/colors';
 import {HomeProps} from '../../types/screens';
 import GradientCard from '../../components/GradientCard';
 import {RootState} from '../../store';
+
+import Trip from '../../svg/Trip';
+import Certification from '../../svg/Certification';
+import Reminders from '../../svg/Reminders';
 
 const stepperStyles = {
   stepIndicatorSize: 25,
@@ -69,6 +73,11 @@ export default function Home({ navigation }: HomeProps) {
     />
   }
 
+  const stepperIllustration = useMemo(() => {
+    const step = 1;
+    return <Trip width={220} height={180} />;
+  }, []);
+
   return (<SafeAreaView style={styles.main}>
     <View style={styles.header}>
       <Button mode="contained" style={{ borderRadius: 25 }}>4000</Button>
@@ -76,8 +85,10 @@ export default function Home({ navigation }: HomeProps) {
         <Avatar.Text size={40} label="A" />
       </TouchableOpacity>
     </View>
-
-    <Divider />
+    <View>
+      <Text style={{ marginLeft: 20, fontSize: 18, color: colors.text }}>Hello,</Text>
+      <Text style={[styles.title, { marginTop: 0 }]}>Alexandreさん</Text>
+    </View>
 
     <ScrollView style={{ flex: 0.9 }}>
       <View style={styles.search}>
@@ -85,7 +96,7 @@ export default function Home({ navigation }: HomeProps) {
           placeholder="Search"
           onChangeText={setSearchQuery}
           value={searchQuery}
-          style={{ width: '90%' }}
+          style={{ width: '90%', borderRadius: 25 }}
           inputStyle={{ color: colors.text, fontSize: 15 }}
           onSubmitEditing={() => console.warn(searchQuery)}
         />
@@ -101,7 +112,12 @@ export default function Home({ navigation }: HomeProps) {
         />
       </View>
 
-      <Text style={styles.title}>Random</Text>
+      <View style={{ alignSelf: 'center' }}>
+        {stepperIllustration}
+        <Text style={{ textAlign: 'center', color: colors.primary, fontSize: 20, fontWeight: '800', margin: 15 }}>Good Job</Text>
+      </View>
+
+    <Text style={styles.title}>Random</Text>
     {randomKanji}
 
     <Text style={styles.title}>Quick start</Text>
@@ -120,7 +136,7 @@ export default function Home({ navigation }: HomeProps) {
     icon={open.open ? 'close' : 'menu'}
     color="white"
     fabStyle={{ backgroundColor: colors.secondary }}
-    actions={menu.map((m) => ({ ...m, onPress: () => navigation.navigate(m.screen, navOpt) }))}
+    actions={menu.map((m) => ({ ...m, onPress: () => navigation.navigate(m.screen, m.navOpt) }))}
     onStateChange={setOpen}
   />
 </SafeAreaView>);

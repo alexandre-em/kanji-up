@@ -8,7 +8,7 @@ export default StyleSheet.create({
     maxWidth: 700,
     alignSelf: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f8f8',
     boxShadow: 'rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px',
   },
   header: {
@@ -32,7 +32,7 @@ export default StyleSheet.create({
     marginVertical: 10,
   },
   title: {
-    fontSize: 25,
+    fontSize: 18,
     fontWeight: '800',
     margin: 10,
     marginLeft: 20,

@@ -85,7 +85,7 @@ export default function KanjiDetail({ navigation, route }: KanjiDetailProps) {
         </View>
         <Button mode={isSelected ? "outlined" : "contained"} onPress={handlePress} style={styles.button}>{isSelected ? "Unselect" : "Select"}</Button>
         <View style={styles.details}>
-          <List.Accordion title="Details" description="number of stroke, meanings, etc.">
+          <List.Accordion title="Details" description="number of stroke, meanings, etc." style={{ backgroundColor: '#f8f8f8' }}>
             <DataTable.Row>
               <DataTable.Cell>id</DataTable.Cell>
               <DataTable.Cell style={{ opacity: 0.5 }}>{details.kanji_id}</DataTable.Cell>
@@ -114,7 +114,7 @@ export default function KanjiDetail({ navigation, route }: KanjiDetailProps) {
         </View>
         {details.radical &&
         <View style={styles.details}>
-          <List.Accordion title="Radical" description="character, number of strokes, name, etc.">
+          <List.Accordion title="Radical" description="character, number of strokes, name, etc." style={{ backgroundColor: '#f8f8f8' }}>
             <DataTable.Row>
               <DataTable.Cell>id</DataTable.Cell>
               <DataTable.Cell style={{ opacity: 0.5 }}>{details.radical.radical_id}</DataTable.Cell>
@@ -144,7 +144,7 @@ export default function KanjiDetail({ navigation, route }: KanjiDetailProps) {
       }
         {details.examples &&
         <View style={styles.details}>
-          <List.Accordion title="Examples" description={`Sentences/Words using the "${details.kanji.character}" character`}>
+          <List.Accordion title="Examples" description={`Sentences/Words using the "${details.kanji.character}" character`} style={{ backgroundColor: '#f8f8f8' }}>
             {details.examples.map(({ japanese, meaning }) => {
               return <View key={japanese}>
                 <View style={{ margin: 10 }}>
