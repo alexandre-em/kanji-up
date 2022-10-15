@@ -6,7 +6,7 @@ import colors from '../../constants/colors';
 import CanvasPlatform from './Canvas';
 import styles from './style';
 
-const color = colors.primaryDark;
+const color = colors.text;
 const margin = 0.8;
 
 const { width } = Dimensions.get('window');
@@ -56,8 +56,13 @@ export default forwardRef(({ visible }: { visible: boolean }, ref) => {
 
   const moveCursor = useCallback((nativeEvent) => {
     if (isWeb) {
-      setPreviousX(nativeEvent.offsetX);
-      setPreviousY(nativeEvent.offsetY);
+      if (nativeEvent.offsetX) {
+        setPreviousX(nativeEvent.offsetX);
+        setPreviousY(nativeEvent.offsetY);
+      } else {
+        setPreviousX(nativeEvent.touches[0].pageX);
+        setPreviousY(nativeEvent.touches[0].pageY);
+      }
     } else {
       setPreviousX(nativeEvent.locationX);
       setPreviousY(nativeEvent.locationY);
@@ -82,7 +87,7 @@ export default forwardRef(({ visible }: { visible: boolean }, ref) => {
 
         ctx.lineTo(parseInt(currentX), parseInt(currentY));
         ctx.lineCap = 'round';
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 4;
         ctx.strokeStyle = color;
         ctx.stroke();
         ctx.closePath();
@@ -107,21 +112,17 @@ export default forwardRef(({ visible }: { visible: boolean }, ref) => {
     setCurrentY('');
   }, []);
 
-  const canvasPlatformProps = Platform.select({
-    web: {
-      onMouseDown: onTouch,
-      onMouseUp: onTouchEnd,
-      onMouseMove: onMove,
-    },
-    native: {
-      onTouchStart: onTouch,
-      onTouchMove: onMove,
-      onTouchEnd: onTouchEnd,
-    }
-  });
+  const canvasPlatformProps = {
+    onMouseDown: onTouch,
+    onMouseUp: onTouchEnd,
+    onMouseMove: onMove,
+    onTouchStart: onTouch,
+    onTouchMove: onMove,
+    onTouchEnd: onTouchEnd,
+  };
 
   useImperativeHandle(ref, () => ({
-    getStrokeLength: () => strokeCount,
+    strokeCount,
     getUri: () => {
       if (canvas && canvas.current) {
         return canvas.current.toDataURL();
@@ -130,15 +131,15 @@ export default forwardRef(({ visible }: { visible: boolean }, ref) => {
     handleClear,
   }));
 
+
   if (!visible) { return null; }
 
   return (
     <View style={styles.body}>
-      <Surface style={[styles.canvas, { width: w, height: w }]} {...canvasPlatformProps} elevation={4}>
-        <Button mode="outlined" icon="eraser-variant" color={colors.primary} style={styles.clearbutton} onPress={handleClear}>
-          Clear
-        </Button>
-        <CanvasPlatform ref={canvas} />
+      <Surface>
+        <View style={[styles.canvas, { width: w, height: w }]} {...canvasPlatformProps} elevation={4}>
+          <CanvasPlatform ref={canvas} />
+        </View>
       </Surface>
     </View>
   );

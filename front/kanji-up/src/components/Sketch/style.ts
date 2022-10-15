@@ -12,12 +12,5 @@ export default StyleSheet.create({
     maxHeight: 500,
     position: 'relative',
   },
-  clearbutton: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    zIndex: 20,
-    borderRadius: 25,
-  },
 });
 
