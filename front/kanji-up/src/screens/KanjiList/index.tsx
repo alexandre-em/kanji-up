@@ -108,7 +108,7 @@ export default function KanjiList({ navigation, route }: KanjiListProps) {
 
   const saveWarning = useMemo(() => (
     <Portal>
-      <Dialog visible={dialog} onDismiss={() => setDialog(false)}>
+      <Dialog style={{ maxWidth: 700, width: '100%', alignSelf: 'center' }} visible={dialog} onDismiss={() => setDialog(false)}>
         <Dialog.Title>Before quitting</Dialog.Title>
         <Dialog.Content>
           <Paragraph>Do you want to save your selection ?</Paragraph>

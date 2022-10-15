@@ -7,7 +7,7 @@ type RootStackParamList = {
   KanjiList: { grade: string },
   KanjiDetail: { id: string },
   Search: undefined,
-  Settings: undefined,
+  Settings: { firstTime: boolean },
   Flashcard: { evaluation: boolean },
 };
 

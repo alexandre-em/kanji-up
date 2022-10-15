@@ -38,6 +38,18 @@ export default StyleSheet.create({
     marginLeft: 20,
     color: colors.text,
   },
+  surface: {
+    width: '90%',
+    alignSelf: 'center',
+    borderRadius: 25,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+    margin: 10, 
+    padding: 10,
+    backgroundColor: '#fde2e7',
+  },
   cardGroup: {
     flex: 0.6,
     flexDirection: 'row',
@@ -46,4 +58,10 @@ export default StyleSheet.create({
     marginBottom: 20,
   },
 });
+
+
+
+
+
+
 

@@ -114,6 +114,7 @@ export default function KanjiDetail({ navigation, route }: KanjiDetailProps) {
         </View>
         {details.radical &&
         <View style={styles.details}>
+          <Divider />
           <List.Accordion title="Radical" description="character, number of strokes, name, etc." style={{ backgroundColor: '#f8f8f8' }}>
             <DataTable.Row>
               <DataTable.Cell>id</DataTable.Cell>
@@ -144,6 +145,7 @@ export default function KanjiDetail({ navigation, route }: KanjiDetailProps) {
       }
         {details.examples &&
         <View style={styles.details}>
+          <Divider />
           <List.Accordion title="Examples" description={`Sentences/Words using the "${details.kanji.character}" character`} style={{ backgroundColor: '#f8f8f8' }}>
             {details.examples.map(({ japanese, meaning }) => {
               return <View key={japanese}>

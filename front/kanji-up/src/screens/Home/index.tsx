@@ -1,6 +1,6 @@
 import React, {useMemo, useState} from 'react';
 import {FlatList, Platform, SafeAreaView, ScrollView, Text, TouchableOpacity, View} from 'react-native';
-import {Avatar, Button, FAB, List, Searchbar} from 'react-native-paper';
+import {Avatar, Button, FAB, List, Searchbar, Surface} from 'react-native-paper';
 import StepIndicator from 'react-native-step-indicator';
 import {SvgUri} from 'react-native-svg';
 import {useSelector} from 'react-redux';
@@ -81,16 +81,16 @@ export default function Home({ navigation }: HomeProps) {
   return (<SafeAreaView style={styles.main}>
     <View style={styles.header}>
       <Button mode="contained" style={{ borderRadius: 25 }}>4000</Button>
-      <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
+      <TouchableOpacity onPress={() => navigation.navigate('Settings', { firstTime: false })}>
         <Avatar.Text size={40} label="A" />
       </TouchableOpacity>
     </View>
+
+    <ScrollView style={{ flex: 0.9 }} showsVerticalScrollIndicator={false} >
     <View>
       <Text style={{ marginLeft: 20, fontSize: 18, color: colors.text }}>Hello,</Text>
       <Text style={[styles.title, { marginTop: 0 }]}>Alexandreさん</Text>
     </View>
-
-    <ScrollView style={{ flex: 0.9 }}>
       <View style={styles.search}>
         <Searchbar
           placeholder="Search"
@@ -112,19 +112,27 @@ export default function Home({ navigation }: HomeProps) {
         />
       </View>
 
-      <View style={{ alignSelf: 'center' }}>
-        {stepperIllustration}
-        <Text style={{ textAlign: 'center', color: colors.primary, fontSize: 20, fontWeight: '800', margin: 15 }}>Good Job</Text>
-      </View>
+      <Surface style={styles.surface}>
+        <View style={{ marginHorizontal: 20 }}>
+          {stepperIllustration}
+        </View>
+        <View style={{ margin: 10 }}>
+          <Text style={{ color: colors.secondary, fontSize: 30, fontWeight: '800', marginHorizontal: 20 }}>Good Job !</Text>
+          <Text style={[styles.title, { fontSize: 22, marginTop: 0 }]}>6000 pts</Text>
+        </View>
+      </Surface>
 
-    <Text style={styles.title}>Random</Text>
+      <Text style={styles.title}>Random</Text>
     {randomKanji}
 
     <Text style={styles.title}>Quick start</Text>
     <FlatList
       horizontal
-      style={{ marginHorizontal: 20 }}
+      style={{ marginHorizontal: 20, marginBottom: 20 }}
       data={list}
+      pagingEnabled
+      showsHorizontalScrollIndicator={false}
+      scrollEventThrottle={225}
       renderItem={renderItem}
       keyExtractor={(item) => item.id}
     />

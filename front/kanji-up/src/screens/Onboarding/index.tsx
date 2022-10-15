@@ -1,11 +1,9 @@
 import React, { useCallback, useRef, useState } from 'react';
 import { FlatList, Animated, View, ViewToken } from 'react-native';
 import { Button } from 'react-native-paper';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useDispatch} from 'react-redux';
 
 import data from './data';
-import AsyncStorageKeys from '../../constants/asyncstorageKeys';
 import OnboardingItem from './OnboardingItem';
 import Paginator from './Paginator';
 import {onboardingStyle} from './style';
@@ -26,10 +24,9 @@ export default function Onboarding({ navigation }: OnboardingProps) {
 
   const renderItem = ({ item }: OnboardingItemProps) => (<OnboardingItem item={item} />);
 
-  const handlePress = useCallback(async () => {
+  const handlePress = useCallback(() => {
     try {
-      await AsyncStorage.setItem(AsyncStorageKeys.FIRST_TIME, 'false');
-      navigation.navigate('Home');
+      navigation.navigate('Settings', { firstTime: true });
     } catch {
       dispatch(error.actions.update('An error occured, please try later...'));
     }

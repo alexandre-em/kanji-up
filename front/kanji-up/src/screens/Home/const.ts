@@ -15,7 +15,7 @@ export const menu = [
     label: 'Evaluate',
     screen: 'Flashcard',
     icon: 'cards-playing-heart-multiple',
-    navOpt: { evaluation: false },
+    navOpt: { evaluation: true },
   },
   {
     label: 'Search',
@@ -27,7 +27,7 @@ export const menu = [
     label: 'Settings',
     screen: 'Settings',
     icon: 'application-settings',
-    navOpt: null,
+    navOpt: { firstTime: false },
   },
 ];
 
