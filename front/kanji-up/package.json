@@ -16,7 +16,6 @@
     "@react-navigation/native": "^6.0.13",
     "@react-navigation/native-stack": "^6.9.0",
     "@reduxjs/toolkit": "^1.8.5",
-    "@shopify/react-native-skia": "^0.1.146",
     "axios": "^0.27.2",
     "expo": "~45.0.0",
     "expo-file-system": "^14.1.0",
@@ -33,6 +32,7 @@
     "react-native-step-indicator": "^1.0.3",
     "react-native-svg": "^12.4.3",
     "react-native-web": "0.17.7",
+    "react-native-webview": "^11.23.1",
     "react-redux": "^8.0.2",
     "redux-logger": "^3.0.6"
   },
@@ -40,6 +40,7 @@
     "@babel/core": "^7.12.9",
     "@types/react": "~17.0.21",
     "@types/react-native": "~0.66.13",
+    "@types/react-native-canvas": "^0.1.9",
     "@typescript-eslint/eslint-plugin": "^5.31.0",
     "@typescript-eslint/parser": "^5.31.0",
     "babel-plugin-inline-import": "^3.0.0",

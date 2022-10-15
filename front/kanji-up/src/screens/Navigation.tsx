@@ -13,6 +13,7 @@ import CategoryScreen from './Category';
 import KanjiListScreen from './KanjiList';
 import KanjiDetailScreen from './KanjiDetail';
 import SettingScreen from './Settings';
+import FlashcardScreen from './Flashcard';
 import {fileNames, readFile} from '../service/file';
 import {kanji, error} from '../store/slices';
 import {RootState} from '../store';
@@ -60,8 +61,9 @@ export default function Navigation() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName={isFirstTime && Platform.OS !== 'web' ? 'Onboarding' : 'Home'} screenOptions={{ headerShown: false }}>
+      <Stack.Navigator initialRouteName={isFirstTime && Platform.OS !== 'web' ? 'Onboarding' : 'Flashcard'} screenOptions={{ headerShown: false }}>
         <Stack.Screen name={'Home'} component={HomeScreen} />
+        <Stack.Screen name={'Flashcard'} component={FlashcardScreen} />
         <Stack.Screen name={'Onboarding'} component={OnboardingScreen} />
         <Stack.Screen name={'Category'} component={CategoryScreen} />
         <Stack.Screen name={'KanjiList'} component={KanjiListScreen} />

@@ -23,3 +23,5 @@ type KanjiDetailProps = NativeStackScreenProps<RootStackParamList, 'KanjiDetail'
 
 type SettingsProps = NativeStackScreenProps<RootStackParamList, 'Settings'>;
 
+type FlashcardProps = NativeStackScreenProps<RootStackParamList, 'Flashcard'>;
+
