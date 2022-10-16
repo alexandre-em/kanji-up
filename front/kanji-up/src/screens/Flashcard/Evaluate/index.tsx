@@ -9,11 +9,12 @@ import colors from '../../../constants/colors';
 
 const timeMax = 30;
 
-export default function Evaluate({ kanji }: { kanji: KanjiType[] }) {
+export default function Evaluate({ kanji, onFinish }: { kanji: KanjiType[], onFinish: Function }) {
+  const i = 0;
   const [timer, setTimer] = React.useState<number>(timeMax);
   const canvasRef = useRef<any>();
   const progressCircleRef = useRef<any>();
-  const i = 0;
+  const [kanjiQueue, setKanjiQueue] = React.useState<KanjiType[] | null>(null);
 
   const handleClear = useCallback(() => {
     if (canvasRef && canvasRef.current) {
@@ -22,9 +23,9 @@ export default function Evaluate({ kanji }: { kanji: KanjiType[] }) {
   }, [canvasRef]);
 
   const handleValidate = useCallback(() => {
-    if (canvasRef?.current && kanji) {
-      const isValid = canvasRef?.current.strokeCount === kanji[i].kanji.strokes;
-      const details = kanji[i].kanji;
+    if (canvasRef?.current && kanjiQueue) {
+      const isValid = canvasRef?.current.strokeCount === kanjiQueue[i].kanji.strokes;
+      const details = kanjiQueue[i].kanji;
 
       // Dispatch score
 
@@ -38,7 +39,15 @@ export default function Evaluate({ kanji }: { kanji: KanjiType[] }) {
         }
       }
     }
-  }, [kanji, canvasRef, progressCircleRef]);
+  }, [kanjiQueue, canvasRef, progressCircleRef]);
+
+  React.useEffect(() => {
+    setKanjiQueue(kanji.sort(() => 0.5 - Math.random()));
+  }, [kanji]);
+
+  React.useEffect(() => {
+    if (kanjiQueue && kanjiQueue.length < 1) { onFinish(); }
+  }, [kanjiQueue]);
 
   React.useEffect(() => {
     if (Platform.OS === 'web') {
@@ -54,6 +63,8 @@ export default function Evaluate({ kanji }: { kanji: KanjiType[] }) {
       }
     }
   }, [timer]);
+
+  if (!kanjiQueue || (kanjiQueue && kanjiQueue.length < 1)) { return null; }
 
   return (<View style={styles.content}>
     <View style={styles.contentHeader}>
@@ -74,9 +85,9 @@ export default function Evaluate({ kanji }: { kanji: KanjiType[] }) {
         />
       }
       <View style={{ justifyContent: 'center', marginLeft: 30 }}>
-        <Text style={styles.text}>on: {kanji[i].kanji.onyomi}</Text>
-        <Text style={styles.text}>kun: {kanji[i].kanji.kunyomi}</Text>
-        <Text style={styles.text}>mean: {kanji[i].kanji.meaning}</Text>
+        <Text style={styles.text}>on: {kanjiQueue[i].kanji.onyomi}</Text>
+        <Text style={styles.text}>kun: {kanjiQueue[i].kanji.kunyomi}</Text>
+        <Text style={styles.text}>mean: {kanjiQueue[i].kanji.meaning}</Text>
       </View>
     </View>
     <Sketch visible ref={canvasRef} />

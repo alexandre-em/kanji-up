@@ -36,9 +36,9 @@ export default function Flashcard({ navigation, route }: FlashcardProps) {
       <Appbar.BackAction onPress={() => navigation.goBack()} />
       <Appbar.Content title={`Flashcard`} titleStyle={{ color: '#fff', fontWeight: '700', fontSize: 17 }} />
     </Appbar.Header>
-    {false
-      ? <Evaluate kanji={sKanji} />
-      : <Practice kanji={sKanji} />
+    {true
+      ? <Evaluate kanji={sKanji} onFinish={() => {}} />
+      : <Practice kanji={sKanji} onFinish={() => {}} />
     }
   </SafeAreaView>)
 };
