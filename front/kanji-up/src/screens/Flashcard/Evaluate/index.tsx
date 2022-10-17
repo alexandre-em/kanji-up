@@ -1,4 +1,4 @@
-import React, {useCallback, useRef} from 'react';
+import React, {useCallback, useEffect, useRef} from 'react';
 import {Platform, Text, View} from 'react-native';
 import {Button} from 'react-native-paper';
 import CircularProgress from 'react-native-circular-progress-indicator';
@@ -15,6 +15,7 @@ export default function Evaluate({ kanji, onFinish }: { kanji: KanjiType[], onFi
   const canvasRef = useRef<any>();
   const progressCircleRef = useRef<any>();
   const [kanjiQueue, setKanjiQueue] = React.useState<KanjiType[] | null>(null);
+  const [start, setStart] = React.useState<boolean>(false);
 
   const handleClear = useCallback(() => {
     if (canvasRef && canvasRef.current) {
@@ -30,6 +31,7 @@ export default function Evaluate({ kanji, onFinish }: { kanji: KanjiType[], onFi
       // Dispatch score
 
 
+      setKanjiQueue((prev) => prev.slice(1));
       // next card
       if (Platform.OS === 'web') {
         setTimer(timeMax);
@@ -41,15 +43,20 @@ export default function Evaluate({ kanji, onFinish }: { kanji: KanjiType[], onFi
     }
   }, [kanjiQueue, canvasRef, progressCircleRef]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     setKanjiQueue(kanji.sort(() => 0.5 - Math.random()));
   }, [kanji]);
 
-  React.useEffect(() => {
-    if (kanjiQueue && kanjiQueue.length < 1) { onFinish(); }
-  }, [kanjiQueue]);
+  useEffect(() => {
+    if (kanjiQueue && kanjiQueue.length > 0 && !start) {
+      setStart(true);
+    }
+    if (start && kanjiQueue && kanjiQueue.length < 1) {
+      onFinish({ title: 'Completed', content: `You have completed a set of ${kanji.length} card` });
+    }
+  }, [kanjiQueue, start]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (Platform.OS === 'web') {
       let interval:number = timeMax;
       if (timer !== 0) {

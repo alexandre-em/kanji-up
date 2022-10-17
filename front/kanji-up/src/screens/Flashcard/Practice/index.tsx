@@ -1,16 +1,17 @@
-import React, {useCallback, useMemo} from 'react';
+import React, {useCallback, useMemo, useState} from 'react';
 import {Text, useWindowDimensions, View} from 'react-native';
 import {Button, Divider, Surface} from 'react-native-paper';
-import SvgUriPlatform from '../../../components/SVGUriPlatform';
 
-import colors from '../../../constants/colors';
 import styles from '../style';
+import SvgUriPlatform from '../../../components/SVGUriPlatform';
+import colors from '../../../constants/colors';
 
 export default function Practice({ kanji, onFinish }: { kanji: KanjiType[], onFinish: Function }) {
   const i = 0;
   const { width } = useWindowDimensions();
-  const [reverse, setReverse] = React.useState<boolean>(false);
-  const [kanjiQueue, setKanjiQueue] = React.useState<KanjiType[] | null>(null);
+  const [start, setStart] = useState<boolean>(false);
+  const [reverse, setReverse] = useState<boolean>(false);
+  const [kanjiQueue, setKanjiQueue] = useState<KanjiType[] | null>(null);
 
   const imgSize = useMemo(() => Math.min(width * 0.7, 500), [width]);
 
@@ -52,8 +53,13 @@ export default function Practice({ kanji, onFinish }: { kanji: KanjiType[], onFi
   }, [kanji]);
 
   React.useEffect(() => {
-    if (kanjiQueue && kanjiQueue.length < 1) { onFinish(); }
-  }, [kanjiQueue]);
+    if (kanjiQueue && kanjiQueue.length > 0 && !start) {
+      setStart(true);
+    }
+    if (start && kanjiQueue && kanjiQueue.length < 1) {
+      onFinish({ title: 'Completed', content: `You have completed a set of ${kanji.length} card` });
+    }
+  }, [kanjiQueue, start]);
 
   return (
     <View style={styles.content}>
