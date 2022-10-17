@@ -1,57 +1,47 @@
-name: Deploy Infrastructure
+name: Deploy API
 
 on:
   push:
+#    - tags:
+#      - 'v[0-9]+.[0-9]+.[0-9]+'
     branches:
-      - api
+      - main
 
 jobs:
-  terraform:
-    name: "Terraform"
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - name: Checkout source code
+        uses: actions/checkout@v1
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
+      - name: Load cache
+        uses: actions/cache@v2
         with:
-          # terraform_version: 0.13.0:
-          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+          path: "**/node_modules"
+          key: ${{ runner.os }}-modules
 
-      - name: Terraform Format
-        id: fmt
-        run: terraform fmt -check
+      - name: Install dependencies
+        working-directory: ./back
+        run: yarn install
 
-      - name: Terraform Init
-        id: init
-        run: terraform init
+      - name: Build App
+        working-directory: ./back
+        run: yarn build
+
+      - name: Generate deployment package
+        working-directory: ./back
+        run: zip -r deploy.zip . -x '*.git*'
+
+      - name: Deploy to EB
+        uses: einaregilsson/beanstalk-deploy@v20
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          AWS_ACCESS_ID: ${{ secrets.AWS_ACCESS_ID }}
-          AWS_ACCESS_SECRET: ${{ secrets.AWS_ACCESS_SECRET }}
-          AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
-          MONGO_URI: ${{ secrets.MONK_URI }}
-          MONGO_DB_NAME: ${{ secrets.MONGO_DB_NAME }}
-          MONGO_COLLECTION: ${{ secrets.MONGO_COLLECTION }}
-      
-      - name: Terraform Validate
-        id: validate
-        run: terraform validate -no-color
+          VERSION_LABEL: monapplication-api-${{ github.run_id }}
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: kanjiup-api
+          environment_name: Kanjiupapi-env
+          version_label: ${{ env.VERSION_LABEL }}
+          region: eu-west-3
+          deployment_package: back/deploy.zip
 
-      - name: Terraform Plan Status
-        if: steps.plan.outcome == 'failure'
-        run: exit 1
-
-      - name: Terraform Apply
-        run: terraform apply -auto-approve -input=false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          AWS_ACCESS_ID: ${{ secrets.AWS_ACCESS_ID }}
-          AWS_ACCESS_SECRET: ${{ secrets.AWS_ACCESS_SECRET }}
-          AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
-          MONGO_URI: ${{ secrets.MONK_URI }}
-          MONGO_DB_NAME: ${{ secrets.MONGO_DB_NAME }}
-          MONGO_COLLECTION: ${{ secrets.MONGO_COLLECTION }}
-          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-          HEROKU_EMAIL: ${{ secrets.HEROKU_EMAIL }}
