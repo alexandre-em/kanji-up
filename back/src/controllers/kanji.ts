@@ -464,7 +464,7 @@ router.delete('/:id', (req, res) => {
  *                kanji:
  *                    oneOf:
  *                        - type: string
- *                        - $ref: '#/components/schemas/KanjiResponse'
+ *                        - $ref: '#/components/schemas/CharacterResponse'
  *                radical:
  *                    oneOf:
  *                        - type: string
