@@ -20,7 +20,7 @@ export default class kanjiService {
   };
 
   searchKanjis({ page=0, limit=10, query='' }, options?: AxiosRequestConfig) {
-    if (query === '') { throw new Error('Please, insert a seqrch query'); }
+    if (query === '') { throw new Error('Please, insert a search query'); }
     return this.baseUrl.get(`/search?query=${query}&page=${page}&limit=${limit}`, options);
   };
 };

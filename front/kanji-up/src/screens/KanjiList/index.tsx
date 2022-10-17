@@ -114,8 +114,8 @@ export default function KanjiList({ navigation, route }: KanjiListProps) {
           <Paragraph>Do you want to save your selection ?</Paragraph>
         </Dialog.Content>
         <Dialog.Actions style={{ flexWrap: 'wrap' }}>
-          <Button onPress={() => { handleCancel(); navigation.goBack(); }}>Don't save</Button>
-          <Button mode="contained" onPress={() => { handleSave(); navigation.goBack(); }}>Save</Button>
+          <Button style={{ borderRadius: 25 }} onPress={() => { handleCancel(); navigation.goBack(); }}>Don't save</Button>
+          <Button style={{ borderRadius: 25 }} mode="contained" onPress={() => { handleSave(); navigation.goBack(); }}>Save</Button>
         </Dialog.Actions>
       </Dialog>
     </Portal>

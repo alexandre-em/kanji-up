@@ -14,6 +14,7 @@ import KanjiListScreen from './KanjiList';
 import KanjiDetailScreen from './KanjiDetail';
 import SettingScreen from './Settings';
 import FlashcardScreen from './Flashcard';
+import SearchScreen from './Search';
 import {fileNames, readFile} from '../service/file';
 import {kanji, error} from '../store/slices';
 import {RootState} from '../store';
@@ -68,9 +69,10 @@ export default function Navigation() {
         <Stack.Screen name={'Category'} component={CategoryScreen} />
         <Stack.Screen name={'KanjiList'} component={KanjiListScreen} />
         <Stack.Screen name={'KanjiDetail'} component={KanjiDetailScreen} />
+        <Stack.Screen name={'Search'} component={SearchScreen} />
         <Stack.Screen name={'Settings'} component={SettingScreen} />
       </Stack.Navigator>
-      <Snackbar duration={1500} visible={errorState.isErrorTriggered} onDismiss={handleCloseSnack} action={{ label: 'close', onPress: handleCloseSnack }}>{errorState.message}</Snackbar>
+      <Snackbar duration={5000} visible={errorState.isErrorTriggered} onDismiss={handleCloseSnack} action={{ label: 'close', onPress: handleCloseSnack }}>{errorState.message}</Snackbar>
     </NavigationContainer>
   );
 };

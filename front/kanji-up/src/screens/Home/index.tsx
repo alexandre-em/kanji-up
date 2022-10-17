@@ -98,7 +98,7 @@ export default function Home({ navigation }: HomeProps) {
           value={searchQuery}
           style={{ width: '90%', borderRadius: 25 }}
           inputStyle={{ color: colors.text, fontSize: 15 }}
-          onSubmitEditing={() => console.warn(searchQuery)}
+          onSubmitEditing={() => navigation.navigate('Search', { search: searchQuery })}
         />
       </View>
 
