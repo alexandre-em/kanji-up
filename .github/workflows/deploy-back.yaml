@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
 
       - name: Load cache
         uses: actions/cache@v2
@@ -21,15 +21,15 @@ jobs:
           key: ${{ runner.os }}-modules
 
       - name: Install dependencies
-        working-directory: ./back
+        working-directory: back
         run: yarn install
 
       - name: Build App
-        working-directory: ./back
+        working-directory: back
         run: yarn build
 
       - name: Generate deployment package
-        working-directory: ./back
+        working-directory: back
         run: zip -r deploy.zip . -x '*.git*'
 
       - name: Deploy to EB
@@ -39,9 +39,8 @@ jobs:
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: kanjiup-api
-          environment_name: Kanjiupapi-env
+          application_name: kanjiupapi
+          environment_name: kanjiupapi-env
           version_label: ${{ env.VERSION_LABEL }}
           region: eu-west-3
           deployment_package: back/deploy.zip
-
