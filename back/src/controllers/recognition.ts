@@ -9,9 +9,26 @@ import { upload } from "../utils";
 import { recognitionService } from '../services';
 import InvalidError from '../error/invalid';
 import NotFoundError from '../error/notFound';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const router: Router = Router();
 const urlencodedParser = bodyParser.urlencoded({ extended: false });
+
+router.get('model', (req, res) => {
+  const model = req.query.model;
+  if (model && model === process.env.KANJI_RECOGNIZER_KEY) {
+    const uris = {
+      web: process.env.KANJI_RECOGNIZER_WEB,
+      native: null,
+    };
+
+    res.status(200).send(uris);
+  } else {
+    res.status(403).send(new Error('Not allowed to access this route or specify what you want to do with'));
+  }
+});
 
 /**
  * @openapi
