@@ -10,4 +10,20 @@ type SelectedKanjiState = {
   status: 'done' | 'inProgress' | 'error' | 'pending',
 };
 
+type AnswerType = {
+  image: string,
+  kanji: string,
+  answer: [{
+    prediction: string,
+    confidence: number,
+  }],
+};
+
+type EvaluationState = {
+  totalScore: number,
+  totalCard: number,
+  answers: Array<AnswerType>,
+  status: 'done' | 'inProgress' | 'error' | 'notStarted',
+  error: Error | null,
+}
 

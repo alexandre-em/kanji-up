@@ -2,18 +2,23 @@ import React, {useCallback, useEffect, useRef} from 'react';
 import {Platform, Text, View} from 'react-native';
 import {Button} from 'react-native-paper';
 import CircularProgress from 'react-native-circular-progress-indicator';
+import {useDispatch, useSelector} from 'react-redux';
 
 import styles from '../style';
 import Sketch from '../../../components/Sketch';
 import colors from '../../../constants/colors';
+import evaluation from '../../../store/slices/evaluation';
+import {RootState} from '../../../store';
 
 const timeMax = 30;
 
 export default function Evaluate({ kanji, onFinish }: { kanji: KanjiType[], onFinish: Function }) {
   const i = 0;
-  const [timer, setTimer] = React.useState<number>(timeMax);
+  const dispatch = useDispatch();
   const canvasRef = useRef<any>();
   const progressCircleRef = useRef<any>();
+  const evaluationState = useSelector((state: RootState) => state.evaluation);
+  const [timer, setTimer] = React.useState<number>(timeMax);
   const [kanjiQueue, setKanjiQueue] = React.useState<KanjiType[] | null>(null);
   const [start, setStart] = React.useState<boolean>(false);
 
@@ -29,9 +34,9 @@ export default function Evaluate({ kanji, onFinish }: { kanji: KanjiType[], onFi
       const details = kanjiQueue[i].kanji;
 
       // Dispatch score
+      
 
-
-      setKanjiQueue((prev) => prev.slice(1));
+      setKanjiQueue((prev) => prev?.slice(1) || prev);
       // next card
       if (Platform.OS === 'web') {
         setTimer(timeMax);

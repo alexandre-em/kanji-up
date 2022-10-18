@@ -1,7 +1,7 @@
 import axios, {AxiosRequestConfig} from 'axios';
 
 // const KANJI_BASE_URL = 'http://localhost:5000';
-const KANJI_BASE_URL = 'https://kanji-up-api.herokuapp.com';
+const KANJI_BASE_URL = 'https://kanjiup-api.alexandre-em.fr';
 
 export default class kanjiService {
   private baseUrl;
