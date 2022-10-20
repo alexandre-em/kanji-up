@@ -1,5 +1,5 @@
 import React, {useMemo, useState} from 'react';
-import {FlatList, Platform, SafeAreaView, ScrollView, Text, TouchableOpacity, View} from 'react-native';
+import {FlatList, Image, Platform, SafeAreaView, ScrollView, Text, TouchableOpacity, View} from 'react-native';
 import {Avatar, Button, FAB, List, Searchbar, Surface} from 'react-native-paper';
 import StepIndicator from 'react-native-step-indicator';
 import {SvgUri} from 'react-native-svg';
@@ -52,9 +52,9 @@ export default function Home({ navigation }: HomeProps) {
       const choosenKanji: Partial<KanjiType> = kanjiState.selectedKanji[kanjiKeys[random]];
 
       const icon = (props: any) => choosenKanji.kanji?.character && Platform.select({
-        web: <List.Icon {...props} icon={{ uri: `https://www.miraisoft.de/anikanjivgx/?svg=${encodeURI(choosenKanji.kanji?.character)}` }} />,
+        web: <Image {...props} style={{ width: 32, height: 32 }} source={{ uri: `https://www.miraisoft.de/anikanjivgx/?svg=${encodeURI(choosenKanji.kanji?.character)}` }} />,
         native: <SvgUri width={32} height={32} uri={`https://www.miraisoft.de/anikanjivgx/?svg=${encodeURI(choosenKanji.kanji?.character)}`} />,
-      })
+      });
 
       return (
         <List.Item title={choosenKanji.kanji?.character} description="See details" left={icon} onPress={() => navigation.navigate('KanjiDetail', { id: choosenKanji.kanji_id as string })} style={{ marginHorizontal: 20 }} />
