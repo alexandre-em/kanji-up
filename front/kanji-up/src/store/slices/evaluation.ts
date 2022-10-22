@@ -8,7 +8,7 @@ const initialState: EvaluationState = {
   error: null,
 };
 
-const initialize = (state: EvaluationState, action: PayloadAction<string>) => {
+const initialize = (state: EvaluationState) => {
   const loadingState: EvaluationState = { ...state, status: 'inProgress' };
 
   return {
@@ -19,6 +19,10 @@ const initialize = (state: EvaluationState, action: PayloadAction<string>) => {
 
 const addAnswer = (state: EvaluationState, action: PayloadAction<AnswerType>) => {
   return { ...state, answers: [...state.answers, action.payload]};
+};
+
+const finish = (state: EvaluationState) => {
+  return { ...state, status: 'done' } as EvaluationState;
 };
 
 const handleError = (state: EvaluationState, action: PayloadAction<Error>) => {
@@ -34,6 +38,7 @@ export const evaluation = createSlice({
     initialize,
     addAnswer,
     handleError,
+    finish,
   },
 });
 

@@ -3,16 +3,18 @@ import {Platform, Text, View} from 'react-native';
 import {Button} from 'react-native-paper';
 import CircularProgress from 'react-native-circular-progress-indicator';
 import {useDispatch, useSelector} from 'react-redux';
+import {AxiosResponse} from 'axios';
 
 import styles from '../style';
 import Sketch from '../../../components/Sketch';
 import colors from '../../../constants/colors';
-import evaluation from '../../../store/slices/evaluation';
 import {RootState} from '../../../store';
+import {error, evaluation} from '../../../store/slices';
+import {recognitionService} from '../../../service';
 
 const timeMax = 30;
 
-export default function Evaluate({ kanji, onFinish }: { kanji: KanjiType[], onFinish: Function }) {
+export default function Evaluate({ kanji, model, onFinish }: { kanji: KanjiType[], model: any, onFinish: Function }) {
   const i = 0;
   const dispatch = useDispatch();
   const canvasRef = useRef<any>();
@@ -28,13 +30,28 @@ export default function Evaluate({ kanji, onFinish }: { kanji: KanjiType[], onFi
     }
   }, [canvasRef]);
 
-  const handleValidate = useCallback(() => {
+  const handleValidate = useCallback(async () => {
     if (canvasRef?.current && kanjiQueue) {
       const isValid = canvasRef?.current.strokeCount === kanjiQueue[i].kanji.strokes;
       const details = kanjiQueue[i].kanji;
 
       // Dispatch score
-      
+      const imageBase64: string = canvasRef.current.getUri();
+      const prediction = await model.predict(imageBase64);
+
+      try {
+        const recognition: AxiosResponse<RecognitionType> = await new Promise((resolve, reject) => {
+          canvasRef.current.toBlob((blob: Blob) => {
+            recognitionService.postRecognition(details.character as string, prediction, blob)
+              .then(resolve)
+              .catch(reject);
+          });
+        });
+        dispatch(evaluation.actions.addAnswer({ kanji: recognition.data.kanji || '', image: recognition.data.image, answer: prediction }));
+
+      } catch (err) {
+        console.error(err);
+      }
 
       setKanjiQueue((prev) => prev?.slice(1) || prev);
       // next card
@@ -46,20 +63,24 @@ export default function Evaluate({ kanji, onFinish }: { kanji: KanjiType[], onFi
         }
       }
     }
-  }, [kanjiQueue, canvasRef, progressCircleRef]);
+  }, [model, kanjiQueue, canvasRef, progressCircleRef, evaluation]);
 
   useEffect(() => {
     setKanjiQueue(kanji.sort(() => 0.5 - Math.random()));
   }, [kanji]);
 
   useEffect(() => {
-    if (kanjiQueue && kanjiQueue.length > 0 && !start) {
-      setStart(true);
+    if (dispatch) {
+      if (kanjiQueue && kanjiQueue.length > 0 && !start) {
+        dispatch(evaluation.actions.initialize());
+        setStart(true);
+      }
+      if (start && kanjiQueue && kanjiQueue.length < 1) {
+        onFinish({ title: 'Completed', content: `You have completed a set of ${kanji.length} card` });
+        dispatch(evaluation.actions.finish());
+      }
     }
-    if (start && kanjiQueue && kanjiQueue.length < 1) {
-      onFinish({ title: 'Completed', content: `You have completed a set of ${kanji.length} card` });
-    }
-  }, [kanjiQueue, start]);
+  }, [dispatch, kanjiQueue, start]);
 
   useEffect(() => {
     if (Platform.OS === 'web') {

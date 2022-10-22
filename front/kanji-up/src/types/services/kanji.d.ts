@@ -27,6 +27,13 @@ type ReferenceType = {
   reference_id: string,
 };
 
+type RecognitionType = {
+  recognition_id: string,
+  image: string,
+  kanji: string,
+  predictions: Array<{ confidence: number, prediction: string }>
+};
+
 type KanjiType = {
   creation_date?: string,
   deleted_at?: string,

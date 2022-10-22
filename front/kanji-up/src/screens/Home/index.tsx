@@ -1,6 +1,6 @@
 import React, {useMemo, useState} from 'react';
 import {FlatList, Image, Platform, SafeAreaView, ScrollView, Text, TouchableOpacity, View} from 'react-native';
-import {Avatar, Button, FAB, List, Searchbar, Surface} from 'react-native-paper';
+import {Avatar, Button, Dialog, FAB, List, Paragraph, Portal, ProgressBar, Searchbar, Surface} from 'react-native-paper';
 import StepIndicator from 'react-native-step-indicator';
 import {SvgUri} from 'react-native-svg';
 import {useSelector} from 'react-redux';
@@ -15,6 +15,7 @@ import {RootState} from '../../store';
 import Trip from '../../svg/Trip';
 import Certification from '../../svg/Certification';
 import Reminders from '../../svg/Reminders';
+import usePrediction from '../../hooks/usePrediction';
 
 const stepperStyles = {
   stepIndicatorSize: 25,
@@ -44,6 +45,9 @@ export default function Home({ navigation }: HomeProps) {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const kanjiState = useSelector((state: RootState) => state.kanji);
   const [open, setOpen] = useState({ open: false });
+  const [downloadProgress, setDownloadProgress] = useState({ progress: 0, showDialog: false });
+  const [isDownloading, setIsDownloading] = useState(false);
+  const model = usePrediction();
 
   const randomKanji = useMemo(() => {
     if (kanjiState.selectedKanji && Object.keys(kanjiState.selectedKanji).length > 0) {
@@ -78,6 +82,33 @@ export default function Home({ navigation }: HomeProps) {
     return <Trip width={220} height={180} />;
   }, []);
 
+  const dialog = useMemo(() => (
+    <Portal>
+      <Dialog style={{ maxWidth: 700, width: '100%', alignSelf: 'center' }} visible={downloadProgress.showDialog} onDismiss={() => setDownloadProgress({ progress: 0, showDialog: false })}>
+        <Dialog.Title>Initializing the application</Dialog.Title>
+        <Dialog.Content>
+          <Paragraph>Downloading models...</Paragraph>
+          <ProgressBar progress={downloadProgress.progress} />
+        </Dialog.Content>
+        <Dialog.Actions style={{ flexWrap: 'wrap' }}>
+          <Button mode="contained" onPress={() => navigation.goBack()}>Finish</Button>
+        </Dialog.Actions>
+      </Dialog>
+    </Portal>
+  ), [downloadProgress]);
+
+  React.useEffect(() => {
+    if (model && !model.isBufferStored && !isDownloading) {
+      setIsDownloading(true);
+      const onDownloadProgress = (progressEvent: any) => {
+        const percentCompleted = progressEvent.loaded / progressEvent.total;
+        setDownloadProgress({ progress: percentCompleted, showDialog: true });
+
+      };
+      model.downloadThenSave({ responseType: 'arraybuffer', onDownloadProgress });
+    }
+  }, [model, isDownloading]);
+
   return (<SafeAreaView style={styles.main}>
     <View style={styles.header}>
       <Button mode="contained" style={{ borderRadius: 25 }}>4000</Button>
@@ -87,10 +118,10 @@ export default function Home({ navigation }: HomeProps) {
     </View>
 
     <ScrollView style={{ flex: 0.9 }} showsVerticalScrollIndicator={false} >
-    <View>
-      <Text style={{ marginLeft: 20, fontSize: 18, color: colors.text }}>Hello,</Text>
-      <Text style={[styles.title, { marginTop: 0 }]}>Alexandreさん</Text>
-    </View>
+      <View>
+        <Text style={{ marginLeft: 20, fontSize: 18, color: colors.text }}>Hello,</Text>
+        <Text style={[styles.title, { marginTop: 0 }]}>Alexandreさん</Text>
+      </View>
       <View style={styles.search}>
         <Searchbar
           placeholder="Search"
@@ -147,6 +178,7 @@ export default function Home({ navigation }: HomeProps) {
     actions={menu.map((m) => ({ ...m, onPress: () => navigation.navigate(m.screen, m.navOpt) }))}
     onStateChange={setOpen}
   />
+  {dialog}
 </SafeAreaView>);
 };
 

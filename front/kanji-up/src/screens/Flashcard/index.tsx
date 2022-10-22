@@ -1,7 +1,8 @@
 import React, {useEffect, useState} from 'react';
-import {SafeAreaView} from 'react-native';
+import {SafeAreaView, View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
-import {Appbar, Button, Dialog, Paragraph, Portal} from 'react-native-paper';
+import {ActivityIndicator, Appbar, Button, Dialog, Paragraph, Portal} from 'react-native-paper';
+import axios, {AxiosResponse} from 'axios';
 
 import styles from './style';
 import Evaluate from './Evaluate';
@@ -9,30 +10,18 @@ import Practice from './Practice';
 import {FlashcardProps} from '../../types/screens';
 import {RootState} from '../../store';
 import {kanjiService} from '../../service';
-import axios, {AxiosResponse} from 'axios';
+import usePrediction from '../../hooks/usePrediction';
 import {error} from '../../store/slices';
 
 export default function Flashcard({ navigation, route }: FlashcardProps) {
   const { evaluation } = route.params;
   const dispatch = useDispatch();
+  const model = usePrediction();
   const kanjiState =  useSelector((state: RootState) => state.kanji);
   const [sKanji, setKanji] = useState<Array<KanjiType>>([]);
   const [dialog, setDialog] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [message, setMessage] = useState({ title: '', content: '' });
-  
-  const dialogComponent = React.useMemo(() => (
-    <Portal>
-      <Dialog style={{ maxWidth: 700, width: '100%', alignSelf: 'center' }} visible={dialog} onDismiss={() => setDialog(false)}>
-        <Dialog.Title>{message.title}</Dialog.Title>
-        <Dialog.Content>
-          <Paragraph>{message.content}</Paragraph>
-        </Dialog.Content>
-        <Dialog.Actions style={{ flexWrap: 'wrap' }}>
-          <Button mode="contained" onPress={() => navigation.goBack()}>Finish</Button>
-        </Dialog.Actions>
-      </Dialog>
-    </Portal>
-  ), [dialog]);
 
   const handleFinish = React.useCallback(({ title, content }) => {
     setMessage({ title, content });
@@ -57,14 +46,45 @@ export default function Flashcard({ navigation, route }: FlashcardProps) {
     return () => { cancelToken.cancel(); }
   }, [kanjiState]);
 
+  useEffect(() => {
+    (async () => {
+      if (model && !model.model && evaluation && !loading) {
+        console.log('useEffect to Load the model, entering condition')
+        setLoading(true);
+        try {
+          await model.loadModel();
+        } catch (err) {
+          dispatch(error.actions.update(err.message));
+        }
+        setLoading(false);
+      }
+    })()
+  }, [model, evaluation, loading]);
+
+  const dialogComponent = React.useMemo(() => (
+    <Portal>
+      <Dialog style={{ maxWidth: 700, width: '100%', alignSelf: 'center' }} visible={dialog} onDismiss={() => setDialog(false)}>
+        <Dialog.Title>{message.title}</Dialog.Title>
+        <Dialog.Content>
+          <Paragraph>{message.content}</Paragraph>
+        </Dialog.Content>
+        <Dialog.Actions style={{ flexWrap: 'wrap' }}>
+          <Button mode="contained" onPress={() => navigation.goBack()}>Finish</Button>
+        </Dialog.Actions>
+      </Dialog>
+    </Portal>
+  ), [dialog]);
+
   return (<SafeAreaView style={styles.main}>
     <Appbar.Header>
       <Appbar.BackAction onPress={() => navigation.goBack()} />
       <Appbar.Content title={`Flashcard`} titleStyle={{ color: '#fff', fontWeight: '700', fontSize: 17 }} />
     </Appbar.Header>
-    {evaluation
-      ? <Evaluate kanji={sKanji} onFinish={handleFinish} />
-      : <Practice kanji={sKanji} onFinish={handleFinish} />
+    {model.model ?
+    (evaluation
+      ? <Evaluate kanji={sKanji} model={model} onFinish={handleFinish} />
+      : <Practice kanji={sKanji} onFinish={handleFinish} />)
+      : <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}><ActivityIndicator  animating /></View>
     }
     {dialogComponent}
   </SafeAreaView>)

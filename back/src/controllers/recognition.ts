@@ -192,7 +192,7 @@ router.patch('/validation/:id', (req, res) => {
  *                    type: string
  *                kanji:
  *                    type: string
- *                prediction:
+ *                predictions:
  *                    type: array
  *                    items:
  *                        $ref: '#/components/schemas/Prediction'

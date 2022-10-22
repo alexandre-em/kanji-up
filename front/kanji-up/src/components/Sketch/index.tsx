@@ -36,11 +36,13 @@ export default forwardRef(({ visible }: { visible: boolean }, ref) => {
         ctx.fillRect(0, 0, w, w);
         
         ctx.lineWidth = 2;
+        /*
         ctx.strokeStyle = '#e0e0e055';
         ctx.moveTo(0, w/2);
         ctx.lineTo(w, w/2);
         ctx.moveTo(w/2, 0);
         ctx.lineTo(w/2, w);
+         */
         ctx.stroke();
 
         setIsOpen(true);
@@ -48,11 +50,6 @@ export default forwardRef(({ visible }: { visible: boolean }, ref) => {
       }
     }
   }, [canvas]);
-
-  useEffect(() => {
-    if (visible && !isOpen) { handleClear(); }
-    if (!visible) { setIsOpen(false); }
-  }, [handleClear, isOpen, visible]);
 
   const moveCursor = useCallback((nativeEvent) => {
     if (isWeb) {
@@ -87,7 +84,7 @@ export default forwardRef(({ visible }: { visible: boolean }, ref) => {
 
         ctx.lineTo(parseInt(currentX), parseInt(currentY));
         ctx.lineCap = 'round';
-        ctx.lineWidth = 4;
+        ctx.lineWidth = 15;
         ctx.strokeStyle = color;
         ctx.stroke();
         ctx.closePath();
@@ -125,12 +122,21 @@ export default forwardRef(({ visible }: { visible: boolean }, ref) => {
     strokeCount,
     getUri: () => {
       if (canvas && canvas.current) {
-        return canvas.current.toDataURL();
+        return canvas.current.toDataURL('image/jpeg', 1);
+      } else { throw new Error('Could not save the canvas'); }
+    },
+    toBlob: (callback: BlobCallback) => {
+      if (canvas && canvas.current) {
+        canvas.current.toBlob(callback, 'image/jpeg', 1);
       } else { throw new Error('Could not save the canvas'); }
     },
     handleClear,
   }));
 
+  useEffect(() => {
+    if (visible && !isOpen) { handleClear(); }
+    if (!visible) { setIsOpen(false); }
+  }, [handleClear, isOpen, visible]);
 
   if (!visible) { return null; }
 
