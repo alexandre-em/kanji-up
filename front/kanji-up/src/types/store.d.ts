@@ -13,10 +13,9 @@ type SelectedKanjiState = {
 type AnswerType = {
   image: string,
   kanji: string,
-  answer: [{
-    prediction: string,
-    confidence: number,
-  }],
+  status: 'correct' | 'incorrect' | 'toReview',
+  message: string | string[],
+  answer: PredictionType[] | [],
 };
 
 type EvaluationState = {

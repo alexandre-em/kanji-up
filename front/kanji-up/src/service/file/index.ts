@@ -1,3 +1,6 @@
+import {RefObject} from "react";
+import {recognitionService} from "..";
+
 export const fileNames = {
   SELECTED_KANJI: 'selectedKanji',
   USER_SCORES: 'userScores',
@@ -25,4 +28,16 @@ export const writeFile = (name: string, contents: string) => {
     }
   });
 };
+
+export const uploadImage = async (canvasRef: RefObject<any>, kanji: string, prediction: Array<PredictionType>) => {
+  if (!canvasRef && !canvasRef.current) { throw new Error('canvasRef is not ready') }
+
+  return new Promise((resolve, reject) => {
+    canvasRef.current.toBlob((blob: Blob) => {
+      recognitionService.postRecognition(kanji, prediction, blob)
+        .then(resolve)
+        .catch(reject);
+    });
+  });
+}
 

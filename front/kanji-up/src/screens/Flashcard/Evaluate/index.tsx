@@ -4,14 +4,13 @@ import {Button} from 'react-native-paper';
 import CircularProgress from 'react-native-circular-progress-indicator';
 import {useDispatch, useSelector} from 'react-redux';
 import {AxiosResponse} from 'axios';
-import * as FileSystem from 'expo-file-system';
 
 import styles from '../style';
 import Sketch from '../../../components/Sketch';
 import colors from '../../../constants/colors';
 import {RootState} from '../../../store';
 import {error, evaluation} from '../../../store/slices';
-import {recognitionService} from '../../../service';
+import {uploadImage} from '../../../service/file';
 
 const timeMax = 30;
 
@@ -35,20 +34,26 @@ export default function Evaluate({ kanji, model, onFinish }: { kanji: KanjiType[
     if (canvasRef?.current && kanjiQueue) {
       const isValid = canvasRef?.current.strokeCount === kanjiQueue[i].kanji.strokes;
       const details = kanjiQueue[i].kanji;
+      const imageBase64: string = Platform.OS === 'web'
+        ? canvasRef.current.getUri()
+        : (await canvasRef.current.getUri()).split('data:image/jpeg;base64,')[1];
+
+      if (!isValid) {
+        dispatch(evaluation.actions.addAnswer({ kanji: details.character as string, image: imageBase64, answer: [], status: 'incorrect', message: 'The stroke number does\'t match' }));
+      }
 
       // Dispatch score
-      const imageBase64: string = canvasRef.current.getUri();
-      const prediction = await model.predict(imageBase64);
+      const prediction: PredictionType[] = await model.predict(imageBase64);
+      const isIncluded = prediction.some((p) => p.prediction === details.character);
+
+      if (!isIncluded) {
+        dispatch(evaluation.actions.addAnswer({ kanji: details.character as string, image: imageBase64, answer: [], status: 'toReview', message: 'The drawing kanji seems not be recognized by our algo' }));
+      }
 
       try {
-        const recognition: AxiosResponse<RecognitionType> = await new Promise((resolve, reject) => {
-          canvasRef.current.toBlob((blob: Blob) => {
-            recognitionService.postRecognition(details.character as string, prediction, blob)
-              .then(resolve)
-              .catch(reject);
-          });
-        });
-        dispatch(evaluation.actions.addAnswer({ kanji: recognition.data.kanji || '', image: recognition.data.image, answer: prediction }));
+        const recognition = await uploadImage(canvasRef, details.character as string, prediction) as AxiosResponse<RecognitionType>;
+
+        dispatch(evaluation.actions.addAnswer({ kanji: recognition.data.kanji || '', image: recognition.data.image, answer: prediction, status: 'correct', message: 'Correct !' }));
 
       } catch (err) {
         console.error(err);
@@ -62,37 +67,6 @@ export default function Evaluate({ kanji, model, onFinish }: { kanji: KanjiType[
         if (progressCircleRef?.current) {
           progressCircleRef.current.reAnimate();
         }
-      }
-    }
-  }, [model, kanjiQueue, canvasRef, progressCircleRef, evaluation]);
-
-  const handleValidateNative = useCallback(async () => {
-    if (canvasRef?.current && kanjiQueue) {
-      const isValid = canvasRef?.current.strokeCount === kanjiQueue[i].kanji.strokes;
-      const details = kanjiQueue[i].kanji;
-
-      // Dispatch score
-      const imageBase64: string = await canvasRef.current.getUri();
-      const imageBase64Code = imageBase64.split('data:image/jpeg;base64,')[1];
-      const prediction = await model.predict(imageBase64Code);
-      const filename = `${FileSystem.documentDirectory}${Date.now().toString()}.jpg`;
-      await FileSystem.writeAsStringAsync(filename, imageBase64Code, {
-        encoding: FileSystem.EncodingType.Base64,
-      });
-
-      try {
-        const recognition: AxiosResponse<RecognitionType> = await recognitionService.postRecognitionNative(details.character as string, prediction, filename);
-
-        dispatch(evaluation.actions.addAnswer({ kanji: recognition.data.kanji || '', image: recognition.data.image, answer: prediction }));
-
-        await FileSystem.deleteAsync(filename);
-      } catch (err) {
-        console.error(err);
-      }
-      setKanjiQueue((prev) => prev?.slice(1) || prev);
-      // next card
-      if (progressCircleRef?.current) {
-        progressCircleRef.current.reAnimate();
       }
     }
   }, [model, kanjiQueue, canvasRef, progressCircleRef, evaluation]);
@@ -145,7 +119,7 @@ export default function Evaluate({ kanji, model, onFinish }: { kanji: KanjiType[
           activeStrokeSecondaryColor={'#C25AFF'}
           inActiveStrokeWidth={15}
           duration={timeMax * 1000}
-          onAnimationComplete={handleValidateNative}
+          onAnimationComplete={handleValidate}
           ref={progressCircleRef}
         />
       }
@@ -160,7 +134,7 @@ export default function Evaluate({ kanji, model, onFinish }: { kanji: KanjiType[
       <Button mode="outlined" icon="eraser-variant" color={colors.primary} style={styles.clearbutton} onPress={handleClear}>
         Clear
       </Button>
-      <Button mode="contained" icon="checkbox-marked-circle-outline" color={colors.primary} style={styles.clearbutton} onPress={Platform.OS === 'web' ? handleValidate : handleValidateNative}>
+      <Button mode="contained" icon="checkbox-marked-circle-outline" color={colors.primary} style={styles.clearbutton} onPress={handleValidate}>
         Validate
       </Button>
     </View>
