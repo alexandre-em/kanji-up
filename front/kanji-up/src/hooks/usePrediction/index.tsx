@@ -11,33 +11,29 @@ import labels from './labels';
 
 tflite.setWasmPath('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-tflite@0.0.1-alpha.8/dist/');
 
-const url = 'https://anki-images.s3.eu-west-3.amazonaws.com/models/kanji_model.tflite';
-
 export default function usePrediction() {
   const startDb = useIndexedDb();
   const [loading, setLoading] = useState<boolean>(false);
   const [model, setModel] = useState<tflite.TFLiteModel>();
 
-  const downloadThenSave = useCallback(async (options: AxiosRequestConfig) => {
-    const buffer: AxiosResponse<ArrayBuffer> = await axios.get(url, options);
+  const downloadThenSave = useCallback(async (onProgress: (progress: number) => void) => {
+    const buffer: AxiosResponse<ArrayBuffer> = await axios.get(url, { responseType: 'arraybuffer', onDownloadProgress: onProgress });
     await startDb(buffer.data, 'kanjiPrediction');
     localStorage.setItem('kanjiPrediction', 'true');
-
-    return buffer.data;
   }, []);
 
-  const isBufferStored = React.useMemo(() => (
+  const isBufferStored = React.useMemo(async () => (
     JSON.parse(localStorage.getItem('kanjiPrediction') || 'false')
   ), []); 
 
-  const loadModel = useCallback(async (customBuffer=null) => {
+  const loadModel = useCallback(async () => {
     console.log('call loadModel function')
     if (model) { return; }
     if (!model && loading) { throw new Error('Model is still loading...'); }
 
     const options = { numThreads: navigator.hardwareConcurrency / 2 };
 
-    if (!customBuffer && isBufferStored) {
+    if (await isBufferStored) {
       setLoading(true);
       const storedModels : any = await startDb(null, 'kanjiPrediction');
       const buffer = storedModels['kanjiPrediction'];
@@ -47,15 +43,7 @@ export default function usePrediction() {
       console.log('model is loaded');
       setModel(loadedModel);
       setLoading(false);
-    }
-
-    if (customBuffer) {
-      console.log('model is loading');
-      const loadedModel: tflite.TFLiteModel = await tflite.loadTFLiteModel(customBuffer, options);
-      console.log('custom model is loaded');
-      setModel(loadedModel);
-      setLoading(false);
-    }
+    } else { throw new Error('Model is not stored'); }
   }, [loading, model]);
 
   /**

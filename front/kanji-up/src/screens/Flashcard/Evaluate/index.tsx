@@ -4,6 +4,7 @@ import {Button} from 'react-native-paper';
 import CircularProgress from 'react-native-circular-progress-indicator';
 import {useDispatch, useSelector} from 'react-redux';
 import {AxiosResponse} from 'axios';
+import * as FileSystem from 'expo-file-system';
 
 import styles from '../style';
 import Sketch from '../../../components/Sketch';
@@ -65,6 +66,37 @@ export default function Evaluate({ kanji, model, onFinish }: { kanji: KanjiType[
     }
   }, [model, kanjiQueue, canvasRef, progressCircleRef, evaluation]);
 
+  const handleValidateNative = useCallback(async () => {
+    if (canvasRef?.current && kanjiQueue) {
+      const isValid = canvasRef?.current.strokeCount === kanjiQueue[i].kanji.strokes;
+      const details = kanjiQueue[i].kanji;
+
+      // Dispatch score
+      const imageBase64: string = await canvasRef.current.getUri();
+      const imageBase64Code = imageBase64.split('data:image/jpeg;base64,')[1];
+      const prediction = await model.predict(imageBase64Code);
+      const filename = `${FileSystem.documentDirectory}${Date.now().toString()}.jpg`;
+      await FileSystem.writeAsStringAsync(filename, imageBase64Code, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+      try {
+        const recognition: AxiosResponse<RecognitionType> = await recognitionService.postRecognitionNative(details.character as string, prediction, filename);
+
+        dispatch(evaluation.actions.addAnswer({ kanji: recognition.data.kanji || '', image: recognition.data.image, answer: prediction }));
+
+        await FileSystem.deleteAsync(filename);
+      } catch (err) {
+        console.error(err);
+      }
+      setKanjiQueue((prev) => prev?.slice(1) || prev);
+      // next card
+      if (progressCircleRef?.current) {
+        progressCircleRef.current.reAnimate();
+      }
+    }
+  }, [model, kanjiQueue, canvasRef, progressCircleRef, evaluation]);
+
   useEffect(() => {
     setKanjiQueue(kanji.sort(() => 0.5 - Math.random()));
   }, [kanji]);
@@ -113,7 +145,7 @@ export default function Evaluate({ kanji, model, onFinish }: { kanji: KanjiType[
           activeStrokeSecondaryColor={'#C25AFF'}
           inActiveStrokeWidth={15}
           duration={timeMax * 1000}
-          onAnimationComplete={handleValidate}
+          onAnimationComplete={handleValidateNative}
           ref={progressCircleRef}
         />
       }
@@ -128,7 +160,7 @@ export default function Evaluate({ kanji, model, onFinish }: { kanji: KanjiType[
       <Button mode="outlined" icon="eraser-variant" color={colors.primary} style={styles.clearbutton} onPress={handleClear}>
         Clear
       </Button>
-      <Button mode="contained" icon="checkbox-marked-circle-outline" color={colors.primary} style={styles.clearbutton} onPress={handleValidate}>
+      <Button mode="contained" icon="checkbox-marked-circle-outline" color={colors.primary} style={styles.clearbutton} onPress={Platform.OS === 'web' ? handleValidate : handleValidateNative}>
         Validate
       </Button>
     </View>

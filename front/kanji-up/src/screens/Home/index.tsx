@@ -98,15 +98,18 @@ export default function Home({ navigation }: HomeProps) {
   ), [downloadProgress]);
 
   React.useEffect(() => {
-    if (model && !model.isBufferStored && !isDownloading) {
-      setIsDownloading(true);
-      const onDownloadProgress = (progressEvent: any) => {
-        const percentCompleted = progressEvent.loaded / progressEvent.total;
-        setDownloadProgress({ progress: percentCompleted, showDialog: true });
+    (async () => {
+      const isStored = await model.isBufferStored;
+      if (model && !(isStored) && !isDownloading) {
+        setIsDownloading(true);
+        const onDownloadProgress = (progressEvent: any) => {
+          const percentCompleted = progressEvent.loaded / progressEvent.total;
+          setDownloadProgress({ progress: percentCompleted, showDialog: true });
 
-      };
-      model.downloadThenSave({ responseType: 'arraybuffer', onDownloadProgress });
-    }
+        };
+        model.downloadThenSave(Platform.OS === 'web' ? onDownloadProgress : (progress: number) => { setDownloadProgress({ progress, showDialog: true }); });
+      }
+    })();
   }, [model, isDownloading]);
 
   return (<SafeAreaView style={styles.main}>
