@@ -22,7 +22,6 @@ export default function Search({ navigation, route }: SearchProps) {
   const [result, setResult] = useState<Pagination<KanjiType>>();
 
   const handleSubmit = useCallback(async ({ page }={ page: 1 }, customSearch=null) => {
-    console.log('Test search', page)
     if (customSearch) { setSearch(customSearch); }
     setLoading(true);
     const cancelToken = axios.CancelToken.source();
@@ -36,7 +35,7 @@ export default function Search({ navigation, route }: SearchProps) {
         })
         .catch(handleError);
     } catch (err) {
-      handleError(err);
+      handleError(err as Error);
     }
 
     return () => { cancelToken.cancel(); }
@@ -55,7 +54,7 @@ export default function Search({ navigation, route }: SearchProps) {
 
   useEffect(() => {
     if (route.params) {
-      handleSubmit({ page: 1 }, route.params.search);
+      handleSubmit({ page: 1 }, route.params.search as any);
     }
   }, [route.params]);
 

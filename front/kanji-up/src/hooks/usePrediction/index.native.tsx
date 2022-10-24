@@ -14,7 +14,6 @@ export default function usePrediction() {
   const [model, setModel] = useState<tf.GraphModel<tf.io.IOHandler>>();
 
   const downloadThenSave = useCallback(async (onProgress: (progress: number) => void) => {
-    console.warn('Downloading model...')
     await tf.ready();
     const model = await tf.loadGraphModel(url, { onProgress });
     await model.save(asyncStorageIO('kanjiPrediction') as IOHandler);
@@ -28,7 +27,6 @@ export default function usePrediction() {
   }, []); 
 
   const loadModel = useCallback(async () => {
-    console.log('call loadModel function')
     if (model) { return; }
     if (!model && loading) { throw new Error('Model is still loading...'); }
 
@@ -43,9 +41,7 @@ export default function usePrediction() {
 
       await tf.ready();
 
-      console.log('model is loading');
       const loadedModel: tf.GraphModel<tf.io.IOHandler> = await tf.loadGraphModel(asyncStorageIO(kanjiPredictionConstants.MODEL_KEY) as IOHandler);
-      console.log('model is loaded');
       setModel(loadedModel);
       setLoading(false);
     } else { throw new Error('Model is not stored'); }
@@ -82,8 +78,6 @@ export default function usePrediction() {
       throw err;
     }
   }, [model, loading]);
-
-  console.log(model);
 
   useEffect(() => {
     if (model) {

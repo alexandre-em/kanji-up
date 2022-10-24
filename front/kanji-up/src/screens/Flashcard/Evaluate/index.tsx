@@ -1,6 +1,6 @@
-import React, {useCallback, useEffect, useRef} from 'react';
-import {Platform, Text, View} from 'react-native';
-import {Button} from 'react-native-paper';
+import React, {useCallback, useEffect, useMemo, useRef} from 'react';
+import {Image, Platform, ScrollView, Text, View} from 'react-native';
+import {Button, Divider, IconButton, List} from 'react-native-paper';
 import CircularProgress from 'react-native-circular-progress-indicator';
 import {useDispatch, useSelector} from 'react-redux';
 import {AxiosResponse} from 'axios';
@@ -40,25 +40,28 @@ export default function Evaluate({ kanji, model, onFinish }: { kanji: KanjiType[
 
       if (!isValid) {
         dispatch(evaluation.actions.addAnswer({ kanji: details.character as string, image: imageBase64, answer: [], status: 'incorrect', message: 'The stroke number does\'t match' }));
+      } else {
+
+        // Dispatch score
+        const prediction: PredictionType[] = await model.predict(imageBase64);
+        const isIncluded = prediction.some((p) => p.prediction === details.character);
+
+        if (!isIncluded) {
+          dispatch(evaluation.actions.addAnswer({ kanji: details.character as string, image: imageBase64, answer: [], status: 'toReview', message: 'The answer and the drawed kanji seems not match, please confirm' }));
+        } else {
+
+          try {
+            const recognition = await uploadImage(canvasRef, details.character as string, prediction) as AxiosResponse<RecognitionType>;
+
+            dispatch(evaluation.actions.addAnswer({ kanji: recognition.data.kanji || '', image: recognition.data.image, answer: prediction, status: 'correct', message: 'Correct !' }));
+
+          } catch (err) {
+            console.error(err);
+          }
+        }
       }
 
-      // Dispatch score
-      const prediction: PredictionType[] = await model.predict(imageBase64);
-      const isIncluded = prediction.some((p) => p.prediction === details.character);
-
-      if (!isIncluded) {
-        dispatch(evaluation.actions.addAnswer({ kanji: details.character as string, image: imageBase64, answer: [], status: 'toReview', message: 'The drawing kanji seems not be recognized by our algo' }));
-      }
-
-      try {
-        const recognition = await uploadImage(canvasRef, details.character as string, prediction) as AxiosResponse<RecognitionType>;
-
-        dispatch(evaluation.actions.addAnswer({ kanji: recognition.data.kanji || '', image: recognition.data.image, answer: prediction, status: 'correct', message: 'Correct !' }));
-
-      } catch (err) {
-        console.error(err);
-      }
-
+      handleClear();
       setKanjiQueue((prev) => prev?.slice(1) || prev);
       // next card
       if (Platform.OS === 'web') {
@@ -71,6 +74,39 @@ export default function Evaluate({ kanji, model, onFinish }: { kanji: KanjiType[
     }
   }, [model, kanjiQueue, canvasRef, progressCircleRef, evaluation]);
 
+  const handleConfirm = useCallback((id: number, ans?: AnswerType) => {
+    dispatch(evaluation.actions.updateAnswerStatus({ id, status: 'correct', message: 'This answer has been validated by the user' }));
+    // TODO: upload image base64
+  }, [dispatch]);
+
+  const handleUnvalidate = useCallback((id: number) => {
+    dispatch(evaluation.actions.updateAnswerStatus({ id, status: 'incorrect', message: 'This answer has been unvalidated by the user' }));
+  }, [dispatch]);
+
+  const results = useMemo(() => {
+    return (<ScrollView>
+      {evaluationState.answers.map((a, i) => {
+        return (
+          <View key={`result-${i}`}>
+            <List.Item
+              title={`Answer was ${a.kanji}`}
+              titleStyle={{ fontWeight: '700', color: colors.primary }}
+              description={a.message}
+              left={() => <Image source={{ uri: a.image }} style={{ width: 30, height: 30 }} />}
+              right={(props) => (a.status === 'toReview' &&
+                <View {...props} style={{ flexDirection: 'row' }}>
+                  <IconButton icon="checkbox-marked-circle-outline" color="#bdf56e" onPress={() => handleConfirm(i) } />
+                  <IconButton icon="close-circle-outline" color={colors.primaryDark} onPress={() => handleUnvalidate(i) } />
+                </View>
+              )}
+            />
+            {i < evaluationState.answers.length - 1 && <Divider />}
+          </View>
+        )
+      })}
+    </ScrollView>)
+  }, [evaluationState]);
+
   useEffect(() => {
     setKanjiQueue(kanji.sort(() => 0.5 - Math.random()));
   }, [kanji]);
@@ -81,12 +117,18 @@ export default function Evaluate({ kanji, model, onFinish }: { kanji: KanjiType[
         dispatch(evaluation.actions.initialize());
         setStart(true);
       }
-      if (start && kanjiQueue && kanjiQueue.length < 1) {
-        onFinish({ title: 'Completed', content: `You have completed a set of ${kanji.length} card` });
+      if (start && kanjiQueue && kanjiQueue.length < 1
+        && (evaluationState.status !== 'done' && evaluationState.status !== 'error')) {
         dispatch(evaluation.actions.finish());
       }
     }
-  }, [dispatch, kanjiQueue, start]);
+  }, [dispatch, kanjiQueue, start, results, evaluationState]);
+
+  useEffect(() => {
+    if (evaluationState.status === 'done' || evaluationState.status === 'error') {
+      onFinish({ title: 'Completed', content: `You have completed a set of ${kanji.length} card`, component: results });
+    }
+  },[evaluationState])
 
   useEffect(() => {
     if (Platform.OS === 'web') {
@@ -95,6 +137,8 @@ export default function Evaluate({ kanji, model, onFinish }: { kanji: KanjiType[
         interval = setInterval(() => {
           setTimer((prev) => prev - 1);
         }, 1000);
+      } else {
+        handleValidate();
       }
 
       return () => {

@@ -21,6 +21,18 @@ const addAnswer = (state: EvaluationState, action: PayloadAction<AnswerType>) =>
   return { ...state, answers: [...state.answers, action.payload]};
 };
 
+const updateAnswerStatus = (state: EvaluationState, action: PayloadAction<{ id: number, status: string, message: string }>) => {
+  if (action.payload.status !== 'correct'
+  && action.payload.status !== 'incorrect'
+  && action.payload.status !== 'toReview') return state;
+
+  const newState = state;
+  state.answers[action.payload.id].status = action.payload.status;
+  state.answers[action.payload.id].message = action.payload.message;
+
+  return newState;
+}
+
 const finish = (state: EvaluationState) => {
   return { ...state, status: 'done' } as EvaluationState;
 };
@@ -31,14 +43,18 @@ const handleError = (state: EvaluationState, action: PayloadAction<Error>) => {
   return { ...state, ...updatedStatus };
 }
 
+const reset = () => (initialState);
+
 export const evaluation = createSlice({
   name: 'evaluation',
   initialState,
   reducers: {
     initialize,
     addAnswer,
+    updateAnswerStatus,
     handleError,
     finish,
+    reset,
   },
 });
 

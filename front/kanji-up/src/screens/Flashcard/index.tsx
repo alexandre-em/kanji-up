@@ -11,7 +11,7 @@ import {FlashcardProps} from '../../types/screens';
 import {RootState} from '../../store';
 import {kanjiService} from '../../service';
 import usePrediction from '../../hooks/usePrediction';
-import {error} from '../../store/slices';
+import {error, evaluation as evaluationSlice} from '../../store/slices';
 
 export default function Flashcard({ navigation, route }: FlashcardProps) {
   const { evaluation } = route.params;
@@ -21,16 +21,22 @@ export default function Flashcard({ navigation, route }: FlashcardProps) {
   const [sKanji, setKanji] = useState<Array<KanjiType>>([]);
   const [dialog, setDialog] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
-  const [message, setMessage] = useState({ title: '', content: '' });
+  const [message, setMessage] = useState({ title: '', content: '', component: undefined });
 
-  const handleFinish = React.useCallback(({ title, content }) => {
-    setMessage({ title, content });
+  const handleFinish = React.useCallback(({ title, content, component }: { title: string, content: string, component: any }) => {
+    setMessage({ title, content, component });
     setDialog(true);
+  }, []);
+
+  const handleConfirmFinish = React.useCallback(() => {
+    // TODO: Save user result and points
+    dispatch(evaluationSlice.actions.reset());
+    navigation.goBack();
   }, []);
 
   useEffect(() => {
     if (Object.keys(kanjiState.selectedKanji).length < 1) {
-      setMessage({ title: `Warning: no kanji` ,content: 'You havn\'t selected kanji to start a flashcard session' });
+      setMessage({ title: `Warning: no kanji` ,content: 'You havn\'t selected kanji to start a flashcard session', component: undefined });
       setDialog(true);
     }
 
@@ -49,11 +55,10 @@ export default function Flashcard({ navigation, route }: FlashcardProps) {
   useEffect(() => {
     (async () => {
       if (model && !model.model && evaluation && !loading) {
-        console.log('useEffect to Load the model, entering condition')
         setLoading(true);
         try {
           await model.loadModel();
-        } catch (err) {
+        } catch (err: any) {
           dispatch(error.actions.update(err.message));
         }
         setLoading(false);
@@ -67,13 +72,14 @@ export default function Flashcard({ navigation, route }: FlashcardProps) {
         <Dialog.Title>{message.title}</Dialog.Title>
         <Dialog.Content>
           <Paragraph>{message.content}</Paragraph>
+          {message && message.component}
         </Dialog.Content>
         <Dialog.Actions style={{ flexWrap: 'wrap' }}>
-          <Button mode="contained" onPress={() => navigation.goBack()}>Finish</Button>
+          <Button mode="contained" onPress={handleConfirmFinish}>Finish</Button>
         </Dialog.Actions>
       </Dialog>
     </Portal>
-  ), [dialog]);
+  ), [dialog, message]);
 
   return (<SafeAreaView style={styles.main}>
     <Appbar.Header>

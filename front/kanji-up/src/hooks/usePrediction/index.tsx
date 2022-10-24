@@ -1,9 +1,8 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import axios, {AxiosRequestConfig, AxiosResponse} from 'axios';
+import axios, {AxiosResponse} from 'axios';
 import '@tensorflow/tfjs-backend-cpu';
 import * as tf from '@tensorflow/tfjs-core';
 import * as tflite from '@tensorflow/tfjs-tflite';
-import {Tensor, Tensor3D} from '@tensorflow/tfjs-core';
 
 import useIndexedDb from '../useIndexedDb';
 import {kanjiPredictionConstants} from './const';
@@ -27,7 +26,6 @@ export default function usePrediction() {
   ), []); 
 
   const loadModel = useCallback(async () => {
-    console.log('call loadModel function')
     if (model) { return; }
     if (!model && loading) { throw new Error('Model is still loading...'); }
 
@@ -38,9 +36,7 @@ export default function usePrediction() {
       const storedModels : any = await startDb(null, 'kanjiPrediction');
       const buffer = storedModels['kanjiPrediction'];
 
-      console.log('model is loading');
       const loadedModel: tflite.TFLiteModel = await tflite.loadTFLiteModel(buffer, options);
-      console.log('model is loaded');
       setModel(loadedModel);
       setLoading(false);
     } else { throw new Error('Model is not stored'); }
@@ -68,10 +64,10 @@ export default function usePrediction() {
 
       // image preprocessing
       const {MODEL_INPUT_WIDTH, MODEL_INPUT_HEIGHT, MIN_CONFIDENCE} = kanjiPredictionConstants;
-      const imageTensor: Tensor3D = tf.browser.fromPixels(img, 1);
-      const resizedImage: Tensor3D = tf.image.resizeBilinear(imageTensor, [MODEL_INPUT_WIDTH, MODEL_INPUT_HEIGHT]);
+      const imageTensor: tf.Tensor3D = tf.browser.fromPixels(img, 1);
+      const resizedImage: tf.Tensor3D = tf.image.resizeBilinear(imageTensor, [MODEL_INPUT_WIDTH, MODEL_INPUT_HEIGHT]);
       // prediction of the model on the image
-      const prediction: Tensor = model!.predict(tf.expandDims(tf.div(resizedImage, 255), 0)) as Tensor;
+      const prediction: tf.Tensor = model!.predict(tf.expandDims(tf.div(resizedImage, 255), 0)) as tf.Tensor;
       const predictionArray: number[][] = prediction.arraySync() as number[][];
 
       // result
@@ -84,8 +80,6 @@ export default function usePrediction() {
       throw err;
     }
   }, [model, loading]);
-
-  console.log(model);
 
   useEffect(() => {
     if (model) {
