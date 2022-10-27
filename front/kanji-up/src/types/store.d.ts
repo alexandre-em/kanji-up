@@ -21,8 +21,15 @@ type AnswerType = {
 type EvaluationState = {
   totalScore: number,
   totalCard: number,
+  time: number,
   answers: Array<AnswerType>,
   status: 'done' | 'inProgress' | 'error' | 'notStarted',
   error: Error | null,
 }
 
+type SettingValuesType = {
+  username: string,
+  flashcardNumber: number,
+  evaluationCardNumber: number,
+  evaluationTime: number,
+};

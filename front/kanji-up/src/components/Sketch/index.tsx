@@ -12,7 +12,7 @@ const margin = 0.8;
 const { width } = Dimensions.get('window');
 const w = Math.min(width * margin, 500);
 
-export default forwardRef(({ visible }: { visible: boolean }, ref) => {
+export default forwardRef(({ visible }: SketchProps, ref) => {
   const [previousX, setPreviousX] = useState('');
   const [previousY, setPreviousY] = useState('');
   const [currentX, setCurrentX] = useState('');

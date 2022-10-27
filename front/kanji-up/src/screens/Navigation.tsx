@@ -16,7 +16,7 @@ import SettingScreen from './Settings';
 import FlashcardScreen from './Flashcard';
 import SearchScreen from './Search';
 import {fileNames, readFile} from '../service/file';
-import {kanji, error} from '../store/slices';
+import {kanji, error, settings} from '../store/slices';
 import {RootState} from '../store';
 import {RootStackParamList} from '../types/screens';
 
@@ -47,8 +47,14 @@ export default function Navigation() {
     loadSelectedKanji();
     AsyncStorage.getItem(AsyncStorageKeys.FIRST_TIME)
       .then((res) => {
-      if (res !== null) {
-          setIsFirstTime(JSON.parse(res as string));
+        if (res !== null) {
+          const firstTime = JSON.parse(res as string);
+          setIsFirstTime(firstTime);
+          if (!firstTime) {
+            readFile('userSettings')
+              .then((content) => dispatch(settings.actions.update(JSON.parse(content))))
+              .catch(() => dispatch(error.actions.update("Could not load user data")))
+          }
         } else { setIsFirstTime(true); }
       })
       .catch(console.error);

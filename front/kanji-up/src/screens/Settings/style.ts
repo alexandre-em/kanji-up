@@ -17,5 +17,17 @@ export default StyleSheet.create({
     fontWeight: '800',
     color: colors.text,
   },
+  subtitle: {
+    marginTop: 15,
+    fontSize: 18,
+    fontWeight: '600',
+    color: colors.text,
+  },
+  button: {
+    width: '80%',
+    alignSelf: 'center',
+    margin: 10,
+    borderRadius: 25,
+  },
 });
 

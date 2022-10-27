@@ -1,17 +1,21 @@
 import React, {useCallback, useMemo, useState} from 'react';
 import {Text, useWindowDimensions, View} from 'react-native';
 import {Button, Divider, Surface} from 'react-native-paper';
+import {useSelector} from 'react-redux';
 
 import styles from '../style';
 import SvgUriPlatform from '../../../components/SVGUriPlatform';
 import colors from '../../../constants/colors';
+import {RootState} from '../../../store';
 
-export default function Practice({ kanji, onFinish }: { kanji: KanjiType[], onFinish: Function }) {
+export default function Practice({ kanji, onFinish }: { kanji: Partial<KanjiType>[], onFinish: Function }) {
   const i = 0;
   const { width } = useWindowDimensions();
   const [start, setStart] = useState<boolean>(false);
+  const [counter, setCounter] = useState<number>(0);
   const [reverse, setReverse] = useState<boolean>(false);
   const [kanjiQueue, setKanjiQueue] = useState<KanjiType[] | null>(null);
+  const settingsState = useSelector((state: RootState) => state.settings);
 
   const imgSize = useMemo(() => Math.min(width * 0.7, 500), [width]);
 
@@ -46,6 +50,7 @@ export default function Practice({ kanji, onFinish }: { kanji: KanjiType[], onFi
 
   const handleNext = useCallback(() => {
     setKanjiQueue((prev) => prev.slice(1));
+    setCounter((prev) => prev + 1);
   }, []);
 
   React.useEffect(() => {
@@ -56,10 +61,17 @@ export default function Practice({ kanji, onFinish }: { kanji: KanjiType[], onFi
     if (kanjiQueue && kanjiQueue.length > 0 && !start) {
       setStart(true);
     }
-    if (start && kanjiQueue && kanjiQueue.length < 1) {
-      onFinish({ title: 'Completed', content: `You have completed a set of ${kanji.length} card` });
+
+    const isLimitReached = counter >= settingsState.flashcardNumber;
+
+    if (start && kanjiQueue && (kanjiQueue.length < 1 || isLimitReached)) {
+      if (!isLimitReached) {
+        setKanjiQueue(kanji.sort(() => 0.5 - Math.random()));
+      } else {
+        onFinish({ title: 'Completed', content: `You have completed a set of ${counter} card` });
+      }
     }
-  }, [kanjiQueue, start]);
+  }, [kanjiQueue, start, counter]);
 
   return (
     <View style={styles.content}>

@@ -3,17 +3,20 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 const initialState: EvaluationState = {
   totalScore: 0,
   totalCard: 50,
+  time: 60,
   answers: [],
   status: 'notStarted',
   error: null,
 };
 
-const initialize = (state: EvaluationState) => {
+const initialize = (state: EvaluationState, action: PayloadAction<{ time: number, totalCard: number }>) => {
+  const { time, totalCard } = action.payload;
   const loadingState: EvaluationState = { ...state, status: 'inProgress' };
 
   return {
     ...loadingState,
-    // set saved params in AsyncStorage (totalCard, )
+    time,
+    totalCard,
   }
 };
 
@@ -43,7 +46,15 @@ const handleError = (state: EvaluationState, action: PayloadAction<Error>) => {
   return { ...state, ...updatedStatus };
 }
 
-const reset = () => (initialState);
+const reset = (state: EvaluationState, action: PayloadAction<{ time: number, totalCard: number }>) => {
+  const { time, totalCard } = action.payload;
+
+  return ({
+    ...initialState,
+    totalCard,
+    time,
+  })
+};
 
 export const evaluation = createSlice({
   name: 'evaluation',
@@ -59,4 +70,3 @@ export const evaluation = createSlice({
 });
 
 export default evaluation.reducer;
-

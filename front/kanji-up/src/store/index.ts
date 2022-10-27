@@ -4,6 +4,7 @@ import logger from 'redux-logger';
 import error from './slices/error';
 import evaluation from './slices/evaluation';
 import kanji from './slices/selectedKanji';
+import settings from './slices/settings';
 
 const devTools = false;
 
@@ -12,6 +13,7 @@ const store = configureStore({
     error,
     kanji,
     evaluation,
+    settings,
   },
   middleware: (getDefaultMiddleware) => {
     const defaultMiddleware = getDefaultMiddleware();

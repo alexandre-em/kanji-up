@@ -3,7 +3,7 @@ import {FlatList, Image, Platform, SafeAreaView, ScrollView, Text, TouchableOpac
 import {Avatar, Button, Dialog, FAB, List, Paragraph, Portal, ProgressBar, Searchbar, Surface} from 'react-native-paper';
 import StepIndicator from 'react-native-step-indicator';
 import {SvgUri} from 'react-native-svg';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 
 import styles from './style';
 import { menu, list, labels } from './const';
@@ -42,8 +42,10 @@ const stepperStyles = {
 };
 
 export default function Home({ navigation }: HomeProps) {
+  const dispatch = useDispatch();
   const [searchQuery, setSearchQuery] = useState<string>('');
   const kanjiState = useSelector((state: RootState) => state.kanji);
+  const settingsState = useSelector((state: RootState) => state.settings);
   const [open, setOpen] = useState({ open: false });
   const [downloadProgress, setDownloadProgress] = useState({ progress: 0, showDialog: false });
   const [isDownloading, setIsDownloading] = useState(false);
@@ -116,14 +118,14 @@ export default function Home({ navigation }: HomeProps) {
     <View style={styles.header}>
       <Button mode="contained" style={{ borderRadius: 25 }}>4000</Button>
       <TouchableOpacity onPress={() => navigation.navigate('Settings', { firstTime: false })}>
-        <Avatar.Text size={40} label="A" />
+        <Avatar.Text size={40} label={settingsState.username.charAt(0) || '-'} />
       </TouchableOpacity>
     </View>
 
     <ScrollView style={{ flex: 0.9 }} showsVerticalScrollIndicator={false} >
       <View>
         <Text style={{ marginLeft: 20, fontSize: 18, color: colors.text }}>Hello,</Text>
-        <Text style={[styles.title, { marginTop: 0 }]}>Alexandreさん</Text>
+        <Text style={[styles.title, { marginTop: 0 }]}>{settingsState.username}さん</Text>
       </View>
       <View style={styles.search}>
         <Searchbar

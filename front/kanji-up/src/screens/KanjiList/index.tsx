@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {ActivityIndicator, Platform, SafeAreaView, ScrollView, Text, TouchableOpacity} from 'react-native';
-import {Appbar, Button, DataTable, Dialog, Divider, IconButton, Menu, Paragraph, Portal, Surface} from 'react-native-paper';
+import {Appbar, DataTable, Divider, IconButton, Menu, Surface} from 'react-native-paper';
 import {useDispatch, useSelector} from 'react-redux';
 import axios, {AxiosRequestConfig, AxiosResponse} from 'axios';
 
@@ -11,6 +11,7 @@ import {KanjiListProps} from '../../types/screens';
 import {error, kanji} from '../../store/slices';
 import {RootState} from '../../store';
 import {fileNames, writeFile} from '../../service/file';
+import CustomDialog from '../../components/CustomDialog';
 
 const MORE_ICON = Platform.OS === 'ios' ? 'dots-horizontal' : 'dots-vertical';
 const numberOfItemsPerPageList = [30, 50, 100, 200];
@@ -63,7 +64,7 @@ export default function KanjiList({ navigation, route }: KanjiListProps) {
     if (kanjiState.selectedKanji[kanjiId]) { return { backgroundColor: '#ebebeb', color: '#fff' }; }
   }, [kanjiState]);
   
-  const getKanjis = useCallback(({ page }, options : AxiosRequestConfig = {}) => {
+  const getKanjis = useCallback(({ page }: { page: number }, options : AxiosRequestConfig = {}) => {
     if (!loading) {
       setLoading(true);
       kanjiService
@@ -106,21 +107,6 @@ export default function KanjiList({ navigation, route }: KanjiListProps) {
   )
   }, [data, loading, selectionMode, kanjiState]);
 
-  const saveWarning = useMemo(() => (
-    <Portal>
-      <Dialog style={{ maxWidth: 700, width: '100%', alignSelf: 'center' }} visible={dialog} onDismiss={() => setDialog(false)}>
-        <Dialog.Title>Before quitting</Dialog.Title>
-        <Dialog.Content>
-          <Paragraph>Do you want to save your selection ?</Paragraph>
-        </Dialog.Content>
-        <Dialog.Actions style={{ flexWrap: 'wrap' }}>
-          <Button style={{ borderRadius: 25 }} onPress={() => { handleCancel(); navigation.goBack(); }}>Don't save</Button>
-          <Button style={{ borderRadius: 25 }} mode="contained" onPress={() => { handleSave(); navigation.goBack(); }}>Save</Button>
-        </Dialog.Actions>
-      </Dialog>
-    </Portal>
-  ), [dialog, kanjiState]);
-
   return (
     <SafeAreaView style={styles.main}>
       <Appbar.Header style={{ backgroundColor: selectionMode ? colors.secondary : colors.primary }}>
@@ -138,7 +124,13 @@ export default function KanjiList({ navigation, route }: KanjiListProps) {
           <Menu.Item onPress={handleSave} title="Save modification" />
         </Menu>
       </Appbar.Header>
-      {saveWarning}
+      <CustomDialog
+        visible={dialog}
+        message={{ title: 'Before quitting', description: 'Do you want to save your selection ?' }}
+        onDismiss={() => setDialog(false)}
+        onSave={() => { handleSave(); navigation.goBack(); }}
+        onCancel={() => {handleCancel(); navigation.goBack();} }
+      />
       {content}
       <DataTable.Pagination
         page={data?.page || 1}

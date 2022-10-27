@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useMemo, useRef} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {Image, Platform, ScrollView, Text, View} from 'react-native';
 import {Button, Divider, IconButton, List} from 'react-native-paper';
 import CircularProgress from 'react-native-circular-progress-indicator';
@@ -9,20 +9,20 @@ import styles from '../style';
 import Sketch from '../../../components/Sketch';
 import colors from '../../../constants/colors';
 import {RootState} from '../../../store';
-import {error, evaluation} from '../../../store/slices';
+import {evaluation} from '../../../store/slices';
 import {uploadImage} from '../../../service/file';
 
-const timeMax = 30;
-
-export default function Evaluate({ kanji, model, onFinish }: { kanji: KanjiType[], model: any, onFinish: Function }) {
+export default function Evaluate({ kanji, model, onFinish }: { kanji: Partial<KanjiType>[], model: any, onFinish: Function }) {
   const i = 0;
   const dispatch = useDispatch();
   const canvasRef = useRef<any>();
   const progressCircleRef = useRef<any>();
   const evaluationState = useSelector((state: RootState) => state.evaluation);
-  const [timer, setTimer] = React.useState<number>(timeMax);
-  const [kanjiQueue, setKanjiQueue] = React.useState<KanjiType[] | null>(null);
-  const [start, setStart] = React.useState<boolean>(false);
+  const settingsState = useSelector((state: RootState) => state.settings);
+  const [timer, setTimer] = useState<number>(settingsState.evaluationTime || 60);
+  const [kanjiQueue, setKanjiQueue] = useState<KanjiType[] | null>(null);
+  const [start, setStart] = useState<boolean>(false);
+  const [counter, setCounter] = useState<number>(0);
 
   const handleClear = useCallback(() => {
     if (canvasRef && canvasRef.current) {
@@ -63,16 +63,17 @@ export default function Evaluate({ kanji, model, onFinish }: { kanji: KanjiType[
 
       handleClear();
       setKanjiQueue((prev) => prev?.slice(1) || prev);
+      setCounter((prev) => prev + 1);
       // next card
-      if (Platform.OS === 'web') {
-        setTimer(timeMax);
+      if (Platform.OS === 'web' && settingsState) {
+        setTimer(settingsState.evaluationTime);
       } else {
         if (progressCircleRef?.current) {
           progressCircleRef.current.reAnimate();
         }
       }
     }
-  }, [model, kanjiQueue, canvasRef, progressCircleRef, evaluation]);
+  }, [model, kanjiQueue, canvasRef, progressCircleRef, evaluation, settingsState]);
 
   const handleConfirm = useCallback((id: number, ans?: AnswerType) => {
     dispatch(evaluation.actions.updateAnswerStatus({ id, status: 'correct', message: 'This answer has been validated by the user' }));
@@ -114,26 +115,32 @@ export default function Evaluate({ kanji, model, onFinish }: { kanji: KanjiType[
   useEffect(() => {
     if (dispatch) {
       if (kanjiQueue && kanjiQueue.length > 0 && !start) {
-        dispatch(evaluation.actions.initialize());
+        dispatch(evaluation.actions.initialize({ time: settingsState.evaluationTime, totalCard: settingsState.evaluationCardNumber }));
         setStart(true);
       }
-      if (start && kanjiQueue && kanjiQueue.length < 1
-        && (evaluationState.status !== 'done' && evaluationState.status !== 'error')) {
-        dispatch(evaluation.actions.finish());
+      const isLimitReached = counter >= settingsState.evaluationCardNumber;
+      if (start && kanjiQueue && (kanjiQueue.length < 1 || isLimitReached)) {
+        if (!isLimitReached) {
+          setKanjiQueue(kanji.sort(() => 0.5 - Math.random()));
+        } else {
+          if (evaluationState.status !== 'done' && evaluationState.status !== 'error') {
+            dispatch(evaluation.actions.finish());
+          }
+        }
       }
     }
-  }, [dispatch, kanjiQueue, start, results, evaluationState]);
+  }, [dispatch, kanjiQueue, start, results, evaluationState, kanji, settingsState, counter]);
 
   useEffect(() => {
     if (evaluationState.status === 'done' || evaluationState.status === 'error') {
-      onFinish({ title: 'Completed', content: `You have completed a set of ${kanji.length} card`, component: results });
+      onFinish({ title: 'Completed', content: `You have completed a set of ${counter} card`, component: results });
     }
-  },[evaluationState])
+  },[evaluationState, settingsState, counter])
 
   useEffect(() => {
     if (Platform.OS === 'web') {
-      let interval:number = timeMax;
-      if (timer !== 0) {
+      let interval:number = settingsState.evaluationTime;
+      if (timer > 0) {
         interval = setInterval(() => {
           setTimer((prev) => prev - 1);
         }, 1000);
@@ -156,13 +163,13 @@ export default function Evaluate({ kanji, model, onFinish }: { kanji: KanjiType[
         : <CircularProgress
           value={0}
           radius={40}
-          maxValue={timeMax}
-          initialValue={timeMax}
+          maxValue={settingsState.evaluationTime || 60}
+          initialValue={settingsState.evaluationTime || 60}
           activeStrokeWidth={15}
           activeStrokeColor={colors.primary}
           activeStrokeSecondaryColor={'#C25AFF'}
           inActiveStrokeWidth={15}
-          duration={timeMax * 1000}
+          duration={(settingsState.evaluationTime || 60) * 1000}
           onAnimationComplete={handleValidate}
           ref={progressCircleRef}
         />
