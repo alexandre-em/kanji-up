@@ -49,11 +49,11 @@ export default function Evaluate({ kanji, model, onFinish }: { kanji: Partial<Ka
           const predictedKanji = prediction.find((p) => p.prediction === details.character);
           const recognition = await uploadImage(canvasRef, details.character as string, prediction) as AxiosResponse<RecognitionType>;
 
-          if (!!predictedKanji) {
-            dispatch(evaluation.actions.addAnswer({ kanji: details.character as string, image: recognition.data.image, answer: prediction, status: 'toReview', message: 'The answer and the drawed kanji seems not matching, please confirm', recognitionId: recognition.data.recognition_id }));
+          if (!predictedKanji) {
+            dispatch(evaluation.actions.addAnswer({ kanji: details.character as string, image: recognition.data.image, answer: prediction, status: 'toReview', message: 'The drawed kanji seems incorrect, please confirm', recognitionId: recognition.data.recognition_id }));
           } else {
             dispatch(evaluation.actions.addAnswer({ kanji: recognition.data.kanji || '', image: recognition.data.image, answer: prediction, status: 'correct', message: 'Correct !', recognitionId: recognition.data.recognition_id }));
-            dispatch(evaluation.actions.addPoints(Math.max(predictedKanji?.confidence, 10)));
+            dispatch(evaluation.actions.addPoints(Math.max(predictedKanji?.confidence * 100, 10)));
           }
         } catch (err: any) {
           dispatch(error.actions.update(err.message));
@@ -87,7 +87,7 @@ export default function Evaluate({ kanji, model, onFinish }: { kanji: Partial<Ka
   }, [dispatch]);
 
   const results = useMemo(() => {
-    return (<ScrollView style={{ height: '65%' }}>
+    return (<ScrollView style={Platform.OS === 'web' ? { maxHeight: 275 } : { height: '65%' }}>
       {evaluationState.answers.map((a, i) => {
         return (
           <View key={`result-${i}`}>
@@ -135,9 +135,9 @@ export default function Evaluate({ kanji, model, onFinish }: { kanji: Partial<Ka
 
   useEffect(() => {
     if (evaluationState.status === 'done' || evaluationState.status === 'error') {
-      onFinish({ title: 'Completed', content: `You have completed a set of ${counter} card`, component: results });
+      onFinish({ title: 'Completed', content: `You have completed with a score of ${evaluationState.totalScore}`, component: results });
     }
-  },[evaluationState, settingsState, counter])
+  },[evaluationState, settingsState])
 
   useEffect(() => {
     if (Platform.OS === 'web') {
