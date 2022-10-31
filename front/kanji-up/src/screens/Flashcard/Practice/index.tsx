@@ -1,6 +1,6 @@
 import React, {useCallback, useMemo, useState} from 'react';
 import {Text, useWindowDimensions, View} from 'react-native';
-import {Button, Divider, Surface} from 'react-native-paper';
+import {Button, Divider, ProgressBar, Surface} from 'react-native-paper';
 import {useSelector} from 'react-redux';
 
 import styles from '../style';
@@ -75,12 +75,19 @@ export default function Practice({ kanji, onFinish }: { kanji: Partial<KanjiType
 
   return (
     <View style={styles.content}>
+      <Surface style={styles.surface}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+          <Text style={styles.subtext}>Progression</Text>
+          <Text style={styles.subtext}>{counter}/{settingsState.flashcardNumber}</Text>
+        </View>
+        <ProgressBar progress={counter/settingsState.flashcardNumber} style={{backgroundColor: '#fff', marginTop: 10, borderRadius: 25 }} color={colors.secondary} />
+      </Surface>
       <Surface style={{ width: imgSize, height: imgSize, alignSelf: 'center' }}>
         {cardContent}
       </Surface>
 
       <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
-        <Button mode="outlined" icon="eraser-variant" color={colors.primary} style={styles.clearbutton} onPress={handleReverse}>
+        <Button mode="outlined" icon="reload" color={colors.primary} style={styles.clearbutton} onPress={handleReverse}>
           Reverse
         </Button>
         <Button mode="contained" icon="checkbox-marked-circle-outline" color={colors.primary} style={styles.clearbutton} onPress={handleNext}>

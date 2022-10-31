@@ -2,14 +2,12 @@ import React, {useEffect, useState} from 'react';
 import {SafeAreaView, View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {ActivityIndicator, Appbar, Button, Dialog, Paragraph, Portal} from 'react-native-paper';
-import axios, {AxiosResponse} from 'axios';
 
 import styles from './style';
 import Evaluate from './Evaluate';
 import Practice from './Practice';
 import {FlashcardProps} from '../../types/screens';
 import {RootState} from '../../store';
-import {kanjiService} from '../../service';
 import usePrediction from '../../hooks/usePrediction';
 import {error, evaluation as evaluationSlice} from '../../store/slices';
 
@@ -19,6 +17,7 @@ export default function Flashcard({ navigation, route }: FlashcardProps) {
   const model = evaluation && usePrediction();
   const kanjiState =  useSelector((state: RootState) => state.kanji);
   const settingsState =  useSelector((state: RootState) => state.settings);
+  const evaluationState =  useSelector((state: RootState) => state.evaluation);
   const [dialog, setDialog] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [message, setMessage] = useState({ title: '', content: '', component: undefined });
@@ -30,6 +29,10 @@ export default function Flashcard({ navigation, route }: FlashcardProps) {
 
   const handleConfirmFinish = React.useCallback(() => {
     // TODO: Save user result and points
+    if (evaluation) {
+
+    }
+
     dispatch(evaluationSlice.actions.reset({ time: settingsState.evaluationTime, totalCard: settingsState.evaluationCardNumber }));
     navigation.goBack();
   }, []);
@@ -62,7 +65,7 @@ export default function Flashcard({ navigation, route }: FlashcardProps) {
 
   const dialogComponent = React.useMemo(() => (
     <Portal>
-      <Dialog style={{ maxWidth: 700, width: '100%', alignSelf: 'center' }} visible={dialog} onDismiss={() => setDialog(false)}>
+      <Dialog style={{ maxWidth: 700, maxHeight: 500, width: '100%', alignSelf: 'center' }} visible={dialog} onDismiss={() => { setDialog(false); navigation.navigate('Home'); } }>
         <Dialog.Title>{message.title}</Dialog.Title>
         <Dialog.Content>
           <Paragraph>{message.content}</Paragraph>

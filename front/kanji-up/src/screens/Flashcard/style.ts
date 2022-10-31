@@ -15,6 +15,7 @@ export default StyleSheet.create({
     flex: 1,
     margin: 20,
     backgroundColor: '#f8f8f8',
+    marginTop: 0,
   },
   contentHeader: {
     flexDirection: 'row',
@@ -28,6 +29,15 @@ export default StyleSheet.create({
     fontSize: 20,
     fontWeight: '900',
   },
+  surface: {
+    padding: 15,
+    borderRadius: 10,
+    backgroundColor: '#fde2e7'
+  },
+  subtext: {
+    color: colors.text,
+    fontWeight: '700',
+  },
   timer: {
     width: 80,
     height: 80,
@@ -38,4 +48,3 @@ export default StyleSheet.create({
     justifyContent: 'center'
   },
 });
-

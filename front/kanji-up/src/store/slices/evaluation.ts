@@ -24,6 +24,10 @@ const addAnswer = (state: EvaluationState, action: PayloadAction<AnswerType>) =>
   return { ...state, answers: [...state.answers, action.payload]};
 };
 
+const addPoints = (state: EvaluationState, action: PayloadAction<number>) => {
+  return { ...state, totalScore: state.totalScore + action.payload };
+}
+
 const updateAnswerStatus = (state: EvaluationState, action: PayloadAction<{ id: number, status: string, message: string }>) => {
   if (action.payload.status !== 'correct'
   && action.payload.status !== 'incorrect'
@@ -62,6 +66,7 @@ export const evaluation = createSlice({
   reducers: {
     initialize,
     addAnswer,
+    addPoints,
     updateAnswerStatus,
     handleError,
     finish,
