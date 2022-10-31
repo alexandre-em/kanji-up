@@ -16,7 +16,7 @@ dotenv.config();
 const router: Router = Router();
 const urlencodedParser = bodyParser.urlencoded({ extended: false });
 
-router.get('model', (req, res) => {
+router.get('/model', (req, res) => {
   const model = req.query.model;
   if (model && model === process.env.KANJI_RECOGNIZER_KEY) {
     const uris = {
