@@ -1,18 +1,19 @@
-import React, {useCallback, useMemo} from 'react';
-import {SafeAreaView, ScrollView, Text} from 'react-native';
-import {Appbar, Button, IconButton, TextInput} from 'react-native-paper';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, {useCallback} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {Platform, SafeAreaView, ScrollView, Text} from 'react-native';
+import {Appbar, Button, IconButton, ProgressBar, TextInput} from 'react-native-paper';
 
-import AsyncStorageKeys from '../../constants/asyncstorageKeys';
+import styles from './style';
+import {RootState} from '../../store';
+import colors from '../../constants/colors';
 import Slider from '../../components/Slider';
 import {SettingsProps} from '../../types/screens';
-import styles from './style';
-import colors from '../../constants/colors';
-import CustomDialog from '../../components/CustomDialog';
-import {readFile, writeFile} from '../../service/file';
 import {error, settings} from '../../store/slices';
-import {RootState} from '../../store';
+import usePrediction from '../../hooks/usePrediction';
+import {readFile, writeFile} from '../../service/file';
+import CustomDialog from '../../components/CustomDialog';
+import AsyncStorageKeys from '../../constants/asyncstorageKeys';
 
 const defaultValues = {
   username: '',
@@ -24,9 +25,13 @@ const defaultValues = {
 export default function Settings({ navigation, route }: SettingsProps) {
   const { firstTime } = route.params;
   const dispatch = useDispatch();
+  const model = usePrediction();
   const savedSettings = useSelector((state: RootState) => state.settings);
   const [values, setValues] = React.useState<SettingValuesType>(defaultValues);
   const [dialog, setDialog] = React.useState<boolean>(false);
+  const [dialogMessages, setDialogMessages] = React.useState({ title: '', description: '' });
+  const [isDownloading, setIsDownloading] = React.useState<boolean>(false);
+  const [progress, setProgress] = React.useState<number>(0);
 
   const handleSave = useCallback(async () => {
     await AsyncStorage.setItem(AsyncStorageKeys.FIRST_TIME, 'false');
@@ -47,8 +52,29 @@ export default function Settings({ navigation, route }: SettingsProps) {
 
   const handleBack = useCallback(() => {
     if (isButtonDisabled) { navigation.navigate('Home'); }
-    else { setDialog(true); }
+    else {
+      setDialog(true);
+      setDialogMessages({ title: 'Before quitting', description: 'Do you want to save your selection ?' });
+    }
   }, [isButtonDisabled]);
+
+  const handleUpdate = useCallback(async () => {
+    setDialogMessages({ title: 'Checking versions', description: 'Downloading a new version of the models' });
+    setDialog(true);
+    setIsDownloading(true);
+    const onDownloadProgress = (progressEvent: any) => {
+      const percentCompleted = progressEvent.loaded / progressEvent.total;
+      setProgress(percentCompleted);
+    };
+
+    await model.downloadThenSave(Platform.OS === 'web' ? onDownloadProgress : (progress: number) => { setProgress(progress); });
+    setIsDownloading(false);
+    setDialog(false);
+  }, []);
+
+  const progressComponent = React.useMemo(() => (
+    <ProgressBar progress={progress} />
+  ), [progress]);
 
   React.useEffect(() => {
     if (!firstTime) {
@@ -78,16 +104,17 @@ export default function Settings({ navigation, route }: SettingsProps) {
       <Button mode="outlined" style={styles.button}>Previous data</Button>
       <Text style={[styles.title, { marginVertical: 15 }]}>Application's settings</Text>
       <Text style={{ color: colors.text, alignSelf: 'center' }}>Last update: 20/09/2022</Text>
-      <Button mode="outlined" style={styles.button}>Check updates</Button>
+      <Button mode="outlined" style={styles.button} onPress={handleUpdate}>Check updates</Button>
     </ScrollView>
     <Button mode="contained" disabled={isButtonDisabled} style={styles.button} onPress={handleSave}>Save</Button>
     <CustomDialog
       visible={dialog}
-      message={{ title: 'Before quitting', description: 'Do you want to save your selection ?' }}
+      message={dialogMessages}
+      component={isDownloading && progressComponent}
       onDismiss={() => setDialog(false)}
       onSave={() => { handleSave(); navigation.navigate('Home'); }}
       onCancel={() => { setDialog(false); navigation.navigate('Home'); } }
+      actions={!isDownloading ? [true, true] : undefined}
     />
   </SafeAreaView>;
 };
-
