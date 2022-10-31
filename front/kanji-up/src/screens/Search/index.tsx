@@ -118,5 +118,4 @@ export default function Search({ navigation, route }: SearchProps) {
     {filterDialog}
   </SafeAreaView>
 )
-}
-
+};

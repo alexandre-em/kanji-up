@@ -1,67 +1,19 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {SafeAreaView, View} from 'react-native';
-import {useDispatch, useSelector} from 'react-redux';
 import {ActivityIndicator, Appbar, Button, Dialog, Paragraph, Portal} from 'react-native-paper';
 
 import styles from './style';
 import Evaluate from './Evaluate';
 import Practice from './Practice';
 import {FlashcardProps} from '../../types/screens';
-import {RootState} from '../../store';
 import usePrediction from '../../hooks/usePrediction';
-import {error, evaluation as evaluationSlice} from '../../store/slices';
+import useHandlers from './useHandlers';
 
 export default function Flashcard({ navigation, route }: FlashcardProps) {
   const { evaluation } = route.params;
-  const dispatch = useDispatch();
+  const [dialog, setDialog] = React.useState<boolean>(false);
   const model = evaluation && usePrediction();
-  const kanjiState =  useSelector((state: RootState) => state.kanji);
-  const settingsState =  useSelector((state: RootState) => state.settings);
-  const evaluationState =  useSelector((state: RootState) => state.evaluation);
-  const [dialog, setDialog] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [message, setMessage] = useState({ title: '', content: '', component: undefined });
-
-  const handleFinish = React.useCallback(({ title, content, component }: { title: string, content: string, component: any }) => {
-    setMessage({ title, content, component });
-    setDialog(true);
-  }, []);
-
-  const handleConfirmFinish = React.useCallback(() => {
-    // TODO: Save user result and points
-    if (evaluation) {
-
-    }
-
-    dispatch(evaluationSlice.actions.reset({ time: settingsState.evaluationTime, totalCard: settingsState.evaluationCardNumber }));
-    navigation.goBack();
-  }, []);
-
-  const sKanji = React.useMemo(() => (
-    Object.values(kanjiState.selectedKanji)
-  ), [kanjiState]);
-
-  useEffect(() => {
-    if (Object.keys(kanjiState.selectedKanji).length < 1) {
-      setMessage({ title: `Warning: no kanji` ,content: 'You havn\'t selected kanji to start a flashcard session', component: undefined });
-      setDialog(true);
-    }
-  }, [kanjiState]);
-
-  useEffect(() => {
-    (async () => {
-      if (model && !model.model && evaluation && !loading) {
-        setLoading(true);
-        try {
-          await model.loadModel();
-        } catch (err: any) {
-          dispatch(error.actions.update(err.message));
-        } finally {
-          setLoading(false);
-        }
-      }
-    })()
-  }, [model, evaluation, loading]);
+  const { sKanji, message, handleFinish, handleConfirmFinish } = useHandlers({ model, evaluation, navigation, setDialog });
 
   const dialogComponent = React.useMemo(() => (
     <Portal>

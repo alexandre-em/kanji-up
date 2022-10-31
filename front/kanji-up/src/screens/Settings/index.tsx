@@ -1,7 +1,6 @@
-import React, {useCallback} from 'react';
+import React from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {Platform, SafeAreaView, ScrollView, Text} from 'react-native';
+import {SafeAreaView, ScrollView, Text} from 'react-native';
 import {Appbar, Button, IconButton, ProgressBar, TextInput} from 'react-native-paper';
 
 import styles from './style';
@@ -9,11 +8,10 @@ import {RootState} from '../../store';
 import colors from '../../constants/colors';
 import Slider from '../../components/Slider';
 import {SettingsProps} from '../../types/screens';
-import {error, settings} from '../../store/slices';
-import usePrediction from '../../hooks/usePrediction';
-import {readFile, writeFile} from '../../service/file';
+import {error} from '../../store/slices';
+import {readFile} from '../../service/file';
 import CustomDialog from '../../components/CustomDialog';
-import AsyncStorageKeys from '../../constants/asyncstorageKeys';
+import useHandlers from './useHandlers';
 
 const defaultValues = {
   username: '',
@@ -25,23 +23,12 @@ const defaultValues = {
 export default function Settings({ navigation, route }: SettingsProps) {
   const { firstTime } = route.params;
   const dispatch = useDispatch();
-  const model = usePrediction();
   const savedSettings = useSelector((state: RootState) => state.settings);
   const [values, setValues] = React.useState<SettingValuesType>(defaultValues);
   const [dialog, setDialog] = React.useState<boolean>(false);
   const [dialogMessages, setDialogMessages] = React.useState({ title: '', description: '' });
   const [isDownloading, setIsDownloading] = React.useState<boolean>(false);
   const [progress, setProgress] = React.useState<number>(0);
-
-  const handleSave = useCallback(async () => {
-    await AsyncStorage.setItem(AsyncStorageKeys.FIRST_TIME, 'false');
-    const json = JSON.stringify(values);
-    await writeFile('userSettings', json);
-    dispatch(settings.actions.update(values));
-    setDialog(false);
-    
-    navigation.navigate('Home');
-  }, [values]);
 
   const isButtonDisabled = React.useMemo(() => {
     const isNameEmpty = values.username === '';
@@ -50,27 +37,7 @@ export default function Settings({ navigation, route }: SettingsProps) {
     return isNameEmpty || isUnchanged;
   }, [values, savedSettings, firstTime]);
 
-  const handleBack = useCallback(() => {
-    if (isButtonDisabled) { navigation.navigate('Home'); }
-    else {
-      setDialog(true);
-      setDialogMessages({ title: 'Before quitting', description: 'Do you want to save your selection ?' });
-    }
-  }, [isButtonDisabled]);
-
-  const handleUpdate = useCallback(async () => {
-    setDialogMessages({ title: 'Checking versions', description: 'Downloading a new version of the models' });
-    setDialog(true);
-    setIsDownloading(true);
-    const onDownloadProgress = (progressEvent: any) => {
-      const percentCompleted = progressEvent.loaded / progressEvent.total;
-      setProgress(percentCompleted);
-    };
-
-    await model.downloadThenSave(Platform.OS === 'web' ? onDownloadProgress : (progress: number) => { setProgress(progress); });
-    setIsDownloading(false);
-    setDialog(false);
-  }, []);
+  const { handleBack, handleSave, handleUpdate } = useHandlers({ values, navigation, isButtonDisabled, setDialog, setDialogMessages, setIsDownloading, setProgress });
 
   const progressComponent = React.useMemo(() => (
     <ProgressBar progress={progress} />

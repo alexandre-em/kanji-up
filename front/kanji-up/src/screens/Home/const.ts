@@ -1,3 +1,5 @@
+import colors from "../../constants/colors";
+
 export const menu = [
   {
     label: 'Select',
@@ -64,3 +66,26 @@ export const list = [
   },
 ];
 
+export const stepperStyles = {
+  stepIndicatorSize: 25,
+  currentStepIndicatorSize: 30,
+  separatorStrokeWidth: 2,
+  currentStepStrokeWidth: 3,
+  stepStrokeCurrentColor: colors.primary,
+  stepStrokeWidth: 3,
+  stepStrokeFinishedColor: colors.primary,
+  stepStrokeUnFinishedColor: '#dedede',
+  separatorFinishedColor: colors.primary,
+  separatorUnFinishedColor: '#dedede',
+  stepIndicatorFinishedColor: colors.primary,
+  stepIndicatorUnFinishedColor: '#ffffff',
+  stepIndicatorCurrentColor: '#ffffff',
+  stepIndicatorLabelFontSize: 0,
+  currentStepIndicatorLabelFontSize: 0,
+  stepIndicatorLabelCurrentColor: 'transparent',
+  stepIndicatorLabelFinishedColor: 'transparent',
+  stepIndicatorLabelUnFinishedColor: 'transparent',
+  labelColor: '#999999',
+  labelSize: 13,
+  currentStepLabelColor: colors.primary,
+};

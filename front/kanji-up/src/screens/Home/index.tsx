@@ -3,10 +3,10 @@ import {FlatList, Image, Platform, SafeAreaView, ScrollView, Text, TouchableOpac
 import {Avatar, Button, Dialog, FAB, List, Paragraph, Portal, ProgressBar, Searchbar, Surface} from 'react-native-paper';
 import StepIndicator from 'react-native-step-indicator';
 import {SvgUri} from 'react-native-svg';
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 
 import styles from './style';
-import { menu, list, labels } from './const';
+import { menu, list, labels, stepperStyles } from './const';
 import colors from '../../constants/colors';
 import {HomeProps} from '../../types/screens';
 import GradientCard from '../../components/GradientCard';
@@ -17,32 +17,7 @@ import Certification from '../../svg/Certification';
 import Reminders from '../../svg/Reminders';
 import usePrediction from '../../hooks/usePrediction';
 
-const stepperStyles = {
-  stepIndicatorSize: 25,
-  currentStepIndicatorSize: 30,
-  separatorStrokeWidth: 2,
-  currentStepStrokeWidth: 3,
-  stepStrokeCurrentColor: colors.primary,
-  stepStrokeWidth: 3,
-  stepStrokeFinishedColor: colors.primary,
-  stepStrokeUnFinishedColor: '#dedede',
-  separatorFinishedColor: colors.primary,
-  separatorUnFinishedColor: '#dedede',
-  stepIndicatorFinishedColor: colors.primary,
-  stepIndicatorUnFinishedColor: '#ffffff',
-  stepIndicatorCurrentColor: '#ffffff',
-  stepIndicatorLabelFontSize: 0,
-  currentStepIndicatorLabelFontSize: 0,
-  stepIndicatorLabelCurrentColor: 'transparent',
-  stepIndicatorLabelFinishedColor: 'transparent',
-  stepIndicatorLabelUnFinishedColor: 'transparent',
-  labelColor: '#999999',
-  labelSize: 13,
-  currentStepLabelColor: colors.primary,
-};
-
 export default function Home({ navigation }: HomeProps) {
-  const dispatch = useDispatch();
   const [searchQuery, setSearchQuery] = useState<string>('');
   const kanjiState = useSelector((state: RootState) => state.kanji);
   const settingsState = useSelector((state: RootState) => state.settings);
