@@ -1,6 +1,6 @@
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { Dimensions, Platform, View } from 'react-native';
-import { Button, Surface } from 'react-native-paper';
+import { Surface } from 'react-native-paper';
 
 import colors from '../../constants/colors';
 import CanvasPlatform from './Canvas';
@@ -139,7 +139,6 @@ export default forwardRef(({ visible }: SketchProps, ref) => {
   }, [handleClear, isOpen, visible]);
 
   if (!visible) { return null; }
-
   return (
     <View style={styles.body}>
       <Surface>
@@ -150,4 +149,3 @@ export default forwardRef(({ visible }: SketchProps, ref) => {
     </View>
   );
 });
-

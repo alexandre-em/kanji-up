@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {ActivityIndicator, ScrollView, Text, useWindowDimensions, View} from 'react-native';
-import {Appbar, Button, Chip, DataTable, Divider, List, Surface} from 'react-native-paper';
+import {ScrollView, Text, useWindowDimensions, View} from 'react-native';
+import {ActivityIndicator, Appbar, Button, Chip, DataTable, Divider, List, Surface} from 'react-native-paper';
 import {useDispatch, useSelector} from 'react-redux';
 import axios from 'axios';
 
@@ -163,4 +163,3 @@ export default function KanjiDetail({ navigation, route }: KanjiDetailProps) {
   </View>
 );
 };
-

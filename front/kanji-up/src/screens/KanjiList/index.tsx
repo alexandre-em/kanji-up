@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {ActivityIndicator, Platform, SafeAreaView, ScrollView, Text, TouchableOpacity} from 'react-native';
-import {Appbar, DataTable, Divider, IconButton, Menu, Surface} from 'react-native-paper';
+import {Platform, SafeAreaView, ScrollView, Text, TouchableOpacity} from 'react-native';
+import {ActivityIndicator, Appbar, DataTable, Divider, IconButton, Menu, Surface} from 'react-native-paper';
 import {useDispatch, useSelector} from 'react-redux';
 import axios, {AxiosRequestConfig, AxiosResponse} from 'axios';
 
@@ -146,4 +146,3 @@ export default function KanjiList({ navigation, route }: KanjiListProps) {
   </SafeAreaView>
 );
 };
-

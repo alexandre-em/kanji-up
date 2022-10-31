@@ -1,9 +1,11 @@
 interface CustomDialogProps {
+  actions?: boolean[];
   visible: boolean;
   message: {
     title: string;
     description: string;
   };
+  component?: any;
   onCancel: () => void;
   onDismiss: () => void;
   onSave: () => void;
@@ -19,4 +21,3 @@ interface SliderProps {
 interface SketchProps {
   visible: boolean;
 }
-

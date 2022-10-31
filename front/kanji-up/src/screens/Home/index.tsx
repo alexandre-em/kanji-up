@@ -63,7 +63,7 @@ export default function Home({ navigation }: HomeProps) {
       });
 
       return (
-        <List.Item title={choosenKanji.kanji?.character} description="See details" left={icon} onPress={() => navigation.navigate('KanjiDetail', { id: choosenKanji.kanji_id as string })} style={{ marginHorizontal: 20 }} />
+        <List.Item title={choosenKanji.kanji?.meaning} description="See details" left={icon} onPress={() => navigation.navigate('KanjiDetail', { id: choosenKanji.kanji_id as string })} style={{ marginHorizontal: 20 }} />
         );
     }
     return null;
@@ -186,4 +186,3 @@ export default function Home({ navigation }: HomeProps) {
   {dialog}
 </SafeAreaView>);
 };
-

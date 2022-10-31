@@ -8,4 +8,3 @@ export default {
   secondaryDark: '#a04859',
   text: '#3F3D56',
 };
-

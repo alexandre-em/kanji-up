@@ -1,6 +1,6 @@
 import React, {useCallback, useMemo} from 'react';
 import {GestureResponderEvent, Platform, useWindowDimensions} from 'react-native';
-import Svg, {Circle, G, Rect, Text} from 'react-native-svg';
+import Svg, {Circle, Rect, Text} from 'react-native-svg';
 import colors from '../constants/colors';
 
 export default function Slider({ value, min, max, onValueChange }: SliderProps) {
@@ -40,6 +40,7 @@ export default function Slider({ value, min, max, onValueChange }: SliderProps) 
       onTouchMove={handleSlide}
       onMouseUp={handlePressOut}
       onTouchEnd={handlePressOut}
+      height={50}
     >
       <Text x={(Math.min(width, 700) - 20)/2} y={20} textAnchor="middle" fontWeight="bold" fill={colors.primary}>{value}</Text>
       <Text x={10} y={20} textAnchor="middle">{min}</Text>

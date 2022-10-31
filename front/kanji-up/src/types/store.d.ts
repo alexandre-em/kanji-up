@@ -11,6 +11,7 @@ type SelectedKanjiState = {
 };
 
 type AnswerType = {
+  recognitionId?: string,
   image: string,
   kanji: string,
   status: 'correct' | 'incorrect' | 'toReview',
