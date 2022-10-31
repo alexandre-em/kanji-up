@@ -22,4 +22,6 @@ __pycache__
 .terraform_env
 terraform.tfstate
 terraform.tfstate.backup
-
+old_kanji_web_model
+old_kanji_saved_model
+kanji-mng
