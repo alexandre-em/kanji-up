@@ -30,6 +30,30 @@ export default [
     image: require('./images/grade5.jpg'),
   }, 
   {
+    id: '6',
+    title: 'School grade 6',
+    count: 181,
+    image: require('./images/grade6.jpg'),
+  }, 
+  {
+    id: '8',
+    title: 'School grade 8',
+    count: 900,
+    image: require('./images/grade8.jpg'),
+  }, 
+  {
+    id: '9',
+    title: 'School grade 9',
+    count: 635,
+    image: require('./images/grade9.jpg'),
+  }, 
+  {
+    id: '10',
+    title: 'School grade 10',
+    count: 160,
+    image: require('./images/grade10.jpg'),
+  }, 
+  {
     id: 'custom',
     title: 'Custom',
     count: 10288,
