@@ -4,10 +4,13 @@ import * as tf from '@tensorflow/tfjs';
 import { decodeJpeg } from '@tensorflow/tfjs-react-native';
 import {IOHandler} from '@tensorflow/tfjs-core/dist/io/types';
 import { Buffer } from 'buffer';
+import axios from 'axios';
 
 import { asyncStorageIO } from '../FileSystemIO';
 import {kanjiPredictionConstants} from './const';
 import labels from './labels';
+
+const url = 'https://anki-images.s3.eu-west-3.amazonaws.com/models/kanji_web_model/model.json';
 
 export default function usePrediction() {
   const [loading, setLoading] = useState<boolean>(false);
@@ -15,6 +18,7 @@ export default function usePrediction() {
 
   const downloadThenSave = useCallback(async (onProgress: (progress: number) => void) => {
     await tf.ready();
+    const url = (await axios.get(`https://kanjiup-api.alexandre-em.fr/recognition/model?model=${kanjiPredictionConstants.MODEL_KEY_DL}`)).data.native;
     const model = await tf.loadGraphModel(url, { onProgress });
     await model.save(asyncStorageIO('kanjiPrediction') as IOHandler);
   }, []);
@@ -93,4 +97,3 @@ export default function usePrediction() {
     predict,
   };
 };
-
