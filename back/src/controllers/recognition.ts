@@ -21,7 +21,7 @@ router.get('model', (req, res) => {
   if (model && model === process.env.KANJI_RECOGNIZER_KEY) {
     const uris = {
       web: process.env.KANJI_RECOGNIZER_WEB,
-      native: null,
+      native: process.env.KANJI_RECOGNIZER_NATIVE,
     };
 
     res.status(200).send(uris);
