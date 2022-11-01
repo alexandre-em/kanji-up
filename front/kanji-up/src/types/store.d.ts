@@ -34,3 +34,9 @@ type SettingValuesType = {
   evaluationCardNumber: number,
   evaluationTime: number,
 };
+
+type UserState = {
+  totalScore: number,
+  dailyScore: number,
+  scores: { [key: string]: number },
+};

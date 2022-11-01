@@ -10,7 +10,7 @@ export const readFile = (name: string): Promise<string> => {
   return new Promise((resolve, reject) => {
     try{
       const contents = localStorage.getItem(name);
-      if (!contents) { reject(new Error('Selected kanji data not found')); }
+      if (!contents) { reject(new Error(`Data with key ${name} not found`)); }
       resolve(contents as string);
     } catch (err) {
       reject(err);

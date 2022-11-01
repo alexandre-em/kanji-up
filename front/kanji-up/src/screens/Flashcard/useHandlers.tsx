@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {error, evaluation as evaluationSlice} from '../../store/slices';
+import {error, evaluation as evaluationSlice, user} from '../../store/slices';
 
 import {RootState} from '../../store';
 
@@ -25,14 +25,13 @@ export default function useHandlers({ evaluation, model, navigation, setDialog }
   }, []);
 
   const handleConfirmFinish = React.useCallback(() => {
-    // TODO: Save user result and points
-    if (evaluation) {
-
+    if (user) {
+      dispatch(user.actions.addScoreDaily(Math.round(evaluationState.totalScore)));
     }
 
     dispatch(evaluationSlice.actions.reset({ time: settingsState.evaluationTime, totalCard: settingsState.evaluationCardNumber }));
     navigation.goBack();
-  }, []);
+  }, [evaluationState]);
 
   const sKanji = React.useMemo(() => (
     Object.values(kanjiState.selectedKanji)

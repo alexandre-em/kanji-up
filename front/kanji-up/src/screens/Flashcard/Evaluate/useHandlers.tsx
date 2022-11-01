@@ -56,7 +56,8 @@ export default function useHandlersEvaluate({ model, kanji, canvasRef, progressC
             dispatch(evaluation.actions.addAnswer({ kanji: details.character as string, image: recognition.data.image, answer: prediction, status: 'toReview', message: 'The drawed kanji seems incorrect, please confirm', recognitionId: recognition.data.recognition_id }));
           } else {
             dispatch(evaluation.actions.addAnswer({ kanji: recognition.data.kanji || '', image: recognition.data.image, answer: prediction, status: 'correct', message: 'Correct !', recognitionId: recognition.data.recognition_id }));
-            dispatch(evaluation.actions.addPoints(Math.max(predictedKanji?.confidence * 100, 10)));
+            const grade = kanjiQueue[i].reference?.grade;
+            dispatch(evaluation.actions.addPoints(Math.max(predictedKanji?.confidence * 100 * (grade === 'custom'? 8 : parseInt(grade || '1')), 10)));
           }
         } catch (err: any) {
           dispatch(error.actions.update(err.message));

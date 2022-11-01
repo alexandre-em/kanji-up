@@ -34,7 +34,7 @@ export const menu = [
 ];
 
 
-export const labels = ['4000', '10000', '25000']; 
+export const labels = ['5000', '10000', '20000']; 
 
 export const list = [
   {

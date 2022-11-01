@@ -1,9 +1,9 @@
-import React, {useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {FlatList, Image, Platform, SafeAreaView, ScrollView, Text, TouchableOpacity, View} from 'react-native';
 import {Avatar, Button, Dialog, FAB, List, Paragraph, Portal, ProgressBar, Searchbar, Surface} from 'react-native-paper';
 import StepIndicator from 'react-native-step-indicator';
 import {SvgUri} from 'react-native-svg';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 
 import styles from './style';
 import { menu, list, labels, stepperStyles } from './const';
@@ -16,10 +16,14 @@ import Trip from '../../svg/Trip';
 import Certification from '../../svg/Certification';
 import Reminders from '../../svg/Reminders';
 import usePrediction from '../../hooks/usePrediction';
+import {readFile, writeFile} from '../../service/file';
+import {user} from '../../store/slices';
 
 export default function Home({ navigation }: HomeProps) {
+  const dispatch = useDispatch();
   const [searchQuery, setSearchQuery] = useState<string>('');
   const kanjiState = useSelector((state: RootState) => state.kanji);
+  const userState = useSelector((state: RootState) => state.user);
   const settingsState = useSelector((state: RootState) => state.settings);
   const [open, setOpen] = useState({ open: false });
   const [downloadProgress, setDownloadProgress] = useState({ progress: 0, showDialog: false });
@@ -44,6 +48,14 @@ export default function Home({ navigation }: HomeProps) {
     return null;
   }, [kanjiState]);
 
+  const step = useMemo(() => {
+    const dailyScore = userState.dailyScore;
+    if (dailyScore < parseInt(labels[0])) { return 0; }
+    if (dailyScore < parseInt(labels[1])) { return 1; }
+    if (dailyScore < parseInt(labels[2])) { return 2; }
+    return 0;
+  }, [userState]);
+
   const renderItem = ({ item }: any) => {
     return <GradientCard
       onPress={() => navigation.navigate(item.screen, item.screenOptions)}
@@ -55,9 +67,16 @@ export default function Home({ navigation }: HomeProps) {
   }
 
   const stepperIllustration = useMemo(() => {
-    const step = 1;
-    return <Trip width={220} height={180} />;
-  }, []);
+    if (step === 0) { return <Trip width={220} height={180} />; }
+    if (step === 1) { return <Reminders width={220} height={180} />; }
+    if (step === 2) { return <Certification width={220} height={180} />; }
+  }, [step]);
+
+  const stepperMessage = useMemo(() => {
+    if (step === 0) { return "Let's begin !"; }
+    if (step === 1) { return "Almost there !"; }
+    if (step === 2) { return "Good job !"; }
+  }, [step]);
 
   const dialog = useMemo(() => (
     <Portal>
@@ -74,7 +93,42 @@ export default function Home({ navigation }: HomeProps) {
     </Portal>
   ), [downloadProgress]);
 
-  React.useEffect(() => {
+  const refreshUserInfo = React.useCallback(() => {
+    if (userState) {
+      const newContent = { ...userState.scores };
+      const date = new Date();
+      const key = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+      newContent[key] = userState.dailyScore;
+      writeFile('userInfo', JSON.stringify(newContent))
+        .then(() => console.log('User info Saved'))
+        .catch((err) => console.error('Error', err));
+    }
+  }, [userState]);
+
+  useEffect(() => {
+    if (userState && userState.dailyScore === 0) {
+      (async () => {
+        const date = new Date();
+        try {
+          const content = await readFile('userInfo');
+          if (content) {
+            const scores = JSON.parse(content);
+            const todayScore = scores[`${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`];
+            const userInfo: UserState = { scores, dailyScore: todayScore || 0, totalScore: Object.values(scores).reduce((a, b) => a + b, 0) };
+
+            dispatch(user.actions.update(userInfo));
+          }
+
+        } catch (err) {
+          dispatch(user.actions.reset());
+        }
+      })()
+    }
+
+    return refreshUserInfo;
+  }, []);
+
+  useEffect(() => {
     (async () => {
       const isStored = await model.isBufferStored;
       if (model && !(isStored) && !isDownloading) {
@@ -91,7 +145,7 @@ export default function Home({ navigation }: HomeProps) {
 
   return (<SafeAreaView style={styles.main}>
     <View style={styles.header}>
-      <Button mode="contained" style={{ borderRadius: 25 }}>4000</Button>
+      <Button mode="contained" style={{ borderRadius: 25 }}>{userState.totalScore}</Button>
       <TouchableOpacity onPress={() => navigation.navigate('Settings', { firstTime: false })}>
         <Avatar.Text size={40} label={settingsState.username.charAt(0) || '-'} />
       </TouchableOpacity>
@@ -118,7 +172,7 @@ export default function Home({ navigation }: HomeProps) {
         <StepIndicator
           stepCount={3}
           customStyles={stepperStyles}
-          currentPosition={1}
+          currentPosition={step}
           labels={labels}
         />
       </View>
@@ -128,8 +182,9 @@ export default function Home({ navigation }: HomeProps) {
           {stepperIllustration}
         </View>
         <View style={{ margin: 10 }}>
-          <Text style={{ color: colors.secondary, fontSize: 30, fontWeight: '800', marginHorizontal: 20 }}>Good Job !</Text>
-          <Text style={[styles.title, { fontSize: 22, marginTop: 0 }]}>6000 pts</Text>
+          <Text style={{ color: colors.secondary, fontSize: 30, fontWeight: '800', marginHorizontal: 20 }}>{stepperMessage}</Text>
+          <Text style={[styles.title, { fontSize: 22, marginTop: 0 }]}>{userState.dailyScore} pts</Text>
+          <Button icon="reload" onPress={refreshUserInfo} mode="contained" style={{ borderRadius: 25 }}>Synchronize</Button>
         </View>
       </Surface>
 

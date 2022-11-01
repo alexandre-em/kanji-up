@@ -1,6 +1,6 @@
 {
   "name": "kanji-up",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "author": "Alexandre Em",
   "license": "MIT",
   "main": "node_modules/expo/AppEntry.js",
