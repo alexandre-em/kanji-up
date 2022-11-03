@@ -4,12 +4,13 @@ import { Router } from 'express';
 import { readFileSync, unlinkSync } from "fs";
 import bodyParser from "body-parser";
 import path from "path";
+import dotenv from 'dotenv';
 
 import { upload } from "../utils";
 import { recognitionService } from '../services';
 import InvalidError from '../error/invalid';
 import NotFoundError from '../error/notFound';
-import dotenv from 'dotenv';
+import {PAGINATION_LIMIT} from '../types/enums';
 
 dotenv.config();
 
@@ -28,6 +29,63 @@ router.get('/model', (req, res) => {
   } else {
     res.status(403).send(new Error('Not allowed to access this route or specify what you want to do with'));
   }
+});
+
+/**
+ * @openapi
+ * /recognition/all:
+ *  get:
+ *      tags:
+ *          - Recognition
+ *      description: List all recognition
+ *      parameters:
+ *          - in: query
+ *            name: page
+ *            description: Page number 
+ *            schema:
+ *                type: integer
+ *          - in: query
+ *            name: limit
+ *            description: Max element number on a page
+ *            schema:
+ *                type: integer
+ *          - in: query
+ *            name: query
+ *            description: Query to find a Kanji
+ *            schema:
+ *                type: string
+ *      responses:
+ *          200:
+ *              description: Returns the predicted kanjis and their results
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/RecognitionPaginateResponse'
+ *          400:
+ *              description: Bad request Error
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/Error'
+ *          500:
+ *              description: Internal Error
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/Error'
+ */
+router.get('/all', (req, res) => {
+  const page = req.query.page ? parseInt(req.query.page as string) : 1;
+  const limit = req.query.limit ? parseInt(req.query.limit as string) : PAGINATION_LIMIT.LITTLE;
+  const query = (req.query.query as string) || undefined;
+
+  recognitionService.getAll(page, limit, query)
+    .then((recognitions) => {
+      res.status(200).send(recognitions);
+    })
+    .catch((err) => {
+      new InvalidError(err.message).sendResponse(res);
+    });
 });
 
 /**
@@ -69,7 +127,7 @@ router.post('/', upload.single('image'), urlencodedParser, (req, res) => {
 	try {
 		const ext = path.extname(req.file.filename).split('\.')[1];
 		const { kanji, predictions } = JSON.parse(req.body.json);
-		const filePath = path.join('uploads/' + req.file.filename);
+		const filePath = path.join(`uploads/${req.file.filename}`);
 		const image = {
 			filename: req.file.filename,
 			data: readFileSync(filePath),
@@ -196,6 +254,33 @@ router.patch('/validation/:id', (req, res) => {
  *                    type: array
  *                    items:
  *                        $ref: '#/components/schemas/Prediction'
+ *        RecognitionPaginateResponse:
+ *            type: object
+ *            properties:
+ *                totalDocs:
+ *                    type: integer
+ *                deleted_at:
+ *                    type: integer
+ *                limit:
+ *                    type: integer
+ *                totalPages:
+ *                    type: integer
+ *                page:
+ *                    type: integer
+ *                pagingCounter:
+ *                    type: integer
+ *                hasPrevPage:
+ *                    type: boolean
+ *                hasNextPage:
+ *                    type: boolean
+ *                prevPage:
+ *                    type: integer
+ *                nextPage:
+ *                    type: integer
+ *                docs:
+ *                    type: array
+ *                    items:
+ *                        $ref: '#/components/schemas/RecognitionResponse'
  */
 
 export default router;

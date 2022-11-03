@@ -148,10 +148,10 @@ router.get('/detail/:id', async (req, res) => {
  */
 router.get('/search', (req, res) => {
   const query = req.query.query;
-  const page = req.query.page && isNaN(parseInt(req.query.page as string)) ? parseInt(req.query.page as string) : 1;
-  const limit = req.query.limit && isNaN(parseInt(req.query.limit as string)) ? parseInt(req.query.limit as string) : PAGINATION_LIMIT.LITTLE;
-
-  console.log('Test');
+  const pge = parseInt(req.query.page as string);
+  const lmt = parseInt(req.query.limit as string);
+  const page = req.query.page && !isNaN(pge) ? pge : 1;
+  const limit = req.query.limit && !isNaN(lmt) ? lmt : PAGINATION_LIMIT.LITTLE;
 
   if (!query) return new InvalidError('Search input is empty. Please type a keyword to run a search.').sendResponse(res);
   kanjiService.searchCharacter(query as string, page, limit)

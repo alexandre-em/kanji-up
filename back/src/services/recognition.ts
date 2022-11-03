@@ -2,9 +2,14 @@
 import { uploadFile } from "../config/aws";
 import { RecognitionModel } from "../models";
 
+export const getAll = async (page: number, limit: number, query?: string) => {
+  return RecognitionModel
+    .paginate(query === '' || !query ? {} : { kanji: query }, { limit, page, select: '-_id, -__v' });
+}
+
 export const addOne = async (kanji: string, image: ImageType, predictions: PredictionResultType[]) => {
 	try {
-		const uploadedImage: AWS.S3.ManagedUpload.SendData = await uploadFile(`uploads/${image.filename}`, image.data) as AWS.S3.ManagedUpload.SendData;
+		const uploadedImage: AWS.S3.ManagedUpload.SendData = await uploadFile(`uploads/${kanji}/${image.filename}`, image.data) as AWS.S3.ManagedUpload.SendData;
 
 		return RecognitionModel.create({ image: uploadedImage.Location, kanji, predictions });
 	} catch (err) {
