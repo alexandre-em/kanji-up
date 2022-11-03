@@ -114,7 +114,7 @@ export default function Home({ navigation }: HomeProps) {
           if (content) {
             const scores = JSON.parse(content);
             const todayScore = scores[`${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`];
-            const userInfo: UserState = { scores, dailyScore: todayScore || 0, totalScore: Object.values(scores).reduce((a, b) => a + b, 0) };
+            const userInfo: UserState = { scores, dailyScore: todayScore || 0, totalScore: Object.values(scores as { [key: string]: number }).reduce((a, b) => a + b, 0) };
 
             dispatch(user.actions.update(userInfo));
           }
@@ -210,7 +210,7 @@ export default function Home({ navigation }: HomeProps) {
     icon={open.open ? 'close' : 'menu'}
     color="white"
     fabStyle={{ backgroundColor: colors.secondary }}
-    actions={menu.map((m) => ({ ...m, onPress: () => navigation.navigate(m.screen, m.navOpt) }))}
+    actions={menu.map((m) => ({ ...m, onPress: () => navigation.navigate(m.screen as any, m.navOpt) }))}
     onStateChange={setOpen}
   />
   {dialog}

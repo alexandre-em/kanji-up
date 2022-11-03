@@ -25,4 +25,3 @@ export default function Category({ navigation }: CategoryProps) {
   </SafeAreaView>
 )
 }
-

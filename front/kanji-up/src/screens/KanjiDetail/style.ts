@@ -37,4 +37,3 @@ export default StyleSheet.create({
   details: {
   },
 });
-

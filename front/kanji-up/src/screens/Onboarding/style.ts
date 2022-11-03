@@ -49,3 +49,15 @@ export const onboardingStyle = StyleSheet.create({
   },
 });
 
+export const paginatorStyle = StyleSheet.create({
+  dot: {
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: colors.primary,
+    marginHorizontal: 8,
+  },
+  container: {
+    flexDirection: 'row',
+    height: 64,
+  },
+});

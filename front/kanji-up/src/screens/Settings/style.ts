@@ -1,7 +1,6 @@
 import {StyleSheet} from "react-native";
 import colors from "../../constants/colors";
 
-
 export default StyleSheet.create({
   main: {
     flex: 1,
@@ -30,4 +29,3 @@ export default StyleSheet.create({
     borderRadius: 25,
   },
 });
-

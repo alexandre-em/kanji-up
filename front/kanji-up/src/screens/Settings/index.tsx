@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {SafeAreaView, ScrollView, Text} from 'react-native';
 import {Appbar, Button, IconButton, ProgressBar, TextInput} from 'react-native-paper';
@@ -24,11 +24,11 @@ export default function Settings({ navigation, route }: SettingsProps) {
   const { firstTime } = route.params;
   const dispatch = useDispatch();
   const savedSettings = useSelector((state: RootState) => state.settings);
-  const [values, setValues] = React.useState<SettingValuesType>(defaultValues);
-  const [dialog, setDialog] = React.useState<boolean>(false);
-  const [dialogMessages, setDialogMessages] = React.useState({ title: '', description: '' });
-  const [isDownloading, setIsDownloading] = React.useState<boolean>(false);
-  const [progress, setProgress] = React.useState<number>(0);
+  const [values, setValues] = useState<SettingValuesType>(defaultValues);
+  const [dialog, setDialog] = useState<boolean>(false);
+  const [dialogMessages, setDialogMessages] = useState({ title: '', description: '' });
+  const [isDownloading, setIsDownloading] = useState<boolean>(false);
+  const [progress, setProgress] = useState<number>(0);
 
   const isButtonDisabled = React.useMemo(() => {
     const isNameEmpty = values.username === '';

@@ -48,4 +48,3 @@ type KanjiType = {
   reference?: Partial<ReferenceType>,
   examples?: Array<{ japanese: string, meaning: string }>,
 };
-

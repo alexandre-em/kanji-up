@@ -24,7 +24,7 @@ export default function useHandlersEvaluate({ model, kanji, canvasRef, progressC
   const evaluationState = useSelector((state: RootState) => state.evaluation);
   const settingsState = useSelector((state: RootState) => state.settings);
   const [timer, setTimer] = useState<number>(settingsState.evaluationTime || 60);
-  const [kanjiQueue, setKanjiQueue] = useState<KanjiType[] | null>(null);
+  const [kanjiQueue, setKanjiQueue] = useState<Partial<KanjiType>[] | null>(null);
   const [start, setStart] = useState<boolean>(false);
   const [counter, setCounter] = useState<number>(0);
 
@@ -37,23 +37,23 @@ export default function useHandlersEvaluate({ model, kanji, canvasRef, progressC
   const handleValidate = useCallback(async () => {
     if (canvasRef?.current && kanjiQueue) {
       const strokeCount = canvasRef?.current.strokeCount;
-      const isValid = strokeCount === kanjiQueue[i].kanji.strokes;
+      const isValid = strokeCount === kanjiQueue[i].kanji?.strokes;
       const details = kanjiQueue[i].kanji;
       const imageBase64: string = Platform.OS === 'web'
         ? canvasRef.current.getUri()
         : (await canvasRef.current.getUri()).split('data:image/jpeg;base64,')[1];
 
       if (!isValid) {
-        dispatch(evaluation.actions.addAnswer({ kanji: details.character as string, image: `data:image/jpeg;base64,${imageBase64}`, answer: [], status: 'incorrect', message: strokeCount === 0 ? 'This kanji has been skipped' : 'The stroke number isn\'t correct' }));
+        dispatch(evaluation.actions.addAnswer({ kanji: details!.character as string, image: `data:image/jpeg;base64,${imageBase64}`, answer: [], status: 'incorrect', message: strokeCount === 0 ? 'This kanji has been skipped' : 'The stroke number isn\'t correct' }));
       } else {
         // Dispatch score
         try {
           const prediction: PredictionType[] = await model.predict(imageBase64);
-          const predictedKanji = prediction.find((p) => p.prediction === details.character);
-          const recognition = await uploadImage(canvasRef, details.character as string, prediction) as AxiosResponse<RecognitionType>;
+          const predictedKanji = prediction.find((p) => p.prediction === details!.character);
+          const recognition = await uploadImage(canvasRef, details!.character as string, prediction) as AxiosResponse<RecognitionType>;
 
           if (!predictedKanji) {
-            dispatch(evaluation.actions.addAnswer({ kanji: details.character as string, image: recognition.data.image, answer: prediction, status: 'toReview', message: 'The drawed kanji seems incorrect, please confirm', recognitionId: recognition.data.recognition_id }));
+            dispatch(evaluation.actions.addAnswer({ kanji: details!.character as string, image: recognition.data.image, answer: prediction, status: 'toReview', message: 'The drawed kanji seems incorrect, please confirm', recognitionId: recognition.data.recognition_id }));
           } else {
             dispatch(evaluation.actions.addAnswer({ kanji: recognition.data.kanji || '', image: recognition.data.image, answer: prediction, status: 'correct', message: 'Correct !', recognitionId: recognition.data.recognition_id }));
             const grade = kanjiQueue[i].reference?.grade;

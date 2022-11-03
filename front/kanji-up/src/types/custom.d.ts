@@ -7,7 +7,6 @@ declare module "*.svg" {
 
 declare global {
   namespace ReactNativePaper {
-    interface Theme extends ThemeOverride
+    interface Theme extends ThemeOverride {};
   }
 }
-

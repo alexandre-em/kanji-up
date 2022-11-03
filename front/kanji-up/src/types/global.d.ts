@@ -38,4 +38,3 @@ interface Pagination<T> {
   prevPage: number | null,
   nextPage: number | null,
 }
-

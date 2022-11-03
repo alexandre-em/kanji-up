@@ -7,4 +7,3 @@ export default ({
   KANJI_DETAIL: 'KanjiDetail',
   FLASHCARD: 'Flashcard',
 });
-

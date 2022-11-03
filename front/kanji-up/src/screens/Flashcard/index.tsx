@@ -12,7 +12,7 @@ import useHandlers from './useHandlers';
 export default function Flashcard({ navigation, route }: FlashcardProps) {
   const { evaluation } = route.params;
   const [dialog, setDialog] = React.useState<boolean>(false);
-  const model = evaluation && usePrediction();
+  const model = usePrediction();
   const { sKanji, message, handleFinish, handleConfirmFinish } = useHandlers({ model, evaluation, navigation, setDialog });
 
   const dialogComponent = React.useMemo(() => (

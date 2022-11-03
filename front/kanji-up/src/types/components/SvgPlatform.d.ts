@@ -4,4 +4,3 @@ type SvgPlatformProps = {
   height: number,
   style?: any,
 }
-

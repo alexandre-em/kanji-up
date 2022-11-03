@@ -9,7 +9,7 @@ interface CustomDialogProps {
   onCancel: () => void;
   onDismiss: () => void;
   onSave: () => void;
-}
+};
 
 interface SliderProps {
   value: number;
@@ -20,4 +20,4 @@ interface SliderProps {
 
 interface SketchProps {
   visible: boolean;
-}
+};

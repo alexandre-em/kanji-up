@@ -24,7 +24,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#851a1b"
-      }
+      },
+      "package": "com.aem.kanjiup"
     },
     "web": {
       "favicon": "./assets/favicon.png"

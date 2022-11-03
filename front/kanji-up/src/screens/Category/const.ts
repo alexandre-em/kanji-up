@@ -60,4 +60,3 @@ export default [
     image: require('./images/custom.jpg'),
   }, 
 ];
-

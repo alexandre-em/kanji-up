@@ -47,9 +47,9 @@ export default function Evaluate({ kanji, model, onFinish }: { kanji: Partial<Ka
         />
       }
       <View style={{ justifyContent: 'center', marginLeft: 30 }}>
-        <Text style={styles.text}>on: {kanjiQueue[i].kanji.onyomi}</Text>
-        <Text style={styles.text}>kun: {kanjiQueue[i].kanji.kunyomi}</Text>
-        <Text style={styles.text}>mean: {kanjiQueue[i].kanji.meaning}</Text>
+        <Text style={styles.text}>on: {kanjiQueue[i].kanji!.onyomi}</Text>
+        <Text style={styles.text}>kun: {kanjiQueue[i].kanji!.kunyomi}</Text>
+        <Text style={styles.text}>mean: {kanjiQueue[i].kanji!.meaning}</Text>
       </View>
     </View>
     <Sketch visible ref={canvasRef} />

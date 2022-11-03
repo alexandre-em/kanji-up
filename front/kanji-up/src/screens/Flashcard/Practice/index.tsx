@@ -14,7 +14,7 @@ export default function Practice({ kanji, onFinish }: { kanji: Partial<KanjiType
   const [start, setStart] = useState<boolean>(false);
   const [counter, setCounter] = useState<number>(0);
   const [reverse, setReverse] = useState<boolean>(false);
-  const [kanjiQueue, setKanjiQueue] = useState<KanjiType[] | null>(null);
+  const [kanjiQueue, setKanjiQueue] = useState<Partial<KanjiType>[] | null>(null);
   const settingsState = useSelector((state: RootState) => state.settings);
 
   const imgSize = useMemo(() => Math.min(width * 0.7, 500), [width]);
@@ -24,13 +24,13 @@ export default function Practice({ kanji, onFinish }: { kanji: Partial<KanjiType
     if (reverse) {
       return (
         <View style={{ padding: 30, justifyContent: 'center', height: '100%' }}>
-          <Text style={{ color: colors.primary, fontSize: 30, fontWeight: '900', alignSelf: 'center' }}>{kanjiQueue[i].kanji.character}</Text>
-          <Text style={styles.text}>on: {kanjiQueue[i].kanji.onyomi}</Text>
-          <Text style={styles.text}>kun: {kanjiQueue[i].kanji.kunyomi}</Text>
-          <Text style={styles.text}>meaning: {kanjiQueue[i].kanji.meaning}</Text>
+          <Text style={{ color: colors.primary, fontSize: 30, fontWeight: '900', alignSelf: 'center' }}>{kanjiQueue[i].kanji!.character}</Text>
+          <Text style={styles.text}>on: {kanjiQueue[i].kanji!.onyomi}</Text>
+          <Text style={styles.text}>kun: {kanjiQueue[i].kanji!.kunyomi}</Text>
+          <Text style={styles.text}>meaning: {kanjiQueue[i].kanji!.meaning}</Text>
           <Divider style={{ marginVertical: 15, width: '80%', alignSelf: 'center' }} />
           <Text style={styles.text}>Examples</Text>
-        {kanjiQueue[i]?.examples && kanjiQueue[i].examples.map((k) => (
+        {kanjiQueue[i].examples && kanjiQueue[i].examples.map((k) => (
           <View key={k.japanese}>
             <Text style={{ fontWeight: '100', color: colors.text }}>{k.japanese}</Text>
             <Text style={{ fontWeight: '100', color: colors.text }}>{k.meaning}</Text>
@@ -41,7 +41,8 @@ export default function Practice({ kanji, onFinish }: { kanji: Partial<KanjiType
   )
     }
 
-    return <SvgUriPlatform width={imgSize} height={imgSize} uri={`https://www.miraisoft.de/anikanjivgx/?svg=${encodeURI(kanjiQueue[i].kanji.character as string)}`} />
+    // TODO: Check if svg is available and if not display text
+    return <SvgUriPlatform width={imgSize} height={imgSize} uri={`https://www.miraisoft.de/anikanjivgx/?svg=${encodeURI(kanjiQueue[i].kanji!.character as string)}`} />
     }, [imgSize, kanjiQueue, reverse]);
 
   const handleReverse = useCallback(() => {
@@ -49,7 +50,7 @@ export default function Practice({ kanji, onFinish }: { kanji: Partial<KanjiType
   }, []);
 
   const handleNext = useCallback(() => {
-    setKanjiQueue((prev) => prev.slice(1));
+    setKanjiQueue((prev) => prev && prev.slice(1));
     setCounter((prev) => prev + 1);
   }, []);
 

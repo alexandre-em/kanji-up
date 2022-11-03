@@ -22,9 +22,7 @@ export default function Slider({ value, min, max, onValueChange }: SliderProps) 
   const handlePressOut = useCallback(() => {
     if (isDragging && pos) {
       const newValuePerc = (pos as number)/(Math.min(width, 700) - 20) * 100;
-
       onValueChange(Math.floor((newValuePerc * max / 100) + min));
-
       setIsDragging(false)
     }
   }, [pos, min, max]);

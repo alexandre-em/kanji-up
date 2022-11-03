@@ -72,7 +72,7 @@ export default function Search({ navigation, route }: SearchProps) {
           value={search}
           style={{ width: '90%', borderRadius: 25 }}
           inputStyle={{ color: colors.text, fontSize: 15 }}
-          onSubmitEditing={handleSubmit}
+          onSubmitEditing={handleSubmit as any}
         />
         <IconButton style={{ backgroundColor: colors.secondary }} icon="filter-variant" onPress={() => setDialog(true)} color="#fff" />
       </Surface>
@@ -117,5 +117,4 @@ export default function Search({ navigation, route }: SearchProps) {
 
     {filterDialog}
   </SafeAreaView>
-)
-};
+)};

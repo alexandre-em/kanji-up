@@ -38,4 +38,3 @@ export default function GradientCard({ buttonTitle, image, onPress, title, subti
     </View>
   )
 };
-

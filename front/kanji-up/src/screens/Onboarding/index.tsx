@@ -57,4 +57,3 @@ export default function Onboarding({ navigation }: OnboardingProps) {
     </View>
   );
 }
-

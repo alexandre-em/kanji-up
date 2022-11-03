@@ -221,4 +221,3 @@ class AsyncStorageHandler {
 export function asyncStorageIO(modelPath) {
   return new AsyncStorageHandler(modelPath);
 }
-
