@@ -2,7 +2,7 @@ import axios, {AxiosRequestConfig} from "axios";
 import {useCallback, useEffect, useState} from "react";
 import {kanjiService} from "../../services";
 
-export default function useHanlers() {
+export default function useHandlers() {
   const [kanjis, setKanjis] = useState<Pagination<KanjiType> | undefined>();
   const [page, setPage] = useState<number>(1);
   const [isSearching, setIsSearching] = useState<boolean>(false);
@@ -37,7 +37,7 @@ export default function useHanlers() {
     setSearchQuery(query);
     searchKanjis(1, query)
       .catch(console.error);
-  }, []);
+  }, [searchKanjis]);
 
   useEffect(() => {
     const cancelToken = axios.CancelToken.source();
@@ -45,6 +45,7 @@ export default function useHanlers() {
 
     return () => cancelToken.cancel();
   }, []);
+
   return {
     kanjis, page,
     handlePage,

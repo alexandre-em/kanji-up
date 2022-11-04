@@ -37,6 +37,7 @@ type RecognitionType = {
   image: string,
   kanji: string,
   predictions: Array<PredictionType>,
+  is_valid?: boolean,
 };
 
 type KanjiType = {
