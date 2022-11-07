@@ -6,6 +6,12 @@ const margin = 0.8;
 const width = window.innerWidth;
 const w = Math.min(width * margin, 500);
 
+export interface SketchFunctions {
+  getUri: () => string;
+  toBlob: (callback: BlobCallback) => void;
+  handleClear: () => void;
+}
+
 export default forwardRef(({ visible }: { visible: boolean }, ref) => {
   const [previousX, setPreviousX] = useState('');
   const [previousY, setPreviousY] = useState('');

@@ -1,12 +1,11 @@
 import React, {useMemo, useRef} from "react";
+import {HighlightOff, TaskAlt} from "@mui/icons-material";
 import {Avatar, Divider, IconButton, List, ListItem, ListItemAvatar, ListItemText, Pagination, Typography} from "@mui/material";
 
 import AppNav from "../../components/AppNav";
 import SearchBar from "../../components/SearchBar";
 import {Content, Footer, Main, Title} from "./styles";
-import {HighlightOff, TaskAlt} from "@mui/icons-material";
 import useHandlers from "./useHandlers";
-
 
 export default function RecognitionList() {
   const mainDivRef: React.MutableRefObject<HTMLDivElement | undefined> = useRef();
@@ -19,8 +18,6 @@ export default function RecognitionList() {
     return mainDivRef.current.clientHeight - 89;
   }, [mainDivRef]);
 
-  console.log(recognition)
-
   if (!recognition) { return null; }
 
   return (
@@ -28,7 +25,7 @@ export default function RecognitionList() {
       <AppNav />
       <Main height={height}>
         <SearchBar handleSearch={handleSearch} />
-        <Title>Result : {recognition.docs.length} out {recognition.totalDocs}</Title>
+        <Title>Result : {recognition.docs.length * recognition.page} out {recognition.totalDocs}</Title>
         <Content>
           <List sx={{ width: '100%' }}>
             {recognition.docs.map((r: RecognitionType, i: number) => (

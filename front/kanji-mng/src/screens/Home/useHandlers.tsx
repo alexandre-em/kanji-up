@@ -1,4 +1,4 @@
-import axios, {AxiosRequestConfig} from "axios";
+import {AxiosRequestConfig} from "axios";
 import {useCallback, useEffect, useState} from "react";
 import {kanjiService} from "../../services";
 
@@ -40,10 +40,8 @@ export default function useHandlers() {
   }, [searchKanjis]);
 
   useEffect(() => {
-    const cancelToken = axios.CancelToken.source();
-    fetchKanjis(1, { cancelToken: cancelToken.token });
-
-    return () => cancelToken.cancel();
+    fetchKanjis(1);
+    // eslint-disable-next-line
   }, []);
 
   return {

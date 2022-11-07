@@ -13,11 +13,8 @@ export const Main = styled.div<MainProps>`
 
 export const Content = styled.div`
   margin: 25px;
-  background-color: #fde2e7;
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
-  border-radius: 10px;
 `;
 
 export const Item = styled(Paper)(({ theme }) => ({

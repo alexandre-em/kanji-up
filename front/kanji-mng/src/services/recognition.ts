@@ -21,4 +21,15 @@ export default class recognitionService {
   userValidation(isValid: boolean, recognitionId: string) {
     return this.baseUrl.patch(`/validation/${recognitionId}`, { is_valid: isValid });
   };
+
+  uploadData(kanji: string, image: Blob, options?: AxiosRequestConfig) {
+    if (!image) { throw new Error('Image is null'); }
+
+    const file = new File([image], `${kanji};${Date.now().toString()}.jpeg`);
+    const formData = new FormData();
+    formData.append('image', file);
+    formData.append('json', JSON.stringify({ kanji }));
+
+    return this.baseUrl.post('/data', formData, options);
+  }
 };

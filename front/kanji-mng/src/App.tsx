@@ -3,6 +3,7 @@ import {BrowserRouter, Route, Routes} from 'react-router-dom';
 import colors from './const/colors';
 import HomeScreen from './screens/Home';
 import RecognitionListScreen from './screens/RecognitionList';
+import KanjiDrawScreen from './screens/KanjiDraw';
 
 function App() {
   const theme = createTheme({
@@ -22,6 +23,7 @@ function App() {
         <Routes>
           <Route path='/' element={<HomeScreen />} />
           <Route path='/recognitions' element={<RecognitionListScreen />} />
+          <Route path='/draw/:id' element={<KanjiDrawScreen />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>
