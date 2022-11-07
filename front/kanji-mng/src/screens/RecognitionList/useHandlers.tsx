@@ -20,7 +20,7 @@ export default function useHandlers() {
     setSearchQuery(query);
     searchRecognition(1, query)
       .catch(console.error);
-  }, []);
+  }, [searchRecognition]);
 
   const handlePage = useCallback((e: React.ChangeEvent<unknown>, value: number) => {
       searchRecognition(value, searchQuery)
@@ -33,6 +33,7 @@ export default function useHandlers() {
       .catch(console.error);
 
     return () => cancelToken.cancel();
+    // eslint-disable-next-line
   }, []);
 
   const handleValidate = useCallback((recognitionId: string) => {
