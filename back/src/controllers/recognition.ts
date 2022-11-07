@@ -151,6 +151,35 @@ router.post('/', upload.single('image'), urlencodedParser, (req, res) => {
 	}
 });
 
+router.post('/data', upload.single('image'), urlencodedParser, (req, res) => {
+  if (!req.file) return new InvalidError('Recognition\'s picture is missing !').sendResponse(res);
+	try {
+		const ext = path.extname(req.file.filename).split('\.')[1];
+		const { kanji } = JSON.parse(req.body.json);
+		const filePath = path.join(`uploads/${req.file.filename}`);
+		const image = {
+			filename: req.file.filename,
+			data: readFileSync(filePath),
+			contentType: `image/${ext}`,
+		}
+
+		recognitionService.addOneData(kanji, image)
+			.then((recognition: AWS.S3.ManagedUpload.SendData) => {
+				unlinkSync(filePath);
+
+				res.status(200).send(recognition);
+			})
+			.catch((e) => {
+				unlinkSync(filePath);
+
+				throw e;
+			});
+	} catch (e) {
+		console.log(e.message);
+		res.status(400).send(e.message);
+	}
+});
+
 /**
  * @openapi
  * /recognition/validation/{id}:
