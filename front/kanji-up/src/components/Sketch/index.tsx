@@ -59,8 +59,8 @@ export default forwardRef(({ visible }: SketchProps, ref) => {
           setPreviousX(nativeEvent.offsetX);
           setPreviousY(nativeEvent.offsetY);
         } else {
-          setPreviousX(nativeEvent.touches[0].pageX);
-          setPreviousY(nativeEvent.touches[0].pageY);
+          setPreviousX(`${nativeEvent.touches[0].pageX - divRef.current.offsetLeft}`);
+          setPreviousY(`${nativeEvent.touches[0].pageY - divRef.current.offsetTop}`);
         }
       }
     } else {
