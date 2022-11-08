@@ -37,13 +37,6 @@ export default forwardRef(({ visible }: SketchProps, ref) => {
         ctx.fillRect(0, 0, w, w);
         
         ctx.lineWidth = 2;
-        /*
-        ctx.strokeStyle = '#e0e0e055';
-        ctx.moveTo(0, w/2);
-        ctx.lineTo(w, w/2);
-        ctx.moveTo(w/2, 0);
-        ctx.lineTo(w/2, w);
-         */
         ctx.stroke();
 
         setIsOpen(true);
@@ -59,8 +52,8 @@ export default forwardRef(({ visible }: SketchProps, ref) => {
           setPreviousX(nativeEvent.offsetX);
           setPreviousY(nativeEvent.offsetY);
         } else {
-          setPreviousX(`${nativeEvent.touches[0].pageX - divRef.current.offsetLeft}`);
-          setPreviousY(`${nativeEvent.touches[0].pageY - divRef.current.offsetTop}`);
+          setPreviousX(`${nativeEvent.touches[0].clientX - divRef.current.offsetLeft - 20}`);
+          setPreviousY(`${nativeEvent.touches[0].clientY - divRef.current.offsetTop - 56}`);
         }
       }
     } else {
@@ -70,10 +63,8 @@ export default forwardRef(({ visible }: SketchProps, ref) => {
   }, [isWeb, divRef]);
 
   const onMove = useCallback((e: any) => {
-    e.preventDefault();
     if (!drawFlag) { return; }
     if (canvas && canvas.current) {
-
       const ctx = canvas.current.getContext('2d');
       if (ctx) {
         ctx.beginPath();
@@ -100,7 +91,6 @@ export default forwardRef(({ visible }: SketchProps, ref) => {
   }, [canvas, currentX, currentY, drawFlag, moveCursor, previousX, previousY]);
 
   const onTouch = useCallback((e: any) => {
-    e.preventDefault();
     setStrokeCount((prevState) => prevState + 1);
     setDrawFlag(true);
     moveCursor(e.nativeEvent);
@@ -147,9 +137,9 @@ export default forwardRef(({ visible }: SketchProps, ref) => {
 
   if (!visible) { return null; }
   return (
-    <View style={styles.body}>
-      <Surface>
-        <View ref={divRef as any} style={[styles.canvas, { width: w, height: w }]} {...canvasPlatformProps} elevation={4}>
+    <View ref={divRef as any} style={styles.body}>
+      <Surface elevation={4}>
+        <View style={[styles.canvas, { width: w, height: w }]} {...canvasPlatformProps}>
           <CanvasPlatform ref={canvas} />
         </View>
       </Surface>

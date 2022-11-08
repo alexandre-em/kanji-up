@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {SafeAreaView, ScrollView, Text} from 'react-native';
+import {View, ScrollView, Text} from 'react-native';
 import {Appbar, Button, IconButton, ProgressBar, TextInput} from 'react-native-paper';
 
 import styles from './style';
@@ -51,7 +51,7 @@ export default function Settings({ navigation, route }: SettingsProps) {
     }
   }, [firstTime]);
 
-  return <SafeAreaView style={styles.main}>
+  return <View style={styles.main}>
     {!firstTime && <Appbar.Header>
       <Appbar.BackAction onPress={handleBack}/>
       <Appbar.Content title="Application's settings" titleStyle={{ color: '#fff', fontWeight: '700', fontSize: 17 }} />
@@ -83,5 +83,5 @@ export default function Settings({ navigation, route }: SettingsProps) {
       onCancel={() => { setDialog(false); navigation.navigate('Home'); } }
       actions={!isDownloading ? [true, true] : undefined}
     />
-  </SafeAreaView>;
+  </View>;
 };

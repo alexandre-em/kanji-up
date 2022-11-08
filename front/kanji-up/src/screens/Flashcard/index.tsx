@@ -1,5 +1,5 @@
 import React from 'react';
-import {SafeAreaView, View} from 'react-native';
+import {View} from 'react-native';
 import {ActivityIndicator, Appbar, Button, Dialog, Paragraph, Portal} from 'react-native-paper';
 
 import styles from './style';
@@ -30,7 +30,7 @@ export default function Flashcard({ navigation, route }: FlashcardProps) {
     </Portal>
   ), [dialog, message]);
 
-  return (<SafeAreaView style={styles.main}>
+  return (<View style={styles.main}>
     <Appbar.Header>
       <Appbar.BackAction onPress={() => navigation.goBack()} />
       <Appbar.Content title={`Flashcard`} titleStyle={{ color: '#fff', fontWeight: '700', fontSize: 17 }} />
@@ -42,5 +42,5 @@ export default function Flashcard({ navigation, route }: FlashcardProps) {
       : <Practice kanji={sKanji} onFinish={handleFinish} />
     }
     {dialogComponent}
-  </SafeAreaView>)
+  </View>)
 };

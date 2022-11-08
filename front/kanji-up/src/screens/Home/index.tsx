@@ -86,9 +86,6 @@ export default function Home({ navigation }: HomeProps) {
           <Paragraph>Downloading models...</Paragraph>
           <ProgressBar progress={downloadProgress.progress} />
         </Dialog.Content>
-        <Dialog.Actions style={{ flexWrap: 'wrap' }}>
-          <Button mode="contained" onPress={() => navigation.goBack()}>Finish</Button>
-        </Dialog.Actions>
       </Dialog>
     </Portal>
   ), [downloadProgress]);
@@ -138,7 +135,8 @@ export default function Home({ navigation }: HomeProps) {
           setDownloadProgress({ progress: percentCompleted, showDialog: true });
 
         };
-        model.downloadThenSave(Platform.OS === 'web' ? onDownloadProgress : (progress: number) => { setDownloadProgress({ progress, showDialog: true }); });
+        await model.downloadThenSave(Platform.OS === 'web' ? onDownloadProgress : (progress: number) => { setDownloadProgress({ progress, showDialog: true }); });
+        setDownloadProgress((prev) =>  ({ ...prev, showDialog: false }));
       }
     })();
   }, [model, isDownloading]);

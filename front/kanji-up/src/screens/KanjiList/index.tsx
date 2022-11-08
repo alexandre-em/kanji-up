@@ -1,5 +1,5 @@
 import React, {useMemo} from 'react';
-import {Platform, SafeAreaView, ScrollView, Text, TouchableOpacity} from 'react-native';
+import {Platform, ScrollView, Text, View, TouchableOpacity} from 'react-native';
 import {ActivityIndicator, Appbar, DataTable, Divider, IconButton, Menu, Surface} from 'react-native-paper';
 import {useSelector} from 'react-redux';
 
@@ -30,14 +30,14 @@ export default function KanjiList({ navigation, route }: KanjiListProps) {
   const content = useMemo(() => {
     if (!data || loading) {
       return (
-        <SafeAreaView style={[styles.main, { justifyContent: 'center', alignItems: 'center' }]} >
+        <View style={[styles.main, { justifyContent: 'center', alignItems: 'center' }]} >
           <ActivityIndicator animating color={colors.primary} />
-        </SafeAreaView>
+        </View>
       )
     }
     return (
       <ScrollView>
-        <SafeAreaView style={styles.grid}>{
+        <View style={styles.grid}>{
           data.docs.map((k) => (
             <TouchableOpacity key={k.kanji?.character_id} onPress={() => handlePress(k)}>
               <Surface style={[styles.kanjiSurface, surfaceStyle(k.kanji_id)]} elevation={4}>
@@ -45,13 +45,13 @@ export default function KanjiList({ navigation, route }: KanjiListProps) {
               </Surface>
             </TouchableOpacity>
           ))
-        }</SafeAreaView>
+        }</View>
     </ScrollView>
   )
   }, [data, loading, selectionMode, kanjiState]);
 
   return (
-    <SafeAreaView style={styles.main}>
+    <View style={styles.main}>
       <Appbar.Header style={{ backgroundColor: selectionMode ? colors.secondary : colors.primary }}>
         <Appbar.BackAction onPress={handleBack} />
         <Appbar.Content title={`Grade: ${grade}`} subtitle="Click on the right menu to switch to selection mode and don't forget to save your modification." titleStyle={{ color: '#fff', fontWeight: '700', fontSize: 17 }} />
@@ -85,6 +85,6 @@ export default function KanjiList({ navigation, route }: KanjiListProps) {
         onItemsPerPageChange={setLimit}
         selectPageDropdownLabel={'Max'}
       />
-  </SafeAreaView>
+  </View>
 );
 };
