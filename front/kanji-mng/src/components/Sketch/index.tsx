@@ -13,6 +13,7 @@ export interface SketchFunctions {
 }
 
 export default forwardRef(({ visible }: { visible: boolean }, ref) => {
+  const divRef: React.MutableRefObject<HTMLDivElement | undefined>  = useRef();
   const [previousX, setPreviousX] = useState('');
   const [previousY, setPreviousY] = useState('');
   const [currentX, setCurrentX] = useState('');
@@ -44,27 +45,26 @@ export default forwardRef(({ visible }: { visible: boolean }, ref) => {
   }, [canvas]);
 
   const moveCursor = useCallback((nativeEvent: MouseEvent | TouchEvent) => {
-    if ((nativeEvent as MouseEvent).offsetX) {
-      setPreviousX(`${(nativeEvent as MouseEvent).offsetX}`);
-      setPreviousY(`${(nativeEvent as MouseEvent).offsetY}`);
-    } else {
-      setPreviousX(`${(nativeEvent as TouchEvent).touches[0].pageX}`);
-      setPreviousY(`${(nativeEvent as TouchEvent).touches[0].pageY}`);
+    if (divRef && divRef.current){
+      if ((nativeEvent as MouseEvent).offsetX) {
+        setPreviousX(`${(nativeEvent as MouseEvent).offsetX}`);
+        setPreviousY(`${(nativeEvent as MouseEvent).offsetY}`);
+      } else {
+        setPreviousX(`${(nativeEvent as TouchEvent).touches[0].pageX - divRef.current.offsetLeft}`);
+        setPreviousY(`${(nativeEvent as TouchEvent).touches[0].pageY - divRef.current.offsetTop}`);
+      }
     }
-  }, []);
+  }, [divRef]);
 
   const onMove = useCallback((e: React.TouchEvent<HTMLDivElement> | React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
     if (!drawFlag) { return; }
     if (canvas && canvas.current) {
-
       const ctx = canvas.current.getContext('2d');
       if (ctx) {
         ctx.beginPath();
 
-        if (currentX === '') {
-          setPreviousX(previousX);
-          setPreviousY(previousY);
-        } else {
+        if (currentX !== ''){
           moveCursor(e.nativeEvent);
           ctx.moveTo(parseInt(previousX), parseInt(previousY));
         }
@@ -83,12 +83,13 @@ export default forwardRef(({ visible }: { visible: boolean }, ref) => {
   }, [canvas, currentX, currentY, drawFlag, moveCursor, previousX, previousY]);
 
   const onTouch = useCallback((e: React.TouchEvent<HTMLDivElement> | React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
     setStrokeCount((prevState) => prevState + 1);
     setDrawFlag(true);
     moveCursor(e.nativeEvent);
   }, [moveCursor]);
 
-  const onTouchEnd = useCallback(() => {
+  const onEnd = useCallback(() => {
     setDrawFlag(false);
     setPreviousX('');
     setPreviousY('');
@@ -98,11 +99,13 @@ export default forwardRef(({ visible }: { visible: boolean }, ref) => {
 
   const canvasPlatformProps = {
     onMouseDown: onTouch,
-    onMouseUp: onTouchEnd,
+    onMouseUp: onEnd,
     onMouseMove: onMove,
+    onMouseLeave: onEnd,
     onTouchStart: onTouch,
     onTouchMove: onMove,
-    onTouchEnd: onTouchEnd,
+    onTouchEnd: onEnd,
+    onTouchCancel: onEnd,
   };
 
   useImperativeHandle(ref, () => ({
@@ -127,10 +130,8 @@ export default forwardRef(({ visible }: { visible: boolean }, ref) => {
 
   if (!visible) { return null; }
   return (
-    <div style={styles.body}>
-      <div style={{ ...styles.canvas, ...({ width: w, height: w }) }} {...canvasPlatformProps}>
-        <canvas ref={canvas as any} />
-      </div>
+    <div ref={divRef as any} style={{ ...styles.canvas, ...({ width: w, height: w }) }} {...canvasPlatformProps}>
+      <canvas ref={canvas as any} />
     </div>
   );
 });
