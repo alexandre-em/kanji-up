@@ -3,19 +3,21 @@
   "version": "0.0.1",
   "author": "Alexandre Em",
   "license": "MIT",
-  "main": "node_modules/expo/AppEntry.js",
   "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "start": "expo start --dev-client",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "web": "expo start --web",
     "build:web": "expo build:web",
+    "build:ios": "react-native bundle --entry-file='index.js' --bundle-output='./ios/main.jsbundle' --dev=false --assets-dest='ios' --platform='ios'",
     "eject": "expo eject",
     "test": "jest"
   },
   "jest": {
     "preset": "jest-expo",
-    "setupFiles": ["./src/setupTests.ts"],
+    "setupFiles": [
+      "./src/setupTests.ts"
+    ],
     "transformIgnorePatterns": [
       "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg|@tensorflow/tfjs-react-native)"
     ]
@@ -43,7 +45,7 @@
     "jest-expo": "^46.0.1",
     "react": "18.0.0",
     "react-dom": "18.0.0",
-    "react-native": "0.69.5",
+    "react-native": "0.69.6",
     "react-native-canvas": "^0.1.38",
     "react-native-circular-progress-indicator": "^4.4.0",
     "react-native-fs": "^2.20.0",
@@ -58,7 +60,8 @@
     "react-native-webview": "11.23.0",
     "react-redux": "^8.0.2",
     "react-test-renderer": "18.0.0",
-    "redux-logger": "^3.0.6"
+    "redux-logger": "^3.0.6",
+    "expo-splash-screen": "~0.16.2"
   },
   "devDependencies": {
     "@babel/core": "^7.18.6",

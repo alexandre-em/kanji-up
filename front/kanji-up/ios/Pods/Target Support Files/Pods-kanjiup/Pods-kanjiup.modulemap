@@ -1,0 +1,6 @@
+module Pods_kanjiup {
+  umbrella header "Pods-kanjiup-umbrella.h"
+
+  export *
+  module * { export * }
+}
