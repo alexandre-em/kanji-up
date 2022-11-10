@@ -42,7 +42,7 @@ export default function KanjiDraw() {
     }
   }, [id, navigate]);
 
-  return <div style={{ width: '100%', height: '100%' }} ref={mainDivRef as any}>
+  return <div style={{ width: '100%', height: '100%', touchAction: 'none' }} ref={mainDivRef as any}>
     <AppNav />
     <Main height={height}>
       <Button onClick={() => navigate('/')} sx={{ margin: 2 }} startIcon={<ArrowBackIos />}>Go back</Button>

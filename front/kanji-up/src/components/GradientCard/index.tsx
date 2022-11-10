@@ -6,7 +6,7 @@ import {LinearGradient} from "expo-linear-gradient";
 import styles from './style';
 
 export default function GradientCard({ buttonTitle, image, onPress, title, subtitle }: GradientCardProps) {
-  const Gradient = Platform.select({ web: View, native: LinearGradient });
+  const Gradient = Platform.select({ web: View, native: LinearGradient as any });
   const webGradient = Platform.OS === 'web' ? [{background: 'linear-gradient(200deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 85%)'}] : [];
   const gradientColors = ['rgba(255,255,255,0)', 'rgba(255,255,255,1)'];
 
