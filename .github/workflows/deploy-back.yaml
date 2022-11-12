@@ -19,15 +19,15 @@ jobs:
           key: ${{ runner.os }}-modules
 
       - name: Install dependencies
-        working-directory: back
+        working-directory: back/kanjiup
         run: yarn install
 
       - name: Build App
-        working-directory: back
+        working-directory: back/kanjiup
         run: yarn build
 
       - name: Generate deployment package
-        working-directory: back
+        working-directory: back/kanjiup
         run: zip -r deploy.zip . -x '*.git*'
 
       - name: Deploy to EB
@@ -41,4 +41,4 @@ jobs:
           environment_name: kanjiupapi-env
           version_label: ${{ env.VERSION_LABEL }}
           region: eu-west-3
-          deployment_package: back/deploy.zip
+          deployment_package: back/kanjiup/deploy.zip

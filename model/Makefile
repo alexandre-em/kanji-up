@@ -27,9 +27,9 @@ kanji_model.h5: kanji_dataset kanji_label.txt
 	$(PYTHON) generate_kanji_model.py
 
 kanji_saved_model: kanji_model.h5
-	rm -dfr ../back/kanji_saved_model
+	rm -dfr ../back/kanjiup/kanji_saved_model
 	$(PYTHON) keras_to_tf_saved_model.py
-	mv kanji_saved_model ../back/
+	mv kanji_saved_model ../back/kanjiup/
 
 clean:
 	rm -f kanji_model.h5 kanji_label.txt
