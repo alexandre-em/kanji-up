@@ -42,20 +42,21 @@ export default function useHandlersEvaluate({ model, kanji, canvasRef, progressC
       const imageBase64: string = Platform.OS === 'web'
         ? canvasRef.current.getUri()
         : (await canvasRef.current.getUri()).split('data:image/jpeg;base64,')[1];
+      const imageBase64WFormat = `data:image/jpeg;base64,${imageBase64}`;
 
       if (!isValid) {
-        dispatch(evaluation.actions.addAnswer({ kanji: details!.character as string, image: `data:image/jpeg;base64,${imageBase64}`, answer: [], status: 'incorrect', message: strokeCount === 0 ? 'This kanji has been skipped' : 'The stroke number isn\'t correct' }));
+        dispatch(evaluation.actions.addAnswer({ kanji: details!.character as string, image: imageBase64WFormat, answer: [], status: 'incorrect', message: strokeCount === 0 ? 'This kanji has been skipped' : 'The stroke number isn\'t correct' }));
       } else {
         // Dispatch score
         try {
           const prediction: PredictionType[] = await model.predict(imageBase64);
           const predictedKanji = prediction.find((p) => p.prediction === details!.character);
-          const recognition = await uploadImage(canvasRef, details!.character as string, prediction) as AxiosResponse<RecognitionType>;
+          // const recognition = await uploadImage(canvasRef, details!.character as string, prediction) as AxiosResponse<RecognitionType>;
 
           if (!predictedKanji) {
-            dispatch(evaluation.actions.addAnswer({ kanji: details!.character as string, image: recognition.data.image, answer: prediction, status: 'toReview', message: 'The drawed kanji seems incorrect, please confirm', recognitionId: recognition.data.recognition_id }));
+            dispatch(evaluation.actions.addAnswer({ kanji: details!.character as string, recognitionId: `${counter}`,image: imageBase64WFormat, answer: prediction, status: 'toReview', message: 'The drawed kanji seems incorrect, please confirm' }));
           } else {
-            dispatch(evaluation.actions.addAnswer({ kanji: recognition.data.kanji || '', image: recognition.data.image, answer: prediction, status: 'correct', message: 'Correct !', recognitionId: recognition.data.recognition_id }));
+            dispatch(evaluation.actions.addAnswer({ kanji: details!.character as string, recognitionId: `${counter}`,image: imageBase64WFormat, answer: prediction, status: 'correct', message: 'Correct !' }));
             const grade = kanjiQueue[i].reference?.grade;
             dispatch(evaluation.actions.addPoints(Math.max(predictedKanji?.confidence * 100 * (grade === 'custom'? 8 : parseInt(grade || '1')), 10)));
           }
@@ -76,7 +77,7 @@ export default function useHandlersEvaluate({ model, kanji, canvasRef, progressC
         }
       }
     }
-  }, [model, kanjiQueue, canvasRef, progressCircleRef, evaluation, settingsState]);
+  }, [model, kanjiQueue, canvasRef, progressCircleRef, evaluation, settingsState, counter]);
 
   const handleConfirm = useCallback((id: number, ans?: AnswerType) => {
     dispatch(evaluation.actions.updateAnswerStatus({ id, status: 'correct', message: 'This answer has been validated by the user' }));
