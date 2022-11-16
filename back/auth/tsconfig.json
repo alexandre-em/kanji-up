@@ -1,6 +1,8 @@
 {
   "compilerOptions": {
     "module": "commonjs",
+    "allowJs": true,
+    "checkJs": true,
     "declaration": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,
@@ -12,10 +14,12 @@
     "baseUrl": "./",
     "incremental": true,
     "skipLibCheck": true,
-    "strictNullChecks": false,
-    "noImplicitAny": false,
+    "strictNullChecks": true,
+    "noImplicitAny": true,
     "strictBindCallApply": false,
+    "resolveJsonModule": true,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "typeRoots": ["./@types", "./node_modules/@types"]
   }
 }
