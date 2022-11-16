@@ -11,7 +11,6 @@ import colors from '../../constants/colors';
 import {HomeProps} from '../../types/screens';
 import GradientCard from '../../components/GradientCard';
 import {RootState} from '../../store';
-
 import Trip from '../../svg/Trip';
 import Certification from '../../svg/Certification';
 import Reminders from '../../svg/Reminders';
@@ -36,10 +35,11 @@ export default function Home({ navigation }: HomeProps) {
       const random: number = Math.floor(Math.random() * kanjiKeys.length);
       const choosenKanji: Partial<KanjiType> = kanjiState.selectedKanji[kanjiKeys[random]];
 
-      const icon = (props: any) => choosenKanji.kanji?.character && Platform.select({
-        web: <Image {...props} style={{ width: 32, height: 32 }} source={{ uri: `https://www.miraisoft.de/anikanjivgx/?svg=${encodeURI(choosenKanji.kanji?.character)}` }} />,
-        native: <SvgUri width={32} height={32} uri={`https://www.miraisoft.de/anikanjivgx/?svg=${encodeURI(choosenKanji.kanji?.character)}`} />,
-      });
+      const icon = (props: any) => choosenKanji.kanji?.character
+      ? (Platform.OS === 'web'
+        ? <Image {...props} style={{ width: 32, height: 32 }} source={{ uri: `https://www.miraisoft.de/anikanjivgx/?svg=${encodeURI(choosenKanji.kanji?.character)}` }} />
+        : <SvgUri width={32} height={32} uri={`https://www.miraisoft.de/anikanjivgx/?svg=${encodeURI(choosenKanji.kanji?.character)}`} />)
+      : null;
 
       return (
         <List.Item title={choosenKanji.kanji?.meaning} description="See details" left={icon} onPress={() => navigation.navigate('KanjiDetail', { id: choosenKanji.kanji_id as string })} style={{ marginHorizontal: 20 }} />

@@ -9,7 +9,7 @@
 		"noEmit": true,
 		"esModuleInterop": true,
 		"lib": ["DOM", "ESNext"],
-    "types": ["./src/types"],
+    "types": ["./src/types", "jest", "reflect-metadata"],
     "typeRoots": ["./src/types", "./node_modules/@types"],
 		"resolveJsonModule": true,
 		"target": "ESNext"

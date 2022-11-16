@@ -7,6 +7,7 @@ const width = window.innerWidth;
 const w = Math.min(width * margin, 500);
 
 export interface SketchFunctions {
+  strokeCount: number;
   getUri: () => string;
   toBlob: (callback: BlobCallback) => void;
   handleClear: () => void;
@@ -130,7 +131,7 @@ export default forwardRef(({ visible }: { visible: boolean }, ref) => {
 
   if (!visible) { return null; }
   return (
-    <div ref={divRef as any} style={{ ...styles.canvas, ...({ width: w, height: w }) }} {...canvasPlatformProps}>
+    <div ref={divRef as any} style={{ ...styles.canvas, ...({ width: w, height: w }) }} {...canvasPlatformProps} data-testid="sketch-canvas">
       <canvas ref={canvas as any} />
     </div>
   );

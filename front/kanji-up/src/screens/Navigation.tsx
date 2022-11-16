@@ -21,6 +21,9 @@ import {RootState} from '../store';
 import {RootStackParamList} from '../types/screens';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
+const linking = {
+  prefixes: ['kanjiup://', 'https://kanjiup.alexandre-em.fr'],
+};
 
 export default function Navigation() {
   const dispatch = useDispatch();
@@ -67,7 +70,7 @@ export default function Navigation() {
   }
 
   return (
-    <NavigationContainer>
+    <NavigationContainer linking={linking}>
       <Stack.Navigator initialRouteName={isFirstTime && Platform.OS !== 'web' ? 'Onboarding' : 'Home'} screenOptions={{ headerShown: false }}>
         <Stack.Screen name={'Home'} component={HomeScreen} />
         <Stack.Screen name={'Flashcard'} component={FlashcardScreen} />
