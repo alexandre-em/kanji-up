@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script type="text/javascript" src="/js/register.js"></script>
+  <link rel="stylesheet" href="/css/authentication.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;700;900&display=swap" rel="stylesheet">
+  <title>Sign up | KanjiUp Auth</title>
+</head>
+<body>
+  <div class="main">
+    <div class="login">
+      <div style="text-align: center;">
+        <div class="banner">
+          <img src="https://raw.githubusercontent.com/alexandre-em/kanji-up/main/front/kanji-up/assets/icon.png" alt="kanjiup-logo" id="logo">
+        </div>
+        <h1 style="color: #3F3D56;">KanjiUp Auth</h1>
+        <p style="color: #3F3D56">Sign up to continue to All Applications.</p>
+      </div>
+      <form id="form" method="post" action="/register">
+        <div style="width: 100%">
+          <h3 style="color: #3F3D56;">Sign up</h3>
+        </div>
+        <input class="input" type="text" name="name" placeholder="Name" required />
+        <input class="input" type="email" name="email" placeholder="Email address" required />
+        <input class="input" type="password" name="password" placeholder="Password" required />
+        <input class="button" type="submit" value="Continue" />
+        <div class="link">
+          <p>Already have an account?</p>
+          <a href="/auth/login">&nbsp; Log in</a>
+        </div>
+      </form>
+      <div id="banner">
+        <p id="error">Authentication failed</p>
+      </div>
+    </div>
+  </div>
+</body>
+<script>
+  document.getElementById("form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    fetch('/auth/register', {
+      method: 'POST',
+      mode: 'cors',
+      cache: 'no-cache',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        name: e.target[0].value,
+        email: e.target[1].value,
+        password: e.target[2].value,
+      })
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .then((res) => {
+        if (res.error != null) { throw new Error(res.message); }
+        if (res.stat === "fail") { throw new Error(res.message); }
+
+        document.getElementById("banner").style.visibility = "visible";
+        document.getElementById("banner").style.backgroundColor = "rgb(237, 247, 237)";
+        document.getElementById("banner").style.border = "rgb(237, 247, 237)";
+        document.getElementById("error").style.color = "rgb(30, 70, 32)";
+        document.getElementById("error").innerHTML = "Account created successfully";
+        setTimeout(() => { history.back(); }, 5000);
+      })
+      .catch((err) => {
+        document.getElementById("banner").style.visibility = "visible";
+        document.getElementById("error").innerHTML = err.message;
+      })
+  });
+</script>
+</html>

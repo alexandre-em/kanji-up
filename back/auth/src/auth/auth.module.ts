@@ -8,11 +8,13 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { UsersModule } from '../users/users.module';
 import { User, UserSchema } from '../users/users.schema';
+import { AppsModule } from 'src/apps/apps.module';
 
 @Module({
   imports: [
     UsersModule,
     PassportModule,
+    AppsModule,
     JwtModule.registerAsync({
       useFactory: () => ({
         secret: process.env.AUTH_API_SECRET_KEY || 'SECRET',
@@ -24,4 +26,4 @@ import { User, UserSchema } from '../users/users.schema';
   providers: [AuthService, LocalStrategy, JwtStrategy],
   controllers: [AuthController],
 })
-export class AuthModule { }
+export class AuthModule {}

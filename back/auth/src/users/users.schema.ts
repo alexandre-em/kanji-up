@@ -5,7 +5,7 @@ import * as bcrypt from 'bcryptjs';
 
 @Schema()
 export class User {
-  @Prop({ required: true, default: util.v4 })
+  @Prop({ required: true, unique: true, default: util.v4 })
   user_id: string;
 
   @Prop({ required: true })

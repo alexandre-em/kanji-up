@@ -10,6 +10,9 @@ export class App {
   @Prop({ required: true })
   name: string;
 
+  @Prop({ required: true, unique: true })
+  redirection_url: string;
+
   @Prop()
   platform: string;
 

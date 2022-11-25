@@ -1,11 +1,13 @@
 export class CreateAppDTO {
   name: string;
   platform?: string;
+  redirection_url: string;
 }
 
 export class UpdateAppDTO {
   name?: string;
   platform?: string;
+  redirection_url?: string;
 }
 
 export class AuthorizeAppDTO {
