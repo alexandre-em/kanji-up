@@ -1,4 +1,4 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateUserDTO {
   @ApiProperty()
@@ -30,13 +30,13 @@ export class UpdateUserAppDTO {
   @ApiProperty()
   total_score: number;
 
-  @ApiProperty()
+  @ApiProperty({ examples: [{ [Date.now().toString()]: 10000 }] })
   scores: {
-    [key: string]: Date;
+    [key: string]: number;
   };
 }
 
 export class UpdateUserPermissionsDTO {
-  @ApiProperty()
-  permissions: string | string[];
+  @ApiProperty({ examples: ['read:user', '[read:user, write:user]'] })
+  permissions: string;
 }

@@ -7,10 +7,7 @@ import { RegisterDTO } from './auth.dto';
 
 @Injectable()
 export class AuthService {
-  constructor(
-    @InjectModel(User.name) private readonly model: Model<UserDocument>,
-    private jwtService: JwtService,
-  ) {}
+  constructor(@InjectModel(User.name) private readonly model: Model<UserDocument>, private jwtService: JwtService) {}
 
   async validateUser(email: string, password: string) {
     const user = await this.model.findOne({ email }).exec();
@@ -20,18 +17,15 @@ export class AuthService {
     }
 
     return new Promise((resolve, reject) => {
-      (user as any).comparePassword(
-        password,
-        (error: Error, match: boolean) => {
-          if (error) {
-            reject(error);
-          }
-          if (!match) {
-            reject(new Error('The password is invalid'));
-          }
-          resolve(user);
-        },
-      );
+      (user as any).comparePassword(password, (error: Error, match: boolean) => {
+        if (error) {
+          reject(error);
+        }
+        if (!match) {
+          reject(new Error('The password is invalid'));
+        }
+        resolve(user);
+      });
     });
   }
 
