@@ -23,6 +23,13 @@ export class User {
   @Prop()
   image: string;
 
+  @Prop({ default: [] })
+  applications: {
+    app_id: string;
+    total_score: number;
+    scores: { [key: string]: Date };
+  }[];
+
   @Prop()
   friends: User[];
 

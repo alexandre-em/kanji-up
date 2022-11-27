@@ -1,16 +1,44 @@
-import { Body, Controller, Get, Param, Request, UseGuards } from '@nestjs/common';
+import { Controller, Delete, Get, Headers, Param, Patch, UseGuards } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
-  constructor(private readonly service: UsersService) {}
+  constructor(
+    private readonly service: UsersService,
+    private readonly jwtService: JwtService,
+  ) {}
 
+  @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  @Get(':id')
-  getOne(@Request() req: any, @Param('id') id: string) {
-    return this.service.getOne(id);
+  @Get('profile')
+  getOne(@Headers() headers: any) {
+    const accessToken = headers.authorization.split(' ')[1];
+    const decodedJwtAccessToken = this.jwtService.decode(accessToken);
+
+    return this.service.getOne(decodedJwtAccessToken?.sub);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Patch('friend/:id')
+  addUserFriend(@Headers() headers: any, @Param('id') id: string) {
+    const accessToken = headers.authorization.split(' ')[1];
+    const decodedJwtAccessToken = this.jwtService.decode(accessToken);
+
+    return this.service.addUserFriend(decodedJwtAccessToken?.sub, { user_id: id });
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Delete('friend/:id')
+  removeUserFriend(@Headers() headers: any, @Param('id') id: string) {
+    const accessToken = headers.authorization.split(' ')[1];
+    const decodedJwtAccessToken = this.jwtService.decode(accessToken);
+
+    return this.service.removeUserFriend(decodedJwtAccessToken?.sub, { user_id: id });
   }
 }
