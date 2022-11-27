@@ -17,6 +17,6 @@ export class AppsService {
   }
 
   updateOne(app_id: string, appInfo: UpdateAppDTO | AuthorizeAppDTO | DeleteAppDTO) {
-    return this.model.updateOne({ app_id }, appInfo);
+    return this.model.updateOne({ app_id }, appInfo).exec();
   }
 }
