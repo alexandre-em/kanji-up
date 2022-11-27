@@ -16,6 +16,10 @@ export class AuthService {
       throw new UnauthorizedException('The username does not exist');
     }
 
+    if (user.deleted_at) {
+      throw new UnauthorizedException(`This user as been deleted : ${user.deleted_at}`);
+    }
+
     return new Promise((resolve, reject) => {
       (user as any).comparePassword(password, (error: Error, match: boolean) => {
         if (error) {
@@ -29,7 +33,17 @@ export class AuthService {
     });
   }
 
-  register(name: string, email: string, password: string): Promise<User> {
+  async register(name: string, email: string, password: string): Promise<User> {
+    const user = await this.model.findOne({ email }).exec();
+
+    if (user && !user.deleted_at) {
+      throw new Error('This user already exist');
+    }
+
+    if (user && user.deleted_at) {
+      return user.update({ deleted_at: null });
+    }
+
     const info: RegisterDTO = {
       name,
       email,

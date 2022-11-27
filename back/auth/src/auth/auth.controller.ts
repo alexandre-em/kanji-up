@@ -40,10 +40,6 @@ export class AuthController {
   register(@Body() registerDTO: RegisterDTO) {
     //TODO: Send a confirmation email
 
-    return this.service.register(
-      registerDTO.name,
-      registerDTO.email,
-      registerDTO.password,
-    );
+    return this.service.register(registerDTO.name, registerDTO.email, registerDTO.password);
   }
 }

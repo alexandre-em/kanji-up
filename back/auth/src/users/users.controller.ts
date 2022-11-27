@@ -59,4 +59,14 @@ export class UsersController {
 
     return this.service.removeUserPermissions(decodedJwtAccessToken?.sub, permissions);
   }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Delete('user')
+  deleteUser(@Headers() headers: any) {
+    const accessToken = headers.authorization.split(' ')[1];
+    const decodedJwtAccessToken = this.jwtService.decode(accessToken);
+
+    return this.service.updateOne(decodedJwtAccessToken?.sub, { deleted_at: new Date() });
+  }
 }
