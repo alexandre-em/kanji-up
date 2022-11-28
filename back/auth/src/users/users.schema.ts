@@ -20,8 +20,11 @@ export class User {
   @Prop({ default: false })
   email_confirmed: boolean;
 
-  @Prop()
-  image: string;
+  @Prop({ type: ({ data: Buffer, contentType: String }) })
+  image: {
+    data: Buffer;
+    contentType: string;
+  };
 
   @Prop({ default: [] })
   applications: {

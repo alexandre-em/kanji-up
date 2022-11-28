@@ -16,6 +16,25 @@ export class UsersService {
     return this.model.updateOne({ user_id }, userinfo).exec();
   }
 
+  async uploadImage(user_id: string, file: any) {
+    const user = await this.model.findOne({ user_id }).exec();
+
+    if (!user) {
+      throw new Error("This user doesn't exist");
+    }
+
+    const image = {
+      data: file.buffer,
+      contentType: file.mimetype,
+    };
+
+    if (Buffer.compare(user.image.data, image.data) === 0) {
+      throw new Error("This file has already been uploaded");
+    }
+
+    return this.model.updateOne({ user_id }, { image }).exec();
+  }
+
   async addUserPermissions(user_id: string, permissions: UpdateUserPermissionsDTO) {
     const user = await this.model.findOne({ user_id }).exec();
     if (!user) {
