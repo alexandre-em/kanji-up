@@ -3,11 +3,12 @@ import { InjectModel } from '@nestjs/mongoose';
 import { JwtService } from '@nestjs/jwt';
 import { Model } from 'mongoose';
 import { User, UserDocument } from '../users/users.schema';
+import { MailService } from 'src/mail/mail.service';
 import { RegisterDTO } from './auth.dto';
 
 @Injectable()
 export class AuthService {
-  constructor(@InjectModel(User.name) private readonly model: Model<UserDocument>, private jwtService: JwtService) {}
+  constructor(@InjectModel(User.name) private readonly model: Model<UserDocument>, private jwtService: JwtService, private mailService: MailService) {}
 
   async validateUser(email: string, password: string) {
     const user = await this.model.findOne({ email }).exec();
@@ -51,10 +52,30 @@ export class AuthService {
       created_at: new Date(),
     };
 
-    return this.model.create(info);
+    const createdUser = await this.model.create(info);
+
+    const token = this.jwtService.sign({ id: createdUser.user_id, confirmed: createdUser.email_confirmed }, { expiresIn: '1d' });
+
+    await this.mailService.sendMail(email, name, token);
+
+    return createdUser;
+  }
+
+  confirmEmail(token: string) {
+    const userInfo = this.jwtService.verify(token);
+
+    if (userInfo.exp * 1000 < Date.now()) {
+      throw new Error('This token is expired.');
+    }
+
+    return this.model.updateOne({ user_id: userInfo.id }, { email_confirmed: true }).exec();
   }
 
   login(user: User) {
+    if (!user.email_confirmed) {
+      throw new Error('Please confirm your email');
+    }
+
     const payload = {
       email: user.email,
       sub: user.user_id,

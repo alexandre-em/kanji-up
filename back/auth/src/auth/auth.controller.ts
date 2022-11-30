@@ -34,8 +34,6 @@ export class AuthController {
 
   @Post('register')
   register(@Body() registerDTO: RegisterDTO) {
-    //TODO: Send a confirmation email
-
     return this.service.register(registerDTO.name, registerDTO.email, registerDTO.password);
   }
 
@@ -50,5 +48,22 @@ export class AuthController {
     //TODO: Send a confirmation email
 
     return null;
+  }
+
+  @Get('confirmation')
+  @Render('confirmed')
+  async confirmAccount(@Query('token') token: string) {
+    try {
+      await this.service.confirmEmail(token);
+      return {
+        title: 'Confirm succeeded',
+        message: 'Thank you for confirming your email address. You can now use KanjiUp applications.',
+      };
+    } catch (e) {
+      return {
+        title: 'Confirmation failed',
+        message: `An error occured or your confirmation token has expired. Please try again later: ${e.message}`,
+      };
+    }
   }
 }
