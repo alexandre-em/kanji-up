@@ -29,11 +29,7 @@ export class AuthController {
   @Get('register')
   @Render('register')
   registerUser() {
-    const data = {
-      appId: 'Alexandre',
-    };
-
-    return data;
+    return {};
   }
 
   @Post('register')
@@ -41,5 +37,18 @@ export class AuthController {
     //TODO: Send a confirmation email
 
     return this.service.register(registerDTO.name, registerDTO.email, registerDTO.password);
+  }
+
+  @Get('reset')
+  @Render('forgetpassword')
+  forgetPassword() {
+    return {};
+  }
+
+  @Post('reset')
+  sendForgetPasswordConfirmation(@Body() registerDTO: RegisterDTO) {
+    //TODO: Send a confirmation email
+
+    return null;
   }
 }

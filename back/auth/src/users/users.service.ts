@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import {Readable} from 'stream';
 import { DeleteUserDTO, UpdateUserDTO, UpdateUserFriendDTO, UpdateUserPermissionsDTO } from './users.dto';
 import { User, UserDocument } from './users.schema';
 
@@ -10,6 +11,25 @@ export class UsersService {
 
   getOne(user_id: string) {
     return this.model.findOne({ user_id }).exec();
+  }
+
+  async getOneImage(user_id: string) {
+    const user = await this.model.findOne({ user_id }).exec();
+
+    if (!user) {
+      throw new Error("This user doesn't exist");
+    }
+    if (!user.image && !(user as User).image.data) {
+      throw new Error('This user does not have image profile');
+    }
+
+    const buffer = user.image.data;
+    const stream = new Readable();
+
+    stream.push(buffer);
+    stream.push(null);
+
+    return { stream, length: buffer.length };
   }
 
   updateOne(user_id: string, userinfo: UpdateUserDTO | DeleteUserDTO) {
@@ -29,7 +49,7 @@ export class UsersService {
     };
 
     if (Buffer.compare(user.image.data, image.data) === 0) {
-      throw new Error("This file has already been uploaded");
+      throw new Error('This file has already been uploaded');
     }
 
     return this.model.updateOne({ user_id }, { image }).exec();

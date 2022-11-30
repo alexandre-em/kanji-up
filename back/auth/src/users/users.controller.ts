@@ -1,8 +1,9 @@
-import { Body, Controller, Delete, FileTypeValidator, Get, Headers, MaxFileSizeValidator, Param, ParseFilePipe, Patch, Put, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, FileTypeValidator, Get, Headers, MaxFileSizeValidator, Param, ParseFilePipe, Patch, Put, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { Response } from 'express';
 import { UpdateUserPermissionsDTO } from './users.dto';
 import { UsersService } from './users.service';
 
@@ -19,6 +20,18 @@ export class UsersController {
     const decodedJwtAccessToken = this.jwtService.decode(accessToken);
 
     return this.service.getOne(decodedJwtAccessToken?.sub);
+  }
+
+  @Get('profile/image/:id')
+  async getOneImage(@Param('id') id: string, @Res() res: Response) {
+    const { stream, length } = await this.service.getOneImage(id);
+
+    res.set({
+      'Content-Type': 'image/png',
+      'Content-Length': length,
+    });
+
+    return stream.pipe(res);
   }
 
   @ApiBearerAuth()
