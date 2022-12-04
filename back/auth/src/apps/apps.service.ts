@@ -9,7 +9,7 @@ export class AppsService {
   constructor(@InjectModel(App.name) private readonly model: Model<AppDocument>) {}
 
   getOne(app_id: string) {
-    return this.model.findOne({ app_id }).exec();
+    return this.model.findOne({ app_id }).select('-_id -__v').exec();
   }
 
   createOne(appInfo: CreateAppDTO) {

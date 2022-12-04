@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import {Readable} from 'stream';
+import { Readable } from 'stream';
 import { DeleteUserDTO, UpdateUserDTO, UpdateUserFriendDTO, UpdateUserPermissionsDTO } from './users.dto';
 import { User, UserDocument } from './users.schema';
 
@@ -9,8 +9,14 @@ import { User, UserDocument } from './users.schema';
 export class UsersService {
   constructor(@InjectModel(User.name) private readonly model: Model<UserDocument>) {}
 
-  getOne(user_id: string) {
-    return this.model.findOne({ user_id }).exec();
+  async getOne(user_id: string) {
+    const user = await this.model.findOne({ user_id }).select('-_id -__v -password -image -email_confirmed').exec();
+
+    if (user?.deleted_at) {
+      throw new Error(`This user has been deleted at: ${user.deleted_at}`);
+    }
+
+    return user;
   }
 
   async getOneImage(user_id: string) {
