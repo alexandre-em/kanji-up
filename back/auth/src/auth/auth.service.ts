@@ -56,7 +56,8 @@ export class AuthService {
 
     const token = this.jwtService.sign({ id: createdUser.user_id, confirmed: createdUser.email_confirmed }, { expiresIn: '1d' });
 
-    await this.mailService.sendMail(email, name, token);
+    const url = `${process.env.BASE_URL}/auth/confirmation?token=${token}`;
+    this.mailService.sendMail(email, name, url);
 
     return createdUser;
   }
@@ -85,5 +86,36 @@ export class AuthService {
     return {
       access_token: this.jwtService.sign(payload),
     };
+  }
+
+  async sendEmailReset(email: string) {
+    const user = await this.model.findOne({ email }).exec();
+    if (!user) {
+      throw new Error('This user does not exist');
+    }
+
+    const token = this.jwtService.sign({ id: user.user_id }, { expiresIn: '1d' });
+
+    const url = `${process.env.BASE_URL}/auth/reset/token?token=${token}`;
+
+    this.mailService.sendMail(email, user.name, url);
+
+    return user;
+  }
+  
+  async newPassword(token: string, email: string, password: string) {
+    const decodedToken = this.jwtService.verify(token);
+
+    if (decodedToken.exp * 1000 < Date.now()) {
+      throw new Error('This token is expired.');
+    }
+
+    const user = await this.model.findOne({ email }).exec(); 
+
+    if (!user || user.user_id !== decodedToken.id) {
+      throw new Error('The token is not valid with this email');
+    }
+
+    return this.model.updateOne({ user_id: user.user_id }, { password }).exec();
   }
 }

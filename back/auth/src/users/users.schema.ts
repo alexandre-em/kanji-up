@@ -20,7 +20,7 @@ export class User {
   @Prop({ default: false })
   email_confirmed: boolean;
 
-  @Prop({ type: ({ data: Buffer, contentType: String }) })
+  @Prop({ type: { data: Buffer, contentType: String } })
   image: {
     data: Buffer;
     contentType: string;
@@ -49,6 +49,17 @@ export class User {
 export type UserDocument = User & Document;
 export const UserSchema = SchemaFactory.createForClass(User);
 
+UserSchema.pre('updateOne', function (next: CallbackWithoutResultAndOptionalError) {
+  const password = (this.getUpdate() as any).password;
+
+  if (!password) {
+    return next();
+  }
+  const newPassword = bcrypt.hashSync(password);
+  (this.getUpdate() as any).password = newPassword;
+  next();
+});
+
 UserSchema.pre('save', function (next: CallbackWithoutResultAndOptionalError) {
   if (!this.isModified('password')) {
     return next();
@@ -57,10 +68,7 @@ UserSchema.pre('save', function (next: CallbackWithoutResultAndOptionalError) {
   next();
 });
 
-UserSchema.methods.comparePassword = function (
-  plaintext: string,
-  callback: any,
-) {
+UserSchema.methods.comparePassword = function ( plaintext: string, callback: any) {
   return callback(null, bcrypt.compareSync(plaintext, this.password));
 };
 

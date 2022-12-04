@@ -44,10 +44,25 @@ export class AuthController {
   }
 
   @Post('reset')
-  sendForgetPasswordConfirmation(@Body() registerDTO: RegisterDTO) {
-    //TODO: Send a confirmation email
+  sendForgetPasswordConfirmation(@Body() registerDTO: Partial<RegisterDTO>) {
+    if (!registerDTO.email) {
+      throw new Error('Insert your email to be able to reset the password');
+    }
 
-    return null;
+    return this.service.sendEmailReset(registerDTO.email);
+  }
+
+  @Get('reset/token')
+  @Render('updatepassword')
+  changePasswordScreen(@Query('token') token: string) {
+    return {
+      token,
+    };
+  }
+
+  @Post('reset/token')
+  changePassword(@Body() body: any) {
+    return this.service.newPassword(body.token, body.email, body.password);
   }
 
   @Get('confirmation')
