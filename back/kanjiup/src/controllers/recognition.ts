@@ -11,6 +11,8 @@ import { recognitionService } from '../services';
 import InvalidError from '../error/invalid';
 import NotFoundError from '../error/notFound';
 import {PAGINATION_LIMIT} from '../types/enums';
+import {checkJWT} from '../config/security';
+import KanjiPermission from '../utils/kanjiPermissions';
 
 dotenv.config();
 
@@ -37,7 +39,8 @@ router.get('/model', (req, res) => {
  *  get:
  *      tags:
  *          - Recognition
- *      description: List all recognition
+ *      description: <h3>List all recognition</h3> <b>Permissions needed to access the resources:</b> <li>add:kanji</li> <li>read:recognition</li>
+
  *      parameters:
  *          - in: query
  *            name: page
@@ -67,6 +70,18 @@ router.get('/model', (req, res) => {
  *                  application/json:
  *                      schema:
  *                          $ref: '#/components/schemas/Error'
+ *          401:
+ *              description: Authentication Error
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/Error'
+ *          403:
+ *              description: Unauthorized Error
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/Error'
  *          500:
  *              description: Internal Error
  *              content:
@@ -74,7 +89,7 @@ router.get('/model', (req, res) => {
  *                      schema:
  *                          $ref: '#/components/schemas/Error'
  */
-router.get('/all', (req, res) => {
+router.get('/all', (req, res, next) => checkJWT(req, res, next, [KanjiPermission.ADD_KANJI, KanjiPermission.GET_RECOGNITION]), (req, res) => {
   const page = req.query.page ? parseInt(req.query.page as string) : 1;
   const limit = req.query.limit ? parseInt(req.query.limit as string) : PAGINATION_LIMIT.LITTLE;
   const query = (req.query.query as string) || undefined;
@@ -94,7 +109,8 @@ router.get('/all', (req, res) => {
  *  post:
  *      tags:
  *          - Recognition
- *      description: Upload the picture and kanji prediction of the drawn kanji
+ *      description: <h3>Upload the picture and kanji prediction of the drawn kanji</h3> <b>Permissions needed to access the resources:</b> <li>add:kanji</li> <li>add:recognition</li>
+
  *      requestBody:
  *          content:
  *              multipart/form-data:
@@ -115,6 +131,18 @@ router.get('/all', (req, res) => {
  *                  application/json:
  *                      schema:
  *                          $ref: '#/components/schemas/Error'
+ *          401:
+ *              description: Authentication Error
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/Error'
+ *          403:
+ *              description: Unauthorized Error
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/Error'
  *          500:
  *              description: Internal Error
  *              content:
@@ -122,7 +150,7 @@ router.get('/all', (req, res) => {
  *                      schema:
  *                          $ref: '#/components/schemas/Error'
  */
-router.post('/', upload.single('image'), urlencodedParser, (req, res) => {
+router.post('/', (req, res, next) => checkJWT(req, res, next, [KanjiPermission.ADD_KANJI, KanjiPermission.ADD_RECOGNITION]), upload.single('image'), urlencodedParser, (req, res) => {
   if (!req.file) return new InvalidError('Recognition\'s picture is missing !').sendResponse(res);
 	try {
 		const ext = path.extname(req.file.filename).split('\.')[1];
@@ -151,7 +179,7 @@ router.post('/', upload.single('image'), urlencodedParser, (req, res) => {
 	}
 });
 
-router.post('/data', upload.single('image'), urlencodedParser, (req, res) => {
+router.post('/data', (req, res, next) => checkJWT(req, res, next, [KanjiPermission.ADD_KANJI, KanjiPermission.UPDATE_RECOGNITION]), upload.single('image'), urlencodedParser, (req, res) => {
   if (!req.file) return new InvalidError('Recognition\'s picture is missing !').sendResponse(res);
 	try {
 		const ext = path.extname(req.file.filename).split('\.')[1];
@@ -193,7 +221,7 @@ router.post('/data', upload.single('image'), urlencodedParser, (req, res) => {
  *            required: true
  *            schema:
  *                type: string
- *      description: Validation of the predicted kanji
+ *      description: <h3>Validation of the predicted kanji</h3> <b>Permissions needed to access the resources:</b> <li>add:kanji</li> <li>update:recognition</li>
  *      requestBody:
  *          content:
  *              application/json:
@@ -214,6 +242,18 @@ router.post('/data', upload.single('image'), urlencodedParser, (req, res) => {
  *                  application/json:
  *                      schema:
  *                          $ref: '#/components/schemas/Error'
+ *          401:
+ *              description: Authentication Error
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/Error'
+ *          403:
+ *              description: Unauthorized Error
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/Error'
  *          500:
  *              description: Internal Error
  *              content:
@@ -221,7 +261,7 @@ router.post('/data', upload.single('image'), urlencodedParser, (req, res) => {
  *                      schema:
  *                          $ref: '#/components/schemas/Error'
  */
-router.patch('/validation/:id', (req, res) => {
+router.patch('/validation/:id', (req, res, next) => checkJWT(req, res, next, [KanjiPermission.ADD_KANJI, KanjiPermission.UPDATE_RECOGNITION]), (req, res) => {
 	const { id } = req.params;
 	try {
 		const is_valid = JSON.parse(req.body.is_valid as string);

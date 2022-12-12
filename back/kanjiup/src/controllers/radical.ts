@@ -7,6 +7,8 @@ import path from "path";
 import { radicalService } from '../services';
 import { upload } from "../utils";
 import InvalidError from '../error/invalid';
+import {checkJWT} from '../config/security';
+import KanjiPermission from '../utils/kanjiPermissions';
 
 const router: Router = Router();
 const urlencodedParser = bodyParser.urlencoded({ extended: false });
@@ -17,7 +19,7 @@ const urlencodedParser = bodyParser.urlencoded({ extended: false });
  *  post:
  *      tags:
  *          - Radical
- *      description: Create a radical object for a kanji
+ *      description: <h3>Create a radical object for a kanji</h3> <b>Permissions needed to access the resources:</b> <li>add:kanji</li> <li>add:radical</li>
  *      requestBody:
  *          content:
  *              multipart/form-data:
@@ -38,6 +40,18 @@ const urlencodedParser = bodyParser.urlencoded({ extended: false });
  *                  application/json:
  *                      schema:
  *                          $ref: '#/components/schemas/Error'
+ *          401:
+ *              description: Authentication Error
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/Error'
+ *          403:
+ *              description: Unauthorized Error
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/Error'
  *          500:
  *              description: Internal Error
  *              content:
@@ -45,7 +59,7 @@ const urlencodedParser = bodyParser.urlencoded({ extended: false });
  *                      schema:
  *                          $ref: '#/components/schemas/Error'
  */
-router.post('/', upload.single('image'), urlencodedParser, (req, res) => {
+router.post('/',(req, res, next) => checkJWT(req, res, next, [KanjiPermission.ADD_KANJI, KanjiPermission.ADD_RADICAL]), upload.single('image'), urlencodedParser, (req, res) => {
   if (!req.file) return new InvalidError('Radical\'s picture is missing !').sendResponse(res);
     const parsedBody = JSON.parse(req.body.json);
     const ext = path.extname(req.file.filename).split('\.')[1];

@@ -3,6 +3,8 @@ import { Router } from 'express';
 
 import { referenceService } from '../services';
 import InvalidError from '../error/invalid';
+import {checkJWT} from '../config/security';
+import KanjiPermission from '../utils/kanjiPermissions';
 
 const router: Router = Router();
 
@@ -12,7 +14,7 @@ const router: Router = Router();
  *  post:
  *      tags:
  *          - Reference
- *      description: Create a reference for a kanji
+ *      description: <h3>Create a reference for a kanji</h3> <b>Permissions needed to access the resources:</b> <li>add:kanji</li> <li>add:reference</li>
  *      requestBody:
  *          content:
  *              application/json:
@@ -27,6 +29,18 @@ const router: Router = Router();
  *                          $ref: '#/components/schemas/ReferenceResponse'
  *          400:
  *              description: Bad request Error
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/Error'
+ *          401:
+ *              description: Authentication Error
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/Error'
+ *          403:
+ *              description: Unauthorized Error
  *              content:
  *                  application/json:
  *                      schema:
@@ -62,7 +76,7 @@ const router: Router = Router();
  *                classic_nelson:
  *                    type: string
  */
-router.post('/', (req, res) => {
+router.post('/', (req, res, next) => checkJWT(req, res, next, [KanjiPermission.ADD_KANJI, KanjiPermission.ADD_REFERENCE]), (req, res) => {
     referenceService
         .addOne(req.body)
         .then((response) => {
