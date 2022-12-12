@@ -10,13 +10,11 @@ const PermissionGuard = (permissions: Permission[]): Type<CanActivate> => {
       const request = context.switchToHttp().getRequest<RequestWithUser>();
       const user = request.user;
 
-      console.log(user);
-
       if (!user.permissions) {
         return false;
       }
 
-      const isPresent = user?.permissions.map((p: Permission) => permissions.includes(p));
+      const isPresent = permissions.map((p: Permission) => user.permissions.includes(p));
 
       return isPresent.reduce((prev: boolean, total: boolean) => prev && total, true);
     }

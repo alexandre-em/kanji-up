@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import Permission from 'src/utils/permission.type';
@@ -20,14 +20,24 @@ export class UsersService {
     return user;
   }
 
+  async getOneDetailed(user_id: string) {
+    const user = await this.model.findOne({ user_id }).select('-__v -password -image').exec();
+
+    if (user?.deleted_at) {
+      throw new Error(`This user has been deleted at: ${user.deleted_at}`);
+    }
+
+    return user;
+  }
+
   async getOneImage(user_id: string) {
     const user = await this.model.findOne({ user_id }).exec();
 
     if (!user) {
-      throw new Error("This user doesn't exist");
+      throw new NotFoundException("This user doesn't exist");
     }
     if (!user.image && !(user as User).image.data) {
-      throw new Error('This user does not have image profile');
+      throw new NotFoundException('This user does not have image profile');
     }
 
     const buffer = user.image.data;
@@ -47,7 +57,7 @@ export class UsersService {
     const user = await this.model.findOne({ user_id }).exec();
 
     if (!user) {
-      throw new Error("This user doesn't exist");
+      throw new NotFoundException("This user doesn't exist");
     }
 
     const image = {
@@ -56,7 +66,7 @@ export class UsersService {
     };
 
     if (Buffer.compare(user.image.data, image.data) === 0) {
-      throw new Error('This file has already been uploaded');
+      throw new UnprocessableEntityException('This file has already been uploaded');
     }
 
     return this.model.updateOne({ user_id }, { image }).exec();
@@ -65,17 +75,17 @@ export class UsersService {
   async addUserPermissions(user_id: string, permissions: UpdateUserPermissionsDTO) {
     const user = await this.model.findOne({ user_id }).exec();
     if (!user) {
-      throw new Error("User doesn't exist");
+      throw new NotFoundException("User doesn't exist");
     }
 
     const updatedPermissions = [...user.permissions];
 
     if (!permissions || !permissions.permissions) {
-      throw new Error('There are no permissions on the body of the request');
+      throw new BadRequestException('There are no permissions on the body of the request');
     }
     if (!Array.isArray(permissions.permissions)) {
       if (user.permissions.includes(permissions.permissions)) {
-        throw new Error(`User already have this permissions : ${permissions.permissions}`);
+        throw new UnprocessableEntityException(`User already have this permissions : ${permissions.permissions}`);
       }
       updatedPermissions.push(permissions.permissions as Permission);
     } else {
@@ -92,15 +102,15 @@ export class UsersService {
   async removeUserPermissions(user_id: string, permissions: UpdateUserPermissionsDTO) {
     const user = await this.model.findOne({ user_id }).exec();
     if (!user) {
-      throw new Error("User doesn't exist");
+      throw new NotFoundException("User doesn't exist");
     }
 
     if (!permissions || !permissions.permissions) {
-      throw new Error('There are no permissions on the body of the request');
+      throw new BadRequestException('There are no permissions on the body of the request');
     }
     if (!Array.isArray(permissions.permissions)) {
       if (!user.permissions.includes(permissions.permissions)) {
-        throw new Error(`User doesn't have this permissions : ${permissions.permissions}`);
+        throw new UnprocessableEntityException(`User doesn't have this permissions : ${permissions.permissions}`);
       }
       const updatedPermissions = user.permissions.filter((p) => p !== permissions.permissions);
       return this.model.updateOne({ user_id }, { permissions: updatedPermissions }).exec();
@@ -120,18 +130,18 @@ export class UsersService {
 
   async addUserFriend(user_id: string, friend_id: UpdateUserFriendDTO) {
     if (user_id === friend_id.user_id) {
-      throw new Error("You can't yourself as a friend");
+      throw new UnprocessableEntityException("You can't yourself as a friend");
     }
     const user = await this.model.findOne({ user_id }).exec();
     const friend = await this.model.findOne({ user_id: friend_id.user_id }).exec();
     if (!user) {
-      throw new Error("User doesn't exist");
+      throw new NotFoundException("User doesn't exist");
     }
     if (!friend) {
-      throw new Error("User you want to add doesn't exist");
+      throw new NotFoundException("User you want to add doesn't exist");
     }
     if (user.friends.includes(friend)) {
-      throw new Error('This user is already your friend');
+      throw new UnprocessableEntityException('This user is already your friend');
     }
 
     const friends = [...user.friends, friend];
@@ -142,13 +152,13 @@ export class UsersService {
     const user = await this.model.findOne({ user_id }).exec();
     const friend = await this.model.findOne({ user_id: friend_id.user_id }).exec();
     if (!user) {
-      throw new Error("User doesn't exist");
+      throw new NotFoundException("User doesn't exist");
     }
     if (!friend) {
-      throw new Error("User you want to remove doesn't exist");
+      throw new NotFoundException("User you want to remove doesn't exist");
     }
     if (!user.friends.includes(friend)) {
-      throw new Error('This user is not your friend');
+      throw new UnprocessableEntityException('This user is not your friend');
     }
 
     const friends = user.friends.filter((f) => f !== friend);
