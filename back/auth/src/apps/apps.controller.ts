@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import PermissionGuard from 'src/auth/permission.guard';
+import permissions from 'src/utils/permission.type';
 import { AuthorizeAppDTO, CreateAppDTO, DeleteAppDTO, UpdateAppDTO } from './apps.dto';
 import { AppsService } from './apps.service';
 
@@ -15,28 +16,28 @@ export class AppsController {
   }
 
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(PermissionGuard([permissions.ADD_APP]))
   @Post('')
   createOne(@Body() body: CreateAppDTO) {
     return this.service.createOne(body);
   }
 
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(PermissionGuard([permissions.UPDATE_APP]))
   @Patch('update/:id')
   updateOne(@Param('id') id: string, @Body() body: UpdateAppDTO) {
     return this.service.updateOne(id, body);
   }
 
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(PermissionGuard([permissions.UPDATE_APP]))
   @Patch('authorize/:id')
   authorizeOne(@Param('id') id: string, @Body() body: AuthorizeAppDTO) {
     return this.service.updateOne(id, body);
   }
 
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(PermissionGuard([permissions.REMOVE_APP]))
   @Delete(':id')
   deleteOne(@Param('id') id: string, @Body() body: DeleteAppDTO) {
     return this.service.updateOne(id, body);

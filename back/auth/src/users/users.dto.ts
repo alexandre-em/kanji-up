@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import Permission from 'src/utils/permission.type';
 
 export class UpdateUserDTO {
   @ApiProperty()
@@ -38,5 +39,5 @@ export class UpdateUserAppDTO {
 
 export class UpdateUserPermissionsDTO {
   @ApiProperty({ examples: ['read:user', '[read:user, write:user]'] })
-  permissions: string;
+  permissions: Permission;
 }

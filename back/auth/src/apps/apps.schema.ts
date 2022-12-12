@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { util } from 'mongoose-uuid-parser';
+import { User } from 'src/users/users.schema';
 
 @Schema()
 export class App {
@@ -15,6 +16,9 @@ export class App {
 
   @Prop()
   platform: string;
+
+  @Prop({ default: new Date() })
+  created_by: User;
 
   @Prop({ default: new Date() })
   created_at: Date;

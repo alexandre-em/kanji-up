@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import Permission from 'src/utils/permission.type';
 import { Readable } from 'stream';
 import { DeleteUserDTO, UpdateUserDTO, UpdateUserFriendDTO, UpdateUserPermissionsDTO } from './users.dto';
 import { User, UserDocument } from './users.schema';
@@ -76,9 +77,9 @@ export class UsersService {
       if (user.permissions.includes(permissions.permissions)) {
         throw new Error(`User already have this permissions : ${permissions.permissions}`);
       }
-      updatedPermissions.push(permissions.permissions as string);
+      updatedPermissions.push(permissions.permissions as Permission);
     } else {
-      (permissions.permissions as string[]).forEach((p: string) => {
+      (permissions.permissions as Permission[]).forEach((p: Permission) => {
         if (!user.permissions.includes(p)) {
           updatedPermissions.push(p);
         }
@@ -104,7 +105,7 @@ export class UsersService {
       const updatedPermissions = user.permissions.filter((p) => p !== permissions.permissions);
       return this.model.updateOne({ user_id }, { permissions: updatedPermissions }).exec();
     } else {
-      (permissions.permissions as string[]).forEach((p: string) => {
+      (permissions.permissions as Permission[]).forEach((p: Permission) => {
         if (user.permissions.includes(p)) {
           const updatedPermissions: string[] = user.permissions.filter((p) => p === permissions.permissions);
 

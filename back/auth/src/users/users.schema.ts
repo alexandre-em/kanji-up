@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { CallbackWithoutResultAndOptionalError, Document } from 'mongoose';
 import { util } from 'mongoose-uuid-parser';
 import * as bcrypt from 'bcryptjs';
+import Permission from 'src/utils/permission.type';
 
 @Schema()
 export class User {
@@ -37,7 +38,7 @@ export class User {
   friends: User[];
 
   @Prop()
-  permissions: string[];
+  permissions: Permission[];
 
   @Prop({ required: true })
   created_at: Date;
@@ -68,7 +69,7 @@ UserSchema.pre('save', function (next: CallbackWithoutResultAndOptionalError) {
   next();
 });
 
-UserSchema.methods.comparePassword = function ( plaintext: string, callback: any) {
+UserSchema.methods.comparePassword = function (plaintext: string, callback: any) {
   return callback(null, bcrypt.compareSync(plaintext, this.password));
 };
 

@@ -13,7 +13,7 @@ import { MailModule } from './mail/mail.module';
     UsersModule,
     MailModule,
     ConfigModule.forRoot({ isGlobal: true }),
-    MongooseModule.forRoot(process.env.AUTH_MONGO_URI as string),
+    MongooseModule.forRoot(`${process.env.MONGO_URI}/user?retryWrites=true&w=majority`),
   ],
 })
 export class AppModule {}

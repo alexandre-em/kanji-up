@@ -102,7 +102,7 @@ export class AuthService {
 
     return user;
   }
-  
+
   async newPassword(token: string, email: string, password: string) {
     const decodedToken = this.jwtService.verify(token);
 
@@ -110,7 +110,7 @@ export class AuthService {
       throw new Error('This token is expired.');
     }
 
-    const user = await this.model.findOne({ email }).exec(); 
+    const user = await this.model.findOne({ email }).exec();
 
     if (!user || user.user_id !== decodedToken.id) {
       throw new Error('The token is not valid with this email');
