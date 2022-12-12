@@ -56,7 +56,7 @@ export class AuthService {
 
     const token = this.jwtService.sign({ id: createdUser.user_id, confirmed: createdUser.email_confirmed }, { expiresIn: '1d' });
 
-    const url = `${process.env.BASE_URL}/auth/confirmation?token=${token}`;
+    const url = `${process.env.AUTH_BASE_URL}/auth/confirmation?token=${token}`;
     this.mailService.sendMail(email, name, url);
 
     return createdUser;
@@ -96,7 +96,7 @@ export class AuthService {
 
     const token = this.jwtService.sign({ id: user.user_id }, { expiresIn: '1d' });
 
-    const url = `${process.env.BASE_URL}/auth/reset/token?token=${token}`;
+    const url = `${process.env.AUTH_BASE_URL}/auth/reset/token?token=${token}`;
 
     this.mailService.sendMail(email, user.name, url);
 
