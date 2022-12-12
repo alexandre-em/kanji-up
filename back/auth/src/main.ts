@@ -23,6 +23,6 @@ async function bootstrap() {
   app.setBaseViewsDir(join(__dirname, '..', 'views'));
   app.set('view engine', 'hbs');
 
-  await app.listen(parseInt(process.env.AUTH_API_PORT || '3000'));
+  await app.listen(parseInt(process.env.PORT || '3000'));
 }
 bootstrap();
