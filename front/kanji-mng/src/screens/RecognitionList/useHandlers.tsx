@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from "react";
+import React, {useCallback, useEffect, useMemo, useState} from "react";
 import axios, {AxiosRequestConfig} from "axios";
 
 import {recognitionService} from '../../services';
@@ -7,6 +7,12 @@ export default function useHandlers() {
   const [recognition, setRecognition] = useState<Pagination<RecognitionType>>();
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [page, setPage] = useState<number>(1);
+
+  const headers = useMemo(() => {
+    const token = localStorage.getItem('access_token');
+
+    return { 'Authorization': token };
+  }, []);
 
   const searchRecognition = useCallback(async (page: number, query: string, options?: AxiosRequestConfig) => {
     const res = await recognitionService.getRecognitions({ page, limit: 20, query }, options)
@@ -18,18 +24,18 @@ export default function useHandlers() {
     e.preventDefault();
     const query = (e.currentTarget.elements[0] as HTMLInputElement).value;
     setSearchQuery(query);
-    searchRecognition(1, query)
+    searchRecognition(1, query, { headers })
       .catch(console.error);
-  }, [searchRecognition]);
+  }, [searchRecognition, headers]);
 
   const handlePage = useCallback((e: React.ChangeEvent<unknown>, value: number) => {
-      searchRecognition(value, searchQuery)
-        .catch(console.error);
-  }, [searchRecognition, searchQuery]);
+    searchRecognition(value, searchQuery, { headers })
+      .catch(console.error);
+  }, [searchRecognition, searchQuery, headers]);
 
   useEffect(() => {
     const cancelToken = axios.CancelToken.source();
-    searchRecognition(1, '', { cancelToken: cancelToken.token })
+    searchRecognition(1, '', { cancelToken: cancelToken.token, headers })
       .catch(console.error);
 
     return () => cancelToken.cancel();

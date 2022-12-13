@@ -31,9 +31,12 @@ export default function KanjiDraw() {
 
   const handleSend = useCallback(() => {
     if (canvasRef && canvasRef.current && id) {
+      const token = localStorage.getItem('access_token');
       canvasRef.current.toBlob((blob) => {
         if (blob) {
-          recognitionService.uploadData(id, blob)
+          recognitionService.uploadData(id, blob, { headers: {
+            'Authorization': `Bearer ${token}`,
+          } })
             .finally(() => {
               navigate('/');
             })
