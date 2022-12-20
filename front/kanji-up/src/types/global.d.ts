@@ -38,3 +38,11 @@ interface Pagination<T> {
   prevPage: number | null,
   nextPage: number | null,
 }
+
+interface DecodedToken {
+  email: string;
+  exp: number;
+  iat: number;
+  permissions: string[];
+  sub: string;
+}

@@ -4,6 +4,8 @@ import {Avatar, Button, Dialog, FAB, List, Paragraph, Portal, ProgressBar, Searc
 import StepIndicator from 'react-native-step-indicator';
 import {SvgUri} from 'react-native-svg';
 import {useDispatch, useSelector} from 'react-redux';
+import * as WebBrowser from 'expo-web-browser';
+import jwtDecode from 'jwt-decode';
 
 import styles from './style';
 import { menu, list, labels, stepperStyles } from './const';
@@ -16,15 +18,20 @@ import Certification from '../../svg/Certification';
 import Reminders from '../../svg/Reminders';
 import usePrediction from '../../hooks/usePrediction';
 import {readFile, writeFile} from '../../service/file';
-import {user} from '../../store/slices';
+import {settings, user} from '../../store/slices';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import asyncstorageKeys from '../../constants/asyncstorageKeys';
 
-export default function Home({ navigation }: HomeProps) {
+WebBrowser.maybeCompleteAuthSession();
+
+export default function Home({ navigation, route }: HomeProps) {
   const dispatch = useDispatch();
   const [searchQuery, setSearchQuery] = useState<string>('');
   const kanjiState = useSelector((state: RootState) => state.kanji);
   const userState = useSelector((state: RootState) => state.user);
   const settingsState = useSelector((state: RootState) => state.settings);
   const [open, setOpen] = useState({ open: false });
+  const [isConnected, setIsConnected] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState({ progress: 0, showDialog: false });
   const [isDownloading, setIsDownloading] = useState(false);
   const model = usePrediction();
@@ -90,6 +97,23 @@ export default function Home({ navigation }: HomeProps) {
     </Portal>
   ), [downloadProgress]);
 
+  const handleAuth = React.useCallback(async () => {
+    const appId = Platform.select({
+      web: '535d3fc2-75f6-4468-9765-639dc3a66931',
+      native: '0333f691-dbc0-4030-98fe-31cee20b7613',
+    })
+    const authUrl = `https://kanjiup-auth.alexandre-em.fr/auth/login?app_id=${appId}`;
+
+    const results = await WebBrowser.openAuthSessionAsync(authUrl);
+
+    if (results && results.type === 'success') {
+      const newToken = results.url.split('?access_token=')[1];
+
+      AsyncStorage.setItem(asyncstorageKeys.ACCESS_TOKEN, newToken);
+      dispatch(settings.actions.update({ accessToken: newToken }));
+    }
+  }, []);
+
   const refreshUserInfo = React.useCallback(() => {
     if (userState) {
       const newContent = { ...userState.scores };
@@ -101,6 +125,16 @@ export default function Home({ navigation }: HomeProps) {
         .catch((err) => console.error('Error', err));
     }
   }, [userState]);
+
+  useEffect(() => {
+    if (route.params && (route.params as any).access_token) {
+      const accessToken = ((route.params as any).access_token);
+
+      AsyncStorage.setItem(asyncstorageKeys.ACCESS_TOKEN, accessToken);
+      dispatch(settings.actions.update({ accessToken }));
+      setIsConnected(true);
+    }
+  }, [route.params]);
 
   useEffect(() => {
     if (userState && userState.dailyScore === 0) {
@@ -126,6 +160,26 @@ export default function Home({ navigation }: HomeProps) {
   }, []);
 
   useEffect(() => {
+    AsyncStorage.getItem(asyncstorageKeys.ACCESS_TOKEN)
+      .then((res) => {
+        if (res === null) {
+          setIsConnected(false);
+        } else {
+          const decodedToken: DecodedToken = jwtDecode(res);
+          const isTokenValid = new Date() < new Date(decodedToken.exp * 1000);
+
+          if (isTokenValid) {
+            dispatch(settings.actions.update({ accessToken: res }));
+          } else {
+            AsyncStorage.removeItem(asyncstorageKeys.ACCESS_TOKEN);
+          }
+
+          setIsConnected(isTokenValid);
+        }
+      });
+  }, []);
+
+  useEffect(() => {
     (async () => {
       const isStored = await model.isBufferStored;
       if (model && !(isStored) && !isDownloading) {
@@ -140,6 +194,16 @@ export default function Home({ navigation }: HomeProps) {
       }
     })();
   }, [model, isDownloading]);
+
+  if (!isConnected) {
+    return (
+      <SafeAreaView style={[styles.main, { justifyContent: 'center', alignItems: 'center' }]}>
+        <Image source={require('../../../assets/adaptive-icon.png')} style={{ width: 200, height: 200 }} />
+        <Text style={[styles.title, { marginTop: 0 }]}>Welcome on KanjiUp application</Text>
+        <Button icon="account" onPress={handleAuth} mode="contained" style={{ borderRadius: 25, width: '70%' }}>Sign in</Button>
+      </SafeAreaView>
+    )
+  }
 
   return (<SafeAreaView style={styles.main}>
     <View style={styles.header}>
@@ -164,8 +228,6 @@ export default function Home({ navigation }: HomeProps) {
           onSubmitEditing={() => navigation.navigate('Search', { search: searchQuery })}
         />
       </View>
-    
-      <Button icon="reload" onPress={refreshUserInfo} mode="contained" style={{ borderRadius: 25 }}>Authenticate</Button>
 
       <View style={styles.stepper}>
         <Text style={styles.title}>Today's objectives</Text>
@@ -189,30 +251,30 @@ export default function Home({ navigation }: HomeProps) {
       </Surface>
 
       <Text style={styles.title}>Random</Text>
-    {randomKanji}
+      {randomKanji}
 
-    <Text style={styles.title}>Quick start</Text>
-    <FlatList
-      horizontal
-      style={{ marginHorizontal: 20, marginBottom: 20 }}
-      data={list}
-      pagingEnabled
-      showsHorizontalScrollIndicator={false}
-      scrollEventThrottle={225}
-      renderItem={renderItem}
-      keyExtractor={(item) => item.id}
+      <Text style={styles.title}>Quick start</Text>
+      <FlatList
+        horizontal
+        style={{ marginHorizontal: 20, marginBottom: 20 }}
+        data={list}
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        scrollEventThrottle={225}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id}
+      />
+    </ScrollView>
+
+    <FAB.Group
+      visible
+      open={open.open}
+      icon={open.open ? 'close' : 'menu'}
+      color="white"
+      fabStyle={{ backgroundColor: colors.secondary }}
+      actions={menu.map((m) => ({ ...m, onPress: () => navigation.navigate(m.screen as any, m.navOpt) }))}
+      onStateChange={setOpen}
     />
-  </ScrollView>
-
-  <FAB.Group
-    visible
-    open={open.open}
-    icon={open.open ? 'close' : 'menu'}
-    color="white"
-    fabStyle={{ backgroundColor: colors.secondary }}
-    actions={menu.map((m) => ({ ...m, onPress: () => navigation.navigate(m.screen as any, m.navOpt) }))}
-    onStateChange={setOpen}
-  />
-  {dialog}
-</SafeAreaView>);
+    {dialog}
+  </SafeAreaView>);
 };

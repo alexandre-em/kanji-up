@@ -1,10 +1,11 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {Platform, View} from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import { Platform, View } from 'react-native';
+import { LinkingOptions, NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {ActivityIndicator, Snackbar} from 'react-native-paper';
 import {useDispatch, useSelector} from 'react-redux';
+import * as Linking from 'expo-linking';
 
 import AsyncStorageKeys from '../constants/asyncstorageKeys';
 import OnboardingScreen from './Onboarding';
@@ -21,8 +22,16 @@ import {RootState} from '../store';
 import {RootStackParamList} from '../types/screens';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
-const linking = {
-  prefixes: ['kanjiup://', 'https://kanjiup.alexandre-em.fr'],
+const config = {
+  screens: {
+    Home: {
+      path: 'home',
+    },
+  }
+};
+const linking: LinkingOptions<ReactNavigation.RootParamList> = {
+  prefixes: [Linking.createURL('/')],
+  config,
 };
 
 export default function Navigation() {
