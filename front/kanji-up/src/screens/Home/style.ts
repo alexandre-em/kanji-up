@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { Platform, StatusBar, StyleSheet } from "react-native";
 import colors from "../../constants/colors";
 
 export default StyleSheet.create({
@@ -10,6 +10,7 @@ export default StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: '#f8f8f8',
     boxShadow: 'rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px',
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
   },
   header: {
     flex: 0.09,

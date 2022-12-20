@@ -19,7 +19,7 @@ export default function Evaluate({ kanji, model, onFinish }: { kanji: Partial<Ka
     model, kanji, canvasRef, progressCircleRef, onFinish,
   });
 
-  if (!kanjiQueue || counter >= settingsState.evaluationCardNumber) { return null; }
+  if (!kanjiQueue || (kanjiQueue && kanjiQueue.length < 1) || counter >= settingsState.evaluationCardNumber) { return null; }
 
   return (<View style={[styles.content, { marginTop: 0 }]}>
     <Surface style={styles.surface}>

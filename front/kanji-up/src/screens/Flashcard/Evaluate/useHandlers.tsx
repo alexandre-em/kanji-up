@@ -42,7 +42,10 @@ export default function useHandlersEvaluate({ model, kanji, canvasRef, progressC
       const imageBase64: string = Platform.OS === 'web'
         ? canvasRef.current.getUri()
         : (await canvasRef.current.getUri()).split('data:image/jpeg;base64,')[1];
-      const imageBase64WFormat = `data:image/jpeg;base64,${imageBase64}`;
+      const imageBase64WFormat = 
+        Platform.OS === 'web'
+        ? imageBase64
+        : `data:image/jpeg;base64,${imageBase64}`;
 
       if (!isValid) {
         dispatch(evaluation.actions.addAnswer({ kanji: details!.character as string, image: imageBase64WFormat, answer: [], status: 'incorrect', message: strokeCount === 0 ? 'This kanji has been skipped' : 'The stroke number isn\'t correct' }));
@@ -124,7 +127,7 @@ export default function useHandlersEvaluate({ model, kanji, canvasRef, progressC
         setStart(true);
       }
       const isLimitReached = counter >= settingsState.evaluationCardNumber;
-      if (start && kanjiQueue && (kanjiQueue.length <= 1 || isLimitReached)) {
+      if (start && kanjiQueue && (kanjiQueue.length <= 0 || isLimitReached)) {
         if (!isLimitReached) {
           setKanjiQueue(kanji.sort(() => 0.5 - Math.random()));
         } else {

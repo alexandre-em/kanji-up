@@ -164,6 +164,8 @@ export default function Home({ navigation }: HomeProps) {
           onSubmitEditing={() => navigation.navigate('Search', { search: searchQuery })}
         />
       </View>
+    
+      <Button icon="reload" onPress={refreshUserInfo} mode="contained" style={{ borderRadius: 25 }}>Authenticate</Button>
 
       <View style={styles.stepper}>
         <Text style={styles.title}>Today's objectives</Text>

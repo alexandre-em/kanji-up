@@ -18,6 +18,8 @@
       "**/*"
     ],
     "ios": {
+      "bundleIdentifier": "com.aem.kanjiup",
+      "requireFullScreen": true,
       "supportsTablet": true
     },
     "android": {
@@ -28,6 +30,8 @@
       "package": "com.aem.kanjiup"
     },
     "web": {
+      "display": "fullscreen",
+      "lang": "en-US",
       "favicon": "./assets/favicon.png"
     }
   }

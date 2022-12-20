@@ -10,17 +10,17 @@ import { asyncStorageIO } from '../FileSystemIO';
 import {kanjiPredictionConstants} from './const';
 import labels from './labels';
 
-const url = 'https://anki-images.s3.eu-west-3.amazonaws.com/models/kanji_web_model/model.json';
-
 export default function usePrediction() {
   const [loading, setLoading] = useState<boolean>(false);
   const [model, setModel] = useState<tf.GraphModel<tf.io.IOHandler>>();
 
   const downloadThenSave = useCallback(async (onProgress: (progress: number) => void) => {
+    await tf.setBackend('cpu');
     await tf.ready();
     const url = (await axios.get(`https://kanjiup-api.alexandre-em.fr/recognition/model?model=${kanjiPredictionConstants.MODEL_KEY_DL}`)).data.native;
-    const model = await tf.loadGraphModel(url, { onProgress });
-    await model.save(asyncStorageIO('kanjiPrediction') as IOHandler);
+    const model = await tf.loadGraphModel(url, { onProgress, requestInit: {} });
+    await model.save(asyncStorageIO('kanji-prediction') as IOHandler);
+    console.warn('model saved !')
   }, []);
 
   const isBufferStored = React.useMemo(async () => {
@@ -43,6 +43,7 @@ export default function usePrediction() {
         throw new Error('Unable to find kanjiPrediction model');
       }
 
+      await tf.setBackend('cpu');
       await tf.ready();
 
       const loadedModel: tf.GraphModel<tf.io.IOHandler> = await tf.loadGraphModel(asyncStorageIO(kanjiPredictionConstants.MODEL_KEY) as IOHandler);
