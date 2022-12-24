@@ -5,7 +5,7 @@ import {useSelector} from 'react-redux';
 
 import styles from '../style';
 import SvgUriPlatform from '../../../components/SVGUriPlatform';
-import colors from '../../../constants/colors';
+import {colors} from '../../../constants';
 import {RootState} from '../../../store';
 
 export default function Practice({ kanji, onFinish }: { kanji: Partial<KanjiType>[], onFinish: Function }) {

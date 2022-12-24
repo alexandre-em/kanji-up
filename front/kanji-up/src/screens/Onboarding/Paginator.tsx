@@ -1,6 +1,6 @@
 import React from 'react';
 import { Animated, View, useWindowDimensions } from 'react-native';
-import colors from '../../constants/colors';
+import {colors} from '../../constants';
 import { paginatorStyle } from './style';
 
 export default function Paginator({ data, scrollX }: PaginatorProps) {

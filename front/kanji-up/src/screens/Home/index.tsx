@@ -4,25 +4,19 @@ import {Avatar, Button, Dialog, FAB, List, Paragraph, Portal, ProgressBar, Searc
 import StepIndicator from 'react-native-step-indicator';
 import {SvgUri} from 'react-native-svg';
 import {useDispatch, useSelector} from 'react-redux';
-import * as WebBrowser from 'expo-web-browser';
-import jwtDecode from 'jwt-decode';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import styles from './style';
 import { menu, list, labels, stepperStyles } from './const';
-import colors from '../../constants/colors';
+import {asyncstorageKeys, colors} from '../../constants';
 import {HomeProps} from '../../types/screens';
 import GradientCard from '../../components/GradientCard';
 import {RootState} from '../../store';
-import Trip from '../../svg/Trip';
-import Certification from '../../svg/Certification';
-import Reminders from '../../svg/Reminders';
+import {Certification, Trip, Reminders} from '../../svg';
 import usePrediction from '../../hooks/usePrediction';
 import {readFile, writeFile} from '../../service/file';
 import {settings, user} from '../../store/slices';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import asyncstorageKeys from '../../constants/asyncstorageKeys';
-
-WebBrowser.maybeCompleteAuthSession();
+import useAuth from '../../hooks/useAuth';
 
 export default function Home({ navigation, route }: HomeProps) {
   const dispatch = useDispatch();
@@ -31,10 +25,10 @@ export default function Home({ navigation, route }: HomeProps) {
   const userState = useSelector((state: RootState) => state.user);
   const settingsState = useSelector((state: RootState) => state.settings);
   const [open, setOpen] = useState({ open: false });
-  const [isConnected, setIsConnected] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState({ progress: 0, showDialog: false });
   const [isDownloading, setIsDownloading] = useState(false);
   const model = usePrediction();
+  const { isConnected, setIsConnected, handleAuth } = useAuth();
 
   const randomKanji = useMemo(() => {
     if (kanjiState.selectedKanji && Object.keys(kanjiState.selectedKanji).length > 0) {
@@ -97,23 +91,6 @@ export default function Home({ navigation, route }: HomeProps) {
     </Portal>
   ), [downloadProgress]);
 
-  const handleAuth = React.useCallback(async () => {
-    const appId = Platform.select({
-      web: '535d3fc2-75f6-4468-9765-639dc3a66931',
-      native: '0333f691-dbc0-4030-98fe-31cee20b7613',
-    })
-    const authUrl = `https://kanjiup-auth.alexandre-em.fr/auth/login?app_id=${appId}`;
-
-    const results = await WebBrowser.openAuthSessionAsync(authUrl);
-
-    if (results && results.type === 'success') {
-      const newToken = results.url.split('?access_token=')[1];
-
-      AsyncStorage.setItem(asyncstorageKeys.ACCESS_TOKEN, newToken);
-      dispatch(settings.actions.update({ accessToken: newToken }));
-    }
-  }, []);
-
   const refreshUserInfo = React.useCallback(() => {
     if (userState) {
       const newContent = { ...userState.scores };
@@ -160,26 +137,6 @@ export default function Home({ navigation, route }: HomeProps) {
   }, []);
 
   useEffect(() => {
-    AsyncStorage.getItem(asyncstorageKeys.ACCESS_TOKEN)
-      .then((res) => {
-        if (res === null) {
-          setIsConnected(false);
-        } else {
-          const decodedToken: DecodedToken = jwtDecode(res);
-          const isTokenValid = new Date() < new Date(decodedToken.exp * 1000);
-
-          if (isTokenValid) {
-            dispatch(settings.actions.update({ accessToken: res }));
-          } else {
-            AsyncStorage.removeItem(asyncstorageKeys.ACCESS_TOKEN);
-          }
-
-          setIsConnected(isTokenValid);
-        }
-      });
-  }, []);
-
-  useEffect(() => {
     (async () => {
       const isStored = await model.isBufferStored;
       if (model && !(isStored) && !isDownloading) {
@@ -195,7 +152,7 @@ export default function Home({ navigation, route }: HomeProps) {
     })();
   }, [model, isDownloading]);
 
-  if (!isConnected) {
+  if (isConnected === false) {
     return (
       <SafeAreaView style={[styles.main, { justifyContent: 'center', alignItems: 'center' }]}>
         <Image source={require('../../../assets/adaptive-icon.png')} style={{ width: 200, height: 200 }} />

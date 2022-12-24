@@ -8,7 +8,7 @@ import useHandlers from './useHandlers';
 import styles from '../style';
 import {RootState} from '../../../store';
 import Sketch from '../../../components/Sketch';
-import colors from '../../../constants/colors';
+import {colors} from '../../../constants';
 
 export default function Evaluate({ kanji, model, onFinish }: { kanji: Partial<KanjiType>[], model: any, onFinish: Function }) {
   const i = 0;

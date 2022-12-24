@@ -8,8 +8,9 @@ import styles from './style';
 import {kanjiService} from '../../service';
 import {error} from '../../store/slices';
 import {SearchProps} from '../../types/screens';
-import colors from '../../constants/colors';
+import {colors} from '../../constants';
 import Searching from '../../svg/Searching';
+import useAuth from '../../hooks/useAuth';
 
 const numberOfItemsPerPageList = [30, 50, 100, 200];
 
@@ -20,6 +21,7 @@ export default function Search({ navigation, route }: SearchProps) {
   const [search, setSearch] = useState<string>("");
   const [limit, setLimit] = useState<number>(30);
   const [result, setResult] = useState<Pagination<KanjiType>>();
+  const { isConnected } = useAuth();
 
   const handleSubmit = useCallback(async ({ page }={ page: 1 }, customSearch=null) => {
     if (customSearch) { setSearch(customSearch); }
@@ -57,6 +59,12 @@ export default function Search({ navigation, route }: SearchProps) {
       handleSubmit({ page: 1 }, route.params.search as any);
     }
   }, [route.params]);
+
+  useEffect(() => {
+    if (isConnected === false) {
+      navigation.navigate('Home');
+    }
+  }, [isConnected])
 
   return (
     <SafeAreaView style={styles.main}>

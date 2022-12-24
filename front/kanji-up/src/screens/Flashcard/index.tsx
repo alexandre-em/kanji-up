@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {View} from 'react-native';
 import {ActivityIndicator, Appbar, Button, Dialog, Paragraph, Portal} from 'react-native-paper';
 
@@ -8,12 +8,14 @@ import Practice from './Practice';
 import {FlashcardProps} from '../../types/screens';
 import usePrediction from '../../hooks/usePrediction';
 import useHandlers from './useHandlers';
+import useAuth from '../../hooks/useAuth';
 
 export default function Flashcard({ navigation, route }: FlashcardProps) {
   const { evaluation } = route.params;
   const [dialog, setDialog] = React.useState<boolean>(false);
   const model = usePrediction();
   const { sKanji, message, handleFinish, handleConfirmFinish } = useHandlers({ model, evaluation, navigation, setDialog });
+  const { isConnected } = useAuth();
 
   const dialogComponent = React.useMemo(() => (
     <Portal>
@@ -29,6 +31,12 @@ export default function Flashcard({ navigation, route }: FlashcardProps) {
       </Dialog>
     </Portal>
   ), [dialog, message]);
+
+  useEffect(() => {
+    if (isConnected === false) {
+      navigation.navigate('Home');
+    }
+  }, [isConnected]);
 
   return (<View style={styles.main}>
     <Appbar.Header>

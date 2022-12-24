@@ -1,14 +1,15 @@
-import React, {useMemo} from 'react';
+import React, {useEffect, useMemo} from 'react';
 import {Platform, ScrollView, Text, View, TouchableOpacity} from 'react-native';
 import {ActivityIndicator, Appbar, DataTable, Divider, IconButton, Menu, Surface} from 'react-native-paper';
 import {useSelector} from 'react-redux';
 
 import styles from './style';
-import colors from '../../constants/colors';
+import {colors} from '../../constants';
 import {KanjiListProps} from '../../types/screens';
 import {RootState} from '../../store';
 import CustomDialog from '../../components/CustomDialog';
 import useHandlers from './useHandlers';
+import useAuth from '../../hooks/useAuth';
 
 const MORE_ICON = Platform.OS === 'ios' ? 'dots-horizontal' : 'dots-vertical';
 const numberOfItemsPerPageList = [30, 50, 100, 200];
@@ -20,6 +21,7 @@ export default function KanjiList({ navigation, route }: KanjiListProps) {
     getKanjis, handleBack, handleSave, handlePress, handleReset,
     handleSelect, handleCancel, handleShowMenu, handleCloseMenu, handleCloseDialog,
   } = useHandlers({ navigation, grade });
+  const { isConnected } = useAuth();
 
   const surfaceStyle = React.useCallback((kanjiId: string) => {
     if (kanjiState.toRemove[kanjiId]) { return { backgroundColor: colors.warning, color: '#fff' }; }
@@ -49,6 +51,12 @@ export default function KanjiList({ navigation, route }: KanjiListProps) {
     </ScrollView>
   )
   }, [data, loading, selectionMode, kanjiState]);
+
+  useEffect(() => {
+    if (isConnected === false) {
+      navigation.navigate('Home');
+    }
+  }, [isConnected]);
 
   return (
     <View style={styles.main}>

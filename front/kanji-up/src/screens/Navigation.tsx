@@ -7,7 +7,7 @@ import {ActivityIndicator, Snackbar} from 'react-native-paper';
 import {useDispatch, useSelector} from 'react-redux';
 import * as Linking from 'expo-linking';
 
-import AsyncStorageKeys from '../constants/asyncstorageKeys';
+import {asyncstorageKeys} from '../constants';
 import OnboardingScreen from './Onboarding';
 import HomeScreen from './Home';
 import CategoryScreen from './Category';
@@ -57,7 +57,7 @@ export default function Navigation() {
 
   useEffect(() => {
     loadSelectedKanji();
-    AsyncStorage.getItem(AsyncStorageKeys.FIRST_TIME)
+    AsyncStorage.getItem(asyncstorageKeys.FIRST_TIME)
       .then((res) => {
         if (res !== null) {
           const firstTime = JSON.parse(res as string);
