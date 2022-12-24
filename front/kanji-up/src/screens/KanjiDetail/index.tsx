@@ -8,9 +8,10 @@ import styles from './style';
 import {kanjiService} from '../../service';
 import SvgUriPlatform from '../../components/SVGUriPlatform';
 import {KanjiDetailProps} from '../../types/screens';
-import colors from '../../constants/colors';
+import {colors} from '../../constants';
 import {error, kanji} from '../../store/slices';
 import {RootState} from '../../store';
+import useAuth from '../../hooks/useAuth';
 
 export default function KanjiDetail({ navigation, route }: KanjiDetailProps) {
   const { width } = useWindowDimensions()
@@ -19,6 +20,7 @@ export default function KanjiDetail({ navigation, route }: KanjiDetailProps) {
   const imgSize = width < 700 ? width * 0.5 : 250;
   const { id } = route.params;
   const [details, setDetails] = useState<KanjiType | null>(null);
+  const { isConnected } = useAuth();
 
   const isSelected = useMemo(() => (
     (kanjiState.selectedKanji[id] && !kanjiState.toRemove[id]) || kanjiState.toAdd[id]
@@ -33,6 +35,12 @@ export default function KanjiDetail({ navigation, route }: KanjiDetailProps) {
       }
     }
   }, [isSelected, details]);
+
+  useEffect(() => {
+    if (isConnected === false) {
+      navigation.navigate('Home');
+    }
+  }, [isConnected]);
 
   useEffect(() => {
     const cancelToken = axios.CancelToken.source();

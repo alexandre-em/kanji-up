@@ -1,6 +1,6 @@
 import {useCallback} from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import AsyncStorageKeys from '../../constants/asyncstorageKeys';
+import {asyncstorageKeys} from '../../constants';
 import {useDispatch} from "react-redux";
 
 import {writeFile} from '../../service/file';
@@ -23,7 +23,7 @@ export default function useHandlers({ values, navigation, isButtonDisabled, setD
   const model = usePrediction();
 
   const handleSave = useCallback(async () => {
-    await AsyncStorage.setItem(AsyncStorageKeys.FIRST_TIME, 'false');
+    await AsyncStorage.setItem(asyncstorageKeys.FIRST_TIME, 'false');
     const json = JSON.stringify(values);
     await writeFile('userSettings', json);
     dispatch(settings.actions.update(values));

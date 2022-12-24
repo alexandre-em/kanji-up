@@ -1,7 +1,7 @@
 import React, {useCallback, useMemo} from 'react';
 import {GestureResponderEvent, Platform, useWindowDimensions} from 'react-native';
 import Svg, {Circle, Rect, Text} from 'react-native-svg';
-import colors from '../constants/colors';
+import { colors }  from '../constants';
 
 export default function Slider({ value, min, max, onValueChange }: SliderProps) {
   const { width } = useWindowDimensions();

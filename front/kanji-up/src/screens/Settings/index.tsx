@@ -1,17 +1,18 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {View, ScrollView, Text} from 'react-native';
 import {Appbar, Button, IconButton, ProgressBar, TextInput} from 'react-native-paper';
 
 import styles from './style';
 import {RootState} from '../../store';
-import colors from '../../constants/colors';
+import {colors} from '../../constants';
 import Slider from '../../components/Slider';
 import {SettingsProps} from '../../types/screens';
 import {error} from '../../store/slices';
 import {readFile} from '../../service/file';
 import CustomDialog from '../../components/CustomDialog';
 import useHandlers from './useHandlers';
+import useAuth from '../../hooks/useAuth';
 
 const defaultValues = {
   username: '',
@@ -29,6 +30,7 @@ export default function Settings({ navigation, route }: SettingsProps) {
   const [dialogMessages, setDialogMessages] = useState({ title: '', description: '' });
   const [isDownloading, setIsDownloading] = useState<boolean>(false);
   const [progress, setProgress] = useState<number>(0);
+  const { isConnected } = useAuth();
 
   const isButtonDisabled = React.useMemo(() => {
     const isNameEmpty = values.username === '';
@@ -50,6 +52,12 @@ export default function Settings({ navigation, route }: SettingsProps) {
         .catch(() => dispatch(error.actions.update("Could not load user data")))
     }
   }, [firstTime]);
+
+  useEffect(() => {
+    if (isConnected === false) {
+      navigation.navigate('Home');
+    }
+  }, [isConnected]);
 
   return <View style={styles.main}>
     {!firstTime && <Appbar.Header>

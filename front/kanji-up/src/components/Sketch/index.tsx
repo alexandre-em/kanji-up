@@ -2,7 +2,7 @@ import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef,
 import { Dimensions, Platform, View } from 'react-native';
 import { Surface } from 'react-native-paper';
 
-import colors from '../../constants/colors';
+import {colors} from '../../constants';
 import CanvasPlatform from './Canvas';
 import styles from './style';
 

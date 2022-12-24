@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const initialState: SettingValuesType = {
   username: 'user',
+  accessToken: null,
   flashcardNumber: 30,
   evaluationCardNumber: 70,
   evaluationTime: 60,

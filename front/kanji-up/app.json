@@ -1,6 +1,7 @@
 {
   "expo": {
     "name": "kanji-up",
+    "scheme": "kanjiup",
     "slug": "kanji-up",
     "version": "0.0.1",
     "orientation": "portrait",

@@ -4,21 +4,21 @@ import {Avatar, Button, Dialog, FAB, List, Paragraph, Portal, ProgressBar, Searc
 import StepIndicator from 'react-native-step-indicator';
 import {SvgUri} from 'react-native-svg';
 import {useDispatch, useSelector} from 'react-redux';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import styles from './style';
 import { menu, list, labels, stepperStyles } from './const';
-import colors from '../../constants/colors';
+import {asyncstorageKeys, colors} from '../../constants';
 import {HomeProps} from '../../types/screens';
 import GradientCard from '../../components/GradientCard';
 import {RootState} from '../../store';
-import Trip from '../../svg/Trip';
-import Certification from '../../svg/Certification';
-import Reminders from '../../svg/Reminders';
+import {Certification, Trip, Reminders} from '../../svg';
 import usePrediction from '../../hooks/usePrediction';
 import {readFile, writeFile} from '../../service/file';
-import {user} from '../../store/slices';
+import {settings, user} from '../../store/slices';
+import useAuth from '../../hooks/useAuth';
 
-export default function Home({ navigation }: HomeProps) {
+export default function Home({ navigation, route }: HomeProps) {
   const dispatch = useDispatch();
   const [searchQuery, setSearchQuery] = useState<string>('');
   const kanjiState = useSelector((state: RootState) => state.kanji);
@@ -28,6 +28,7 @@ export default function Home({ navigation }: HomeProps) {
   const [downloadProgress, setDownloadProgress] = useState({ progress: 0, showDialog: false });
   const [isDownloading, setIsDownloading] = useState(false);
   const model = usePrediction();
+  const { isConnected, setIsConnected, handleAuth } = useAuth();
 
   const randomKanji = useMemo(() => {
     if (kanjiState.selectedKanji && Object.keys(kanjiState.selectedKanji).length > 0) {
@@ -103,6 +104,16 @@ export default function Home({ navigation }: HomeProps) {
   }, [userState]);
 
   useEffect(() => {
+    if (route.params && (route.params as any).access_token) {
+      const accessToken = ((route.params as any).access_token);
+
+      AsyncStorage.setItem(asyncstorageKeys.ACCESS_TOKEN, accessToken);
+      dispatch(settings.actions.update({ accessToken }));
+      setIsConnected(true);
+    }
+  }, [route.params]);
+
+  useEffect(() => {
     if (userState && userState.dailyScore === 0) {
       (async () => {
         const date = new Date();
@@ -141,6 +152,16 @@ export default function Home({ navigation }: HomeProps) {
     })();
   }, [model, isDownloading]);
 
+  if (isConnected === false) {
+    return (
+      <SafeAreaView style={[styles.main, { justifyContent: 'center', alignItems: 'center' }]}>
+        <Image source={require('../../../assets/adaptive-icon.png')} style={{ width: 200, height: 200 }} />
+        <Text style={[styles.title, { marginTop: 0 }]}>Welcome on KanjiUp application</Text>
+        <Button icon="account" onPress={handleAuth} mode="contained" style={{ borderRadius: 25, width: '70%' }}>Sign in</Button>
+      </SafeAreaView>
+    )
+  }
+
   return (<SafeAreaView style={styles.main}>
     <View style={styles.header}>
       <Button mode="contained" style={{ borderRadius: 25 }}>{userState.totalScore}</Button>
@@ -164,8 +185,6 @@ export default function Home({ navigation }: HomeProps) {
           onSubmitEditing={() => navigation.navigate('Search', { search: searchQuery })}
         />
       </View>
-    
-      <Button icon="reload" onPress={refreshUserInfo} mode="contained" style={{ borderRadius: 25 }}>Authenticate</Button>
 
       <View style={styles.stepper}>
         <Text style={styles.title}>Today's objectives</Text>
@@ -189,30 +208,30 @@ export default function Home({ navigation }: HomeProps) {
       </Surface>
 
       <Text style={styles.title}>Random</Text>
-    {randomKanji}
+      {randomKanji}
 
-    <Text style={styles.title}>Quick start</Text>
-    <FlatList
-      horizontal
-      style={{ marginHorizontal: 20, marginBottom: 20 }}
-      data={list}
-      pagingEnabled
-      showsHorizontalScrollIndicator={false}
-      scrollEventThrottle={225}
-      renderItem={renderItem}
-      keyExtractor={(item) => item.id}
+      <Text style={styles.title}>Quick start</Text>
+      <FlatList
+        horizontal
+        style={{ marginHorizontal: 20, marginBottom: 20 }}
+        data={list}
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        scrollEventThrottle={225}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id}
+      />
+    </ScrollView>
+
+    <FAB.Group
+      visible
+      open={open.open}
+      icon={open.open ? 'close' : 'menu'}
+      color="white"
+      fabStyle={{ backgroundColor: colors.secondary }}
+      actions={menu.map((m) => ({ ...m, onPress: () => navigation.navigate(m.screen as any, m.navOpt) }))}
+      onStateChange={setOpen}
     />
-  </ScrollView>
-
-  <FAB.Group
-    visible
-    open={open.open}
-    icon={open.open ? 'close' : 'menu'}
-    color="white"
-    fabStyle={{ backgroundColor: colors.secondary }}
-    actions={menu.map((m) => ({ ...m, onPress: () => navigation.navigate(m.screen as any, m.navOpt) }))}
-    onStateChange={setOpen}
-  />
-  {dialog}
-</SafeAreaView>);
+    {dialog}
+  </SafeAreaView>);
 };

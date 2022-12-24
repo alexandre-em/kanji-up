@@ -8,7 +8,7 @@ import {RootState} from '../../../store';
 import {error, evaluation} from '../../../store/slices';
 import {uploadImage} from '../../../service/file';
 import {recognitionService} from '../../../service';
-import colors from '../../../constants/colors';
+import {colors} from '../../../constants';
 
 interface useHandlersEvaluateProps {
   model: any;
