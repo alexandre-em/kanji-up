@@ -14,7 +14,7 @@ export class UsersService {
     const user = await this.model.findOne({ user_id }).select('-_id -__v -password -image -email_confirmed').exec();
 
     if (user?.deleted_at) {
-      throw new Error(`This user has been deleted at: ${user.deleted_at}`);
+      throw new NotFoundException(`This user has been deleted at: ${user.deleted_at}`);
     }
 
     return user;
@@ -24,7 +24,7 @@ export class UsersService {
     const user = await this.model.findOne({ user_id }).select('-__v -password -image').exec();
 
     if (user?.deleted_at) {
-      throw new Error(`This user has been deleted at: ${user.deleted_at}`);
+      throw new NotFoundException(`This user has been deleted at: ${user.deleted_at}`);
     }
 
     return user;
@@ -110,7 +110,7 @@ export class UsersService {
     }
     if (!Array.isArray(permissions.permissions)) {
       if (!user.permissions.includes(permissions.permissions)) {
-        throw new UnprocessableEntityException(`User doesn't have this permissions : ${permissions.permissions}`);
+        throw new NotFoundException(`User doesn't have this permissions : ${permissions.permissions}`);
       }
       const updatedPermissions = user.permissions.filter((p) => p !== permissions.permissions);
       return this.model.updateOne({ user_id }, { permissions: updatedPermissions }).exec();
@@ -130,7 +130,7 @@ export class UsersService {
 
   async addUserFriend(user_id: string, friend_id: UpdateUserFriendDTO) {
     if (user_id === friend_id.user_id) {
-      throw new UnprocessableEntityException("You can't yourself as a friend");
+      throw new BadRequestException("You can't add yourself as a friend");
     }
     const user = await this.model.findOne({ user_id }).exec();
     const friend = await this.model.findOne({ user_id: friend_id.user_id }).exec();

@@ -58,16 +58,14 @@
       })
     })
       .then((res) => {
-        return res.json();
+          return res.json();
       })
       .then((res) => {
-        if (res.error != null) { throw new Error(res.message); }
-        if (res.stat === "fail") { throw new Error(res.message); }
+        if (res.message != null) { throw new Error(res.message); }
 
         window.location.replace("{{ redirection_url }}?access_token="+res.access_token);
       })
       .catch((err) => {
-      console.log(err.message);
         document.getElementById("banner").style.visibility = "visible";
         document.getElementById("error").innerHTML = err.message;
       })

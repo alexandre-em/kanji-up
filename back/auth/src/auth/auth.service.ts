@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { JwtService } from '@nestjs/jwt';
 import { Model } from 'mongoose';
@@ -27,7 +27,7 @@ export class AuthService {
           reject(error);
         }
         if (!match) {
-          reject(new Error('The password is invalid'));
+          reject(new UnauthorizedException('The email/password is invalid'));
         }
         resolve(user);
       });
@@ -66,7 +66,7 @@ export class AuthService {
     const userInfo = this.jwtService.verify(token);
 
     if (userInfo.exp * 1000 < Date.now()) {
-      throw new Error('This token is expired.');
+      throw new UnauthorizedException('This token is expired.');
     }
 
     return this.model.updateOne({ user_id: userInfo.id }, { email_confirmed: true }).exec();
@@ -74,7 +74,7 @@ export class AuthService {
 
   login(user: User) {
     if (!user.email_confirmed) {
-      throw new Error('Please confirm your email');
+      throw new UnauthorizedException('Please confirm your email');
     }
 
     const payload = {
@@ -91,7 +91,7 @@ export class AuthService {
   async sendEmailReset(email: string) {
     const user = await this.model.findOne({ email }).exec();
     if (!user) {
-      throw new Error('This user does not exist');
+      throw new NotFoundException('This user does not exist');
     }
 
     const token = this.jwtService.sign({ id: user.user_id }, { expiresIn: '1d' });
@@ -107,13 +107,13 @@ export class AuthService {
     const decodedToken = this.jwtService.verify(token);
 
     if (decodedToken.exp * 1000 < Date.now()) {
-      throw new Error('This token is expired.');
+      throw new UnauthorizedException('This token is expired.');
     }
 
     const user = await this.model.findOne({ email }).exec();
 
     if (!user || user.user_id !== decodedToken.id) {
-      throw new Error('The token is not valid with this email');
+      throw new UnprocessableEntityException('The token is not valid with this email');
     }
 
     return this.model.updateOne({ user_id: user.user_id }, { password }).exec();

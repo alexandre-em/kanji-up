@@ -60,14 +60,14 @@
         return res.json();
       })
       .then((res) => {
-        if (res.error != null) { throw new Error(res.message); }
+        if (res.message != null) { throw new Error(res.message); }
         if (res.stat === "fail") { throw new Error(res.message); }
 
         document.getElementById("banner").style.visibility = "visible";
         document.getElementById("banner").style.backgroundColor = "rgb(237, 247, 237)";
         document.getElementById("banner").style.border = "rgb(237, 247, 237)";
         document.getElementById("error").style.color = "rgb(30, 70, 32)";
-        document.getElementById("error").innerHTML = "Account created successfully";
+        document.getElementById("error").innerHTML = "Account created successfully, please confirm your email address";
         setTimeout(() => { history.back(); }, 5000);
       })
       .catch((err) => {
