@@ -67,7 +67,7 @@ export default function useHandlers({ navigation, grade }: useHandlersProps) {
           setData(res.data);
           setLoading(false);
         })
-        .catch((err) => dispatch(error.actions.update(axios.isCancel(err) ? 'Previous action cancelled.' : err.message)));
+        .catch((err) => dispatch(error.actions.update({ message: axios.isCancel(err) ? 'Previous action cancelled.' : err.message })));
     }
   }, [limit, loading]);
 

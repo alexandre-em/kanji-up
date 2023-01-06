@@ -28,7 +28,7 @@ export default function Onboarding({ navigation }: OnboardingProps) {
     try {
       navigation.navigate('Settings', { firstTime: true });
     } catch {
-      dispatch(error.actions.update('An error occured, please try later...'));
+      dispatch(error.actions.update({ message: 'An error occured, please try later...' }));
     }
   }, [navigation, slidesRef]);
 

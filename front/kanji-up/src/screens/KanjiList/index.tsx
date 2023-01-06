@@ -79,6 +79,7 @@ export default function KanjiList({ navigation, route }: KanjiListProps) {
         visible={dialog}
         message={{ title: 'Before quitting', description: 'Do you want to save your selection ?' }}
         onDismiss={handleCloseDialog}
+        actions={[true, true]}
         onSave={() => { handleSave(); navigation.goBack(); }}
         onCancel={() => { handleCancel(); navigation.goBack(); } }
       />

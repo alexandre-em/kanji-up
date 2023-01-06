@@ -49,7 +49,7 @@ export default function KanjiDetail({ navigation, route }: KanjiDetailProps) {
       kanjiService
         .getKanjiDetail({ id }, { cancelToken: cancelToken.token })
         .then((res) => setDetails(res.data))
-        .catch((err) => dispatch(error.actions.update(axios.isCancel(err) ? 'Previous action cancelled.' : err.message)));
+        .catch((err) => dispatch(error.actions.update({ message: axios.isCancel(err) ? 'Previous action cancelled.' : err.message })));
     }
 
     return () => { cancelToken.cancel(); }

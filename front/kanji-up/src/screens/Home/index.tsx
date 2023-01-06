@@ -8,14 +8,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import styles from './style';
 import { menu, list, labels, stepperStyles } from './const';
-import {asyncstorageKeys, colors} from '../../constants';
+import {asyncstorageKeys, colors, snackbarColors} from '../../constants';
 import {HomeProps} from '../../types/screens';
 import GradientCard from '../../components/GradientCard';
 import {RootState} from '../../store';
 import {Certification, Trip, Reminders} from '../../svg';
 import usePrediction from '../../hooks/usePrediction';
 import {readFile, writeFile} from '../../service/file';
-import {settings, user} from '../../store/slices';
+import {settings, user, error} from '../../store/slices';
 import useAuth from '../../hooks/useAuth';
 
 export default function Home({ navigation, route }: HomeProps) {
@@ -25,7 +25,7 @@ export default function Home({ navigation, route }: HomeProps) {
   const userState = useSelector((state: RootState) => state.user);
   const settingsState = useSelector((state: RootState) => state.settings);
   const [open, setOpen] = useState({ open: false });
-  const [downloadProgress, setDownloadProgress] = useState({ progress: 0, showDialog: false });
+  const [downloadProgress, setDownloadProgress] = useState({ progress: 0, showDialog: false, message: '' });
   const [isDownloading, setIsDownloading] = useState(false);
   const model = usePrediction();
   const { isConnected, setIsConnected, handleAuth } = useAuth();
@@ -81,10 +81,10 @@ export default function Home({ navigation, route }: HomeProps) {
 
   const dialog = useMemo(() => (
     <Portal>
-      <Dialog style={{ maxWidth: 700, width: '100%', alignSelf: 'center' }} visible={downloadProgress.showDialog} onDismiss={() => setDownloadProgress({ progress: 0, showDialog: false })}>
+      <Dialog style={{ maxWidth: 700, width: '100%', alignSelf: 'center' }} visible={downloadProgress.showDialog} onDismiss={() => setDownloadProgress({ progress: 0, showDialog: false, message: '' })}>
         <Dialog.Title>Initializing the application</Dialog.Title>
         <Dialog.Content>
-          <Paragraph>Downloading models...</Paragraph>
+          <Paragraph>{downloadProgress.message}</Paragraph>
           <ProgressBar progress={downloadProgress.progress} />
         </Dialog.Content>
       </Dialog>
@@ -98,8 +98,8 @@ export default function Home({ navigation, route }: HomeProps) {
       const key = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
       newContent[key] = userState.dailyScore;
       writeFile('userInfo', JSON.stringify(newContent))
-        .then(() => console.log('User info Saved'))
-        .catch((err) => console.error('Error', err));
+        .then(() => dispatch(error.actions.update({ message: 'User info Saved', color: snackbarColors.info })))
+        .catch((err) => dispatch(error.actions.update({ message: 'Error' + err.message })));
     }
   }, [userState]);
 
@@ -143,10 +143,10 @@ export default function Home({ navigation, route }: HomeProps) {
         setIsDownloading(true);
         const onDownloadProgress = (progressEvent: any) => {
           const percentCompleted = progressEvent.loaded / progressEvent.total;
-          setDownloadProgress({ progress: percentCompleted, showDialog: true });
+          setDownloadProgress({ progress: percentCompleted, showDialog: true, message: 'Downloading models...' });
 
         };
-        await model.downloadThenSave(Platform.OS === 'web' ? onDownloadProgress : (progress: number) => { setDownloadProgress({ progress, showDialog: true }); });
+        await model.downloadThenSave(Platform.OS === 'web' ? onDownloadProgress : (progress: number) => { setDownloadProgress({ progress, showDialog: true, message: 'Downloading kanji recognition model...' }); }, () => setDownloadProgress((prev) => ({ ...prev, message: 'Saving the model on the device...' })));
         setDownloadProgress((prev) =>  ({ ...prev, showDialog: false }));
       }
     })();

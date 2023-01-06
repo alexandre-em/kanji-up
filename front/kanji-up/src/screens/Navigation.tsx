@@ -44,7 +44,7 @@ export default function Navigation() {
       const contents = await readFile(fileNames.SELECTED_KANJI);
       dispatch(kanji.actions.initialize(contents));
     } catch (err) {
-      dispatch(error.actions.update(err instanceof Error ? err.message : 'An error occurred'));
+      dispatch(error.actions.update({ message: err instanceof Error ? err.message : 'An error occurred' }));
       dispatch(kanji.actions.updateStatus('error'));
     }
   }, []);
@@ -65,7 +65,7 @@ export default function Navigation() {
           if (!firstTime) {
             readFile('userSettings')
               .then((content) => dispatch(settings.actions.update(JSON.parse(content))))
-              .catch(() => dispatch(error.actions.update("Could not load user data")))
+              .catch(() => dispatch(error.actions.update({ message: "Could not load user data" })))
           }
         } else { setIsFirstTime(true); }
       })
@@ -90,7 +90,7 @@ export default function Navigation() {
         <Stack.Screen name={'Search'} component={SearchScreen} />
         <Stack.Screen name={'Settings'} component={SettingScreen} />
       </Stack.Navigator>
-      <Snackbar duration={5000} visible={errorState.isErrorTriggered} onDismiss={handleCloseSnack} action={{ label: 'close', onPress: handleCloseSnack }}>{errorState.message}</Snackbar>
+      <Snackbar duration={5000} visible={errorState.isErrorTriggered} onDismiss={handleCloseSnack} action={{ label: 'close', onPress: handleCloseSnack }} style={{ backgroundColor: errorState.color }}>{errorState.message}</Snackbar>
     </NavigationContainer>
   );
 };

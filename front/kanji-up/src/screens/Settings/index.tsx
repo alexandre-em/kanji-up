@@ -49,7 +49,7 @@ export default function Settings({ navigation, route }: SettingsProps) {
     if (!firstTime) {
       readFile('userSettings')
         .then((content) => setValues(JSON.parse(content)))
-        .catch(() => dispatch(error.actions.update("Could not load user data")))
+        .catch(() => dispatch(error.actions.update({ message: "Could not load user data" })))
     }
   }, [firstTime]);
 

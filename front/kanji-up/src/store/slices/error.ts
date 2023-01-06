@@ -1,8 +1,10 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { snackbarColors } from '../../constants';
 
 const initialState: ErrorState = {
   isErrorTriggered: false,
   message: '',
+  color: snackbarColors.error,
 };
 
 export const error = createSlice({
@@ -10,7 +12,7 @@ export const error = createSlice({
   initialState,
   reducers: {
     reset: () => initialState,
-    update: (state, action: PayloadAction<string>) => ({ isErrorTriggered: true, message: action.payload }),
+    update: (state, action: PayloadAction<Partial<ErrorState>>) => ({ isErrorTriggered: true, message: action.payload.message, color: action.payload.color || snackbarColors.error }),
   },
 });
 

@@ -18,7 +18,13 @@ export default function useAuth() {
     const appId = Platform.select({
       web: '535d3fc2-75f6-4468-9765-639dc3a66931',
       native: '0333f691-dbc0-4030-98fe-31cee20b7613',
-    })
+    });
+    /*
+    const appId = Platform.select({
+      web: '2a2541f9-b476-4853-9625-34918c625ddb',
+      native: '9e2791ee-3420-4f8b-8f2a-32d3e06878c6',
+    });
+     */
     const authUrl = `https://kanjiup-auth.alexandre-em.fr/auth/login?app_id=${appId}`;
 
     const results = await WebBrowser.openAuthSessionAsync(authUrl);
@@ -26,8 +32,6 @@ export default function useAuth() {
     if (results && results.type === 'success') {
       const parseParam = results.url.split('?access_token=');
       const newToken = parseParam[1];
-
-      console.log(parseParam)
 
       if (newToken !== null || newToken !== undefined) {
         AsyncStorage.setItem(asyncstorageKeys.ACCESS_TOKEN, newToken);

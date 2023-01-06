@@ -1,6 +1,7 @@
 type ErrorState = {
   isErrorTriggered: boolean,
   message: string,
+  color: string,
 };
 
 type SelectedKanjiState = {

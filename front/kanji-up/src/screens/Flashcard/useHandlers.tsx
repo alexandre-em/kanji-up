@@ -51,7 +51,7 @@ export default function useHandlers({ evaluation, model, navigation, setDialog }
         try {
           await model.loadModel();
         } catch (err: any) {
-          dispatch(error.actions.update(err.message));
+          dispatch(error.actions.update({ message: err.message }));
         } finally {
           setLoading(false);
         }

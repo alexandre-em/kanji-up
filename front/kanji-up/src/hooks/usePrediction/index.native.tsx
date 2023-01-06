@@ -14,11 +14,16 @@ export default function usePrediction() {
   const [loading, setLoading] = useState<boolean>(false);
   const [model, setModel] = useState<tf.GraphModel<tf.io.IOHandler>>();
 
-  const downloadThenSave = useCallback(async (onProgress: (progress: number) => void) => {
+  const downloadThenSave = useCallback(async (onProgress: (progress: number) => void, onFinishDownload?: () => void) => {
     await tf.setBackend('cpu');
     await tf.ready();
     const url = (await axios.get(`https://kanjiup-api.alexandre-em.fr/recognition/model?model=${kanjiPredictionConstants.MODEL_KEY_DL}`)).data.native;
     const model = await tf.loadGraphModel(url, { onProgress, requestInit: {} });
+
+    if (onFinishDownload) {
+      onFinishDownload();
+    }
+
     await model.save(asyncStorageIO('kanji-prediction') as IOHandler);
     console.warn('model saved !')
   }, []);

@@ -64,7 +64,7 @@ export default function useHandlersEvaluate({ model, kanji, canvasRef, progressC
             dispatch(evaluation.actions.addPoints(Math.max(predictedKanji?.confidence * 100 * (grade === 'custom'? 8 : parseInt(grade || '1')), 10)));
           }
         } catch (err: any) {
-          dispatch(error.actions.update(err.message));
+          dispatch(error.actions.update({ message: err.message }));
         }
       }
 

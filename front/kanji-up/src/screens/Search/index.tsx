@@ -27,7 +27,7 @@ export default function Search({ navigation, route }: SearchProps) {
     if (customSearch) { setSearch(customSearch); }
     setLoading(true);
     const cancelToken = axios.CancelToken.source();
-    const handleError = (err: Error) => dispatch(error.actions.update(axios.isCancel(err) ? 'Previous action cancelled.' : err.message));
+    const handleError = (err: Error) => dispatch(error.actions.update({ message: axios.isCancel(err) ? 'Previous action cancelled.' : err.message }));
     try {
       await kanjiService
         .searchKanjis({ query: customSearch || search, page, limit },{ cancelToken: cancelToken.token })
