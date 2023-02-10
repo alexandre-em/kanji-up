@@ -92,6 +92,7 @@ export default function KanjiDetail({ navigation, route }: KanjiDetailProps) {
           </View>
         </View>
         <Button mode={isSelected ? "outlined" : "contained"} onPress={handlePress} style={styles.button}>{isSelected ? "Unselect" : "Select"}</Button>
+        <Button mode="outlined" onPress={handleReport} style={[styles.button,]} color={colors.warning} >Report a bug</Button>
         <View style={styles.details}>
           <List.Accordion title="Details" description="number of stroke, meanings, etc." style={{ backgroundColor: '#f8f8f8' }}>
             <DataTable.Row>

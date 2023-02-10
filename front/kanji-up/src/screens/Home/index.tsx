@@ -13,10 +13,10 @@ import {HomeProps} from '../../types/screens';
 import GradientCard from '../../components/GradientCard';
 import {RootState} from '../../store';
 import {Certification, Trip, Reminders} from '../../svg';
-import usePrediction from '../../hooks/usePrediction';
 import {readFile, writeFile} from '../../service/file';
 import {settings, user, error} from '../../store/slices';
 import useAuth from '../../hooks/useAuth';
+import useModelDownload from './hooks/useModelDownload';
 
 export default function Home({ navigation, route }: HomeProps) {
   const dispatch = useDispatch();
@@ -25,10 +25,8 @@ export default function Home({ navigation, route }: HomeProps) {
   const userState = useSelector((state: RootState) => state.user);
   const settingsState = useSelector((state: RootState) => state.settings);
   const [open, setOpen] = useState({ open: false });
-  const [downloadProgress, setDownloadProgress] = useState({ progress: 0, showDialog: false, message: '' });
-  const [isDownloading, setIsDownloading] = useState(false);
-  const model = usePrediction();
   const { isConnected, setIsConnected, handleAuth } = useAuth();
+  const { downloadProgress, handleDismissDownload } = useModelDownload();
 
   const randomKanji = useMemo(() => {
     if (kanjiState.selectedKanji && Object.keys(kanjiState.selectedKanji).length > 0) {
@@ -81,7 +79,7 @@ export default function Home({ navigation, route }: HomeProps) {
 
   const dialog = useMemo(() => (
     <Portal>
-      <Dialog style={{ maxWidth: 700, width: '100%', alignSelf: 'center' }} visible={downloadProgress.showDialog} onDismiss={() => setDownloadProgress({ progress: 0, showDialog: false, message: '' })}>
+      <Dialog style={{ maxWidth: 700, width: '100%', alignSelf: 'center' }} visible={downloadProgress.showDialog} onDismiss={handleDismissDownload}>
         <Dialog.Title>Initializing the application</Dialog.Title>
         <Dialog.Content>
           <Paragraph>{downloadProgress.message}</Paragraph>
@@ -112,45 +110,6 @@ export default function Home({ navigation, route }: HomeProps) {
       setIsConnected(true);
     }
   }, [route.params]);
-
-  useEffect(() => {
-    if (userState && userState.dailyScore === 0) {
-      (async () => {
-        const date = new Date();
-        try {
-          const content = await readFile('userInfo');
-          if (content) {
-            const scores = JSON.parse(content);
-            const todayScore = scores[`${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`];
-            const userInfo: UserState = { scores, dailyScore: todayScore || 0, totalScore: Object.values(scores as { [key: string]: number }).reduce((a, b) => a + b, 0) };
-
-            dispatch(user.actions.update(userInfo));
-          }
-
-        } catch (err) {
-          dispatch(user.actions.reset());
-        }
-      })()
-    }
-
-    return refreshUserInfo;
-  }, []);
-
-  useEffect(() => {
-    (async () => {
-      const isStored = await model.isBufferStored;
-      if (model && !(isStored) && !isDownloading) {
-        setIsDownloading(true);
-        const onDownloadProgress = (progressEvent: any) => {
-          const percentCompleted = progressEvent.loaded / progressEvent.total;
-          setDownloadProgress({ progress: percentCompleted, showDialog: true, message: 'Downloading models...' });
-
-        };
-        await model.downloadThenSave(Platform.OS === 'web' ? onDownloadProgress : (progress: number) => { setDownloadProgress({ progress, showDialog: true, message: 'Downloading kanji recognition model...' }); }, () => setDownloadProgress((prev) => ({ ...prev, message: 'Saving the model on the device...' })));
-        setDownloadProgress((prev) =>  ({ ...prev, showDialog: false }));
-      }
-    })();
-  }, [model, isDownloading]);
 
   if (isConnected === false) {
     return (

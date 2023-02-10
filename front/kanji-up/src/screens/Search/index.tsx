@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, ScrollView, SafeAreaView, Text, } from 'react-native';
-import { ActivityIndicator, Appbar, DataTable, Dialog, Divider, IconButton, List, Paragraph, Portal, Searchbar, Surface } from 'react-native-paper';
+import { ActivityIndicator, Appbar, DataTable, Divider, List, Searchbar, Surface } from 'react-native-paper';
 import axios, {AxiosResponse} from 'axios';
 import {useDispatch} from 'react-redux';
 
@@ -17,7 +17,6 @@ const numberOfItemsPerPageList = [30, 50, 100, 200];
 export default function Search({ navigation, route }: SearchProps) {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState<boolean>(false);
-  const [dialog, setDialog] = useState<boolean>(false);
   const [search, setSearch] = useState<string>("");
   const [limit, setLimit] = useState<number>(30);
   const [result, setResult] = useState<Pagination<KanjiType>>();
@@ -43,17 +42,6 @@ export default function Search({ navigation, route }: SearchProps) {
     return () => { cancelToken.cancel(); }
   }, [search, limit]);
 
-  const filterDialog = useMemo(() => (
-    <Portal>
-      <Dialog style={{ maxWidth: 700, width: '100%', alignSelf: 'center' }} visible={dialog} onDismiss={() => setDialog(false)}>
-        <Dialog.Title>Search result settings</Dialog.Title>
-        <Dialog.Content>
-          <Paragraph>Do you want to save your selection ?</Paragraph>
-        </Dialog.Content>
-      </Dialog>
-    </Portal>
-  ), [dialog]);
-
   useEffect(() => {
     if (route.params) {
       handleSubmit({ page: 1 }, route.params.search as any);
@@ -78,11 +66,10 @@ export default function Search({ navigation, route }: SearchProps) {
           placeholder="Search"
           onChangeText={setSearch}
           value={search}
-          style={{ width: '90%', borderRadius: 25 }}
+          style={{ width: '100%', borderRadius: 25 }}
           inputStyle={{ color: colors.text, fontSize: 15 }}
           onSubmitEditing={handleSubmit as any}
         />
-        <IconButton style={{ backgroundColor: colors.secondary }} icon="filter-variant" onPress={() => setDialog(true)} color="#fff" />
       </Surface>
 
       <Surface style={[styles.surface, { flex: 0.95, alignItems: 'center', justifyContent: 'center' }]} elevation={5}>
@@ -122,7 +109,5 @@ export default function Search({ navigation, route }: SearchProps) {
           </View>
         }
       </Surface>
-
-    {filterDialog}
   </SafeAreaView>
 )};

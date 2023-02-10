@@ -29,6 +29,12 @@ export default function KanjiList({ navigation, route }: KanjiListProps) {
     if (kanjiState.selectedKanji[kanjiId]) { return { backgroundColor: '#ebebeb', color: '#fff' }; }
   }, [kanjiState]);
 
+  useEffect(() => {
+    if (isConnected === false) {
+      navigation.navigate('Home');
+    }
+  }, [isConnected]);
+
   const content = useMemo(() => {
     if (!data || loading) {
       return (
@@ -51,12 +57,6 @@ export default function KanjiList({ navigation, route }: KanjiListProps) {
     </ScrollView>
   )
   }, [data, loading, selectionMode, kanjiState]);
-
-  useEffect(() => {
-    if (isConnected === false) {
-      navigation.navigate('Home');
-    }
-  }, [isConnected]);
 
   return (
     <View style={styles.main}>

@@ -61,6 +61,7 @@ UserSchema.pre('updateOne', function (next: CallbackWithoutResultAndOptionalErro
   next();
 });
 
+// Crypt the password before saving on the database then save the crypted password
 UserSchema.pre('save', function (next: CallbackWithoutResultAndOptionalError) {
   if (!this.isModified('password')) {
     return next();
