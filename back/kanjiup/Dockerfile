@@ -1,10 +1,8 @@
 FROM node:buster-slim
 WORKDIR /api
 
-COPY package*.json /api/
-RUN npm i
-
 COPY . /api/
+RUN npm install
 
 ARG AWS_ACCESS_ID
 ENV AWS_ACCESS_ID ${AWS_ACCESS_ID}
@@ -29,6 +27,8 @@ ENV AUTH_API_SECRET_NATIVE=${AUTH_API_SECRET_NATIVE}
 ARG PORT
 ENV PORT=${PORT}
 
-EXPOSE ${PORT}
-CMD ["npm", "run", "build"]
+RUN npm run build
 
+EXPOSE 8080
+
+CMD node dist/app.js
