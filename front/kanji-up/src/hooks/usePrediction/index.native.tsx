@@ -17,7 +17,7 @@ export default function usePrediction() {
   const downloadThenSave = useCallback(async (onProgress: (progress: number) => void, onFinishDownload?: () => void) => {
     await tf.setBackend('cpu');
     await tf.ready();
-    const url = (await axios.get(`https://kanjiup-api.alexandre-em.fr/recognition/model?model=${kanjiPredictionConstants.MODEL_KEY_DL}`)).data.native;
+    const url = (await axios.get(`https://kanjiup1-alexandreemem.b4a.run/recognition/model?model=${kanjiPredictionConstants.MODEL_KEY_DL}`)).data.native;
     const model = await tf.loadGraphModel(url, { onProgress, requestInit: {} });
 
     if (onFinishDownload) {

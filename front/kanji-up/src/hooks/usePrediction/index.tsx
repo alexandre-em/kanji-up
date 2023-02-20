@@ -16,7 +16,7 @@ export default function usePrediction() {
   const [model, setModel] = useState<tflite.TFLiteModel>();
 
   const downloadThenSave = useCallback(async (onProgress: (progress: number) => void, onFinishDownload?: () => void ) => {
-    const url = (await axios.get(`https://kanjiup-api.alexandre-em.fr/recognition/model?model=${kanjiPredictionConstants.MODEL_KEY_DL}`)).data.web;
+    const url = (await axios.get(`https://kanjiup1-alexandreemem.b4a.run/recognition/model?model=${kanjiPredictionConstants.MODEL_KEY_DL}`)).data.web;
     const buffer: AxiosResponse<ArrayBuffer> = await axios.get(url, { responseType: 'arraybuffer', onDownloadProgress: onProgress });
     if (onFinishDownload) {
       onFinishDownload();
