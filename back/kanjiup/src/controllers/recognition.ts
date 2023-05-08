@@ -19,7 +19,7 @@ dotenv.config();
 const router: Router = Router();
 const urlencodedParser = bodyParser.urlencoded({ extended: false });
 
-router.get('/model',(req, res, next) => checkJWT(req, res, next, [KanjiPermission.ADD_KANJI, KanjiPermission.GET_RECOGNITION]), (req, res) => {
+router.get('/model',(req, res, next) => checkJWT(req, res, next, [KanjiPermission.GET_RECOGNITION]), (req, res) => {
   const model = req.query.model;
   if (model && model === process.env.KANJI_RECOGNIZER_KEY) {
     const uris = {
