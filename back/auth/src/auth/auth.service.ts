@@ -8,10 +8,10 @@ import { RegisterDTO } from './auth.dto';
 
 @Injectable()
 export class AuthService {
-  constructor(@InjectModel(User.name) private readonly model: Model<UserDocument>, private jwtService: JwtService, private mailService: MailService) {}
+  constructor(@InjectModel(User.name) private readonly model: Model<UserDocument>, private jwtService: JwtService, private mailService: MailService) { }
 
   async validateUser(email: string, password: string) {
-    const user = await this.model.findOne({ email }).exec();
+    const user: User | null = await this.model.findOne({ email }).exec();
 
     if (!user) {
       throw new UnauthorizedException('The username does not exist');
@@ -19,6 +19,10 @@ export class AuthService {
 
     if (user.deleted_at) {
       throw new UnauthorizedException(`This user as been deleted : ${user.deleted_at}`);
+    }
+
+    if (user.email_confirmed !== null && !user.email_confirmed) {
+      throw new UnauthorizedException('Please confirm your email !');
     }
 
     return new Promise((resolve, reject) => {
@@ -78,6 +82,7 @@ export class AuthService {
     }
 
     const payload = {
+      name: user.name,
       email: user.email,
       sub: user.user_id,
       permissions: user.permissions,
