@@ -1,12 +1,12 @@
-import {useCallback} from "react";
+import { useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {asyncstorageKeys} from '../../constants';
-import {useDispatch} from "react-redux";
+import { asyncstorageKeys } from '../../constants';
+import { useDispatch } from 'react-redux';
 
-import {writeFile} from '../../service/file';
-import {settings} from "../../store/slices";
-import {Platform} from "react-native";
-import usePrediction from "../../hooks/usePrediction";
+import { writeFile } from '../../service/file';
+import { settings } from '../../store/slices';
+import { Platform } from 'react-native';
+import usePrediction from '../../hooks/usePrediction';
 
 interface useHandlersProps {
   values: SettingValuesType;
@@ -16,7 +16,7 @@ interface useHandlersProps {
   setDialogMessages: Function;
   setIsDownloading: Function;
   setProgress: Function;
-};
+}
 
 export default function useHandlers({ values, navigation, isButtonDisabled, setDialog, setDialogMessages, setIsDownloading, setProgress }: useHandlersProps) {
   const dispatch = useDispatch();
@@ -28,13 +28,14 @@ export default function useHandlers({ values, navigation, isButtonDisabled, setD
     await writeFile('userSettings', json);
     dispatch(settings.actions.update(values));
     setDialog(false);
-    
+
     navigation.navigate('Home');
   }, [values]);
 
   const handleBack = useCallback(() => {
-    if (isButtonDisabled) { navigation.navigate('Home'); }
-    else {
+    if (isButtonDisabled) {
+      navigation.navigate('Home');
+    } else {
       setDialog(true);
       setDialogMessages({ title: 'Before quitting', description: 'Do you want to save your selection ?' });
     }
@@ -49,10 +50,18 @@ export default function useHandlers({ values, navigation, isButtonDisabled, setD
       setProgress(percentCompleted);
     };
 
-    await model.downloadThenSave(Platform.OS === 'web' ? onDownloadProgress : (progress: number) => { setProgress(progress); });
+    await model.downloadThenSave(
+      Platform.OS === 'web'
+        ? onDownloadProgress
+        : (progress: number) => {
+            setProgress(progress);
+          }
+    );
     setIsDownloading(false);
     setDialog(false);
   }, []);
 
-  return { handleSave, handleBack, handleUpdate }
-};
+  const handleSignout = useCallback(() => {}, []);
+
+  return { handleSave, handleBack, handleUpdate, handleSignout };
+}

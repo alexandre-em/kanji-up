@@ -12,7 +12,7 @@ export const error = createSlice({
   initialState,
   reducers: {
     reset: () => initialState,
-    update: (state, action: PayloadAction<Partial<ErrorState>>) => ({ isErrorTriggered: true, message: action.payload.message, color: action.payload.color || snackbarColors.error }),
+    update: (_, action: PayloadAction<Partial<ErrorState>>) => ({ isErrorTriggered: true, message: action.payload.message, color: action.payload.color || snackbarColors.error }),
   },
 });
 

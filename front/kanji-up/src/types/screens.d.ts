@@ -1,14 +1,14 @@
-import {NativeStackScreenProps} from "@react-navigation/native-stack";
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 type RootStackParamList = {
-  Home: undefined,
-  Onboarding: undefined,
-  Category: undefined,
-  KanjiList: { grade: string },
-  KanjiDetail: { id: string },
-  Search: { search: string },
-  Settings: { firstTime: boolean },
-  Flashcard: { evaluation: boolean },
+  Home: undefined;
+  Onboarding: undefined;
+  Category: undefined;
+  KanjiList: { grade: string };
+  KanjiDetail: { id: string };
+  Search: { search: string };
+  Settings: { firstTime: boolean };
+  Flashcard: { evaluation: boolean; model: any };
 };
 
 type OnboardingProps = NativeStackScreenProps<RootStackParamList, 'Onboarding'>;

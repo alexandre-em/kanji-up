@@ -1,14 +1,14 @@
 import React, { useCallback, useRef, useState } from 'react';
 import { FlatList, Animated, View, ViewToken } from 'react-native';
 import { Button } from 'react-native-paper';
-import {useDispatch} from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import data from './data';
 import OnboardingItem from './OnboardingItem';
 import Paginator from './Paginator';
-import {onboardingStyle} from './style';
-import {OnboardingProps} from '../../types/screens';
-import {error} from '../../store/slices';
+import { onboardingStyle } from './style';
+import { OnboardingProps } from '../../types/screens';
+import { error } from '../../store/slices';
 
 export default function Onboarding({ navigation }: OnboardingProps) {
   const scrollX = useRef(new Animated.Value(0)).current;
@@ -22,7 +22,7 @@ export default function Onboarding({ navigation }: OnboardingProps) {
 
   const viewConfig = useRef({ viewAreaCoveragePercentThreshold: 50 }).current;
 
-  const renderItem = ({ item }: OnboardingItemProps) => (<OnboardingItem item={item} />);
+  const renderItem = ({ item }: OnboardingItemProps) => <OnboardingItem item={item} />;
 
   const handlePress = useCallback(() => {
     try {
@@ -53,7 +53,11 @@ export default function Onboarding({ navigation }: OnboardingProps) {
         />
       </View>
       <Paginator data={data} scrollX={scrollX} />
-      {currentIndex === (data.length - 1) && <Button mode="contained" onPress={handlePress} style={onboardingStyle.button}>Begin</Button>}
+      {currentIndex === data.length - 1 && (
+        <Button mode="contained" onPress={handlePress} style={onboardingStyle.button}>
+          Begin
+        </Button>
+      )}
     </View>
   );
 }

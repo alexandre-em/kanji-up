@@ -2,7 +2,7 @@ import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef,
 import { Dimensions, Platform, View } from 'react-native';
 import { Surface } from 'react-native-paper';
 
-import {colors} from '../../constants';
+import { colors } from '../../constants';
 import CanvasPlatform from './Canvas';
 import styles from './style';
 
@@ -33,9 +33,9 @@ export default forwardRef(({ visible }: SketchProps, ref) => {
         canvas.current.height = w;
         ctx.strokeStyle = '#fff';
         ctx.strokeRect(0, 0, w, w);
-        ctx.fillStyle = "#fff";
+        ctx.fillStyle = '#fff';
         ctx.fillRect(0, 0, w, w);
-        
+
         ctx.lineWidth = 2;
         ctx.stroke();
 
@@ -45,56 +45,67 @@ export default forwardRef(({ visible }: SketchProps, ref) => {
     }
   }, [canvas]);
 
-  const moveCursor = useCallback((nativeEvent: any) => {
-    if (isWeb) {
-      if (divRef && divRef.current) {
-        if (nativeEvent.offsetX) {
-          setPreviousX(nativeEvent.offsetX);
-          setPreviousY(nativeEvent.offsetY);
-        } else {
-          setPreviousX(`${nativeEvent.touches[0].clientX - divRef.current.offsetLeft - 20}`);
-          setPreviousY(`${nativeEvent.touches[0].clientY - divRef.current.offsetTop - 56}`);
+  const moveCursor = useCallback(
+    (nativeEvent: any) => {
+      if (isWeb) {
+        if (divRef && divRef.current) {
+          if (nativeEvent.offsetX) {
+            setPreviousX(nativeEvent.offsetX);
+            setPreviousY(nativeEvent.offsetY);
+          } else {
+            setPreviousX(`${nativeEvent.touches[0].clientX - divRef.current.offsetLeft - 20}`);
+            setPreviousY(`${nativeEvent.touches[0].clientY - divRef.current.offsetTop - 56}`);
+          }
+        }
+      } else {
+        setPreviousX(nativeEvent.locationX);
+        setPreviousY(nativeEvent.locationY);
+      }
+    },
+    [isWeb, divRef]
+  );
+
+  const onMove = useCallback(
+    (e: any) => {
+      if (!drawFlag) {
+        return;
+      }
+      if (canvas && canvas.current) {
+        const ctx = canvas.current.getContext('2d');
+        if (ctx) {
+          ctx.beginPath();
+
+          if (currentX === '') {
+            setPreviousX(previousX);
+            setPreviousY(previousY);
+          } else {
+            moveCursor(e.nativeEvent);
+            ctx.moveTo(parseInt(previousX, 10), parseInt(previousY, 10));
+          }
+
+          ctx.lineTo(parseInt(currentX, 10), parseInt(currentY, 10));
+          ctx.lineCap = 'round';
+          ctx.lineWidth = 15;
+          ctx.strokeStyle = color;
+          ctx.stroke();
+          ctx.closePath();
+
+          setCurrentX(previousX);
+          setCurrentY(previousY);
         }
       }
-    } else {
-      setPreviousX(nativeEvent.locationX);
-      setPreviousY(nativeEvent.locationY);
-    }
-  }, [isWeb, divRef]);
+    },
+    [canvas, currentX, currentY, drawFlag, moveCursor, previousX, previousY]
+  );
 
-  const onMove = useCallback((e: any) => {
-    if (!drawFlag) { return; }
-    if (canvas && canvas.current) {
-      const ctx = canvas.current.getContext('2d');
-      if (ctx) {
-        ctx.beginPath();
-
-        if (currentX === '') {
-          setPreviousX(previousX);
-          setPreviousY(previousY);
-        } else {
-          moveCursor(e.nativeEvent);
-          ctx.moveTo(parseInt(previousX), parseInt(previousY));
-        }
-
-        ctx.lineTo(parseInt(currentX), parseInt(currentY));
-        ctx.lineCap = 'round';
-        ctx.lineWidth = 15;
-        ctx.strokeStyle = color;
-        ctx.stroke();
-        ctx.closePath();
-
-        setCurrentX(previousX);
-        setCurrentY(previousY);
-      }
-    }
-  }, [canvas, currentX, currentY, drawFlag, moveCursor, previousX, previousY]);
-
-  const onTouch = useCallback((e: any) => {
-    setStrokeCount((prevState) => prevState + 1);
-    setDrawFlag(true);
-    moveCursor(e.nativeEvent);
-  }, [moveCursor]);
+  const onTouch = useCallback(
+    (e: any) => {
+      setStrokeCount((prevState) => prevState + 1);
+      setDrawFlag(true);
+      moveCursor(e.nativeEvent);
+    },
+    [moveCursor]
+  );
 
   const onTouchEnd = useCallback(() => {
     setDrawFlag(false);
@@ -111,7 +122,7 @@ export default forwardRef(({ visible }: SketchProps, ref) => {
     onMouseLeave: onTouchEnd,
     onTouchStart: onTouch,
     onTouchMove: onMove,
-    onTouchEnd: onTouchEnd,
+    onTouchEnd,
     onTouchCancel: onTouchEnd,
   };
 
@@ -120,22 +131,32 @@ export default forwardRef(({ visible }: SketchProps, ref) => {
     getUri: () => {
       if (canvas && canvas.current) {
         return canvas.current.toDataURL('image/jpeg', 1);
-      } else { throw new Error('Could not save the canvas'); }
+      } else {
+        throw new Error('Could not save the canvas');
+      }
     },
     toBlob: (callback: BlobCallback) => {
       if (canvas && canvas.current) {
         canvas.current.toBlob(callback, 'image/jpeg', 1);
-      } else { throw new Error('Could not save the canvas'); }
+      } else {
+        throw new Error('Could not save the canvas');
+      }
     },
     handleClear,
   }));
 
   useEffect(() => {
-    if (visible && !isOpen) { handleClear(); }
-    if (!visible) { setIsOpen(false); }
+    if (visible && !isOpen) {
+      handleClear();
+    }
+    if (!visible) {
+      setIsOpen(false);
+    }
   }, [handleClear, isOpen, visible]);
 
-  if (!visible) { return null; }
+  if (!visible) {
+    return null;
+  }
   return (
     <View ref={divRef as any} style={styles.body}>
       <Surface elevation={4}>

@@ -40,6 +40,7 @@ interface Pagination<T> {
 }
 
 interface DecodedToken {
+  name: string;
   email: string;
   exp: number;
   iat: number;

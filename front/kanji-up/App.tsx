@@ -1,11 +1,11 @@
-import React from 'react';
+import React from "react";
 
-import { Provider as PaperProvider, DefaultTheme } from 'react-native-paper';
-import { Provider } from 'react-redux';
+import { Provider as PaperProvider, DefaultTheme } from "react-native-paper";
+import { Provider } from "react-redux";
 
-import { colors } from './src/constants';
-import Navigation from './src/screens/Navigation';
-import store from './src/store';
+import { colors } from "./src/constants";
+import Navigation from "./src/screens/Navigation";
+import store from "./src/store";
 
 const theme = {
   ...DefaultTheme,
@@ -14,9 +14,9 @@ const theme = {
   myOwnProperty: true,
   colors: {
     ...DefaultTheme.colors,
-    ...colors
+    ...colors,
   },
-}
+};
 
 export type ThemeOverride = typeof theme;
 
@@ -29,4 +29,3 @@ export default function App() {
     </PaperProvider>
   );
 }
-
