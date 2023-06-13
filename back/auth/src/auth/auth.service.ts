@@ -8,7 +8,7 @@ import { RegisterDTO } from './auth.dto';
 
 @Injectable()
 export class AuthService {
-  constructor(@InjectModel(User.name) private readonly model: Model<UserDocument>, private jwtService: JwtService, private mailService: MailService) { }
+  constructor(@InjectModel(User.name) private readonly model: Model<UserDocument>, private jwtService: JwtService, private mailService: MailService) {}
 
   async validateUser(email: string, password: string) {
     const user: User | null = await this.model.findOne({ email }).exec();
@@ -122,5 +122,23 @@ export class AuthService {
     }
 
     return this.model.updateOne({ user_id: user.user_id }, { password }).exec();
+  }
+
+  checkJwt(token: string) {
+    try {
+      const decodedToken = this.jwtService.verify(token);
+
+      return decodedToken.exp && decodedToken.exp * 1000 > Date.now();
+    } catch (e) {
+      return false;
+    }
+  }
+
+  async logout(token: string) {
+    if (!token) {
+      return;
+    }
+
+    const decodedToken = this.jwtService.verify(token);
   }
 }

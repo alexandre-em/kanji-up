@@ -1,70 +1,42 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script type="text/javascript" src="/js/login.js"></script>
-  <link rel="stylesheet" href="/css/authentication.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;700;900&display=swap" rel="stylesheet">
-  <title>Log in | KanjiUp Auth</title>
-</head>
-<body>
-  <div class="main">
-    <div class="login">
-      <div style="text-align: center;">
-        <div class="banner">
-          <img src="/icon.png" alt="kanjiup-logo" id="logo">
+<html lang='en'>
+  <head>
+    <meta charset='UTF-8' />
+    <meta http-equiv='X-UA-Compatible' content='IE=edge' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <script type='text/javascript' src='/js/login.js'></script>
+    <link rel='stylesheet' href='/css/authentication.css' />
+    <link rel='preconnect' href='https://fonts.googleapis.com' />
+    <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin />
+    <link href='https://fonts.googleapis.com/css2?family=Roboto:wght@300;700;900&display=swap' rel='stylesheet' />
+    <title>Log in | KanjiUp Auth</title>
+  </head>
+  <body>
+    <div class='main'>
+      <div class='login'>
+        <div style='text-align: center;'>
+          <div class='banner'>
+            <img src='/icon.png' alt='kanjiup-logo' id='logo' />
+          </div>
+          <h1 style='color: #3F3D56;'>KanjiUp Auth</h1>
+          <p style='color: #3F3D56'>Log in to continue to All Applications.</p>
         </div>
-        <h1 style="color: #3F3D56;">KanjiUp Auth</h1>
-        <p style="color: #3F3D56">Log in to continue to All Applications.</p>
-      </div>
-      <form id="form" method="post" action="/auth/login">
-        <div style="width: 100%">
-          <h3 style="color: #3F3D56;">{{title}}</h3>
+        <form id='form' method='post' action='/auth/login'>
+          <div style='width: 100%'>
+            <h3 style='color: #3F3D56;'>{{title}}</h3>
+          </div>
+          <p style='color: #3F3D56'>{{message}}</p>
+          <div class='link'>
+            <a id='button' href='javascript:window.close()'>Close</a>
+          </div>
+        </form>
+        <div id='banner'>
+          <p id='error'>Authentication failed</p>
         </div>
-        <p style="color: #3F3D56">{{message}}</p>
-        <div class="link">
-          <a href="javascript:window.close()">Close</a>
-        </div>
-      </form>
-      <div id="banner">
-        <p id="error">Authentication failed</p>
       </div>
     </div>
-  </div>
-</body>
-<script>
-  document.getElementById("form").addEventListener("submit", function (e) {
-    e.preventDefault();
-    fetch('/auth/login', {
-      method: 'POST',
-      mode: 'cors',
-      cache: 'no-cache',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        username: e.target[0].value,
-        password: e.target[1].value,
-      })
-    })
-      .then((res) => {
-        return res.json();
-      })
-      .then((res) => {
-        if (res.error != null) { throw new Error(res.message); }
-        if (res.stat === "fail") { throw new Error(res.message); }
-
-        window.location.replace("{{ redirection_url }}?access_token="+res.access_token);
-      })
-      .catch((err) => {
-      console.log(err.message);
-        document.getElementById("banner").style.visibility = "visible";
-        document.getElementById("error").innerHTML = err.message;
-      })
-  });
-</script>
+  </body>
+  <script>
+    const button = document.getElementById("button"); button.addEventListener("click", function (e) { e.preventDefault(); fetch('/auth/logout', { method: 'POST', mode: 'cors', }) .then((res) => {
+    return res.json(); }) .then((res) => { console.log('test logout successeed'); window.close(); }) .catch((err) => { console.log(err.message); }) }); button.click();
+  </script>
 </html>

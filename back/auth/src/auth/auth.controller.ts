@@ -1,9 +1,8 @@
-import { Body, Controller, Get, Post, Query, Render, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Render, Req, UseGuards, Res } from '@nestjs/common';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { AppsService } from 'src/apps/apps.service';
 import { RegisterDTO } from './auth.dto';
 import { AuthService } from './auth.service';
-import RequestWithUser from './requestWithUser.interface';
 import { LocalAuthenticationGuard } from './local.guard';
 
 @ApiTags('Authentication')
@@ -13,10 +12,13 @@ export class AuthController {
 
   @Get('login')
   @Render('login')
-  async loginUser(@Query('app_id') appId: string) {
+  async loginUser(@Query('app_id') appId: string, @Req() req: any) {
     const application = await this.appService.getOne(appId);
+    const accessToken = req.cookies.access_token;
 
     return {
+      is_authenticated: this.service.checkJwt(accessToken),
+      access_token: accessToken,
       redirection_url: application?.redirection_url || 'None',
     };
   }
@@ -24,8 +26,40 @@ export class AuthController {
   @ApiBody({ description: 'body: { "username": "string", "password": "string" }' })
   @UseGuards(LocalAuthenticationGuard)
   @Post('login')
-  async login(@Req() req: RequestWithUser) {
-    return this.service.login(req.user);
+  async login(@Req() req: any, @Res({ passthrough: true }) res: any) {
+    if (this.service.checkJwt(req.cookies.access_token)) {
+      return { access_token: req.cookies.access_token };
+    }
+
+    const payload = this.service.login(req.user);
+
+    res
+      .cookie('access_token', payload.access_token, {
+        httpOnly: true,
+        sameSite: 'lax',
+        expires: new Date(Date.now() + 259200 * 1000),
+      })
+      .send(payload);
+  }
+
+  @Get('logout')
+  @Render('confirmed')
+  logoutScreen() {
+    return {
+      title: 'Logout succeeded',
+      message: 'Thank you for using KanjiUp application.',
+    };
+  }
+
+  @Post('logout')
+  logout(@Req() req: any, @Res({ passthrough: true }) res: any) {
+    this.service.logout(req.cookies.access_token);
+
+    res
+      .cookie('access_token', '', {
+        expires: new Date(),
+      })
+      .send({ status: 'ok' });
   }
 
   @Get('register')
