@@ -27,11 +27,7 @@ export class AuthController {
   @UseGuards(LocalAuthenticationGuard)
   @Post('login')
   async login(@Req() req: any, @Res({ passthrough: true }) res: any) {
-    if (this.service.checkJwt(req.cookies.access_token)) {
-      return { access_token: req.cookies.access_token };
-    }
-
-    const payload = this.service.login(req.user);
+    const payload = await this.service.login(req.user);
 
     res
       .cookie('access_token', payload.access_token, {

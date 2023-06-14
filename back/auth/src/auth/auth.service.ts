@@ -1,14 +1,15 @@
-import { Injectable, NotFoundException, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { JwtService } from '@nestjs/jwt';
 import { Model } from 'mongoose';
 import { User, UserDocument } from '../users/users.schema';
 import { MailService } from 'src/mail/mail.service';
 import { RegisterDTO } from './auth.dto';
+import { SessionService } from 'src/session/session.service';
 
 @Injectable()
 export class AuthService {
-  constructor(@InjectModel(User.name) private readonly model: Model<UserDocument>, private jwtService: JwtService, private mailService: MailService) {}
+  constructor(@InjectModel(User.name) private readonly model: Model<UserDocument>, private jwtService: JwtService, private mailService: MailService, private sessionService: SessionService) {}
 
   async validateUser(email: string, password: string) {
     const user: User | null = await this.model.findOne({ email }).exec();
@@ -42,7 +43,7 @@ export class AuthService {
     const user = await this.model.findOne({ email }).exec();
 
     if (user && !user.deleted_at) {
-      throw new Error('This user already exist');
+      throw new BadRequestException('This user already exist');
     }
 
     if (user && user.deleted_at) {
@@ -76,9 +77,21 @@ export class AuthService {
     return this.model.updateOne({ user_id: userInfo.id }, { email_confirmed: true }).exec();
   }
 
-  login(user: User) {
+  async login(user: User) {
     if (!user.email_confirmed) {
       throw new UnauthorizedException('Please confirm your email');
+    }
+
+    const oldSession = await this.sessionService.getUserToken(user.user_id);
+
+    if (oldSession !== null) {
+      const isValidToken = this.jwtService.verify(oldSession.token);
+
+      if (isValidToken) {
+        return {
+          access_token: oldSession.token,
+        };
+      }
     }
 
     const payload = {
@@ -88,8 +101,12 @@ export class AuthService {
       permissions: user.permissions,
     };
 
+    const accessToken = this.jwtService.sign(payload);
+
+    this.sessionService.createSession(accessToken);
+
     return {
-      access_token: this.jwtService.sign(payload),
+      access_token: accessToken,
     };
   }
 
@@ -109,7 +126,7 @@ export class AuthService {
   }
 
   async newPassword(token: string, email: string, password: string) {
-    const decodedToken = this.jwtService.verify(token);
+    const decodedToken: DecodedToken = this.jwtService.verify(token);
 
     if (decodedToken.exp * 1000 < Date.now()) {
       throw new UnauthorizedException('This token is expired.');
@@ -117,7 +134,7 @@ export class AuthService {
 
     const user = await this.model.findOne({ email }).exec();
 
-    if (!user || user.user_id !== decodedToken.id) {
+    if (!user || user.user_id !== decodedToken.sub) {
       throw new UnprocessableEntityException('The token is not valid with this email');
     }
 
@@ -126,7 +143,7 @@ export class AuthService {
 
   checkJwt(token: string) {
     try {
-      const decodedToken = this.jwtService.verify(token);
+      const decodedToken: DecodedToken = this.jwtService.verify(token);
 
       return decodedToken.exp && decodedToken.exp * 1000 > Date.now();
     } catch (e) {
@@ -139,6 +156,6 @@ export class AuthService {
       return;
     }
 
-    const decodedToken = this.jwtService.verify(token);
+    this.sessionService.removeSession(token);
   }
 }
