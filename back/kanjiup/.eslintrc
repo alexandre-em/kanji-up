@@ -1,0 +1,20 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "extends": ["plugin:@typescript-eslint/recommended"],
+  "parserOptions": { "ecmaVersion": 2015, "sourceType": "module" },
+  "rules": {
+    "prettier/prettier": ["error", { "printWidth": 200 }],
+    "max-len": [
+      "error",
+      {
+        "code": 200,
+        "tabWidth": 2,
+        "ignoreComments": true,
+        "ignoreUrls": true,
+        "ignoreStrings": true,
+        "ignoreTemplateLiterals": true
+      }
+    ],
+    "no-multiple-empty-lines": ["error", { "max": 2, "maxEOF": 1 }]
+  }
+}
