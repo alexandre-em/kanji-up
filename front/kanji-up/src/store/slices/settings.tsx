@@ -1,25 +1,18 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import jwtDecode from "jwt-decode";
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import jwtDecode from 'jwt-decode';
 
 const initialState: SettingValuesType = {
-  username: "user",
+  username: 'user',
   accessToken: null,
   flashcardNumber: 30,
   evaluationCardNumber: 70,
   evaluationTime: 60,
 };
 
-const initialize = () => {
-  return initialState;
-};
+const initialize = () => initialState;
 
-const update = (
-  state: SettingValuesType,
-  action: PayloadAction<Partial<SettingValuesType>>
-) => {
-  const decodedToken: DecodedToken = jwtDecode(
-    action.payload.accessToken as string
-  );
+const update = (state: SettingValuesType, action: PayloadAction<Partial<SettingValuesType>>) => {
+  const decodedToken: DecodedToken = jwtDecode(action.payload.accessToken as string);
   const updatedState: SettingValuesType = {
     ...action.payload,
     username: decodedToken.name,
@@ -28,12 +21,15 @@ const update = (
   return { ...state, ...updatedState };
 };
 
+const logout = (state: SettingValuesType) => ({ ...state, username: 'user', accessToken: null });
+
 export const settings = createSlice({
-  name: "settings",
+  name: 'settings',
   initialState,
   reducers: {
     initialize,
     update,
+    logout,
   },
 });
 

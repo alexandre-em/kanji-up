@@ -42,6 +42,12 @@ export default function useAuth() {
     }
   }, []);
 
+  const handleDisconnect = useCallback(() => {
+    AsyncStorage.removeItem(asyncstorageKeys.ACCESS_TOKEN);
+    dispatch(settings.actions.logout());
+    setIsConnected(false);
+  }, []);
+
   useEffect(() => {
     AsyncStorage.getItem(asyncstorageKeys.ACCESS_TOKEN).then((res: string | null) => {
       if (res === null || res === undefined) {
@@ -65,5 +71,6 @@ export default function useAuth() {
     isConnected,
     setIsConnected,
     handleAuth,
+    handleDisconnect,
   };
 }

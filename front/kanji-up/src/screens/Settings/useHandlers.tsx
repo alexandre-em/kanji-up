@@ -1,14 +1,16 @@
 import { useCallback } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { asyncstorageKeys } from '../../constants';
+import { Platform } from 'react-native';
 import { useDispatch } from 'react-redux';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as WebBrowser from 'expo-web-browser';
 
+import { asyncstorageKeys } from '../../constants';
 import { writeFile } from '../../service/file';
 import { settings } from '../../store/slices';
-import { Platform } from 'react-native';
 import usePrediction from '../../hooks/usePrediction';
+import useAuth from '../../hooks/useAuth';
 
-interface useHandlersProps {
+interface HandlersProps {
   values: SettingValuesType;
   navigation: any;
   isButtonDisabled: boolean;
@@ -18,9 +20,12 @@ interface useHandlersProps {
   setProgress: Function;
 }
 
-export default function useHandlers({ values, navigation, isButtonDisabled, setDialog, setDialogMessages, setIsDownloading, setProgress }: useHandlersProps) {
+WebBrowser.maybeCompleteAuthSession();
+
+export default function useHandlers({ values, navigation, isButtonDisabled, setDialog, setDialogMessages, setIsDownloading, setProgress }: HandlersProps) {
   const dispatch = useDispatch();
   const model = usePrediction();
+  const { handleDisconnect } = useAuth();
 
   const handleSave = useCallback(async () => {
     await AsyncStorage.setItem(asyncstorageKeys.FIRST_TIME, 'false');
@@ -61,7 +66,12 @@ export default function useHandlers({ values, navigation, isButtonDisabled, setD
     setDialog(false);
   }, []);
 
-  const handleSignout = useCallback(() => {}, []);
+  const handleSignout = useCallback(async () => {
+    const authUrl = `https://kanjiup-auth.alexandre-em.fr/auth/logout`;
+    await WebBrowser.openAuthSessionAsync(authUrl);
+    handleDisconnect();
+    navigation.replace('Home', null, null, Math.random.toString());
+  }, []);
 
   return { handleSave, handleBack, handleUpdate, handleSignout };
 }
