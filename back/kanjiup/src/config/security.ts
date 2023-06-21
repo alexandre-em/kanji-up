@@ -2,6 +2,7 @@ import jwt, { VerifyErrors } from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import Express from 'express';
 import UnauthorizedError from '../error/unauthorized';
+import { checkJwtTokenValidity } from '../services/auth';
 
 dotenv.config();
 const SECRET_KEY = process.env.AUTH_API_SECRET_KEY || '';
@@ -12,12 +13,14 @@ export async function checkJWT(req: Express.Request, res: Express.Response, next
     token = token.slice(7, token.length);
   }
 
-  if (token) {
+  const isValid = await checkJwtTokenValidity(token);
+
+  if (token && isValid) {
     jwt.verify(token, SECRET_KEY || '', (err: VerifyErrors | null, decoded: DecodedToken) => {
       if (err) {
         return new UnauthorizedError('Authentication token is not valid').sendResponse(res);
       } else {
-        req.decoded = decoded;
+        // req.decoded = decoded;
 
         if (permissions && permissions.length > 0 && decoded.permissions && decoded.permissions.length > 0) {
           const isAuthorized = permissions.map((p) => decoded.permissions.includes(p)).reduce((prev, curr) => prev && curr, true);
