@@ -3,6 +3,7 @@ import { Platform } from 'react-native';
 import { useDispatch } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as WebBrowser from 'expo-web-browser';
+import Constants from 'expo-constants';
 
 import { asyncstorageKeys } from '../../constants';
 import { writeFile } from '../../service/file';
@@ -67,7 +68,7 @@ export default function useHandlers({ values, navigation, isButtonDisabled, setD
   }, []);
 
   const handleSignout = useCallback(async () => {
-    const authUrl = `https://kanjiup-auth.alexandre-em.fr/auth/logout`;
+    const authUrl = `${Constants.expoConfig?.extra.AUTH_BASE_URL}/auth/logout`;
     await WebBrowser.openAuthSessionAsync(authUrl);
     handleDisconnect();
     navigation.replace('Home', null, null, Math.random.toString());

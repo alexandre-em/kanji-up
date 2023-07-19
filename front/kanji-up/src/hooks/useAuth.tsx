@@ -4,6 +4,7 @@ import { Platform } from 'react-native';
 import { useDispatch } from 'react-redux';
 import * as WebBrowser from 'expo-web-browser';
 import jwtDecode from 'jwt-decode';
+import Constants from 'expo-constants';
 
 import { asyncstorageKeys } from '../constants';
 import { settings } from '../store/slices';
@@ -16,17 +17,11 @@ export default function useAuth() {
 
   const handleAuth = useCallback(async () => {
     const appId = Platform.select({
-      web: '535d3fc2-75f6-4468-9765-639dc3a66931',
-      native: '0333f691-dbc0-4030-98fe-31cee20b7613',
+      web: Constants?.expoConfig?.extra?.AUTH_APP_ID_WEB,
+      native: Constants?.expoConfig?.extra?.AUTH_APP_ID_NATIVE,
     });
 
-    // Developpement environment
-    // const appId = Platform.select({
-    //   web: '2a2541f9-b476-4853-9625-34918c625ddb',
-    //   native: '9e2791ee-3420-4f8b-8f2a-32d3e06878c6',
-    // });
-
-    const authUrl = `https://kanjiup-auth.alexandre-em.fr/auth/login?app_id=${appId}`;
+    const authUrl = `${Constants?.expoConfig?.extra?.AUTH_BASE_URL}/auth/login?app_id=${appId}`;
 
     const results = await WebBrowser.openAuthSessionAsync(authUrl);
 

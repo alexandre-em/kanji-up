@@ -1,14 +1,14 @@
-import React, {useCallback, useMemo, useState} from 'react';
-import {Text, useWindowDimensions, View} from 'react-native';
-import {Button, Divider, ProgressBar, Surface} from 'react-native-paper';
-import {useSelector} from 'react-redux';
+import React, { useCallback, useMemo, useState } from 'react';
+import { Text, useWindowDimensions, View } from 'react-native';
+import { Button, Divider, ProgressBar, Surface, TouchableRipple } from 'react-native-paper';
+import { useSelector } from 'react-redux';
 
 import styles from '../style';
 import SvgUriPlatform from '../../../components/SVGUriPlatform';
-import {colors} from '../../../constants';
-import {RootState} from '../../../store';
+import { colors } from '../../../constants';
+import { RootState } from '../../../store';
 
-export default function Practice({ kanji, onFinish }: { kanji: Partial<KanjiType>[], onFinish: Function }) {
+export default function Practice({ kanji, onFinish }: { kanji: Partial<KanjiType>[]; onFinish: Function }) {
   const i = 0;
   const { width } = useWindowDimensions();
   const [start, setStart] = useState<boolean>(false);
@@ -30,23 +30,25 @@ export default function Practice({ kanji, onFinish }: { kanji: Partial<KanjiType
           <Text style={styles.text}>meaning: {kanjiQueue[i].kanji!.meaning}</Text>
           <Divider style={{ marginVertical: 15, width: '80%', alignSelf: 'center' }} />
           <Text style={styles.text}>Examples</Text>
-        {kanjiQueue[i].examples && kanjiQueue[i].examples.map((k) => (
-          <View key={k.japanese}>
-            <Text style={{ fontWeight: '100', color: colors.text }}>{k.japanese}</Text>
-            <Text style={{ fontWeight: '100', color: colors.text }}>{k.meaning}</Text>
-
-          </View>
-      )).filter((_, i) => i < 3)}
-    </View>
-  )
+          {kanjiQueue[i].examples &&
+            kanjiQueue[i].examples
+              .map((k) => (
+                <View key={k.japanese}>
+                  <Text style={{ fontWeight: '100', color: colors.text }}>{k.japanese}</Text>
+                  <Text style={{ fontWeight: '100', color: colors.text }}>{k.meaning}</Text>
+                </View>
+              ))
+              .filter((_, index) => index < 3)}
+        </View>
+      );
     }
 
     // TODO: Check if svg is available and if not display text
-    return <SvgUriPlatform width={imgSize} height={imgSize} uri={`https://www.miraisoft.de/anikanjivgx/?svg=${encodeURI(kanjiQueue[i].kanji!.character as string)}`} />
-    }, [imgSize, kanjiQueue, reverse]);
+    return <SvgUriPlatform width={imgSize} height={imgSize} uri={`https://www.miraisoft.de/anikanjivgx/?svg=${encodeURI(kanjiQueue[i].kanji!.character as string)}`} />;
+  }, [imgSize, kanjiQueue, reverse]);
 
   const handleReverse = useCallback(() => {
-    setReverse(p => !p);
+    setReverse((p) => !p);
   }, []);
 
   const handleNext = useCallback(() => {
@@ -79,13 +81,15 @@ export default function Practice({ kanji, onFinish }: { kanji: Partial<KanjiType
       <Surface style={styles.surface}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
           <Text style={styles.subtext}>Progression</Text>
-          <Text style={styles.subtext}>{counter}/{settingsState.flashcardNumber}</Text>
+          <Text style={styles.subtext}>
+            {counter}/{settingsState.flashcardNumber}
+          </Text>
         </View>
-        <ProgressBar progress={counter/settingsState.flashcardNumber} style={{backgroundColor: '#fff', marginTop: 10, borderRadius: 25 }} color={colors.secondary} />
+        <ProgressBar progress={counter / settingsState.flashcardNumber} style={{ backgroundColor: '#fff', marginTop: 10, borderRadius: 25 }} color={colors.secondary} />
       </Surface>
-      <Surface style={{ width: imgSize, height: imgSize, alignSelf: 'center' }}>
-        {cardContent}
-      </Surface>
+      <TouchableRipple style={{ width: imgSize, height: imgSize, alignSelf: 'center' }} onPress={handleReverse}>
+        <Surface style={{ width: imgSize, height: imgSize }}>{cardContent}</Surface>
+      </TouchableRipple>
 
       <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
         <Button mode="outlined" icon="reload" color={colors.primary} style={styles.clearbutton} onPress={handleReverse}>

@@ -1,13 +1,11 @@
 import axios, { AxiosRequestConfig } from 'axios';
-
-// const KANJI_BASE_URL = 'http://localhost:5000';
-const KANJI_BASE_URL = 'https://kanjiup-api.alexandre-em.fr';
+import Constants from 'expo-constants';
 
 export default class KanjiService {
   private baseUrl;
 
   constructor() {
-    this.baseUrl = axios.create({ baseURL: `${KANJI_BASE_URL}/kanjis`, headers: { 'Access-Control-Allow-Origin': '*' } });
+    this.baseUrl = axios.create({ baseURL: `${Constants?.expoConfig?.extra?.KANJI_BASE_URL}/kanjis`, headers: { 'Access-Control-Allow-Origin': '*' } });
   }
 
   getKanjis({ page = 0, limit = 10, grade = '1' }, options?: AxiosRequestConfig) {

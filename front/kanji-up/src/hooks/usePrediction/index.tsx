@@ -3,11 +3,11 @@ import axios, { AxiosRequestHeaders, AxiosResponse } from 'axios';
 import '@tensorflow/tfjs-backend-cpu';
 import * as tf from '@tensorflow/tfjs-core';
 import * as tflite from '@tensorflow/tfjs-tflite';
+import Constants from 'expo-constants';
 
 import useIndexedDb from '../useIndexedDb';
 import { kanjiPredictionConstants } from './const';
 import labels from './labels';
-import { API_BASE_URL } from '../../constants';
 
 tflite.setWasmPath('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-tflite@0.0.1-alpha.8/dist/');
 
@@ -17,7 +17,7 @@ export default function usePrediction() {
   const [model, setModel] = useState<tflite.TFLiteModel>();
 
   const downloadThenSave = useCallback(async (onProgress: (progress: number) => void, onFinishDownload?: () => void, headers?: AxiosRequestHeaders) => {
-    const dlUri = `${API_BASE_URL}/recognition/model?model=${kanjiPredictionConstants.MODEL_KEY_DL}`;
+    const dlUri = `${Constants?.expoConfig?.extra?.KANJI_BASE_URL}/recognition/model?model=${kanjiPredictionConstants.MODEL_KEY_DL}`;
     const modelUrl = (await axios.get(dlUri, { headers })).data.web;
     const buffer: AxiosResponse<ArrayBuffer> = await axios.get(modelUrl, { responseType: 'arraybuffer', onDownloadProgress: onProgress });
     if (onFinishDownload) {
@@ -65,6 +65,7 @@ export default function usePrediction() {
 
     if (!loading) {
       setLoading(true);
+      // eslint-disable-next-line
       const modelPath = require('./kanji_model.tflite');
       const loadedModel: tflite.TFLiteModel = await tflite.loadTFLiteModel(modelPath, options);
       setModel(loadedModel);

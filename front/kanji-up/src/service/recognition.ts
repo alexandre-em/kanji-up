@@ -1,11 +1,11 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
-import { API_BASE_URL } from '../constants';
+import Constants from 'expo-constants';
 
 export default class RecognitionService {
   private baseUrl;
 
   constructor() {
-    this.baseUrl = axios.create({ baseURL: `${API_BASE_URL}/recognition`, headers: { 'Access-Control-Allow-Origin': '*' } });
+    this.baseUrl = axios.create({ baseURL: `${Constants?.expoConfig?.extra?.KANJI_BASE_URL}/recognition`, headers: { 'Access-Control-Allow-Origin': '*' } });
   }
 
   postRecognition(kanji: string, predictions: { confidence: number; prediction: string }[], image: Blob, options?: AxiosRequestConfig): Promise<AxiosResponse<RecognitionType>> {
