@@ -1,25 +1,18 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable tsdoc/syntax */
-import { Router } from 'express';
-import { readFileSync, unlinkSync } from "fs";
-import bodyParser from "body-parser";
-import path from "path";
+import { Request, Response } from 'express';
+import { readFileSync, unlinkSync } from 'fs';
+import path from 'path';
 import dotenv from 'dotenv';
 
-import { upload } from "../utils";
 import { recognitionService } from '../services';
 import InvalidError from '../error/invalid';
 import NotFoundError from '../error/notFound';
-import {PAGINATION_LIMIT} from '../types/enums';
-import {checkJWT} from '../config/security';
-import KanjiPermission from '../utils/kanjiPermissions';
+import { PAGINATION_LIMIT } from '../types/enums';
 
 dotenv.config();
 
-const router: Router = Router();
-const urlencodedParser = bodyParser.urlencoded({ extended: false });
-
-router.get('/model',(req, res, next) => checkJWT(req, res, next, [KanjiPermission.GET_RECOGNITION]), (req, res) => {
+export function getRecognitionModel(req: Request, res: Response) {
   const model = req.query.model;
   if (model && model === process.env.KANJI_RECOGNIZER_KEY) {
     const uris = {
@@ -31,325 +24,100 @@ router.get('/model',(req, res, next) => checkJWT(req, res, next, [KanjiPermissio
   } else {
     res.status(403).send(new Error('Not allowed to access this route or specify what you want to do with'));
   }
-});
+}
 
-/**
- * @openapi
- * /recognition/all:
- *  get:
- *      tags:
- *          - Recognition
- *      description: <h3>List all recognition</h3> <b>Permissions needed to access the resources:</b> <li>add:kanji</li> <li>read:recognition</li>
-
- *      parameters:
- *          - in: query
- *            name: page
- *            description: Page number 
- *            schema:
- *                type: integer
- *          - in: query
- *            name: limit
- *            description: Max element number on a page
- *            schema:
- *                type: integer
- *          - in: query
- *            name: query
- *            description: Query to find a Kanji
- *            schema:
- *                type: string
- *      responses:
- *          200:
- *              description: Returns the predicted kanjis and their results
- *              content:
- *                  application/json:
- *                      schema:
- *                          $ref: '#/components/schemas/RecognitionPaginateResponse'
- *          400:
- *              description: Bad request Error
- *              content:
- *                  application/json:
- *                      schema:
- *                          $ref: '#/components/schemas/Error'
- *          401:
- *              description: Authentication Error
- *              content:
- *                  application/json:
- *                      schema:
- *                          $ref: '#/components/schemas/Error'
- *          403:
- *              description: Unauthorized Error
- *              content:
- *                  application/json:
- *                      schema:
- *                          $ref: '#/components/schemas/Error'
- *          500:
- *              description: Internal Error
- *              content:
- *                  application/json:
- *                      schema:
- *                          $ref: '#/components/schemas/Error'
- */
-router.get('/all', (req, res, next) => checkJWT(req, res, next, [KanjiPermission.ADD_KANJI, KanjiPermission.GET_RECOGNITION]), (req, res) => {
+export function getOne(req: Request, res: Response) {
   const page = req.query.page ? parseInt(req.query.page as string) : 1;
   const limit = req.query.limit ? parseInt(req.query.limit as string) : PAGINATION_LIMIT.LITTLE;
   const query = (req.query.query as string) || undefined;
 
-  recognitionService.getAll(page, limit, query)
+  recognitionService
+    .getAll(page, limit, query)
     .then((recognitions) => {
       res.status(200).send(recognitions);
     })
     .catch((err) => {
       new InvalidError(err.message).sendResponse(res);
     });
-});
+}
 
-/**
- * @openapi
- * /recognition:
- *  post:
- *      tags:
- *          - Recognition
- *      description: <h3>Upload the picture and kanji prediction of the drawn kanji</h3> <b>Permissions needed to access the resources:</b> <li>add:kanji</li> <li>add:recognition</li>
+export function createOne(req: Request, res: Response) {
+  if (!req.file) return new InvalidError("Recognition's picture is missing !").sendResponse(res);
+  try {
+    const ext = path.extname(req.file.filename).split('.')[1];
+    const { kanji, predictions } = JSON.parse(req.body.json);
+    const filePath = path.join(`uploads/${req.file.filename}`);
+    const image = {
+      filename: req.file.filename,
+      data: readFileSync(filePath),
+      contentType: `image/${ext}`,
+    };
 
- *      requestBody:
- *          content:
- *              multipart/form-data:
- *                  schema:
- *                      $ref: '#/components/schemas/RecognitionPostBody'
- *                  example:
- *                      json: '{ "kanji": "和" }'
- *      responses:
- *          201:
- *              description: Returns the predicted kanjis with their score and the link of the uploaded drawing (picture)
- *              content:
- *                  application/json:
- *                      schema:
- *                          $ref: '#/components/schemas/RecognitionResponse'
- *          400:
- *              description: Bad request Error
- *              content:
- *                  application/json:
- *                      schema:
- *                          $ref: '#/components/schemas/Error'
- *          401:
- *              description: Authentication Error
- *              content:
- *                  application/json:
- *                      schema:
- *                          $ref: '#/components/schemas/Error'
- *          403:
- *              description: Unauthorized Error
- *              content:
- *                  application/json:
- *                      schema:
- *                          $ref: '#/components/schemas/Error'
- *          500:
- *              description: Internal Error
- *              content:
- *                  application/json:
- *                      schema:
- *                          $ref: '#/components/schemas/Error'
- */
-router.post('/', (req, res, next) => checkJWT(req, res, next, [KanjiPermission.ADD_KANJI, KanjiPermission.ADD_RECOGNITION]), upload.single('image'), urlencodedParser, (req, res) => {
-  if (!req.file) return new InvalidError('Recognition\'s picture is missing !').sendResponse(res);
-	try {
-		const ext = path.extname(req.file.filename).split('\.')[1];
-		const { kanji, predictions } = JSON.parse(req.body.json);
-		const filePath = path.join(`uploads/${req.file.filename}`);
-		const image = {
-			filename: req.file.filename,
-			data: readFileSync(filePath),
-			contentType: `image/${ext}`,
-		}
+    recognitionService
+      .addOne(kanji, image, predictions)
+      .then((recognition) => {
+        unlinkSync(filePath);
 
-		recognitionService.addOne(kanji, image, predictions)
-			.then((recognition) => {
-				unlinkSync(filePath);
+        res.status(200).send(recognition);
+      })
+      .catch((e) => {
+        unlinkSync(filePath);
 
-				res.status(200).send(recognition);
-			})
-			.catch((e) => {
-				unlinkSync(filePath);
+        throw e;
+      });
+  } catch (e) {
+    console.log(e.message);
+    res.status(400).send(e.message);
+  }
+}
 
-				throw e;
-			});
-	} catch (e) {
-		console.log(e.message);
-		res.status(400).send(e.message);
-	}
-});
+export function createTrainData(req: Request, res: Response) {
+  if (!req.file) return new InvalidError("Recognition's picture is missing !").sendResponse(res);
+  try {
+    const ext = path.extname(req.file.filename).split('.')[1];
+    const { kanji } = JSON.parse(req.body.json);
+    const filePath = path.join(`uploads/${req.file.filename}`);
+    const image = {
+      filename: req.file.filename,
+      data: readFileSync(filePath),
+      contentType: `image/${ext}`,
+    };
 
-router.post('/data', (req, res, next) => checkJWT(req, res, next, [KanjiPermission.ADD_KANJI, KanjiPermission.UPDATE_RECOGNITION]), upload.single('image'), urlencodedParser, (req, res) => {
-  if (!req.file) return new InvalidError('Recognition\'s picture is missing !').sendResponse(res);
-	try {
-		const ext = path.extname(req.file.filename).split('\.')[1];
-		const { kanji } = JSON.parse(req.body.json);
-		const filePath = path.join(`uploads/${req.file.filename}`);
-		const image = {
-			filename: req.file.filename,
-			data: readFileSync(filePath),
-			contentType: `image/${ext}`,
-		}
+    recognitionService
+      .addOneData(kanji, image)
+      .then((recognition: AWS.S3.ManagedUpload.SendData) => {
+        unlinkSync(filePath);
 
-		recognitionService.addOneData(kanji, image)
-			.then((recognition: AWS.S3.ManagedUpload.SendData) => {
-				unlinkSync(filePath);
+        res.status(200).send(recognition);
+      })
+      .catch((e) => {
+        unlinkSync(filePath);
 
-				res.status(200).send(recognition);
-			})
-			.catch((e) => {
-				unlinkSync(filePath);
+        throw e;
+      });
+  } catch (e) {
+    console.log(e.message);
+    res.status(400).send(e.message);
+  }
+}
 
-				throw e;
-			});
-	} catch (e) {
-		console.log(e.message);
-		res.status(400).send(e.message);
-	}
-});
+export function updateOneStatus(req: Request, res: Response) {
+  const { id } = req.params;
+  try {
+    const is_valid = JSON.parse(req.body.is_valid as string);
+    if (typeof is_valid !== 'boolean') new InvalidError('Query param `is_valid` must be a boolean value: `true` or `false`').sendResponse(res);
 
-/**
- * @openapi
- * /recognition/validation/{id}:
- *  patch:
- *      tags:
- *          - Recognition
- *      parameters:
- *          - name: id
- *            in: path
- *            description: Recognition Id
- *            required: true
- *            schema:
- *                type: string
- *      description: <h3>Validation of the predicted kanji</h3> <b>Permissions needed to access the resources:</b> <li>add:kanji</li> <li>update:recognition</li>
- *      requestBody:
- *          content:
- *              application/json:
- *                  schema:
- *                      $ref: '#/components/schemas/RecognitionPatchBody'
- *                  example:
- *                      is_valid: true
- *      responses:
- *          200:
- *              description: Returns the validated or non-validated prediction
- *              content:
- *                  application/json:
- *                      schema:
- *                          $ref: '#/components/schemas/RecognitionResponse'
- *          400:
- *              description: Bad request Error
- *              content:
- *                  application/json:
- *                      schema:
- *                          $ref: '#/components/schemas/Error'
- *          401:
- *              description: Authentication Error
- *              content:
- *                  application/json:
- *                      schema:
- *                          $ref: '#/components/schemas/Error'
- *          403:
- *              description: Unauthorized Error
- *              content:
- *                  application/json:
- *                      schema:
- *                          $ref: '#/components/schemas/Error'
- *          500:
- *              description: Internal Error
- *              content:
- *                  application/json:
- *                      schema:
- *                          $ref: '#/components/schemas/Error'
- */
-router.patch('/validation/:id', (req, res, next) => checkJWT(req, res, next, [KanjiPermission.ADD_KANJI, KanjiPermission.UPDATE_RECOGNITION]), (req, res) => {
-	const { id } = req.params;
-	try {
-		const is_valid = JSON.parse(req.body.is_valid as string);
-		if (typeof is_valid !== 'boolean') new InvalidError('Query param `is_valid` must be a boolean value: `true` or `false`').sendResponse(res);
+    recognitionService
+      .updateOne(id, { is_valid })
+      .then((before) => {
+        if (before === null) new NotFoundError(`Recognition_id not found: ${id}`).sendResponse(res);
 
-		recognitionService.updateOne(id, { is_valid })
-			.then((before) => {
-				if (before === null) new NotFoundError(`Recognition_id not found: ${id}`).sendResponse(res);
-
-				res.status(200).send(before);
-			})
-			.catch((err) => {
-				throw new Error(err);
-			})
-	} catch (e) {
-		res.status(400).send(e.message);
-	}
-});
-
-/**
- * @openapi
- * components:
- *    schemas:
- *        Prediction:
- *            type: object
- *            properties:
- *                prediction:
- *                    type: string
- *                confidence:
- *                    type: number
- *        RecognitionPostBody:
- *            required:
- *                - json
- *                - image
- *            type: object
- *            properties:
- *                image:
- *                    type: string
- *                    format: binary
- *                json:
- *                    type: string
- *        RecognitionPatchBody:
- *            required:
- *                - is_valid
- *            type: object
- *            properties:
- *                is_valid:
- *                    type: boolean
- *        RecognitionResponse:
- *            type: object
- *            properties:
- *                recognition_id:
- *                    type: string
- *                image:
- *                    type: string
- *                kanji:
- *                    type: string
- *                predictions:
- *                    type: array
- *                    items:
- *                        $ref: '#/components/schemas/Prediction'
- *        RecognitionPaginateResponse:
- *            type: object
- *            properties:
- *                totalDocs:
- *                    type: integer
- *                deleted_at:
- *                    type: integer
- *                limit:
- *                    type: integer
- *                totalPages:
- *                    type: integer
- *                page:
- *                    type: integer
- *                pagingCounter:
- *                    type: integer
- *                hasPrevPage:
- *                    type: boolean
- *                hasNextPage:
- *                    type: boolean
- *                prevPage:
- *                    type: integer
- *                nextPage:
- *                    type: integer
- *                docs:
- *                    type: array
- *                    items:
- *                        $ref: '#/components/schemas/RecognitionResponse'
- */
-
-export default router;
+        res.status(200).send(before);
+      })
+      .catch((err) => {
+        throw new Error(err);
+      });
+  } catch (e) {
+    res.status(400).send(e.message);
+  }
+}

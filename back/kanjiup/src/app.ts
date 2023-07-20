@@ -1,12 +1,12 @@
 /* eslint-disable tsdoc/syntax */
-import express, {Express} from 'express';
-import bodyParser from "body-parser";
+import express, { Express } from 'express';
+import bodyParser from 'body-parser';
 import cors from 'cors';
 import swaggerUi from 'swagger-ui-express';
 import dotenv from 'dotenv';
 
 import { mongoConfig, specs } from './config';
-import { KanjiController, CharacterController, RadicalController, ReferenceController, RecognitionController } from "./controllers";
+import { KanjiRoute, CharacterRoute, RadicalRoute, ReferenceRoute, RecognitionRoute } from './routes';
 
 dotenv.config();
 
@@ -15,8 +15,8 @@ const port = process.env.PORT || 5000;
 
 // Database connection
 mongoConfig()
-    .then(() => console.log('DB: OK'))
-    .catch((err) => console.warn('DB: KO ' + err));
+  .then(() => console.log('DB: OK'))
+  .catch((err) => console.warn('DB: KO ' + err));
 
 // Middlewares
 app.use(cors());
@@ -35,11 +35,11 @@ app.use(bodyParser.json());
  */
 
 // API Endpoints
-app.use('/kanjis', KanjiController);
-app.use('/characters', CharacterController);
-app.use('/radicals', RadicalController);
-app.use('/references', ReferenceController);
-app.use('/recognition', RecognitionController);
+app.use('/api/v1/kanjis', KanjiRoute);
+app.use('/api/v1/characters', CharacterRoute);
+app.use('/api/v1/radicals', RadicalRoute);
+app.use('/api/v1/references', ReferenceRoute);
+app.use('/api/v1/recognition', RecognitionRoute);
 app.use('/', swaggerUi.serve, swaggerUi.setup(specs));
 
 app.listen(port, () => {

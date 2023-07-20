@@ -13,8 +13,8 @@
  *                date:
  *                    type: string
  */
-export { default as KanjiController } from './kanji';
-export { default as CharacterController } from './character';
-export { default as RadicalController } from './radical';
-export { default as ReferenceController } from './reference';
-export { default as RecognitionController } from './recognition';
+export { default as KanjiRoute } from './kanji';
+export { default as CharacterRoute } from './character';
+export { default as RadicalRoute } from './radical';
+export { default as ReferenceRoute } from './reference';
+export { default as RecognitionRoute } from './recognition';
