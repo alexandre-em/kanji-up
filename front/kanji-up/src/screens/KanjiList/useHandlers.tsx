@@ -1,15 +1,15 @@
-import axios, {AxiosRequestConfig, AxiosResponse} from 'axios';
-import {useCallback, useEffect, useState} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
-import {kanjiService} from '../../service';
-import {fileNames, writeFile} from '../../service/file';
-import {RootState} from '../../store';
-import {error, kanji} from '../../store/slices';
+import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import { useCallback, useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { kanjiService } from '../../service';
+import { fileNames, writeFile } from '../../service/file';
+import { RootState } from '../../store';
+import { error, kanji } from '../../store/slices';
 
 interface useHandlersProps {
   navigation: any;
   grade: string;
-};
+}
 
 export default function useHandlers({ navigation, grade }: useHandlersProps) {
   const dispatch = useDispatch();
@@ -25,19 +25,24 @@ export default function useHandlers({ navigation, grade }: useHandlersProps) {
   const handleCloseMenu = useCallback(() => setVisible(false), []);
   const handleCloseDialog = useCallback(() => setDialog(false), []);
 
-  const handleSelect = useCallback(() => { setSelection((prevState: boolean) => !prevState); }, []);
+  const handleSelect = useCallback(() => {
+    setSelection((prevState: boolean) => !prevState);
+  }, []);
 
-  const handlePress = useCallback((selectedKanji: KanjiType) => {
-    if (selectionMode) {
-      if (kanjiState.toAdd[selectedKanji.kanji_id] || (kanjiState.selectedKanji[selectedKanji.kanji_id] && !kanjiState.toRemove[selectedKanji.kanji_id])) {
-        dispatch(kanji.actions.unSelectKanji(selectedKanji));
+  const handlePress = useCallback(
+    (selectedKanji: KanjiType) => {
+      if (selectionMode) {
+        if (kanjiState.toAdd[selectedKanji.kanji_id] || (kanjiState.selectedKanji[selectedKanji.kanji_id] && !kanjiState.toRemove[selectedKanji.kanji_id])) {
+          dispatch(kanji.actions.unSelectKanji(selectedKanji));
+        } else {
+          dispatch(kanji.actions.selectKanji(selectedKanji));
+        }
       } else {
-        dispatch(kanji.actions.selectKanji(selectedKanji));
+        navigation.navigate('KanjiDetail', { id: selectedKanji.kanji_id });
       }
-    } else {
-      navigation.navigate('KanjiDetail', { id: selectedKanji.kanji_id });
-    }
-  }, [selectionMode, kanjiState]);
+    },
+    [selectionMode, kanjiState]
+  );
 
   const handleReset = useCallback(() => {
     dispatch(kanji.actions.reset());
@@ -54,33 +59,47 @@ export default function useHandlers({ navigation, grade }: useHandlersProps) {
   const handleBack = useCallback(() => {
     const hasModifs = Object.keys(kanjiState.toRemove).length + Object.keys(kanjiState.toAdd).length > 0;
 
-    if (hasModifs) { setDialog(true); }
-    else { navigation.goBack() }
-  }, [kanjiState]);
-  
-  const getKanjis = useCallback(({ page }: { page: number }, options : AxiosRequestConfig = {}) => {
-    if (!loading) {
-      setLoading(true);
-      kanjiService
-        .getKanjis({ grade, limit, page: page ?? {} }, options)
-        .then((res: AxiosResponse<Pagination<KanjiType>>) => {
-          setData(res.data);
-          setLoading(false);
-        })
-        .catch((err) => dispatch(error.actions.update({ message: axios.isCancel(err) ? 'Previous action cancelled.' : err.message })));
+    if (hasModifs) {
+      setDialog(true);
+    } else {
+      navigation.goBack();
     }
-  }, [limit, loading]);
+  }, [kanjiState]);
+
+  const getKanjis = useCallback(
+    ({ page }: { page: number }, options: AxiosRequestConfig = {}) => {
+      if (!loading) {
+        setLoading(true);
+        kanjiService
+          .getKanjis({ grade, limit, page: page ?? {} }, options)
+          .then((res: AxiosResponse<Pagination<KanjiType>>) => {
+            if (!res?.data?.docs) {
+              throw new Error('No data founded. Try later and if this error appear again, please contact an admin');
+            }
+            setData(res.data);
+            setLoading(false);
+          })
+          .catch((err) => dispatch(error.actions.update({ message: axios.isCancel(err) ? 'Previous action cancelled.' : err.message })));
+      }
+    },
+    [limit, loading]
+  );
 
   useEffect(() => {
     const cancelToken = axios.CancelToken.source();
     getKanjis({ page: 1 }, { cancelToken: cancelToken.token });
 
-    return () => { cancelToken.cancel(); }
+    return () => {
+      cancelToken.cancel();
+    };
   }, [limit]);
 
   return {
-    data, loading, selectionMode,
-    visible, dialog,
+    data,
+    loading,
+    selectionMode,
+    visible,
+    dialog,
     setLimit,
     getKanjis,
     handleBack,
@@ -93,4 +112,4 @@ export default function useHandlers({ navigation, grade }: useHandlersProps) {
     handleCloseMenu,
     handleCloseDialog,
   };
-};
+}
