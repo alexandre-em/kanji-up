@@ -1,2 +1,3 @@
 env
 kanji_model.h5
+out/images/*
