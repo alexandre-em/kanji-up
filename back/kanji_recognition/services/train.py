@@ -1,26 +1,18 @@
-from tensorflow.keras import Sequential
-from tensorflow.keras.layers import (
-    Conv2D,
-    Activation,
-    BatchNormalization,
-    MaxPooling2D,
-    Dropout,
-    Dense,
-    Flatten,
-)
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
+
+from utils.model import RecognitionModel
 
 
 EPOCHS = 4
 
 
-def make_model_save(dataset_path: str, label):
+def create_data_batches(dataset_path: str, label):
     """
-    Train the recognition model.
+    Generate train, validation and test batches of tensor image data
 
         Parameters:
-            dataset_path (str): path of the dataset
-            label: array of kanjis (str) used on dataset
+            dataset_path (str): Path of the directory containing the splitted data
+            label (str): array of kanji value
     """
     image_size = (64, 64)
     batch_size = 256
@@ -66,32 +58,23 @@ def make_model_save(dataset_path: str, label):
         class_mode="binary",
     )
 
-    n_class = len(label)
+    return [train_batches, validation_batches, test_batches]
 
-    model = Sequential(
-        [
-            Conv2D(32, (3, 3), input_shape=(64, 64, 1)),
-            Activation("relu"),
-            BatchNormalization(),
-            MaxPooling2D(pool_size=(2, 2)),
-            Conv2D(64, (3, 3)),
-            Activation("relu"),
-            BatchNormalization(),
-            MaxPooling2D(pool_size=(2, 2)),
-            Flatten(),
-            Dense(1024),
-            Activation("relu"),
-            BatchNormalization(),
-            Dropout(0.2),
-            Dense(n_class),
-            Activation("softmax"),
-        ]
-    )
 
-    # model.summary()
-    model.compile(
-        optimizer="adam", loss="sparse_categorical_crossentropy", metrics=["accuracy"]
-    )
+def train_model(batches):
+    """
+    Train the recognition model.
+
+        Parameters:
+            batches (arr): batches of tensor image data (train index [0], validation [1], test [2])
+    """
+
+    [train_batches, validation_batches, test_batches] = batches
+
+    model = RecognitionModel().recognition
+
+    if model is None:
+        raise Exception("The recognition model is not yet ready")
 
     # # Fitting the Model
     model.fit(

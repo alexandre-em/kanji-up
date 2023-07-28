@@ -11,7 +11,7 @@ def get_files(path):
         Returns:
             An array of all filename
     """
-    [f for f in os.listdir(path) if os.path.join(path, f)]
+    return [f for f in os.listdir(path) if os.path.join(path, f)]
 
 
 def create_dir(path):
