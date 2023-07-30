@@ -22,4 +22,6 @@ RUN curl "https://${KANJI_RECOGNIZER_DL_URL}/models/kanji_model.h5" \
     --compressed \
     --output ./kanji_model.h5
 
-CMD ["gunicorn", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "main:app", "--bind", "0.0.0.0:8000"]
+EXPOSE 10000
+
+CMD ["gunicorn", "main:app", "--bind", "0.0.0.0:10000"]
