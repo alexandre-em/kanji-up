@@ -1,4 +1,5 @@
 import os
+from os.path import isfile
 
 
 def get_files(path):
@@ -40,5 +41,18 @@ def create_file(path, file):
     with open(path, "wb") as image:
         image.write(file)
         image.close()
+
+    return True
+
+
+def delete_file(path):
+    """
+    Delete a file at `path`
+
+        Parameters:
+            path: path of the file
+    """
+    if os.path.isfile(path):
+        os.remove(path)
 
     return True

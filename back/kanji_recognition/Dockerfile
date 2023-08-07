@@ -11,6 +11,8 @@ RUN pip3 install -r requirements.txt
 
 ARG KANJI_RECOGNIZER_DL_URL
 ENV KANJI_RECOGNIZER_DL_URL=${KANJI_RECOGNIZER_DL_URL}
+ARG AUTH_API_SECRET_KEY
+ENV AUTH_API_SECRET_KEY=${AUTH_API_SECRET_KEY}
 
 COPY . .
 RUN curl "https://${KANJI_RECOGNIZER_DL_URL}/models/kanji_model.h5" \
@@ -22,4 +24,4 @@ RUN curl "https://${KANJI_RECOGNIZER_DL_URL}/models/kanji_model.h5" \
 
 EXPOSE 10000
 
-CMD ["gunicorn", "main:app", "--bind", "0.0.0.0:10000"]
+CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "main:app", "--bind", "0.0.0.0:10000"]

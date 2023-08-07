@@ -20,10 +20,12 @@ spec:
           image: alexandreem22/recognition:0.1
           imagePullPolicy: Never
           ports:
-            - containerPort: 8000
+            - containerPort: 10000
           env:
-            - name: AUTH_BASE_URL
-              value: "$(AUTH_BASE_URL)"
+            - name: AUTH_API_SECRET_KEY
+              value: "$(AUTH_API_SECRET_KEY)"
+            - name: KANJI_RECOGNIZER_DL_URL
+              value: "$(KANJI_RECOGNIZER_DL_URL)"
 ---
 apiVersion: v1
 kind: Service
@@ -36,5 +38,5 @@ spec:
   ports:
     - protocol: TCP
       port: 5000
-      targetPort: 8000
+      targetPort: 10000
       nodePort: 31110
