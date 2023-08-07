@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kanji-up-dep
+  labels:
+    app: kanji-up-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kanji-up-app
+  template:
+    metadata:
+      name: kanji-up-recognition-pod
+      labels:
+        app: kanji-up-app
+    spec:
+      containers:
+        - name: kanji-up-recognition
+          image: alexandreem22/recognition:0.1
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8000
+          env:
+            - name: AUTH_BASE_URL
+              value: "$(AUTH_BASE_URL)"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kanji-up-src
+spec:
+  selector:
+    app: kanji-up-app
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 8000
+      nodePort: 31110

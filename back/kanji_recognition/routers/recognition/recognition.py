@@ -20,6 +20,11 @@ async def train_recognition_model():
     return "ok"
 
 
+@router.get("/health")
+async def check_health():
+    return "ok"
+
+
 @router.post("/:kanji")
 async def create_recognition(file: bytes = File(...), kanji: str = ""):
     path = "out/images/" + kanji

@@ -7,7 +7,7 @@
     "build": "tsc",
     "run:buildedapi": "node dist/app.js",
     "start": "ts-node src/app.ts",
-    "dev:server": "nodemon --watch './**/*.ts' --exec 'ts-node' --files src/app.ts",
+    "start:dev": "nodemon --watch './**/*.ts' --exec 'ts-node' --files src/app.ts",
     "migrate:kanjiapi": "ts-node ./migrate/index.ts",
     "lint": "eslint src/**/*.ts --ext .ts",
     "format": "eslint src/**/*.ts --ext .ts --fix",

@@ -1,9 +1,9 @@
-version: '3.8'
+version: "3.8"
 
 services:
   api:
     build:
-      context: ./back/kanjiup
+      context: ../back/kanjiup
       args:
         - SAVED_MODEL_URL=${SAVED_MODEL_URL}
     environment:

@@ -4,15 +4,13 @@ WORKDIR /recognition
 
 RUN apt-get -y update && apt-get -y install curl
 
-COPY pyproject.toml .
-RUN pip3 install poetry
-RUN poetry config virtualenvs.create false
-RUN poetry install
+# COPY pyproject.toml .
+COPY requirements.txt .
+# RUN pip3 install poetry && poetry config virtualenvs.create false && poetry install
+RUN pip3 install -r requirements.txt
 
 ARG KANJI_RECOGNIZER_DL_URL
 ENV KANJI_RECOGNIZER_DL_URL=${KANJI_RECOGNIZER_DL_URL}
-
-RUN echo ${KANJI_RECOGNIZER_DL_URL}
 
 COPY . .
 RUN curl "https://${KANJI_RECOGNIZER_DL_URL}/models/kanji_model.h5" \
