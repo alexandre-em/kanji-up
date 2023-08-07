@@ -4,10 +4,10 @@ import { migrateFromKanjiDic } from './kanjiDic';
 
 // Database connection
 mongoConfig()
-	.then(() => {
-		(async () => {
-			await migrateFromKanjiApi();
-			await migrateFromKanjiDic();
-		})();
-	})
-	.catch((err) => console.warn('DB: KO ' + err));
+  .then(() => {
+    (async () => {
+      await migrateFromKanjiApi();
+      // await migrateFromKanjiDic();
+    })();
+  })
+  .catch((err) => console.warn('DB: KO ' + err));
