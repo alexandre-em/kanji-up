@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-dep
+  labels:
+    app: pi-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-app
+  template:
+    metadata:
+      name: kanji-up-api-pod
+      labels:
+        app: api-app
+    spec:
+      imagePullSecrets:
+        - name: kanji-up-reco-secret
+      containers:
+        - name: kanji-up-api
+          image: alexandreem22/kanjiup-api:0.1
+          imagePullPolicy: Always
+          readinessProbe:
+            httpGet:
+              path: /api
+              port: 5000
+              httpHeaders:
+                - name: Host
+                  value: kanjiup-api.alexandre-em.fr
+          ports:
+            - containerPort: 5000
+          envFrom:
+            - secretRef:
+                name: kanjiup-api-secret

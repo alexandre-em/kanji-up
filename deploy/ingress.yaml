@@ -1,0 +1,44 @@
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: web-ingress
+#   annotations:
+#     # This tells Google Cloud to create an External Load Balancer to realize this Ingress
+#     kubernetes.io/ingress.class: gce
+#     # This enables HTTP connections from Internet clients
+#     kubernetes.io/ingress.allow-http: "true"
+#     # This tells Google Cloud to associate the External Load Balancer with the static IP which we created earlier
+#     # kubernetes.io/ingress.global-static-ip-name: web-ip
+# spec:
+#   defaultBackend:
+#     service:
+#       name: recognition-svc
+#       port:
+#         number: 80
+#
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: kanji-app
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /(/|$)(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: api-svc
+                port:
+                  number: 5001
+          - path: /api/v1/recognitions(/|$)(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: recognition-svc
+                port:
+                  number: 8000
+  ingressClassName: nginx

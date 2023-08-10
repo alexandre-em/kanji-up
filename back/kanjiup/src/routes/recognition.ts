@@ -13,7 +13,6 @@ const urlencodedParser = bodyParser.urlencoded({ extended: false });
 router.get('/model', (req, res, next) => checkJWT(req, res, next, [KanjiPermission.GET_RECOGNITION]), getRecognitionModel);
 
 /**
- * @openapi
  * /api/v1/recognition/all:
  *  get:
  *      tags:
@@ -71,7 +70,6 @@ router.get('/model', (req, res, next) => checkJWT(req, res, next, [KanjiPermissi
 router.get('/all', (req, res, next) => checkJWT(req, res, next, [KanjiPermission.ADD_KANJI, KanjiPermission.GET_RECOGNITION]), getOne);
 
 /**
- * @openapi
  * /api/v1/recognition:
  *  post:
  *      tags:
@@ -122,7 +120,6 @@ router.post('/', (req, res, next) => checkJWT(req, res, next, [KanjiPermission.A
 router.post('/data', (req, res, next) => checkJWT(req, res, next, [KanjiPermission.ADD_KANJI, KanjiPermission.UPDATE_RECOGNITION]), upload.single('image'), urlencodedParser, createTrainData);
 
 /**
- * @openapi
  * /api/v1/recognition/validation/{id}:
  *  patch:
  *      tags:
@@ -177,7 +174,6 @@ router.post('/data', (req, res, next) => checkJWT(req, res, next, [KanjiPermissi
 router.patch('/validation/:id', (req, res, next) => checkJWT(req, res, next, [KanjiPermission.ADD_KANJI, KanjiPermission.UPDATE_RECOGNITION]), updateOneStatus);
 
 /**
- * @openapi
  * components:
  *    schemas:
  *        Prediction:

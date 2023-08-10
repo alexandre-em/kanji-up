@@ -7,7 +7,7 @@ RUN apt-get -y update && apt-get -y install curl
 # COPY pyproject.toml .
 COPY requirements.txt .
 # RUN pip3 install poetry && poetry config virtualenvs.create false && poetry install
-RUN pip3 install -r requirements.txt
+RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
 ARG KANJI_RECOGNIZER_DL_URL
 ENV KANJI_RECOGNIZER_DL_URL=${KANJI_RECOGNIZER_DL_URL}
@@ -22,6 +22,6 @@ RUN curl "https://${KANJI_RECOGNIZER_DL_URL}/models/kanji_model.h5" \
     --compressed \
     --output ./kanji_model.h5
 
-EXPOSE 10000
+EXPOSE 8000
 
-CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "main:app", "--bind", "0.0.0.0:10000"]
+CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "main:app", "--bind", "0.0.0.0:8000"]

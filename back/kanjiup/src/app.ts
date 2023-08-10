@@ -30,7 +30,6 @@ app.use(bodyParser.json());
  * - Reference
  * - Character
  * - Radical
- * - Recognition
  * - Kanji
  */
 
@@ -39,7 +38,7 @@ app.use('/api/v1/kanjis', KanjiRoute);
 app.use('/api/v1/characters', CharacterRoute);
 app.use('/api/v1/radicals', RadicalRoute);
 app.use('/api/v1/references', ReferenceRoute);
-app.use('/api/v1/recognition', RecognitionRoute);
+// app.use('/api/v1/recognition', RecognitionRoute);
 app.use('/', swaggerUi.serve, swaggerUi.setup(specs));
 
 app.listen(port, () => {

@@ -12,6 +12,7 @@ model/extract
 model/my_saved_model
 *.tflite
 model/kanji_web_model
+deploy/secrets/real
 kanji_saved_model
 model/kanji_dataset*
 uploads/*.png

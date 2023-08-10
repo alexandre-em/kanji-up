@@ -7,15 +7,14 @@ from utils.model import RecognitionModel
 
 app = FastAPI()
 
-app.add_middleware(
-    TrustedHostMiddleware,
-    allowed_hosts=[
-        "192.168.49.2",
-        "localhost",
-        "kanjiup.alexandre-em.fr",
-        "kanjiup-api.alexandre-em.fr",
-    ],
-)
+# app.add_middleware(
+#     TrustedHostMiddleware,
+#     allowed_hosts=[
+#         "192.168.49.2",
+#         "localhost",
+#         "kanjiup-reco.alexandre-em.fr",
+#     ],
+# )
 
 model = RecognitionModel()
 

@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recognition-dep
+  labels:
+    app: recognition-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: recognition-app
+  template:
+    metadata:
+      name: kanji-up-recognition-pod
+      labels:
+        app: recognition-app
+    spec:
+      imagePullSecrets:
+        - name: kanji-up-reco-secret
+      containers:
+        - name: kanji-up-recognition
+          image: alexandreem22/recognition:0.1
+          imagePullPolicy: Always
+          readinessProbe:
+            httpGet:
+              path: /api/v1/recognitions/health
+              port: 8000
+              httpHeaders:
+                - name: Host
+                  value: kanjiup-reco.alexandre-em.fr
+          ports:
+            - containerPort: 8000
