@@ -1,44 +1,27 @@
-# apiVersion: networking.k8s.io/v1
-# kind: Ingress
-# metadata:
-#   name: web-ingress
-#   annotations:
-#     # This tells Google Cloud to create an External Load Balancer to realize this Ingress
-#     kubernetes.io/ingress.class: gce
-#     # This enables HTTP connections from Internet clients
-#     kubernetes.io/ingress.allow-http: "true"
-#     # This tells Google Cloud to associate the External Load Balancer with the static IP which we created earlier
-#     # kubernetes.io/ingress.global-static-ip-name: web-ip
-# spec:
-#   defaultBackend:
-#     service:
-#       name: recognition-svc
-#       port:
-#         number: 80
-#
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: kanji-app
   annotations:
-    nginx.ingress.kubernetes.io/use-regex: "true"
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    kubernetes.io/ingress.class: nginx
+    external-dns.alpha.kubernetes.io/hostname: "kanjiup-reco.alexandre-em.fr"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    certmanager.k8s.io/issuer: "letsencrypt-prod"
+    certmanager.k8s.io/acme-challenge-type: dns01
+    certmanager.k8s.io/acme-dns01-provider: vultr
+  name: kanji-app-ingress
 spec:
   rules:
-    - http:
+    - host: "kanjiup-reco.alexandre-em.fr"
+      http:
         paths:
-          - path: /(/|$)(.*)
-            pathType: Prefix
-            backend:
-              service:
-                name: api-svc
-                port:
-                  number: 5001
-          - path: /api/v1/recognitions(/|$)(.*)
-            pathType: Prefix
-            backend:
+          - backend:
               service:
                 name: recognition-svc
                 port:
-                  number: 8000
-  ingressClassName: nginx
+                  number: 80
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - "kanjiup-reco.alexandre-em.fr"
+      secretName: wildcard-tls
