@@ -7,18 +7,23 @@ const initialState: SettingValuesType = {
   flashcardNumber: 30,
   evaluationCardNumber: 70,
   evaluationTime: 60,
+  useLocalModel: false,
 };
 
 const initialize = () => initialState;
 
 const update = (state: SettingValuesType, action: PayloadAction<Partial<SettingValuesType>>) => {
-  const decodedToken: DecodedToken = jwtDecode(action.payload.accessToken as string);
   const updatedState: SettingValuesType = {
+    ...state,
     ...action.payload,
-    username: decodedToken.name,
   };
 
-  return { ...state, ...updatedState };
+  if (action.payload.accessToken) {
+    const decodedToken: DecodedToken = jwtDecode(action.payload.accessToken as string);
+    updatedState.username = decodedToken.name;
+  }
+
+  return updatedState;
 };
 
 const logout = (state: SettingValuesType) => ({ ...state, username: 'user', accessToken: null });

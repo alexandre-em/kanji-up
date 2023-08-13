@@ -99,7 +99,6 @@ export default function usePrediction() {
 
     const modelBundles = bundleResourceIO(KRJson, modelWeights);
     const loadedModel: tf.GraphModel<tf.io.IOHandler> = await tf.loadGraphModel(modelBundles);
-    console.warn('loadedModel');
     setModel(loadedModel);
     setLoading(false);
   }, [loading, model]);
@@ -141,7 +140,7 @@ export default function usePrediction() {
 
       return indexes.map((index: number) => ({
         prediction: labels[index],
-        confidence: predictionArray[0][index],
+        score: predictionArray[0][index],
       }));
     },
     [model, loading]

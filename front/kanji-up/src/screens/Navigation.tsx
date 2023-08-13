@@ -6,6 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ActivityIndicator, Snackbar } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Linking from 'expo-linking';
+import NetInfo from '@react-native-community/netinfo';
 
 import { asyncstorageKeys } from '../constants';
 import OnboardingScreen from './Onboarding';
@@ -21,6 +22,8 @@ import { kanji, error, settings } from '../store/slices';
 import { RootState } from '../store';
 import { RootStackParamList } from '../types/screens';
 import usePrediction from '../hooks/usePrediction';
+
+const MAX_WIFI_STRENGTH = 50; // 0 to 100
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const config = {
@@ -46,7 +49,7 @@ export default function Navigation() {
       const contents = await readFile(fileNames.SELECTED_KANJI);
       dispatch(kanji.actions.initialize(contents));
     } catch (err) {
-      dispatch(error.actions.update({ message: err instanceof Error ? err.message : 'An error occurred' }));
+      // dispatch(error.actions.update({ message: err instanceof Error ? err.message : 'An error occurred' }));
       dispatch(kanji.actions.updateStatus('error'));
     }
   }, []);
@@ -75,9 +78,14 @@ export default function Navigation() {
   }, []);
 
   useEffect(() => {
-    if (model && !model.model) {
-      model.loadModel();
-    }
+    NetInfo.fetch().then((state) => {
+      if (Platform.OS === 'web' || (state.isInternetReachable && state.type === 'wifi' && state.details.strength && state.details.strength > MAX_WIFI_STRENGTH)) {
+        dispatch(settings.actions.update({ useLocalModel: true }));
+        if (model && !model.model) {
+          model.loadModel();
+        }
+      }
+    });
   }, []);
 
   if (isFirstTime === undefined) {

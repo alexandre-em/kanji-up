@@ -1,7 +1,7 @@
-import {AxiosResponse} from 'axios';
+import { AxiosResponse } from 'axios';
 import * as FileSystem from 'expo-file-system';
-import {RefObject} from 'react';
-import {recognitionService} from '..';
+import { RefObject } from 'react';
+import { recognitionService } from '..';
 
 export const fileNames = {
   SELECTED_KANJI: 'selectedKanji',
@@ -18,8 +18,10 @@ export const writeFile = (name: string, contents: string) => {
   return FileSystem.writeAsStringAsync(fileUri, contents);
 };
 
-export const uploadImage = async (canvasRef: RefObject<any>, kanji: string, prediction: Array<PredictionType>) => {
-  if (!canvasRef && !canvasRef.current) { throw new Error('canvasRef is not ready') }
+export const uploadImage = async (canvasRef: RefObject<any>, kanji: string) => {
+  if (!canvasRef && !canvasRef.current) {
+    throw new Error('canvasRef is not ready');
+  }
 
   const imageBase64: string = await canvasRef.current.getUri();
   const imageBase64Code = imageBase64.split('data:image/jpeg;base64,')[1];
@@ -28,10 +30,9 @@ export const uploadImage = async (canvasRef: RefObject<any>, kanji: string, pred
   await FileSystem.writeAsStringAsync(filename, imageBase64Code, {
     encoding: FileSystem.EncodingType.Base64,
   });
-  const recognition: AxiosResponse<RecognitionType> = await recognitionService.postRecognitionNative(kanji, prediction, filename);
+  const recognition: AxiosResponse<RecognitionType> = await recognitionService.postRecognitionNative(kanji, filename);
 
   await FileSystem.deleteAsync(filename);
 
   return recognition;
-}
-
+};

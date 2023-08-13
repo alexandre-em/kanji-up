@@ -118,7 +118,7 @@ export default function usePrediction() {
       // result
       const indexes = predictionArray[0].map((v: number, indice: number) => indice).filter((iconfidence: number) => predictionArray[0][iconfidence] >= MIN_CONFIDENCE);
 
-      return indexes.map((index: number) => ({ prediction: labels[index], confidence: predictionArray[0][index] }));
+      return indexes.map((index: number) => ({ prediction: labels[index], score: predictionArray[0][index] }));
     },
     [model, loading]
   );

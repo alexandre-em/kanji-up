@@ -41,6 +41,7 @@ export default {
       AUTH_APP_ID_WEB: process.env.AUTH_APP_ID_WEB,
       AUTH_APP_ID_NATIVE: process.env.AUTH_APP_ID_NATIVE,
       KANJI_BASE_URL: process.env.KANJI_BASE_URL ?? 'http://localhost:5000',
+      RECOGNITION_BASE_URL: process.env.RECOGNITION_BASE_URL ?? 'http://localhost:3000',
     },
   },
 };

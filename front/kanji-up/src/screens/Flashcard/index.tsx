@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { Text, View } from 'react-native';
 import { ActivityIndicator, Appbar, Button, Dialog, Paragraph, Portal } from 'react-native-paper';
+import { useSelector } from 'react-redux';
 
 import styles from './style';
 import Evaluate from './Evaluate';
@@ -8,12 +9,13 @@ import Practice from './Practice';
 import { FlashcardProps } from '../../types/screens';
 import useHandlers from './useHandlers';
 import useAuth from '../../hooks/useAuth';
+import { RootState } from '../../store';
 
 export default function Flashcard({ navigation, route }: FlashcardProps) {
   const { evaluation, model } = route.params;
-  const [dialog, setDialog] = React.useState<boolean>(false);
-  const { sKanji, message, handleFinish, handleConfirmFinish } = useHandlers({ model, evaluation, navigation, setDialog });
+  const { sKanji, message, dialog, handleFinish, handleConfirmFinish, setDialog } = useHandlers({ navigation });
   const { isConnected } = useAuth();
+  const settingState = useSelector((state: RootState) => state.settings);
 
   const dialogComponent = React.useMemo(
     () => (
@@ -43,7 +45,7 @@ export default function Flashcard({ navigation, route }: FlashcardProps) {
 
   const evaluationScreen = useMemo(() => {
     if (evaluation) {
-      if (model && model.model) {
+      if (!settingState.useLocalModel || (model && model.model)) {
         return <Evaluate kanji={sKanji} model={model} onFinish={handleFinish} />;
       }
 
@@ -62,7 +64,7 @@ export default function Flashcard({ navigation, route }: FlashcardProps) {
     }
   }, [isConnected]);
 
-  if (model && !model.model) {
+  if (settingState.useLocalModel && model && !model.model) {
     return (
       <View style={{ display: 'flex', flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <ActivityIndicator animating />

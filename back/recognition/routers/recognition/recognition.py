@@ -25,7 +25,7 @@ async def check_health():
     return "ok"
 
 
-@router.post("/:kanji", dependencies=[Depends(JWTBearer())], tags=["recognitions"])
+@router.post("/{kanji}", dependencies=[Depends(JWTBearer())], tags=["recognitions"])
 async def get_recognition(file: bytes = File(...), kanji: str = ""):
     path = "out/images/" + kanji
     create_dir(path)

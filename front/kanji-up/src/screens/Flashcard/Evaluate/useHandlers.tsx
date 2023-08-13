@@ -7,6 +7,7 @@ import { RootState } from '../../../store';
 import { error, evaluation } from '../../../store/slices';
 import { recognitionService } from '../../../service';
 import { colors } from '../../../constants';
+import { uploadImage } from '../../../service/file';
 
 interface UseHandlersEvaluateProps {
   model: any;
@@ -25,7 +26,6 @@ export default function useHandlersEvaluate({ model, kanji, canvasRef, progressC
   const [kanjiQueue, setKanjiQueue] = useState<Partial<KanjiType>[] | null>(null);
   const [start, setStart] = useState<boolean>(false);
   const [counter, setCounter] = useState<number>(0);
-  const [promiseQueue, setPromiseQueue] = useState<Promise<any>[]>([]);
 
   const handleClear = useCallback(() => {
     if (canvasRef && canvasRef.current) {
@@ -38,9 +38,9 @@ export default function useHandlersEvaluate({ model, kanji, canvasRef, progressC
       const strokeCount = canvasRef?.current.strokeCount;
       const isValid = strokeCount === kanjiQueue[i].kanji?.strokes;
       const details = kanjiQueue[i].kanji;
-      console.warn('Image transformation to Base64');
       const imageBase64: string = Platform.OS === 'web' ? canvasRef.current.getUri() : (await canvasRef.current.getUri()).split('data:image/jpeg;base64,')[1];
       const imageBase64WFormat = Platform.OS === 'web' ? imageBase64 : `data:image/jpeg;base64,${imageBase64}`;
+      let predictFunction;
 
       if (!isValid) {
         dispatch(
@@ -53,58 +53,44 @@ export default function useHandlersEvaluate({ model, kanji, canvasRef, progressC
           })
         );
       } else {
-        // Dispatch score
-        // FIX: Make it async
-        console.warn('Before Predicion');
-        model
-          .predict(imageBase64)
+        if (settingsState.useLocalModel) {
+          predictFunction = model.predict(imageBase64);
+        } else {
+          predictFunction = uploadImage(canvasRef, details!.character as string, { headers: { Authorization: `Bearer ${settingsState.accessToken}` } });
+        }
+
+        predictFunction
           .then((prediction: any) => {
             const predictedKanji = prediction.find((p: any) => p.prediction === details!.character);
-            // const recognition = await uploadImage(canvasRef, details!.character as string, prediction) as AxiosResponse<RecognitionType>;
 
-            if (!predictedKanji) {
-              dispatch(
-                evaluation.actions.addAnswer({
-                  kanji: details!.character as string,
-                  recognitionId: `${counter}`,
-                  image: imageBase64WFormat,
-                  answer: prediction,
-                  status: 'toReview',
-                  message: 'The drawed kanji seems incorrect, please confirm',
-                })
-              );
-            } else {
-              dispatch(
-                evaluation.actions.addAnswer({
-                  kanji: details!.character as string,
-                  recognitionId: `${counter}`,
-                  image: imageBase64WFormat,
-                  answer: prediction,
-                  status: 'correct',
-                  message: 'Correct !',
-                })
-              );
+            dispatch(
+              evaluation.actions.addAnswer({
+                kanji: details!.character as string,
+                recognitionId: `${counter}`,
+                image: imageBase64WFormat,
+                answer: prediction,
+                status: !predictedKanji ? 'toReview' : 'correct',
+                message: !predictedKanji ? 'The drawed kanji seems incorrect, please confirm' : 'Correct answer !',
+              })
+            );
+            if (predictedKanji) {
               const grade = kanjiQueue[i].reference?.grade;
-              dispatch(evaluation.actions.addPoints(Math.max(predictedKanji?.confidence * 100 * (grade === 'custom' ? 8 : parseInt(grade || '1', 10)), 10)));
+              dispatch(evaluation.actions.addPoints(Math.max(predictedKanji.score * 100 * (grade === 'custom' ? 8 : parseInt(grade || '1', 10)), 10)));
             }
-            console.warn('Prediction completed');
           })
           .catch((err: any) => {
             dispatch(error.actions.update({ message: err.message }));
           });
-        console.warn('After Prediction?');
       }
-    }
 
-    handleClear();
-    setKanjiQueue((prev) => prev?.slice(1) || prev);
-    setCounter((prev) => prev + 1);
-    // next card
-    if (Platform.OS === 'web' && settingsState) {
-      setTimer(settingsState.evaluationTime);
-    } else {
-      if (progressCircleRef?.current) {
-        progressCircleRef.current.reAnimate();
+      handleClear();
+      setKanjiQueue((prev) => prev?.slice(1) || prev);
+      setCounter((prev) => prev + 1);
+      // next card
+      if (Platform.OS === 'web' && settingsState) {
+        setTimer(settingsState.evaluationTime);
+      } else {
+        progressCircleRef?.current?.reAnimate();
       }
     }
   }, [model, kanjiQueue, canvasRef, progressCircleRef, evaluation, settingsState, counter]);
