@@ -1,4 +1,4 @@
-interface DecodedToken {
+export interface DecodedToken {
   name: string;
   email: string;
   exp: number;

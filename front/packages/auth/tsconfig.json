@@ -10,9 +10,8 @@
     "allowJs": false,
     "declaration": true,
     "declarationMap": true,
-    "allowSyntheticDefaultImports": true,
-    "typeRoots": ["../types"]
+    "jsx": "react",
+    "allowSyntheticDefaultImports": true
   },
-  "include": ["**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules", "dist"]
 }

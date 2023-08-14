@@ -3,6 +3,8 @@ import { router } from 'expo-router';
 
 export type AuthContextValueType = {
   accessToken: string | null;
+  signIn: (token: string | null) => void;
+  signOut: () => void;
 };
 
 const AuthContext = React.createContext<AuthContextValueType | null>(null);
@@ -26,12 +28,15 @@ function useProtectedRoute(accessToken: string | null) {
   }, [accessToken]);
 }
 
-export function Provider({ token, children }: { token: string | null; children: React.ReactNode }) {
+export function Provider({ children }: { children: React.ReactNode }) {
+  const [token, setToken] = React.useState<string | null>(null);
   useProtectedRoute(token);
 
   return (
     <AuthContext.Provider
       value={{
+        signIn: setToken,
+        signOut: () => setToken(null),
         accessToken: token,
       }}>
       {children}

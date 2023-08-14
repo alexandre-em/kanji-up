@@ -3,8 +3,9 @@ import { useFonts } from 'expo-font';
 import { SplashScreen, Stack } from 'expo-router';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Provider as PaperProvider, DefaultTheme } from 'react-native-paper';
+import { AuthProvider } from 'kanji-app-auth';
 
-import colors from '../constants/Colors';
+import { colors } from '../constants/Colors';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -57,9 +58,12 @@ export default function RootLayout() {
 function RootLayoutNav() {
   return (
     <PaperProvider theme={theme}>
-      <Stack>
-        <Stack.Screen name="home" options={{ headerShown: false }} />
-      </Stack>
+      <AuthProvider>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="home" options={{ headerShown: false }} />
+          <Stack.Screen name="sign-in" options={{ headerShown: false }} />
+        </Stack>
+      </AuthProvider>
     </PaperProvider>
   );
 }

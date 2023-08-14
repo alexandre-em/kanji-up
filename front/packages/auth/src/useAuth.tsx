@@ -2,11 +2,9 @@ import { useCallback, useEffect, useState } from 'react';
 import * as WebBrowser from 'expo-web-browser';
 import jwtDecode from 'jwt-decode';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { DecodedToken } from 'kanji-app-types';
 
-const asyncstorageKeys = {
-  FIRST_TIME: '@isFirstTime',
-  ACCESS_TOKEN: 'accessToken',
-};
+import { asyncstorageKeys } from './constants';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -14,7 +12,7 @@ export default function useKanjiAppAuth({ authUrl }: { authUrl: string }) {
   const [isConnected, setIsConnected] = useState<boolean | null>(null);
   const [token, setToken] = useState<string | null>(null);
 
-  const handleAuth = useCallback(async () => {
+  const login = useCallback(async () => {
     const results = await WebBrowser.openAuthSessionAsync(authUrl);
 
     if (results && results.type === 'success') {
@@ -26,14 +24,17 @@ export default function useKanjiAppAuth({ authUrl }: { authUrl: string }) {
         // dispatch(settings.actions.update({ accessToken: newToken }));
         setIsConnected(true);
         setToken(newToken);
+
+        return newToken;
       }
     }
+
+    throw new Error('No token given. Aborting. Please try again.');
   }, []);
 
-  const handleDisconnect = useCallback(async () => {
+  const logout = useCallback(async () => {
     AsyncStorage.removeItem(asyncstorageKeys.ACCESS_TOKEN);
     await WebBrowser.openAuthSessionAsync(authUrl);
-    handleDisconnect();
     // dispatch(settings.actions.logout());
     setIsConnected(false);
     setToken(null);
@@ -58,12 +59,12 @@ export default function useKanjiAppAuth({ authUrl }: { authUrl: string }) {
         setIsConnected(isTokenValid);
       }
     });
-  }, []);
+  }, [token]);
 
   return {
     isConnected,
     token,
-    handleAuth,
-    handleDisconnect,
+    login,
+    logout,
   };
 }

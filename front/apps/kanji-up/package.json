@@ -23,6 +23,7 @@
     "expo-status-bar": "~1.6.0",
     "expo-system-ui": "~2.4.0",
     "expo-web-browser": "~12.3.2",
+    "kanji-app-auth": "*",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-native": "0.72.3",
@@ -35,6 +36,7 @@
   "devDependencies": {
     "@babel/core": "^7.20.0",
     "@types/react": "~18.2.14",
+    "kanji-app-types": "*",
     "jest": "^29.2.1",
     "jest-expo": "~49.0.0",
     "react-test-renderer": "18.2.0",
