@@ -1,0 +1,19 @@
+{
+  "name": "kanji-app-auth",
+  "version": "0.0.1",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@react-native-async-storage/async-storage": "1.18.2",
+    "@reduxjs/toolkit": "^1.9.5",
+    "jwt-decode": "^3.1.2",
+    "react-redux": "^8.1.2",
+    "redux-logger": "^3.0.6"
+  },
+  "devDependencies": {
+    "kanji-app-types": "*"
+  }
+}
