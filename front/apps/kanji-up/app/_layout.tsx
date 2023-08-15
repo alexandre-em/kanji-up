@@ -1,11 +1,13 @@
 import { useEffect } from 'react';
 import { useFonts } from 'expo-font';
+import { Provider } from 'react-redux';
 import { SplashScreen, Stack } from 'expo-router';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Provider as PaperProvider, DefaultTheme } from 'react-native-paper';
+
 import { AuthProvider } from 'kanji-app-auth';
 
 import { colors } from '../constants/Colors';
+import store from '../store';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -34,12 +36,14 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const [loaded, error] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-    ...FontAwesome.font,
   });
 
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
-    if (error) throw error;
+    if (error) {
+      console.warn(error);
+      throw error;
+    }
   }, [error]);
 
   useEffect(() => {
@@ -58,12 +62,11 @@ export default function RootLayout() {
 function RootLayoutNav() {
   return (
     <PaperProvider theme={theme}>
-      <AuthProvider>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="home" options={{ headerShown: false }} />
-          <Stack.Screen name="sign-in" options={{ headerShown: false }} />
-        </Stack>
-      </AuthProvider>
+      <Provider store={store}>
+        <AuthProvider>
+          <Stack screenOptions={{ headerShown: false }}></Stack>
+        </AuthProvider>
+      </Provider>
     </PaperProvider>
   );
 }

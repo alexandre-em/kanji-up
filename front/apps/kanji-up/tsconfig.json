@@ -10,29 +10,11 @@
     "allowJs": false,
     "declaration": true,
     "declarationMap": true,
-    "allowSyntheticDefaultImports": true,
-    "paths": {
-      "@/*": [
-        "./*"
-      ],
-      "@kanji-app/packages/types": [
-        "../../packages/types/src/index.ts"
-      ]
-    }
+    "types": ["react", "react-native"],
+    "typeRoots": ["./types", "../../node_modules/@types", "../../node_modules/kanji-app-types"],
+    "target": "ESNext",
+    "allowSyntheticDefaultImports": true
   },
-  "references": [
-    {
-      "path": "../../packages/types"
-    }
-  ],
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    ".expo/types/**/*.ts",
-    "expo-env.d.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist"
-  ]
+  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"],
+  "exclude": ["node_modules", "dist"]
 }

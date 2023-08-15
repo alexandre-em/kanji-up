@@ -7,4 +7,7 @@ const config = getDefaultConfig(__dirname, {
   isCSSEnabled: true,
 });
 
+const assetsExts = config.resolver.assetsExts ?? [];
+config.resolver.assetsExts = [...assetsExts, 'bin', 'tflite'];
+
 module.exports = config;

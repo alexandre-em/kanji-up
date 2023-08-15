@@ -20,7 +20,7 @@ function useProtectedRoute(accessToken: string | null) {
     // If the user is not signed in and the initial segment is not anything in the auth group.
     if (!accessToken) {
       // Redirect to the sign-in page.
-      router.replace('/sign-in');
+      router.replace('/');
     } else {
       // Redirect away from the sign-in page.
       router.replace('/home');
@@ -30,6 +30,7 @@ function useProtectedRoute(accessToken: string | null) {
 
 export function Provider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = React.useState<string | null>(null);
+
   useProtectedRoute(token);
 
   return (

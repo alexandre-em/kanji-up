@@ -20,4 +20,17 @@ export default StyleSheet.create({
     marginLeft: 20,
     color: colors.text,
   },
+  header: {
+    flex: 0.09,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 15,
+    flexWrap: 'wrap',
+  },
+  headerTitle: {
+    backgroundColor: colors.primary,
+    padding: 5,
+    borderRadius: 25,
+  },
 });
