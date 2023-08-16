@@ -28,7 +28,7 @@ export const getAll = async (page: number, limit: number, grade?: string) => {
 export const searchCharacter = async (query: string, page = 1, limit = 10) => {
   const charactersAggregate = await CharacterModel.aggregate()
     .search({
-      index: 'search kanji',
+      index: 'searchKanji',
       text: {
         query,
         path: {
