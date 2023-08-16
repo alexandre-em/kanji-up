@@ -43,7 +43,7 @@ export default function RandomKanji() {
         title={choosenKanji.kanji?.meaning}
         description="See details"
         left={icon}
-        onPress={() => router.replace(`/kanji/${choosenKanji.kanji_id as string}`)}
+        onPress={() => router.push(`/kanji/${choosenKanji.kanji_id as string}`)}
         style={{ marginHorizontal: 20 }}
       />
     );

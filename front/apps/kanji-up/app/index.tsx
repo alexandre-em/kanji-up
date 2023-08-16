@@ -1,22 +1,42 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { Image, SafeAreaView, Text } from 'react-native';
 import { Button } from 'react-native-paper';
 import { useAuth, useKanjiAppAuth } from 'kanji-app-auth';
+import config from 'kanji-app-core';
 
 import styles from '../styles/global';
+import { router } from 'expo-router';
+
+const authUrl = `${process.env.EXPO_PUBLIC_AUTH_BASE_URL}/auth/login?app_id=`;
+const appId = process.env.EXPO_PUBLIC_AUTH_APP_ID_WEB;
+const endpointUrls = {
+  kanji: process.env.KANJI_BASE_URL,
+  recognition: process.env.RECOGNITION_BASE_URL,
+};
 
 export default function Page() {
-  const url = 'https://kanjiup-auth.cyclic.app/auth/login?app_id=';
-  const appId = '2a2541f9-b476-4853-9625-34918c625ddb';
   const AuthContext = useAuth();
-  const { login } = useKanjiAppAuth({ authUrl: url + appId });
+  const { token, login } = useKanjiAppAuth({ authUrl: authUrl + appId });
 
   const handleAuth = useCallback(async () => {
     if (AuthContext) {
       const accessToken = await login();
       AuthContext.signIn(accessToken);
+      config.init(endpointUrls, accessToken);
+
+      router.replace('/home');
     }
   }, [AuthContext]);
+
+  useEffect(() => {
+    if (AuthContext && token) {
+      AuthContext.signIn(token);
+
+      config.init(endpointUrls, token);
+
+      router.replace('/home');
+    }
+  }, [AuthContext, token]);
 
   return (
     <SafeAreaView style={[styles.main, { justifyContent: 'center', alignItems: 'center' }]}>

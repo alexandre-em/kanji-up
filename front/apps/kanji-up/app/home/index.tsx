@@ -22,7 +22,7 @@ export default function Home() {
 
   const renderItem = ({ item }: { item: (typeof list)[0] }) => (
     <GradientCard
-      onPress={() => router.replace(item.screen as Href<string>)}
+      onPress={() => router.push(item.screen as Href<string>)}
       image={item.image}
       title={item.title}
       subtitle={item.subtitle}
@@ -36,7 +36,7 @@ export default function Home() {
         <Button mode="contained" style={{ borderRadius: 25 }}>
           {userState.totalScore}
         </Button>
-        <TouchableOpacity onPress={() => router.replace('/settings')}>
+        <TouchableOpacity onPress={() => router.push('/settings')}>
           <Avatar.Text size={40} label={settingsState.username.charAt(0) || '-'} />
         </TouchableOpacity>
       </View>
@@ -53,7 +53,7 @@ export default function Home() {
             value={searchQuery}
             style={{ width: '90%', borderRadius: 25 }}
             inputStyle={{ color: colors.text, fontSize: 15 }}
-            onSubmitEditing={() => router.replace(`/search?search=${searchQuery}`)}
+            onSubmitEditing={() => router.push(`/search?search=${searchQuery}`)}
           />
         </View>
 
@@ -83,7 +83,7 @@ export default function Home() {
         fabStyle={{ backgroundColor: colors.secondary }}
         actions={menu.map((m) => ({
           ...m,
-          onPress: () => router.replace(m.screen as Href<string>),
+          onPress: () => router.push(m.screen as Href<string>),
         }))}
         onStateChange={setOpen}
       />

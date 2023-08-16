@@ -27,6 +27,7 @@
     "expo-system-ui": "~2.4.0",
     "expo-web-browser": "~12.3.2",
     "kanji-app-auth": "*",
+    "kanji-app-core": "*",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-native": "0.72.3",

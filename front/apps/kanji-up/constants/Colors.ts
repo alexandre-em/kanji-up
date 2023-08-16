@@ -7,6 +7,7 @@ export const colors = {
   secondary: '#f56e88',
   secondaryDark: '#a04859',
   text: '#3F3D56',
+  surface: '#DA2A2D',
 };
 
 export const snackbarColors = {
