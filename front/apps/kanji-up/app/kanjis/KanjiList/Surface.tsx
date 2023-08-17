@@ -30,7 +30,7 @@ export default function KanjiSurface({ kanji, onPress }: { kanji: KanjiType; onP
 
   return (
     <TouchableOpacity key={kanji.kanji?.character_id} onPress={onPress}>
-      <Surface style={[styles.kanjiSurface, surfaceStyle(kanji.kanji_id)]} elevation={4}>
+      <Surface style={[styles.kanjiSurface, surfaceStyle(kanji.kanji_id)]} elevation={1}>
         <Text style={styles.kanjiText}>{kanji.kanji?.character}</Text>
       </Surface>
     </TouchableOpacity>

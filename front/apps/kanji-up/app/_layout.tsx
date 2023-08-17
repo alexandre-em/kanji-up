@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useFonts } from 'expo-font';
 import { Provider } from 'react-redux';
 import { SplashScreen, Stack } from 'expo-router';
-import { Provider as PaperProvider, DefaultTheme } from 'react-native-paper';
+import { Provider as PaperProvider, DefaultTheme, Portal } from 'react-native-paper';
 
 import { AuthProvider } from 'kanji-app-auth';
 
@@ -62,11 +62,13 @@ export default function RootLayout() {
 function RootLayoutNav() {
   return (
     <PaperProvider theme={theme}>
-      <Provider store={store}>
-        <AuthProvider>
-          <Stack screenOptions={{ headerShown: false }}></Stack>
-        </AuthProvider>
-      </Provider>
+      <Portal>
+        <Provider store={store}>
+          <AuthProvider>
+            <Stack screenOptions={{ headerShown: false }}></Stack>
+          </AuthProvider>
+        </Provider>
+      </Portal>
     </PaperProvider>
   );
 }

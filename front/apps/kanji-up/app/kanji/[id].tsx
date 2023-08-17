@@ -65,7 +65,7 @@ export default function KanjiDetail() {
   return (
     <View style={global.main}>
       <Appbar.Header>
-        {!access_token && <Appbar.BackAction onPress={() => router.back()} />}
+        <Appbar.BackAction onPress={() => router.back()} />
         <Appbar.Content
           title={`Detail of ${details.kanji.character}`}
           titleStyle={{ color: '#fff', fontWeight: '700', fontSize: 17 }}

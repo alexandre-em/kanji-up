@@ -3,40 +3,50 @@ import { Image, SafeAreaView, Text } from 'react-native';
 import { Button } from 'react-native-paper';
 import { useAuth, useKanjiAppAuth } from 'kanji-app-auth';
 import config from 'kanji-app-core';
+import jwtDecode from 'jwt-decode';
 
 import styles from '../styles/global';
-import { router } from 'expo-router';
+import { useDispatch } from 'react-redux';
+import { settings } from 'store/slices';
+import { DecodedToken } from 'kanji-app-types';
 
 const authUrl = `${process.env.EXPO_PUBLIC_AUTH_BASE_URL}/auth/login?app_id=`;
 const appId = process.env.EXPO_PUBLIC_AUTH_APP_ID_WEB;
 const endpointUrls = {
-  kanji: process.env.KANJI_BASE_URL,
-  recognition: process.env.RECOGNITION_BASE_URL,
+  kanji: process.env.EXPO_PUBLIC_KANJI_BASE_URL,
+  recognition: process.env.EXPO_PUBLIC_RECOGNITION_BASE_URL,
 };
 
 export default function Page() {
   const AuthContext = useAuth();
+  const dispatch = useDispatch();
   const { token, login } = useKanjiAppAuth({ authUrl: authUrl + appId });
 
-  const handleAuth = useCallback(async () => {
-    if (AuthContext) {
-      const accessToken = await login();
-      AuthContext.signIn(accessToken);
-      config.init(endpointUrls, accessToken);
+  const signIn = useCallback(
+    (accessToken: string) => {
+      if (AuthContext) {
+        AuthContext.signIn(accessToken);
 
-      router.replace('/home');
-    }
-  }, [AuthContext]);
+        config.init(endpointUrls, accessToken);
+
+        const decodedToken: DecodedToken = jwtDecode(accessToken);
+
+        dispatch(settings.actions.update({ username: decodedToken.name }));
+      }
+    },
+    [AuthContext]
+  );
+
+  const handleAuth = useCallback(async () => {
+    const accessToken = await login();
+    signIn(accessToken);
+  }, []);
 
   useEffect(() => {
-    if (AuthContext && token) {
-      AuthContext.signIn(token);
-
-      config.init(endpointUrls, token);
-
-      router.replace('/home');
+    if (token) {
+      signIn(token);
     }
-  }, [AuthContext, token]);
+  }, [token]);
 
   return (
     <SafeAreaView style={[styles.main, { justifyContent: 'center', alignItems: 'center' }]}>

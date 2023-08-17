@@ -4,7 +4,6 @@ import { DecodedToken } from 'kanji-app-types';
 
 const initialState: SettingValuesType = {
   username: 'user',
-  accessToken: null,
   flashcardNumber: 30,
   evaluationCardNumber: 70,
   evaluationTime: 60,
@@ -19,15 +18,10 @@ const update = (state: SettingValuesType, action: PayloadAction<Partial<SettingV
     ...action.payload,
   };
 
-  if (action.payload.accessToken) {
-    const decodedToken: DecodedToken = jwtDecode(action.payload.accessToken as string);
-    updatedState.username = decodedToken.name;
-  }
-
   return updatedState;
 };
 
-const logout = (state: SettingValuesType) => ({ ...state, username: 'user', accessToken: null });
+const logout = (state: SettingValuesType) => ({ ...state, username: 'user', });
 
 export const settings = createSlice({
   name: 'settings',

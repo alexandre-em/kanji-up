@@ -59,11 +59,7 @@ export default function KanjiList() {
     <View style={global.main}>
       <Appbar.Header style={{ backgroundColor: selectionMode ? colors.secondary : colors.primary }}>
         <Appbar.BackAction onPress={handleBack} />
-        <Appbar.Content
-          title={`Grade: ${grade}`}
-          subtitle="Click on the right menu to switch to selection mode and don't forget to save your modification."
-          titleStyle={{ color: '#fff', fontWeight: '700', fontSize: 17 }}
-        />
+        <Appbar.Content title={`Grade: ${grade}`} titleStyle={{ color: '#fff', fontWeight: '700', fontSize: 17 }} />
         <Menu
           visible={visible}
           onDismiss={handleCloseMenu}

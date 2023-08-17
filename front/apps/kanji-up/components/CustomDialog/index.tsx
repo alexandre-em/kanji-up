@@ -11,13 +11,9 @@ export default function CustomDialog({ visible, message, actions, onCancel, onDi
           {props.children}
         </Dialog.Content>
         <Dialog.Actions style={{ flexWrap: 'wrap' }}>
-          {((actions && actions[0]) || false) && (
-            <Button style={{ borderRadius: 25 }} onPress={onCancel}>
-              Don't save
-            </Button>
-          )}
+          {((actions && actions[0]) || false) && <Button onPress={onCancel}>Don't save</Button>}
           {((actions && actions[1]) || false) && (
-            <Button style={{ borderRadius: 25 }} mode="contained" onPress={onSave}>
+            <Button mode="contained" onPress={onSave}>
               Save
             </Button>
           )}

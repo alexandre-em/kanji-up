@@ -1,24 +1,58 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Href, router } from 'expo-router';
 import { FlatList, SafeAreaView, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { Avatar, Button, FAB, Searchbar } from 'react-native-paper';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { asyncstorageKeys } from 'kanji-app-auth';
+
+import { RootState } from 'store';
+import globalStyles from 'styles/global';
+import { colors } from 'constants/Colors';
+import GradientCard from 'components/GradientCard';
+import { fileNames, readFile } from 'services/file';
+import { kanji, settings } from 'store/slices';
 
 import styles from './style';
-import globalStyles from '../../styles/global';
 import { menu, list } from './constants';
-import { colors } from '../../constants/Colors';
 import RandomKanji from './components/randomKanji';
 import Stepper from './components/stepper';
-import { RootState } from '../../store';
-
-import GradientCard from '../../components/GradientCard';
 
 export default function Home() {
+  const dispatch = useDispatch();
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [isFirstTime, setIsFirstTime] = useState<boolean>(false);
   const settingsState = useSelector((state: RootState) => state.settings);
   const userState = useSelector((state: RootState) => state.user);
   const [open, setOpen] = useState({ open: false });
+
+  const loadSelectedKanji = useCallback(async () => {
+    try {
+      const contents = await readFile(fileNames.SELECTED_KANJI);
+      dispatch(kanji.actions.initialize(contents));
+    } catch (err) {
+      // dispatch(error.actions.update({ message: err instanceof Error ? err.message : 'An error occurred' }));
+      // dispatch(kanji.actions.updateStatus('error'));
+    }
+  }, []);
+
+  // TODO: Put a modal (see expo doc) with the a quick tuto (old onboarding screen)
+  useEffect(() => {
+    loadSelectedKanji();
+    AsyncStorage.getItem(asyncstorageKeys.FIRST_TIME)
+      .then((res: string | null) => {
+        if (res !== null) {
+          const firstTime = JSON.parse(res as string);
+          setIsFirstTime(firstTime);
+          if (!firstTime) {
+            readFile('userSettings').then((content) => dispatch(settings.actions.update(JSON.parse(content))));
+          }
+        } else {
+          setIsFirstTime(true);
+        }
+      })
+      .catch(console.error);
+  }, []);
 
   const renderItem = ({ item }: { item: (typeof list)[0] }) => (
     <GradientCard
@@ -51,7 +85,7 @@ export default function Home() {
             placeholder="Search"
             onChangeText={setSearchQuery}
             value={searchQuery}
-            style={{ width: '90%', borderRadius: 25 }}
+            style={[globalStyles.search, { width: '90%' }]}
             inputStyle={{ color: colors.text, fontSize: 15 }}
             onSubmitEditing={() => router.push(`/search?search=${searchQuery}`)}
           />

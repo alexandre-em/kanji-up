@@ -1,31 +1,31 @@
 export const menu = [
   {
     label: 'Select',
-    screen: 'Category',
+    screen: '/category',
     icon: 'cards',
     navOpt: null,
   },
   {
     label: 'Train',
-    screen: 'Flashcard',
+    screen: '/flashcard',
     icon: 'cards-playing-heart-multiple',
     navOpt: { evaluation: false },
   },
   {
     label: 'Evaluate',
-    screen: 'Flashcard',
+    screen: '/evaluation',
     icon: 'cards-playing-heart-multiple',
     navOpt: { evaluation: true },
   },
   {
     label: 'Search',
-    screen: 'Search',
+    screen: '/search',
     icon: 'book-search',
     navOpt: null,
   },
   {
     label: 'Settings',
-    screen: 'Settings',
+    screen: '/settings',
     icon: 'application-settings',
     navOpt: { firstTime: false },
   },
