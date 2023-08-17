@@ -7,7 +7,8 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "test": "jest --watchAll"
+    "test": "jest --watchAll",
+    "build:web": "expo export -p web"
   },
   "jest": {
     "preset": "jest-expo"
@@ -28,6 +29,7 @@
     "expo-web-browser": "~12.3.2",
     "kanji-app-auth": "*",
     "kanji-app-core": "*",
+    "kanji-app-svg-ui": "*",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-native": "0.72.3",

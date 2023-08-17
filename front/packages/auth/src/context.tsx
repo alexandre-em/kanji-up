@@ -23,6 +23,10 @@ function useProtectedRoute(accessToken: string | null) {
     if (!accessToken && !access_token) {
       // Redirect to the sign-in page.
       router.replace('/');
+    } else {
+      if (!access_token) {
+        router.replace('/home');
+      }
     }
   }, [accessToken, access_token]);
 }

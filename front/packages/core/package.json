@@ -1,7 +1,7 @@
 {
   "name": "kanji-app-core",
   "version": "0.0.1",
-  "license": "MIT",
+  "private": "true",
   "dependencies": {
     "axios": "^1.4.0"
   },

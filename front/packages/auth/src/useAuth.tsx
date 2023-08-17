@@ -8,11 +8,14 @@ import { asyncstorageKeys } from './constants';
 
 WebBrowser.maybeCompleteAuthSession();
 
-export default function useKanjiAppAuth({ authUrl }: { authUrl: string }) {
+export default function useKanjiAppAuth() {
   const [isConnected, setIsConnected] = useState<boolean | null>(null);
   const [token, setToken] = useState<string | null>(null);
 
-  const login = useCallback(async () => {
+  const login = useCallback(async (authUrl: string | undefined) => {
+    if (!authUrl) {
+      throw new Error('Need an url to redirect');
+    }
     const results = await WebBrowser.openAuthSessionAsync(authUrl);
 
     if (results && results.type === 'success') {
@@ -32,7 +35,11 @@ export default function useKanjiAppAuth({ authUrl }: { authUrl: string }) {
     throw new Error('No token given. Aborting. Please try again.');
   }, []);
 
-  const logout = useCallback(async () => {
+  const logout = useCallback(async (authUrl: string | undefined) => {
+    if (!authUrl) {
+      throw new Error('Need an url to redirect');
+    }
+
     AsyncStorage.removeItem(asyncstorageKeys.ACCESS_TOKEN);
     await WebBrowser.openAuthSessionAsync(authUrl);
     // dispatch(settings.actions.logout());
