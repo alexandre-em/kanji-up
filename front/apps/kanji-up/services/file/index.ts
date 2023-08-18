@@ -1,5 +1,6 @@
-import { AxiosRequestConfig } from 'axios';
+import { AxiosRequestConfig, AxiosResponse } from 'axios';
 import core from 'kanji-app-core';
+import { PredictionType } from 'kanji-app-types';
 import { RefObject } from 'react';
 
 export const fileNames = {
@@ -38,7 +39,7 @@ export const uploadImage = async (canvasRef: RefObject<any>, kanji: string, opti
     canvasRef.current.toBlob((blob: Blob) => {
       core.recognitionService
         ?.post(kanji, blob, options)
-        .then((res) => {
+        .then((res: AxiosResponse<PredictionType[]>) => {
           resolve(res.data);
         })
         .catch(reject);

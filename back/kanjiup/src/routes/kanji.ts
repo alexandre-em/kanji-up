@@ -89,6 +89,7 @@ router.get('', getAll);
  *                          $ref: '#/components/schemas/Error'
  */
 router.get('/detail/:id', getOne);
+// TODO: Replace /detail/:id by /:id and FIX the response when the kanji is not found (returns 200, expected: 404)
 
 /**
  * @openapi

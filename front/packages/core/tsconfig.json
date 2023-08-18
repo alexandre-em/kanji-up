@@ -3,15 +3,9 @@
   "compilerOptions": {
     "rootDir": ".",
     "outDir": "./dist",
-    "baseUrl": ".",
-    "sourceMap": true,
-    "resolveJsonModule": true,
     "composite": true,
-    "allowJs": false,
     "declaration": true,
-    "declarationMap": true,
-    "jsx": "react",
-    "allowSyntheticDefaultImports": true
+    "declarationMap": true
   },
   "exclude": ["node_modules", "dist"]
 }

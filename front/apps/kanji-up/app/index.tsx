@@ -20,7 +20,7 @@ const endpointUrls = {
 export default function Page() {
   const AuthContext = useAuth();
   const dispatch = useDispatch();
-  const { token, login } = useKanjiAppAuth({ authUrl: authUrl + appId });
+  const { token, login } = useKanjiAppAuth();
 
   const signIn = useCallback(
     (accessToken: string) => {
@@ -38,7 +38,7 @@ export default function Page() {
   );
 
   const handleAuth = useCallback(async () => {
-    const accessToken = await login();
+    const accessToken = await login(authUrl + appId);
     signIn(accessToken);
   }, []);
 

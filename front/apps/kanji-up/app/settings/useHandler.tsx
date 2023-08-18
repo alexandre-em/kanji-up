@@ -62,7 +62,7 @@ export default function useHandlers({ values, isButtonDisabled, setDialog, setDi
   }, []);
 
   const handleSignout = useCallback(async () => {
-    await logout(process.env.EXPO_PUBLIC_AUTH_BASE_URL);
+    await logout(process.env.EXPO_PUBLIC_AUTH_BASE_URL + '/auth/logout');
     AuthContext!.signOut();
   }, []);
 
