@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { Image, Platform, ScrollView, Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import { Avatar, Button, Divider, IconButton, List } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 

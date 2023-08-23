@@ -54,8 +54,8 @@ export default [
     image: require('./images/grade10.jpg'),
   },
   {
-    id: 'custom',
-    title: 'Custom',
+    id: 'other',
+    title: 'Other',
     count: 10288,
     image: require('./images/custom.jpg'),
   },

@@ -5,7 +5,6 @@ import { useAuth, useKanjiAppAuth } from 'kanji-app-auth';
 import config from 'kanji-app-core';
 
 import styles from '../styles/global';
-import { useGlobalSearchParams } from 'expo-router';
 
 const authUrl = `${process.env.EXPO_PUBLIC_AUTH_BASE_URL}/auth/login?app_id=`;
 const appId = Platform.select({
@@ -19,7 +18,6 @@ const endpointUrls = {
 
 export default function Page() {
   const AuthContext = useAuth();
-  const { access_token } = useGlobalSearchParams();
   const { token, login } = useKanjiAppAuth();
 
   const signIn = useCallback(
@@ -33,11 +31,8 @@ export default function Page() {
     [AuthContext]
   );
 
-  console.warn(access_token);
-
   const handleAuth = useCallback(async () => {
     const accessToken = await login(authUrl + appId);
-    console.warn(accessToken);
     signIn(accessToken);
   }, []);
 

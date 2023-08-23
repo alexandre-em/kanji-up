@@ -1,13 +1,13 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { View } from 'react-native';
-import { Slot, Stack, router } from 'expo-router';
+import { Stack, router } from 'expo-router';
 import { Appbar, Button, Dialog, Paragraph, Portal } from 'react-native-paper';
 import { useSelector, useDispatch } from 'react-redux';
 import { KanjiType } from 'kanji-app-types';
 
 import global from 'styles/global';
 import { RootState } from 'store';
-import { user, evaluation } from 'store/slices';
+import { evaluation } from 'store/slices';
 
 type QuizzContextValues = { kanjis: KanjiType[]; onFinish: () => void };
 
@@ -31,14 +31,14 @@ export default function Quizz() {
   const evaluationState = useSelector((state: RootState) => state.evaluation);
 
   const handleConfirmFinish = React.useCallback(() => {
-    if (user) {
-      dispatch(user.actions.addScoreDaily(Math.round(evaluationState.totalScore)));
-    }
-
-    dispatch(evaluation.actions.reset({ time: settingsState.evaluationTime, totalCard: settingsState.evaluationCardNumber }));
     setDialog(false);
     router.push('/home');
   }, [evaluationState]);
+
+  const handleBack = React.useCallback(() => {
+    dispatch(evaluation.actions.reset({ time: settingsState.evaluationTime, totalCard: settingsState.evaluationCardNumber }));
+    router.back();
+  }, []);
 
   const sKanji = useMemo(() => Object.values(kanjiState.selectedKanji), [kanjiState]);
 
@@ -83,7 +83,7 @@ export default function Quizz() {
     <QuizzContext.Provider value={{ kanjis: sKanji, onFinish: handleConfirmFinish }}>
       <View style={global.main}>
         <Appbar.Header>
-          <Appbar.BackAction onPress={() => router.back()} />
+          <Appbar.BackAction onPress={handleBack} />
           <Appbar.Content title="Quizz" titleStyle={{ color: '#fff', fontWeight: '700', fontSize: 17 }} />
         </Appbar.Header>
         <Stack>
