@@ -1,0 +1,3 @@
+utils/RecognitionModel/kanji_web_model
+*.tflite
+*.bin
