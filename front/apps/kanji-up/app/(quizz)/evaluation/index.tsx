@@ -67,9 +67,7 @@ export default function Evaluate() {
         // if (settingsState.useLocalModel) {
         //   predictFunction = ModelContext?.models.recognition.predict(imageBase64);
         // } else {
-        predictFunction = uploadImage(canvasRef, details!.character as string, {
-          headers: { Authorization: `Bearer ${AuthContext.token}` },
-        });
+        predictFunction = uploadImage(canvasRef, details!.character as string);
         // }
 
         predictFunction

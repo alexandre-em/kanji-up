@@ -8,7 +8,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "test": "jest --watchAll",
-    "build:web": "expo export -p web"
+    "build:web": "expo export -p web && cp ./assets/_redirects ./dist/"
   },
   "jest": {
     "preset": "jest-expo"
