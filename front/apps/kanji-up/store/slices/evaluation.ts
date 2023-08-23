@@ -28,13 +28,14 @@ const addPoints = (state: EvaluationState, action: PayloadAction<number>) => {
   return { ...state, totalScore: state.totalScore + action.payload };
 };
 
-const updateAnswerStatus = (state: EvaluationState, action: PayloadAction<{ id: number; status: string; message: string }>) => {
+const updateAnswerStatus = (state: EvaluationState, action: PayloadAction<{ id: string; status: string; message: string }>) => {
   if (action.payload.status !== 'correct' && action.payload.status !== 'incorrect' && action.payload.status !== 'toReview')
     return state;
 
   const newState = state;
-  state.answers[action.payload.id].status = action.payload.status;
-  state.answers[action.payload.id].message = action.payload.message;
+  const answer = state.answers.find((ans) => ans.recognitionId === action.payload.id);
+  answer!.status = action.payload.status;
+  answer!.message = action.payload.message;
 
   return newState;
 };

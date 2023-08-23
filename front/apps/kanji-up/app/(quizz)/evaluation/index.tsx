@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Platform, Text, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { Button, ProgressBar, Surface } from 'react-native-paper';
+import { Button } from 'react-native-paper';
 import Sketch from 'kanji-app-sketch';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import { useKanjiAppAuth } from 'kanji-app-auth';
@@ -12,6 +12,7 @@ import { RootState } from 'store';
 import { colors } from 'constants/Colors';
 import { error, evaluation } from 'store/slices';
 import { uploadImage } from 'services/file';
+import { router } from 'expo-router';
 
 export default function Evaluate() {
   const dispatch = useDispatch();
@@ -64,40 +65,39 @@ export default function Evaluate() {
         );
       } else {
         // if (settingsState.useLocalModel) {
-        //   predictFunction = model.predict(imageBase64);
+        //   predictFunction = ModelContext?.models.recognition.predict(imageBase64);
         // } else {
-        //   predictFunction = uploadImage(canvasRef, details!.character as string, {
-        //     headers: { Authorization: `Bearer ${AuthContext.token}` },
-        //   });
+        predictFunction = uploadImage(canvasRef, details!.character as string, {
+          headers: { Authorization: `Bearer ${AuthContext.token}` },
+        });
         // }
 
-        // predictFunction
-        //   .then((prediction: any) => {
-        //     const predictedKanji = prediction.find((p: any) => p.prediction === details!.character);
+        predictFunction
+          .then((prediction: any) => {
+            const predictedKanji = prediction.find((p: any) => p.prediction === details!.character);
 
-        //     dispatch(
-        //       evaluation.actions.addAnswer({
-        //         kanji: details!.character as string,
-        //         recognitionId: `${counter}`,
-        //         image: imageBase64WFormat,
-        //         answer: prediction,
-        //         status: !predictedKanji ? 'toReview' : 'correct',
-        //         message: !predictedKanji ? 'The drawed kanji seems incorrect, please confirm' : 'Correct answer !',
-        //       })
-        //     );
-        //     if (predictedKanji) {
-        //       const grade = kanjiQueue[counter].reference?.grade;
-        //       dispatch(
-        //         evaluation.actions.addPoints(
-        //           Math.max(predictedKanji.score * 100 * (grade === 'custom' ? 8 : parseInt(grade || '1', 10)), 10)
-        //         )
-        //       );
-        //     }
-        //   })
-        //   .catch((err: any) => {
-        //     dispatch(error.actions.update({ message: err.message }));
-        //   });
-        console.log('PREDICTION');
+            dispatch(
+              evaluation.actions.addAnswer({
+                kanji: details!.character as string,
+                recognitionId: `${counter}`,
+                image: imageBase64WFormat,
+                answer: prediction,
+                status: !predictedKanji ? 'toReview' : 'correct',
+                message: !predictedKanji ? 'The drawed kanji seems incorrect, please confirm' : 'Correct answer !',
+              })
+            );
+            if (predictedKanji) {
+              const grade = kanjiQueue[counter].reference?.grade;
+              dispatch(
+                evaluation.actions.addPoints(
+                  Math.max(predictedKanji.score * 100 * (grade === 'custom' ? 8 : parseInt(grade || '1', 10)), 10)
+                )
+              );
+            }
+          })
+          .catch((err: any) => {
+            dispatch(error.actions.update({ message: err.message }));
+          });
       }
 
       handleClear();
@@ -131,6 +131,12 @@ export default function Evaluate() {
     return () => {};
   }, [timer]);
 
+  useEffect(() => {
+    if (counter && counter >= settingsState.evaluationCardNumber) {
+      router.push('/modal');
+    }
+  }, [counter]);
+
   if (kanjiQueue.length <= counter || !kanjiQueue[counter]) {
     return <Text>Loading...</Text>;
   }
@@ -147,7 +153,7 @@ export default function Evaluate() {
           {() => <Text style={{ color: colors.text, fontWeight: '900' }}>{timer}</Text>}
         </AnimatedCircularProgress>
         <View style={{ justifyContent: 'center', marginLeft: 30 }}>
-          <Text style={[styles.text, { color: colors.primary }]}>
+          <Text style={[styles.text, { color: colors.primary, fontWeight: 'bold' }]}>
             Card: {counter + 1} / {settingsState.evaluationCardNumber}
           </Text>
           <Text style={styles.text}>on: {kanjiQueue[counter].kanji!.onyomi}</Text>

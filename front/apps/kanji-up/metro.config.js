@@ -1,6 +1,5 @@
 // Learn more https://docs.expo.io/guides/customizing-metro
 const { getDefaultConfig } = require('expo/metro-config');
-const defaultAssetExts = require('metro-config/src/defaults/defaults').assetExts;
 
 /** @type {import('expo/metro-config').MetroConfig} */
 const config = getDefaultConfig(__dirname, {
@@ -8,7 +7,9 @@ const config = getDefaultConfig(__dirname, {
   isCSSEnabled: true,
 });
 
-const assetsExts = config.resolver.assetsExts ?? [];
-config.resolver.assetsExts = [...defaultAssetExts, 'bin', 'tflite', 'cjs', 'mjs'];
+const sourceExts = config.resolver.sourceExts ?? [];
+config.resolver.sourceExts = [...sourceExts, 'bin', 'tflite', 'mjs'];
+const assetExts = config.resolver.assetExts ?? [];
+config.resolver.assetExts = [...assetExts, 'bin', 'tflite', 'mjs'];
 
 module.exports = config;

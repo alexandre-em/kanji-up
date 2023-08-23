@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { View } from 'react-native';
-import { Slot, router } from 'expo-router';
-import { ActivityIndicator, Appbar, Button, Dialog, Paragraph, Portal } from 'react-native-paper';
+import { Slot, Stack, router } from 'expo-router';
+import { Appbar, Button, Dialog, Paragraph, Portal } from 'react-native-paper';
 import { useSelector, useDispatch } from 'react-redux';
 import { KanjiType } from 'kanji-app-types';
 
@@ -36,7 +36,8 @@ export default function Quizz() {
     }
 
     dispatch(evaluation.actions.reset({ time: settingsState.evaluationTime, totalCard: settingsState.evaluationCardNumber }));
-    router.back();
+    setDialog(false);
+    router.push('/home');
   }, [evaluationState]);
 
   const sKanji = useMemo(() => Object.values(kanjiState.selectedKanji), [kanjiState]);
@@ -70,22 +71,13 @@ export default function Quizz() {
   useEffect(() => {
     if (Object.keys(kanjiState.selectedKanji).length < 1) {
       setMessage({
-        title: `Warning: no kanji`,
-        content: "You havn't selected kanji to start a flashcard session",
+        title: `Warning`,
+        content: 'No kanji have been selected',
         component: undefined,
       });
       setDialog(true);
     }
   }, [kanjiState]);
-
-  // if (settingState.useLocalModel && model && !model.model) {
-  //   return (
-  //     <View style={{ display: 'flex', flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-  //       <ActivityIndicator animating />
-  //       <Text>Loading model...</Text>
-  //     </View>
-  //   );
-  // }
 
   return (
     <QuizzContext.Provider value={{ kanjis: sKanji, onFinish: handleConfirmFinish }}>
@@ -94,7 +86,30 @@ export default function Quizz() {
           <Appbar.BackAction onPress={() => router.back()} />
           <Appbar.Content title="Quizz" titleStyle={{ color: '#fff', fontWeight: '700', fontSize: 17 }} />
         </Appbar.Header>
-        <Slot />
+        <Stack>
+          <Stack.Screen
+            name="evaluation/index"
+            options={{
+              // Hide the header for all other routes.
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="flashcard/index"
+            options={{
+              // Hide the header for all other routes.
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="modal"
+            options={{
+              // Set the presentation mode to modal for our modal route.
+              headerShown: false,
+              presentation: 'modal',
+            }}
+          />
+        </Stack>
         {dialogComponent}
       </View>
     </QuizzContext.Provider>

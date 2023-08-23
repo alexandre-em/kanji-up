@@ -26,10 +26,7 @@ export default function Search() {
 
   const handleSubmit = useCallback(
     async ({ page } = { page: 1 }, customSearch?: string) => {
-      if (customSearch && customSearch !== '') {
-        setSearch(customSearch);
-      }
-      if (search && search !== '' && searchInput && searchInput !== '') {
+      if ((customSearch && customSearch !== '') || (searchInput && searchInput !== '')) {
         setLoading(true);
         const cancelToken = axios.CancelToken.source();
         const handleError = (err: Error) =>
@@ -38,10 +35,7 @@ export default function Search() {
           );
         try {
           await core
-            .kanjiService!.search(
-              { query: customSearch || searchInput, page, limit },
-              { cancelToken: cancelToken.token, headers: { Authorization: `Bearer ${access_token}` } }
-            )
+            .kanjiService!.search({ query: customSearch || searchInput, page, limit }, { cancelToken: cancelToken.token })
             .then((res: AxiosResponse<Pagination<KanjiType>>) => {
               setResult(res.data);
               setLoading(false);
@@ -58,7 +52,7 @@ export default function Search() {
 
       return;
     },
-    [searchInput, search, limit, access_token]
+    [searchInput, limit, access_token]
   );
 
   useEffect(() => {
