@@ -62,10 +62,13 @@ export default function Settings() {
         <Text style={global.title}>Application&apos;s settings</Text>
         <View style={styles.switchGroup}>
           <Text style={global.subtitle}>Use offline recognition model</Text>
+          <Switch value={false} onValueChange={() => {}} />
+          {/*
           <Switch
-            value={values.useLocalModel}
+            value={false}
             onValueChange={() => setValues((prevState) => ({ ...prevState, useLocalModel: !prevState.useLocalModel }))}
           />
+          */}
         </View>
         <Text style={global.subtitle}>Practice flashcard number</Text>
         <Slider

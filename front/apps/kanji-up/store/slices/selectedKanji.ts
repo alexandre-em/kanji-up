@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { KanjiType } from 'kanji-app-types';
 
 const initialState: SelectedKanjiState = {
   selectedKanji: {},

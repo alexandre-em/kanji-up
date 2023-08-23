@@ -125,6 +125,7 @@ export default function Home() {
         open={open.open}
         icon={open.open ? 'close' : 'menu'}
         color="white"
+        style={{ backgroundColor: !open.open ? colors.elevation.level0 : colors.elevation.level3 + 'B0' }}
         fabStyle={{ backgroundColor: colors.secondary }}
         actions={menu.map((m) => ({
           ...m,

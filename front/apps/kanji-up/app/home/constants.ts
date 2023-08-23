@@ -3,31 +3,26 @@ export const menu = [
     label: 'Select',
     screen: '/category',
     icon: 'cards',
-    navOpt: null,
   },
   {
     label: 'Train',
     screen: '/flashcard',
     icon: 'cards-playing-heart-multiple',
-    navOpt: { evaluation: false },
   },
   {
     label: 'Evaluate',
     screen: '/evaluation',
     icon: 'cards-playing-heart-multiple',
-    navOpt: { evaluation: true },
   },
   {
     label: 'Search',
     screen: '/search',
     icon: 'book-search',
-    navOpt: null,
   },
   {
     label: 'Settings',
     screen: '/settings',
     icon: 'application-settings',
-    navOpt: { firstTime: false },
   },
 ];
 
