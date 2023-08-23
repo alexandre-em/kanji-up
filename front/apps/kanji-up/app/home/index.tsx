@@ -4,7 +4,8 @@ import { FlatList, SafeAreaView, ScrollView, Text, TouchableOpacity, View } from
 import { Avatar, Button, FAB, Searchbar } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { asyncstorageKeys } from 'kanji-app-auth';
+import { asyncstorageKeys, useAuth } from 'kanji-app-auth';
+import jwtDecode from 'jwt-decode';
 
 import { RootState } from 'store';
 import globalStyles from 'styles/global';
@@ -17,11 +18,13 @@ import styles from './style';
 import { menu, list } from './constants';
 import RandomKanji from './components/randomKanji';
 import Stepper from './components/stepper';
+import { DecodedToken } from 'kanji-app-types';
 
 export default function Home() {
   const dispatch = useDispatch();
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [isFirstTime, setIsFirstTime] = useState<boolean>(false);
+  const AuthContext = useAuth();
   const settingsState = useSelector((state: RootState) => state.settings);
   const userState = useSelector((state: RootState) => state.user);
   const [open, setOpen] = useState({ open: false });
@@ -53,6 +56,14 @@ export default function Home() {
       })
       .catch(console.error);
   }, []);
+
+  useEffect(() => {
+    if (AuthContext?.accessToken) {
+      const decodedToken: DecodedToken = jwtDecode(AuthContext.accessToken);
+
+      dispatch(settings.actions.update({ username: decodedToken.name }));
+    }
+  }, [AuthContext?.accessToken]);
 
   const renderItem = ({ item }: { item: (typeof list)[0] }) => (
     <GradientCard

@@ -1,5 +1,5 @@
 import React from 'react';
-import { router, useGlobalSearchParams } from 'expo-router';
+import { router, useGlobalSearchParams, useRootNavigation } from 'expo-router';
 
 export type AuthContextValueType = {
   accessToken: string | null;
@@ -17,18 +17,23 @@ export function useAuth() {
 // This hook will protect the route access based on user authentication.
 function useProtectedRoute(accessToken: string | null) {
   const { access_token } = useGlobalSearchParams();
+  const rootNavigation = useRootNavigation();
 
   React.useEffect(() => {
     // If the user is not signed in and the initial segment is not anything in the auth group.
     if (!accessToken && !access_token) {
       // Redirect to the sign-in page.
-      router.replace('/');
+      if (rootNavigation?.isReady()) {
+        new Promise((r) => setTimeout(r, 2000)).then(() => router.replace('/'));
+      }
     } else {
       if (!access_token) {
-        router.replace('/home');
+        if (rootNavigation?.isReady()) {
+          new Promise((r) => setTimeout(r, 2000)).then(() => router.replace('/home'));
+        }
       }
     }
-  }, [accessToken, access_token]);
+  }, [rootNavigation?.isReady, accessToken, access_token]);
 }
 
 export function Provider({ children }: { children: React.ReactNode }) {

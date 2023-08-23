@@ -1,17 +1,17 @@
 import { useCallback, useEffect } from 'react';
-import { Image, SafeAreaView, Text } from 'react-native';
+import { Image, Platform, SafeAreaView, Text } from 'react-native';
 import { Button } from 'react-native-paper';
 import { useAuth, useKanjiAppAuth } from 'kanji-app-auth';
 import config from 'kanji-app-core';
-import jwtDecode from 'jwt-decode';
 
 import styles from '../styles/global';
-import { useDispatch } from 'react-redux';
-import { settings } from 'store/slices';
-import { DecodedToken } from 'kanji-app-types';
+import { useGlobalSearchParams } from 'expo-router';
 
 const authUrl = `${process.env.EXPO_PUBLIC_AUTH_BASE_URL}/auth/login?app_id=`;
-const appId = process.env.EXPO_PUBLIC_AUTH_APP_ID_WEB;
+const appId = Platform.select({
+  web: process.env.EXPO_PUBLIC_AUTH_APP_ID_WEB,
+  native: process.env.EXPO_PUBLIC_AUTH_APP_ID_NATIVE,
+});
 const endpointUrls = {
   kanji: process.env.EXPO_PUBLIC_KANJI_BASE_URL,
   recognition: process.env.EXPO_PUBLIC_RECOGNITION_BASE_URL,
@@ -19,7 +19,7 @@ const endpointUrls = {
 
 export default function Page() {
   const AuthContext = useAuth();
-  const dispatch = useDispatch();
+  const { access_token } = useGlobalSearchParams();
   const { token, login } = useKanjiAppAuth();
 
   const signIn = useCallback(
@@ -28,17 +28,16 @@ export default function Page() {
         AuthContext.signIn(accessToken);
 
         config.init(endpointUrls, accessToken);
-
-        const decodedToken: DecodedToken = jwtDecode(accessToken);
-
-        dispatch(settings.actions.update({ username: decodedToken.name }));
       }
     },
     [AuthContext]
   );
 
+  console.warn(access_token);
+
   const handleAuth = useCallback(async () => {
     const accessToken = await login(authUrl + appId);
+    console.warn(accessToken);
     signIn(accessToken);
   }, []);
 
