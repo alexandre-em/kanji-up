@@ -19,9 +19,9 @@
     "lib": ["DOM", "ESNext"],
     // "types": ["./packages/types", "jest", "reflect-metadata"],
     // "typeRoots": ["./src/types", "./node_modules/@types"],
-    "typeRoots": ["../../node_modules/kanji-app-types", "../../node_modules/@types"],
+    // "typeRoots": ["../../node_modules/kanji-app-types", "../../node_modules/@types"],
     "resolveJsonModule": true,
     "target": "ESNext"
   },
-  "exclude": ["node_modules", "dist", "*.d.ts"]
+  "exclude": ["node_modules", "dist"]
 }

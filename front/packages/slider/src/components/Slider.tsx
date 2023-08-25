@@ -19,9 +19,18 @@ export default function Slider({ value, min, max, color, onValueChange }: Slider
     return ((value - min) / max) * 100;
   }, [value, min, max]);
 
+  const handlePressIn = useCallback(() => {
+    setIsDragging(true);
+  }, []);
+
   const handleSlide = useCallback(
     (e: GestureResponderEvent | any) => {
-      const x = Platform.OS === 'web' ? e.nativeEvent.layerX : e.nativeEvent.locationX;
+      const x =
+        Platform.OS === 'web'
+          ? e.nativeEvent?.touches
+            ? e.nativeEvent.touches[0].clientX
+            : e.nativeEvent.layerX
+          : e.nativeEvent.locationX;
       if (isDragging) {
         setPos(x);
       }
@@ -48,6 +57,8 @@ export default function Slider({ value, min, max, color, onValueChange }: Slider
       onTouchMove={handleSlide}
       onMouseUp={handlePressOut}
       onTouchEnd={handlePressOut}
+      onMouseDown={handlePressIn}
+      onTouchStart={handlePressIn}
       height={50}>
       <Text x={(Math.min(width, 700) - 20) / 2} y={20} textAnchor="middle" fontWeight="bold" fill={color}>
         {value}
@@ -60,14 +71,7 @@ export default function Slider({ value, min, max, color, onValueChange }: Slider
       </Text>
       <Rect x={0} y={30} width={`${progressValue}%`} height={5} rx={3} fill={color} />
       <Rect x={`${progressValue}%`} y={30} width={`${100 - progressValue}%`} height={5} rx={3} fill={color} />
-      <Circle
-        cx={pos}
-        cy={32}
-        r="12"
-        fill={color}
-        onMouseDown={() => setIsDragging(true)}
-        onPressIn={() => setIsDragging(true)}
-      />
+      <Circle cx={pos} cy={32} r="12" fill={color} />
     </Svg>
   );
 }
