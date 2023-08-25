@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { RootState } from 'store';
 import { colors } from 'constants/Colors';
-import { evaluation, user } from 'store/slices';
+import { evaluation, kanji, user } from 'store/slices';
 import { router } from 'expo-router';
 import global from 'styles/global';
 
@@ -26,17 +26,18 @@ export default function Modal() {
   }, []);
 
   const handleValidate = useCallback(
-    (id: string) => {
+    (id: string, kanjiId: string) => {
       dispatch(
         evaluation.actions.updateAnswerStatus({ id, status: 'correct', message: 'This answer has been validated by the user' })
       );
       dispatch(evaluation.actions.addPoints(USER_VALIDATE_POINT));
+      dispatch(kanji.actions.updateProgression({ id: kanjiId, inc: 1 }));
     },
     [dispatch]
   );
 
   const handleUnvalidate = useCallback(
-    (id: string) => {
+    (id: string, kanjiId: string) => {
       dispatch(
         evaluation.actions.updateAnswerStatus({
           id,
@@ -44,6 +45,7 @@ export default function Modal() {
           message: 'This answer has been unvalidated by the user',
         })
       );
+      dispatch(kanji.actions.updateProgression({ id: kanjiId, inc: -2 }));
     },
     [dispatch]
   );
@@ -66,12 +68,12 @@ export default function Modal() {
                     <IconButton
                       icon="checkbox-marked-circle-outline"
                       iconColor="#bdf56e"
-                      onPress={() => handleValidate(a.recognitionId!)}
+                      onPress={() => handleValidate(a.recognitionId!, a.kanjiId)}
                     />
                     <IconButton
                       icon="close-circle-outline"
                       iconColor={colors.primaryDark}
-                      onPress={() => handleUnvalidate(a.recognitionId!)}
+                      onPress={() => handleUnvalidate(a.recognitionId!, a.kanjiId)}
                     />
                   </View>
                 )

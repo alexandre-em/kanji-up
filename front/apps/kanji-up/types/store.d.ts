@@ -8,6 +8,7 @@ type SelectedKanjiState = {
   selectedKanji: { [key: string]: Partial<KanjiType> };
   toAdd: { [key: string]: Partial<KanjiType> };
   toRemove: { [key: string]: Partial<KanjiType> };
+  progression: { [id: string]: number };
   status: 'done' | 'inProgress' | 'error' | 'pending';
 };
 
@@ -15,6 +16,7 @@ type AnswerType = {
   recognitionId?: string;
   image: string;
   kanji: string;
+  kanjiId: string;
   status: 'correct' | 'incorrect' | 'toReview';
   message: string | string[];
   answer: PredictionType[] | [];

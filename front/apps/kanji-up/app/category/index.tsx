@@ -21,7 +21,9 @@ export default function Category() {
             key={`grade-${c.id}`}
             style={{ position: 'relative' }}>
             <Image source={c.image} style={styles.tileImage} />
-            <Text style={styles.title}>{c.title}</Text>
+            <Text style={styles.title}>
+              {c.title} ({c.count})
+            </Text>
           </TouchableOpacity>
         ))}
       </ScrollView>

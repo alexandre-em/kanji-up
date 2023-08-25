@@ -13,6 +13,7 @@ import { RootState } from 'store';
 import global from 'styles/global';
 import core from 'kanji-app-core';
 import { router, useGlobalSearchParams } from 'expo-router';
+import { KANJI_PROGRESSION_MAX } from 'constants';
 
 export default function KanjiDetail() {
   const { width } = useWindowDimensions();
@@ -67,53 +68,57 @@ export default function KanjiDetail() {
       <Appbar.Header>
         <Appbar.BackAction onPress={() => router.back()} />
         <Appbar.Content
-          title={`Detail of ${details.kanji.character}`}
+          title={`Detail of ${details.kanji.character} ${
+            kanjiState.progression[details.kanji_id] !== undefined
+              ? `(${(kanjiState.progression[details.kanji_id] / KANJI_PROGRESSION_MAX) * 100}%)`
+              : ''
+          }`}
           titleStyle={{ color: '#fff', fontWeight: '700', fontSize: 17 }}
         />
       </Appbar.Header>
-      <ScrollView>
-        <View style={styles.content}>
-          <Surface elevation={4} style={{ marginRight: 12, position: 'relative' }}>
-            <View
-              style={{ borderColor: '#e0e0e0', borderRightWidth: 1, position: 'absolute', width: '50%', height: '100%' }}></View>
-            <View
-              style={{ borderColor: '#e0e0e0', borderBottomWidth: 1, position: 'absolute', width: '100%', height: '50%' }}></View>
-            <SvgUriPlatform
-              width={imgSize}
-              height={imgSize}
-              uri={`https://www.miraisoft.de/anikanjivgx/?svg=${encodeURI(details.kanji.character as string)}`}
-            />
-          </Surface>
-          <View style={{ width: (width < 700 ? width : 680) - imgSize }}>
-            <Text style={global.title}>Onyomi</Text>
-            <View style={styles.tags}>
-              {(details.kanji.onyomi || [])
-                .join('|')
-                .split(/,|\||、/)
-                .map((k) => (
-                  <Chip key={`on-${k}`} textStyle={{ color: '#fff' }} style={styles.tag}>
-                    {k}
-                  </Chip>
-                ))}
-            </View>
-            <Text style={global.title}>Kunyomi</Text>
-            <View style={styles.tags}>
-              {(details.kanji.kunyomi || [])
-                .join('|')
-                .split(/,|\||、/)
-                .map((k) => (
-                  <Chip key={`kun-${k}`} textStyle={{ color: '#fff' }} style={styles.tag}>
-                    {k}
-                  </Chip>
-                ))}
-            </View>
+      <View style={styles.content}>
+        <Surface elevation={4} style={{ marginRight: 12, position: 'relative' }}>
+          <View
+            style={{ borderColor: '#e0e0e0', borderRightWidth: 1, position: 'absolute', width: '50%', height: '100%' }}></View>
+          <View
+            style={{ borderColor: '#e0e0e0', borderBottomWidth: 1, position: 'absolute', width: '100%', height: '50%' }}></View>
+          <SvgUriPlatform
+            width={imgSize}
+            height={imgSize}
+            uri={`https://www.miraisoft.de/anikanjivgx/?svg=${encodeURI(details.kanji.character as string)}`}
+          />
+        </Surface>
+        <View style={{ width: (width < 700 ? width : 680) - imgSize }}>
+          <Text style={global.title}>Onyomi</Text>
+          <View style={styles.tags}>
+            {(details.kanji.onyomi || [])
+              .join('|')
+              .split(/,|\||、/)
+              .map((k) => (
+                <Chip key={`on-${k}`} textStyle={{ color: '#fff' }} style={styles.tag}>
+                  {k}
+                </Chip>
+              ))}
+          </View>
+          <Text style={global.title}>Kunyomi</Text>
+          <View style={styles.tags}>
+            {(details.kanji.kunyomi || [])
+              .join('|')
+              .split(/,|\||、/)
+              .map((k) => (
+                <Chip key={`kun-${k}`} textStyle={{ color: '#fff' }} style={styles.tag}>
+                  {k}
+                </Chip>
+              ))}
           </View>
         </View>
-        {!access_token && (
-          <Button mode={isSelected ? 'outlined' : 'contained'} onPress={handlePress} style={styles.button}>
-            {isSelected ? 'Unselect' : 'Select'}
-          </Button>
-        )}
+      </View>
+      {!access_token && (
+        <Button mode={isSelected ? 'outlined' : 'contained'} onPress={handlePress} style={styles.button}>
+          {isSelected ? 'Unselect' : 'Select'}
+        </Button>
+      )}
+      <ScrollView>
         <View style={styles.details}>
           <List.Accordion title="Details" description="number of stroke, meanings, etc." style={{ backgroundColor: '#f8f8f8' }}>
             <DataTable.Row>

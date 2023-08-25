@@ -1,12 +1,15 @@
 import { router } from 'expo-router';
-import { Image, Platform } from 'react-native';
-import { List } from 'react-native-paper';
+import { Image, Platform, Text } from 'react-native';
+import { List, ProgressBar } from 'react-native-paper';
 import { SvgUri } from 'react-native-svg';
 import { useSelector } from 'react-redux';
 
 import { KanjiType } from 'kanji-app-types';
 
-import { RootState } from '../../../store';
+import { RootState } from 'store';
+import { AnimatedCircularProgress } from 'react-native-circular-progress';
+import { colors } from 'constants';
+import { KANJI_PROGRESSION_MAX } from 'constants';
 
 export default function RandomKanji() {
   const kanjiState = useSelector((state: RootState) => state.kanji);
@@ -43,7 +46,21 @@ export default function RandomKanji() {
         title={choosenKanji.kanji?.meaning}
         description="See details"
         left={icon}
-        onPress={() => router.push(`/kanji/${choosenKanji.kanji_id as string}`)}
+        right={() => (
+          <AnimatedCircularProgress
+            size={40}
+            width={7}
+            fill={(kanjiState.progression[choosenKanji.kanji_id!] ?? 0 / KANJI_PROGRESSION_MAX) * 100}
+            tintColor={colors.primary}
+            backgroundColor={colors.primary + '75'}>
+            {() => (
+              <Text style={{ color: colors.text, fontWeight: '900' }}>
+                {(kanjiState.progression[choosenKanji.kanji_id!] ?? 0 / KANJI_PROGRESSION_MAX) * 100}
+              </Text>
+            )}
+          </AnimatedCircularProgress>
+        )}
+        onPress={() => router.push(`/kanji/${choosenKanji.kanji_id}`)}
         style={{ marginHorizontal: 20 }}
       />
     );

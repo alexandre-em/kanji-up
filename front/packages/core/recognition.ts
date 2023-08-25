@@ -11,6 +11,10 @@ export default class RecognitionService {
     });
   }
 
+  health(options?: AxiosRequestConfig): Promise<AxiosResponse<string>> {
+    return this._instance.get('/health', options);
+  }
+
   post(kanji: string, image: Blob, options?: AxiosRequestConfig): Promise<AxiosResponse<PredictionType[]>> {
     if (!this._instance) throw new Error('Recognition instance not ready...');
     if (!image) throw new Error('Image is null');

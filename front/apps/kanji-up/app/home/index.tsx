@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Href, router } from 'expo-router';
 import { FlatList, SafeAreaView, ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import { Avatar, Button, FAB, Searchbar } from 'react-native-paper';
+import { Avatar, Button, FAB, List, Searchbar } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { asyncstorageKeys, useAuth } from 'kanji-app-auth';
@@ -19,11 +19,13 @@ import { menu, list } from './constants';
 import RandomKanji from './components/randomKanji';
 import Stepper from './components/stepper';
 import { DecodedToken } from 'kanji-app-types';
+import core from 'kanji-app-core';
 
 export default function Home() {
   const dispatch = useDispatch();
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [isFirstTime, setIsFirstTime] = useState<boolean>(false);
+  const [recognitionColor, setRecognitionColor] = useState<boolean>(false);
   const AuthContext = useAuth();
   const settingsState = useSelector((state: RootState) => state.settings);
   const userState = useSelector((state: RootState) => state.user);
@@ -55,6 +57,11 @@ export default function Home() {
         }
       })
       .catch(console.error);
+
+    core.recognitionService
+      ?.health()
+      .then(({ status }) => setRecognitionColor(status === 200))
+      .catch(() => setRecognitionColor(false));
   }, []);
 
   useEffect(() => {
@@ -103,6 +110,13 @@ export default function Home() {
         </View>
 
         <Stepper />
+
+        <Text style={globalStyles.title}>Server health</Text>
+        <List.Item
+          title="Recognition service"
+          left={() => <List.Icon icon="square-rounded" color={recognitionColor ? 'green' : 'red'} />}
+          style={{ marginHorizontal: 20 }}
+        />
 
         <Text style={globalStyles.title}>Random</Text>
         <RandomKanji />

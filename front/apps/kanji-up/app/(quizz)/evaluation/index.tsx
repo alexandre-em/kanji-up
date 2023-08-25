@@ -4,22 +4,19 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Button } from 'react-native-paper';
 import Sketch from 'kanji-app-sketch';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
-import { useKanjiAppAuth } from 'kanji-app-auth';
 
 import { useQuizzContext } from '../_layout';
 import styles from '../style';
 import { RootState } from 'store';
 import { colors } from 'constants/Colors';
-import { error, evaluation } from 'store/slices';
+import { error, evaluation, kanji } from 'store/slices';
 import { uploadImage } from 'services/file';
 import { router } from 'expo-router';
 
 export default function Evaluate() {
   const dispatch = useDispatch();
   const QuizzContext = useQuizzContext();
-  const AuthContext = useKanjiAppAuth();
   const canvasRef = useRef<any>();
-  const progressCircleRef = useRef<any>();
   const settingsState = useSelector((state: RootState) => state.settings);
   const [counter, setCounter] = useState<number>(0);
   const [timer, setTimer] = useState<number>(settingsState.evaluationTime || 60);
@@ -33,7 +30,7 @@ export default function Evaluate() {
       );
     }
     return [];
-  }, [QuizzContext.kanjis, settingsState.evaluationCardNumber]);
+  }, []);
 
   const handleClear = useCallback(() => {
     if (canvasRef && canvasRef.current) {
@@ -57,12 +54,14 @@ export default function Evaluate() {
         dispatch(
           evaluation.actions.addAnswer({
             kanji: details!.character as string,
+            kanjiId: kanjiQueue[counter].kanji_id,
             image: imageBase64WFormat,
             answer: [],
             status: 'incorrect',
             message: strokeCount === 0 ? 'This kanji has been skipped' : "The stroke number wasn't correct",
           })
         );
+        dispatch(kanji.actions.updateProgression({ id: kanjiQueue[counter].kanji_id, inc: strokeCount === 0 ? 0 : -2 }));
       } else {
         // if (settingsState.useLocalModel) {
         //   predictFunction = ModelContext?.models.recognition.predict(imageBase64);
@@ -77,6 +76,7 @@ export default function Evaluate() {
             dispatch(
               evaluation.actions.addAnswer({
                 kanji: details!.character as string,
+                kanjiId: kanjiQueue[counter].kanji_id,
                 recognitionId: `${counter}`,
                 image: imageBase64WFormat,
                 answer: prediction,
@@ -91,6 +91,7 @@ export default function Evaluate() {
                   Math.max(predictedKanji.score * 100 * (grade === 'custom' ? 8 : parseInt(grade || '1', 10)), 10)
                 )
               );
+              dispatch(kanji.actions.updateProgression({ id: kanjiQueue[counter].kanji_id, inc: 2 }));
             }
           })
           .catch((err: any) => {
@@ -98,17 +99,13 @@ export default function Evaluate() {
           });
       }
 
+      // next card
       handleClear();
       // setKanjiQueue((prev) => prev?.slice(1) || prev);
+      setTimer(settingsState.evaluationTime);
       setCounter((prev) => prev + 1);
-      // next card
-      if (Platform.OS === 'web' && settingsState) {
-        setTimer(settingsState.evaluationTime);
-      } else {
-        progressCircleRef?.current?.reAnimate();
-      }
     }
-  }, [kanjiQueue, canvasRef, progressCircleRef, evaluation, settingsState, counter]);
+  }, [kanjiQueue, canvasRef, evaluation, settingsState, counter]);
 
   useEffect(() => {
     if (Platform.OS === 'web') {

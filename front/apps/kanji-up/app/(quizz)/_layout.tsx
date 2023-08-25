@@ -37,7 +37,7 @@ export default function Quizz() {
 
   const handleBack = React.useCallback(() => {
     dispatch(evaluation.actions.reset({ time: settingsState.evaluationTime, totalCard: settingsState.evaluationCardNumber }));
-    router.back();
+    router.push('/home');
   }, []);
 
   const sKanji = useMemo(() => Object.values(kanjiState.selectedKanji), [kanjiState]);
