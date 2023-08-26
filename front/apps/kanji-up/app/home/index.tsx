@@ -114,7 +114,7 @@ export default function Home() {
         <Text style={globalStyles.title}>Server health</Text>
         <List.Item
           title="Recognition service"
-          left={() => <List.Icon icon="square-rounded" color={recognitionColor ? 'green' : 'red'} />}
+          left={() => <List.Icon icon="square-rounded" color={recognitionColor ? 'green' : 'lightgrey'} />}
           style={{ marginHorizontal: 20 }}
         />
 

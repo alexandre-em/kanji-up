@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useFonts } from 'expo-font';
 import { Provider } from 'react-redux';
 import { SplashScreen, Stack } from 'expo-router';
+import Head from 'expo-router/head';
 import { Provider as PaperProvider, DefaultTheme } from 'react-native-paper';
 
 import { AuthProvider } from 'kanji-app-auth';
@@ -64,6 +65,10 @@ function RootLayoutNav() {
     <PaperProvider theme={theme}>
       <Provider store={store}>
         <AuthProvider>
+          <Head>
+            <title>KanjiUp V2</title>
+            <meta name="description" content="Learn and memorize Japanese kanji with Flashcard and drawing quizz" />
+          </Head>
           <Stack screenOptions={{ headerShown: false }}></Stack>
         </AuthProvider>
       </Provider>

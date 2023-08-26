@@ -26,7 +26,10 @@
       "package": "com.aem.kanjiup"
     },
     "web": {
+      "name": "KanjiUp V2",
+      "backgroundColor": "#851a1b",
       "display": "fullscreen",
+      "orientation": "portrait",
       "bundler": "metro",
       "output": "static",
       "favicon": "./assets/images/favicon.png"

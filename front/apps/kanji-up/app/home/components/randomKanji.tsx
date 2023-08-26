@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { Image, Platform, Text } from 'react-native';
-import { List, ProgressBar } from 'react-native-paper';
+import { List } from 'react-native-paper';
 import { SvgUri } from 'react-native-svg';
 import { useSelector } from 'react-redux';
 
@@ -8,8 +8,7 @@ import { KanjiType } from 'kanji-app-types';
 
 import { RootState } from 'store';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
-import { colors } from 'constants';
-import { KANJI_PROGRESSION_MAX } from 'constants';
+import { KANJI_PROGRESSION_MAX, colors } from 'constants';
 
 export default function RandomKanji() {
   const kanjiState = useSelector((state: RootState) => state.kanji);
