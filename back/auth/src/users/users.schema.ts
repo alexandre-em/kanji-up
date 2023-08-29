@@ -27,12 +27,11 @@ export class User {
     contentType: string;
   };
 
-  @Prop({ default: [] })
+  @Prop({ type: { kanji: {}, word: {} }, default: { kanji: {}, word: {} } })
   applications: {
-    app_id: string;
-    total_score: number;
-    scores: { [key: string]: Date };
-  }[];
+    kanji: Score;
+    word: Score;
+  };
 
   @Prop()
   friends: User[];

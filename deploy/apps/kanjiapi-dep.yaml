@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: api-dep
   labels:
-    app: pi-app
+    app: api-app
 spec:
   replicas: 1
   selector:
@@ -32,4 +32,4 @@ spec:
             - containerPort: 5000
           envFrom:
             - secretRef:
-                name: kanjiup-api-secret
+                name: kanjiup-secret

@@ -6,3 +6,10 @@ type DecodedToken = {
   iat: number;
   exp: number;
 };
+
+type Score = {
+  total_score: number;
+  scores: { [timestamp: string]: number };
+  progressions: { [key: string]: number };
+};
+

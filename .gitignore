@@ -26,3 +26,7 @@ terraform.tfstate
 terraform.tfstate.backup
 old_kanji_web_model
 old_kanji_saved_model
+
+
+# TODO: Remove after merging new front struct branch
+front

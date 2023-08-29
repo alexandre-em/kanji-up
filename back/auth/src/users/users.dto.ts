@@ -26,13 +26,15 @@ export class UpdateUserFriendDTO {
 
 export class UpdateUserAppDTO {
   @ApiProperty()
-  app_id: string;
-
-  @ApiProperty()
   total_score: number;
 
   @ApiProperty({ examples: [{ [Date.now().toString()]: 10000 }] })
   scores: {
+    [timestamp: string]: number;
+  };
+
+  @ApiProperty({ examples: [{ 愛: 30 }] })
+  progression: {
     [key: string]: number;
   };
 }

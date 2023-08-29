@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
-import { UpdateUserPermissionsDTO } from './users.dto';
+import { UpdateUserAppDTO, UpdateUserPermissionsDTO } from './users.dto';
 import { UsersService } from './users.service';
 import permissions from 'src/utils/permission.type';
 import permissionGuard from 'src/auth/permission.guard';
@@ -109,5 +109,15 @@ export class UsersController {
     const decodedJwtAccessToken = this.jwtService.decode(accessToken);
 
     return this.service.updateOne(decodedJwtAccessToken?.sub, { deleted_at: new Date() });
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthenticationGuard)
+  @Put('score/:app')
+  updateAppUserScore(@Headers() headers: any, @Param('app') app: string, @Body() body: UpdateUserAppDTO) {
+    const accessToken = headers.authorization.split(' ')[1];
+    const decodedJwtAccessToken = this.jwtService.decode(accessToken);
+
+    return this.service.updateUserApp(decodedJwtAccessToken?.sub, app, body);
   }
 }

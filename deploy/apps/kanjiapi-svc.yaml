@@ -4,9 +4,9 @@ metadata:
   name: kanjiup-api-svc
 spec:
   selector:
-    app: kanjiup-api-app
+    app: api-app
   type: ClusterIP
   ports:
     - protocol: TCP
-      port: 5001
+      port: 80
       targetPort: 5000

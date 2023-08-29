@@ -1,9 +1,9 @@
 import { BadRequestException, Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
+import { InjectModel, Prop } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import Permission from 'src/utils/permission.type';
 import { Readable } from 'stream';
-import { DeleteUserDTO, UpdateUserDTO, UpdateUserFriendDTO, UpdateUserPermissionsDTO } from './users.dto';
+import { DeleteUserDTO, UpdateUserAppDTO, UpdateUserDTO, UpdateUserFriendDTO, UpdateUserPermissionsDTO } from './users.dto';
 import { User, UserDocument } from './users.schema';
 
 @Injectable()
@@ -163,5 +163,20 @@ export class UsersService {
 
     const friends = user.friends.filter((f) => f !== friend);
     return this.model.updateOne({ user_id }, { friends }).exec();
+  }
+
+  async updateUserApp(user_id: string, appType: string, body: UpdateUserAppDTO) {
+    if (!appType) {
+      throw new BadRequestException('Application type not specified');
+    }
+
+    switch (appType) {
+      case 'kanji':
+        return this.model.updateOne({ user_id }, { 'applications.kanji': body }).exec();
+      case 'word':
+        return this.model.updateOne({ user_id }, { 'applications.word': body }).exec();
+      default:
+        throw new BadRequestException('Invalid application type');
+    }
   }
 }
