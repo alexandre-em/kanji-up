@@ -8,6 +8,13 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
+  app.enableCors({
+    origin: ['http://localhost:8081', 'https://kanjiup.alexandre-em.fr', 'https://kanjiup-v2.alexandre-em.fr'],
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
+  });
+
   const config = new DocumentBuilder()
     .setTitle('Auth/User API')
     .setDescription('KanjiUp Auth & Users API')
