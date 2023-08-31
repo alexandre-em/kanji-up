@@ -4,6 +4,15 @@ const initialState: UserState = {
   totalScore: 0,
   dailyScore: 0,
   scores: {},
+  progression: {},
+};
+
+const updateProgression = (state: UserState, action: PayloadAction<{ id: string; inc: number }>) => {
+  const { id, inc } = action.payload;
+  const { progression } = state;
+  const updateKanjiProgression = progression[id] ?? 0;
+
+  return { ...state, progression: { ...progression, [id]: updateKanjiProgression + inc } };
 };
 
 export const user = createSlice({
@@ -16,6 +25,7 @@ export const user = createSlice({
       ...state,
       dailyScore: state.dailyScore + action.payload,
     }),
+    updateProgression,
   },
 });
 

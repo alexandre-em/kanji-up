@@ -5,7 +5,6 @@ const initialState: SelectedKanjiState = {
   selectedKanji: {},
   toAdd: {},
   toRemove: {},
-  progression: {},
   status: 'pending',
 };
 
@@ -67,14 +66,6 @@ const reset = (state: SelectedKanjiState) => {
   return { ...state, selectedKanji: {}, toAdd: {}, toRemove: {} };
 };
 
-const updateProgression = (state: SelectedKanjiState, action: PayloadAction<{ id: string; inc: number }>) => {
-  const { id, inc } = action.payload;
-  const { progression } = state;
-  const updateKanjiProgression = progression[id] ?? 0;
-
-  return { ...state, progression: { ...progression, [id]: updateKanjiProgression + inc } };
-};
-
 export const kanji = createSlice({
   name: 'kanji',
   initialState,
@@ -82,7 +73,6 @@ export const kanji = createSlice({
     initialize,
     cancel,
     updateStatus,
-    updateProgression,
     selectKanji,
     unSelectKanji,
     save,

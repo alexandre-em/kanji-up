@@ -11,6 +11,7 @@ import { KANJI_PROGRESSION_MAX, colors } from 'constants';
 
 export default function KanjiSurface({ kanji, onPress }: { kanji: KanjiType; onPress?: (e: GestureResponderEvent) => void }) {
   const kanjiState = useSelector((s: RootState) => s.kanji);
+  const userState = useSelector((s: RootState) => s.user);
 
   const surfaceStyle = React.useCallback(
     (kanjiId: string) => {
@@ -33,10 +34,10 @@ export default function KanjiSurface({ kanji, onPress }: { kanji: KanjiType; onP
       <Surface style={[styles.kanjiSurface, surfaceStyle(kanji.kanji_id)]} elevation={1}>
         <Text style={styles.kanjiText}>{kanji.kanji?.character}</Text>
       </Surface>
-      {kanjiState.progression[kanji.kanji_id] !== undefined && (
+      {userState.progression[kanji.kanji_id] !== undefined && (
         <ProgressBar
           style={{ width: 60, alignSelf: 'center' }}
-          progress={kanjiState.progression[kanji.kanji_id] / KANJI_PROGRESSION_MAX}
+          progress={userState.progression[kanji.kanji_id] / KANJI_PROGRESSION_MAX}
         />
       )}
     </TouchableOpacity>

@@ -8,6 +8,7 @@ export const colors = {
   secondaryDark: '#a04859',
   text: '#3F3D56',
   surface: '#DA2A2D',
+  success: '#bdf56e',
   elevation: {
     level0: 'transparent',
     level1: '#fff',

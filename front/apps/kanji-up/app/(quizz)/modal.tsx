@@ -5,9 +5,11 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { RootState } from 'store';
 import { colors } from 'constants/Colors';
-import { evaluation, kanji, user } from 'store/slices';
+import { evaluation, user } from 'store/slices';
 import { router } from 'expo-router';
 import global from 'styles/global';
+import core from 'kanji-app-core';
+import { KANJI_PROGRESSION_INC, KANJI_PROGRESSION_INC_LOW } from 'constants';
 
 const USER_VALIDATE_POINT = 10;
 
@@ -15,23 +17,35 @@ export default function Modal() {
   const dispatch = useDispatch();
   const evaluationState = useSelector((root: RootState) => root.evaluation);
   const settingsState = useSelector((root: RootState) => root.settings);
+  const userState = useSelector((root: RootState) => root.user);
 
   const handleConfirmFinish = useCallback(() => {
-    if (user) {
-      dispatch(user.actions.addScoreDaily(Math.round(evaluationState.totalScore)));
-    }
+    const date = new Date();
+    const formattedDate = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
 
+    const quizzScore = Math.round(evaluationState.totalScore);
+
+    const score = {
+      total_score: userState.totalScore + quizzScore,
+      scores: { [formattedDate]: userState.dailyScore + quizzScore },
+      progression: userState.progression,
+    };
+
+    console.log(score);
+
+    core.userService?.updateUserScore(score);
+    // Update user state
+    dispatch(user.actions.addScoreDaily(Math.round(evaluationState.totalScore)));
+    // Reset evaluation state
     dispatch(evaluation.actions.reset({ time: settingsState.evaluationTime, totalCard: settingsState.evaluationCardNumber }));
     router.push('/home');
-  }, []);
+  }, [userState]);
 
   const handleValidate = useCallback(
     (id: string, kanjiId: string) => {
-      dispatch(
-        evaluation.actions.updateAnswerStatus({ id, status: 'correct', message: 'This answer has been validated by the user' })
-      );
+      dispatch(evaluation.actions.updateAnswerStatus({ id, status: 'correct', message: 'Validated by the user' }));
       dispatch(evaluation.actions.addPoints(USER_VALIDATE_POINT));
-      dispatch(kanji.actions.updateProgression({ id: kanjiId, inc: 1 }));
+      dispatch(user.actions.updateProgression({ id: kanjiId, inc: KANJI_PROGRESSION_INC_LOW }));
     },
     [dispatch]
   );
@@ -42,10 +56,10 @@ export default function Modal() {
         evaluation.actions.updateAnswerStatus({
           id,
           status: 'incorrect',
-          message: 'This answer has been unvalidated by the user',
+          message: 'Unvalidated by the user',
         })
       );
-      dispatch(kanji.actions.updateProgression({ id: kanjiId, inc: -2 }));
+      dispatch(user.actions.updateProgression({ id: kanjiId, inc: -1 * KANJI_PROGRESSION_INC }));
     },
     [dispatch]
   );
@@ -67,7 +81,7 @@ export default function Modal() {
                   <View {...props} style={{ flexDirection: 'row' }}>
                     <IconButton
                       icon="checkbox-marked-circle-outline"
-                      iconColor="#bdf56e"
+                      iconColor={colors.success}
                       onPress={() => handleValidate(a.recognitionId!, a.kanjiId)}
                     />
                     <IconButton

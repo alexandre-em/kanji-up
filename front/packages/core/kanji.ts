@@ -31,4 +31,25 @@ export default class KanjiService {
     }
     return this._instance.get(`/search?query=${query}&page=${page}&limit=${limit}`, options);
   }
+
+  createKanji(kanjiId: string, radicalId: string, referenceId: string, examples = [], options?: AxiosRequestConfig) {
+    if (!this._instance) throw new Error('Kanji instance not ready...');
+    if (!kanjiId || !radicalId || !referenceId) throw new Error('Kanji cannot be created. Field missing');
+
+    const body = {
+      kanji: kanjiId,
+      radical: radicalId,
+      reference: referenceId,
+      examples,
+    };
+
+    return this._instance.post('/', body, options);
+  }
+
+  deleteKanji(kanjiId: string, options?: AxiosRequestConfig) {
+    if (!this._instance) throw new Error('Kanji instance not ready...');
+    if (!kanjiId) throw new Error('Kanji id not valid');
+
+    return this._instance.delete(`/${kanjiId}`, options);
+  }
 }

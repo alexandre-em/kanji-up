@@ -8,7 +8,6 @@ type SelectedKanjiState = {
   selectedKanji: { [key: string]: Partial<KanjiType> };
   toAdd: { [key: string]: Partial<KanjiType> };
   toRemove: { [key: string]: Partial<KanjiType> };
-  progression: { [id: string]: number };
   status: 'done' | 'inProgress' | 'error' | 'pending';
 };
 
@@ -43,4 +42,5 @@ type UserState = {
   totalScore: number;
   dailyScore: number;
   scores: { [key: string]: number };
+  progression: { [id: string]: number };
 };

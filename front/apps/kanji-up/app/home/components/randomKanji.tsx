@@ -12,6 +12,7 @@ import { KANJI_PROGRESSION_MAX, colors } from 'constants';
 
 export default function RandomKanji() {
   const kanjiState = useSelector((state: RootState) => state.kanji);
+  const userState = useSelector((state: RootState) => state.user);
 
   if (kanjiState.selectedKanji && Object.keys(kanjiState.selectedKanji).length > 0) {
     const kanjiKeys: Array<string> = Object.keys(kanjiState.selectedKanji);
@@ -49,12 +50,12 @@ export default function RandomKanji() {
           <AnimatedCircularProgress
             size={40}
             width={7}
-            fill={(kanjiState.progression[choosenKanji.kanji_id!] ?? 0 / KANJI_PROGRESSION_MAX) * 100}
+            fill={((userState.progression[choosenKanji.kanji_id!] || 0) / KANJI_PROGRESSION_MAX) * 100}
             tintColor={colors.primary}
             backgroundColor={colors.primary + '75'}>
             {() => (
               <Text style={{ color: colors.text, fontWeight: '900' }}>
-                {(kanjiState.progression[choosenKanji.kanji_id!] ?? 0 / KANJI_PROGRESSION_MAX) * 100}
+                {((userState.progression[choosenKanji.kanji_id!] || 0) / KANJI_PROGRESSION_MAX) * 100}
               </Text>
             )}
           </AnimatedCircularProgress>

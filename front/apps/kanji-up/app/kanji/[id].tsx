@@ -19,6 +19,7 @@ export default function KanjiDetail() {
   const { width } = useWindowDimensions();
   const dispatch = useDispatch();
   const kanjiState = useSelector((state: RootState) => state.kanji);
+  const userState = useSelector((state: RootState) => state.user);
   const imgSize = width < 700 ? width * 0.5 : 250;
   const { id, access_token } = useGlobalSearchParams();
   const [details, setDetails] = useState<KanjiType | null>(null);
@@ -68,11 +69,10 @@ export default function KanjiDetail() {
       <Appbar.Header>
         <Appbar.BackAction onPress={() => router.back()} />
         <Appbar.Content
-          title={`Detail of ${details.kanji.character} ${
-            kanjiState.progression[details.kanji_id] !== undefined
-              ? `(${(kanjiState.progression[details.kanji_id] / KANJI_PROGRESSION_MAX) * 100}%)`
+          title={`Detail of ${details.kanji.character} ${userState.progression[details.kanji_id] !== undefined
+              ? `(${(userState.progression[details.kanji_id] / KANJI_PROGRESSION_MAX) * 100}%)`
               : ''
-          }`}
+            }`}
           titleStyle={{ color: '#fff', fontWeight: '700', fontSize: 17 }}
         />
       </Appbar.Header>

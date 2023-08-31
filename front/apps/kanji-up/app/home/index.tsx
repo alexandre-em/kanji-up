@@ -12,7 +12,7 @@ import globalStyles from 'styles/global';
 import { colors } from 'constants/Colors';
 import GradientCard from 'components/GradientCard';
 import { fileNames, readFile } from 'services/file';
-import { kanji, settings } from 'store/slices';
+import { kanji, settings, user } from 'store/slices';
 
 import styles from './style';
 import { menu, list } from './constants';
@@ -25,6 +25,7 @@ export default function Home() {
   const dispatch = useDispatch();
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [isFirstTime, setIsFirstTime] = useState<boolean>(false);
+  const [userId, setUserId] = useState<string>('');
   const [recognitionColor, setRecognitionColor] = useState<boolean>(false);
   const AuthContext = useAuth();
   const settingsState = useSelector((state: RootState) => state.settings);
@@ -40,6 +41,29 @@ export default function Home() {
       // dispatch(kanji.actions.updateStatus('error'));
     }
   }, []);
+
+  const refreshUserScore = useCallback(() => {
+    core.userService
+      ?.getProfile()
+      .then(({ data }) => {
+        if (data.applications?.kanji) {
+          setUserId(data.user_id);
+          const scores = data.applications.kanji;
+          const date = new Date();
+          const formattedDate = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+
+          dispatch(
+            user.actions.update({
+              totalScore: scores.total_score,
+              dailyScore: scores.scores[formattedDate],
+              scores: scores.scores,
+              progression: scores.progression,
+            })
+          );
+        }
+      })
+      .catch(() => router.replace('/'));
+  }, [core.userService]);
 
   // TODO: Put a modal (see expo doc) with the a quick tuto (old onboarding screen)
   useEffect(() => {
@@ -62,6 +86,8 @@ export default function Home() {
       ?.health()
       .then(({ status }) => setRecognitionColor(status === 200))
       .catch(() => setRecognitionColor(false));
+
+    refreshUserScore();
   }, []);
 
   useEffect(() => {
@@ -89,7 +115,11 @@ export default function Home() {
           {userState.totalScore}
         </Button>
         <TouchableOpacity onPress={() => router.push('/settings')}>
-          <Avatar.Text size={40} label={settingsState.username.charAt(0) || '-'} />
+          {userId ? (
+            <Avatar.Image size={40} source={`${process.env.EXPO_PUBLIC_AUTH_BASE_URL}/users/profile/image/${userId}`} />
+          ) : (
+            <Avatar.Text size={40} label={settingsState.username.charAt(0) || '-'} />
+          )}
         </TouchableOpacity>
       </View>
 
@@ -109,12 +139,12 @@ export default function Home() {
           />
         </View>
 
-        <Stepper />
+        <Stepper onRefresh={refreshUserScore} />
 
         <Text style={globalStyles.title}>Server health</Text>
         <List.Item
           title="Recognition service"
-          left={() => <List.Icon icon="square-rounded" color={recognitionColor ? 'green' : 'lightgrey'} />}
+          left={() => <List.Icon icon="square-rounded" color={recognitionColor ? colors.success : 'lightgrey'} />}
           style={{ marginHorizontal: 20 }}
         />
 

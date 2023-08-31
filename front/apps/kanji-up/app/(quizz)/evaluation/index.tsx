@@ -9,9 +9,10 @@ import { useQuizzContext } from '../_layout';
 import styles from '../style';
 import { RootState } from 'store';
 import { colors } from 'constants/Colors';
-import { error, evaluation, kanji } from 'store/slices';
+import { error, evaluation, user } from 'store/slices';
 import { uploadImage } from 'services/file';
 import { router } from 'expo-router';
+import { KANJI_PROGRESSION_INC } from 'constants';
 
 export default function Evaluate() {
   const dispatch = useDispatch();
@@ -58,10 +59,15 @@ export default function Evaluate() {
             image: imageBase64WFormat,
             answer: [],
             status: 'incorrect',
-            message: strokeCount === 0 ? 'This kanji has been skipped' : "The stroke number wasn't correct",
+            message: strokeCount === 0 ? 'This kanji has been skipped' : 'Stroke number is not correct',
           })
         );
-        dispatch(kanji.actions.updateProgression({ id: kanjiQueue[counter].kanji_id, inc: strokeCount === 0 ? 0 : -2 }));
+        dispatch(
+          user.actions.updateProgression({
+            id: kanjiQueue[counter].kanji_id,
+            inc: strokeCount === 0 ? 0 : -1 * KANJI_PROGRESSION_INC,
+          })
+        );
       } else {
         // if (settingsState.useLocalModel) {
         //   predictFunction = ModelContext?.models.recognition.predict(imageBase64);
@@ -81,7 +87,7 @@ export default function Evaluate() {
                 image: imageBase64WFormat,
                 answer: prediction,
                 status: !predictedKanji ? 'toReview' : 'correct',
-                message: !predictedKanji ? 'The drawed kanji seems incorrect, please confirm' : 'Correct answer !',
+                message: !predictedKanji ? 'Is the drawed kanji correct ?' : 'Correct answer !',
               })
             );
             if (predictedKanji) {
@@ -91,7 +97,7 @@ export default function Evaluate() {
                   Math.max(predictedKanji.score * 100 * (grade === 'custom' ? 8 : parseInt(grade || '1', 10)), 10)
                 )
               );
-              dispatch(kanji.actions.updateProgression({ id: kanjiQueue[counter].kanji_id, inc: 2 }));
+              dispatch(user.actions.updateProgression({ id: kanjiQueue[counter].kanji_id, inc: KANJI_PROGRESSION_INC }));
             }
           })
           .catch((err: any) => {
@@ -101,7 +107,6 @@ export default function Evaluate() {
 
       // next card
       handleClear();
-      // setKanjiQueue((prev) => prev?.slice(1) || prev);
       setTimer(settingsState.evaluationTime);
       setCounter((prev) => prev + 1);
     }

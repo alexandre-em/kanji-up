@@ -14,6 +14,7 @@ const appId = Platform.select({
 const endpointUrls = {
   kanji: process.env.EXPO_PUBLIC_KANJI_BASE_URL,
   recognition: process.env.EXPO_PUBLIC_RECOGNITION_BASE_URL,
+  user: process.env.EXPO_PUBLIC_AUTH_BASE_URL,
 };
 
 export default function Page() {
