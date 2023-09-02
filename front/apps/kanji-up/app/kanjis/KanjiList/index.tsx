@@ -22,6 +22,7 @@ export default function KanjiList({ grade, selectionMode }: { grade: string; sel
   const dispatch = useDispatch();
   const [data, setData] = useState<Pagination<KanjiType> | null>(null);
   const [limit, setLimit] = useState<number>(30);
+  const [page, setPage] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(false);
   const kanjiState = useSelector((state: RootState) => state.kanji);
 
@@ -72,6 +73,17 @@ export default function KanjiList({ grade, selectionMode }: { grade: string; sel
     };
   }, [grade]);
 
+  React.useEffect(() => {
+    const cancelToken = axios.CancelToken.source();
+    if (core && core.kanjiService) {
+      getKanjis({ page }, { cancelToken: cancelToken.token });
+    }
+
+    return () => {
+      cancelToken.cancel();
+    };
+  }, [limit, page]);
+
   if (!data || loading) {
     return (
       <View style={[global.main, { justifyContent: 'center', alignItems: 'center' }]}>
@@ -91,7 +103,7 @@ export default function KanjiList({ grade, selectionMode }: { grade: string; sel
       <DataTable.Pagination
         page={data?.page || 1}
         numberOfPages={data?.totalPages || 0}
-        onPageChange={(page) => getKanjis({ page })}
+        onPageChange={setPage}
         showFastPaginationControls
         numberOfItemsPerPageList={numberOfItemsPerPageList}
         numberOfItemsPerPage={data?.limit}

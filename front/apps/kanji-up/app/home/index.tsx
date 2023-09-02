@@ -1,11 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Href, router } from 'expo-router';
+import { Href, router, useGlobalSearchParams } from 'expo-router';
 import { FlatList, SafeAreaView, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { Avatar, Button, FAB, List, Searchbar } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { asyncstorageKeys, useAuth } from 'kanji-app-auth';
-import jwtDecode from 'jwt-decode';
 
 import { RootState } from 'store';
 import globalStyles from 'styles/global';
@@ -18,8 +17,8 @@ import styles from './style';
 import { menu, list } from './constants';
 import RandomKanji from './components/randomKanji';
 import Stepper from './components/stepper';
-import { DecodedToken } from 'kanji-app-types';
 import core from 'kanji-app-core';
+import { endpointUrls } from 'constants';
 
 export default function Home() {
   const dispatch = useDispatch();
@@ -31,6 +30,7 @@ export default function Home() {
   const settingsState = useSelector((state: RootState) => state.settings);
   const userState = useSelector((state: RootState) => state.user);
   const [open, setOpen] = useState({ open: false });
+  const { access_token } = useGlobalSearchParams();
 
   const loadSelectedKanji = useCallback(async () => {
     try {
@@ -52,6 +52,8 @@ export default function Home() {
           const date = new Date();
           const formattedDate = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
 
+          dispatch(settings.actions.update({ username: data.name }));
+
           dispatch(
             user.actions.update({
               totalScore: scores.total_score,
@@ -64,6 +66,16 @@ export default function Home() {
       })
       .catch(() => router.replace('/'));
   }, [core.userService]);
+
+  const renderItem = ({ item }: { item: (typeof list)[0] }) => (
+    <GradientCard
+      onPress={() => router.push(item.screen as Href<string>)}
+      image={item.image}
+      title={item.title}
+      subtitle={item.subtitle}
+      buttonTitle={item.buttonTitle}
+    />
+  );
 
   // TODO: Put a modal (see expo doc) with the a quick tuto (old onboarding screen)
   useEffect(() => {
@@ -91,22 +103,13 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (AuthContext?.accessToken) {
-      const decodedToken: DecodedToken = jwtDecode(AuthContext.accessToken);
-
-      dispatch(settings.actions.update({ username: decodedToken.name }));
+    if (access_token) {
+      if (AuthContext?.signIn) {
+        AuthContext.signIn(access_token as string);
+        core.init(endpointUrls, access_token as string);
+      }
     }
-  }, [AuthContext?.accessToken]);
-
-  const renderItem = ({ item }: { item: (typeof list)[0] }) => (
-    <GradientCard
-      onPress={() => router.push(item.screen as Href<string>)}
-      image={item.image}
-      title={item.title}
-      subtitle={item.subtitle}
-      buttonTitle={item.buttonTitle}
-    />
-  );
+  }, [access_token, AuthContext?.signIn]);
 
   return (
     <SafeAreaView style={globalStyles.main}>
@@ -116,7 +119,7 @@ export default function Home() {
         </Button>
         <TouchableOpacity onPress={() => router.push('/settings')}>
           {userId ? (
-            <Avatar.Image size={40} source={`${process.env.EXPO_PUBLIC_AUTH_BASE_URL}/users/profile/image/${userId}`} />
+            <Avatar.Image size={40} source={{ uri: `${process.env.EXPO_PUBLIC_AUTH_BASE_URL}/users/profile/image/${userId}` }} />
           ) : (
             <Avatar.Text size={40} label={settingsState.username.charAt(0) || '-'} />
           )}

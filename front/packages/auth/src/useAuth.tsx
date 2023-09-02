@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { Platform } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 import jwtDecode from 'jwt-decode';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -34,7 +35,8 @@ export default function useKanjiAppAuth() {
       }
     }
 
-    throw new Error('No token given. Aborting. Please try again.');
+    if (results.type !== 'dismiss' && Platform.OS !== 'android') throw new Error('No token given. Aborting. Please try again.');
+    else return null;
   }, []);
 
   const logout = useCallback(async (authUrl: string | undefined) => {

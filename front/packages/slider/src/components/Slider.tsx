@@ -60,13 +60,13 @@ export default function Slider({ value, min, max, color, onValueChange }: Slider
       onMouseDown={handlePressIn}
       onTouchStart={handlePressIn}
       height={50}>
-      <Text x={(Math.min(width, 700) - 20) / 2} y={20} textAnchor="middle" fontWeight="bold" fill={color}>
+      <Text x={(Math.min(width, 700) - 20) / 2} y={20} textAnchor="middle" fontWeight="bold" fontFamily="RobotoBold" fill={color}>
         {value}
       </Text>
-      <Text x={10} y={20} textAnchor="middle">
+      <Text x={10} y={20} fontWeight="bold" fontFamily="Roboto" textAnchor="middle">
         {min}
       </Text>
-      <Text x={Math.min(width, 700) - 35} y={20} textAnchor="middle">
+      <Text x={Math.min(width, 700) - 35} y={20} fontWeight="bold" fontFamily="Roboto" textAnchor="middle">
         {max + min}
       </Text>
       <Rect x={0} y={30} width={`${progressValue}%`} height={5} rx={3} fill={color} />

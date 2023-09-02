@@ -18,5 +18,6 @@ export default StyleSheet.create({
     fontWeight: '800',
     textTransform: 'uppercase',
     color: '#fff',
+    fontFamily: 'RobotoBlack',
   },
 });

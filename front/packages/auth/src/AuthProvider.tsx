@@ -5,6 +5,8 @@ export type AuthContextValueType = {
   accessToken: string | null;
   signIn: (token: string | null) => void;
   signOut: () => void;
+  loading: boolean;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const AuthContext = React.createContext<AuthContextValueType | null>(null);
@@ -24,12 +26,12 @@ function useProtectedRoute(accessToken: string | null) {
     if (!accessToken && !access_token) {
       // Redirect to the sign-in page.
       if (rootNavigation?.isReady()) {
-        new Promise((r) => setTimeout(r, 2000)).then(() => router.replace('/'));
+        new Promise((r) => setTimeout(r, 1000)).then(() => router.replace('/'));
       }
     } else {
       if (!access_token) {
         if (rootNavigation?.isReady()) {
-          new Promise((r) => setTimeout(r, 2000)).then(() => router.replace('/home'));
+          new Promise((r) => setTimeout(r, 1000)).then(() => router.replace('/home'));
         }
       }
     }
@@ -38,6 +40,7 @@ function useProtectedRoute(accessToken: string | null) {
 
 export function Provider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = React.useState<string | null>(null);
+  const [loading, setLoading] = React.useState<boolean>(false);
 
   useProtectedRoute(token);
 
@@ -47,6 +50,8 @@ export function Provider({ children }: { children: React.ReactNode }) {
         signIn: setToken,
         signOut: () => setToken(null),
         accessToken: token,
+        loading,
+        setLoading,
       }}>
       {children}
     </AuthContext.Provider>

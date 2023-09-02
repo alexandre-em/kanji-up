@@ -12,6 +12,7 @@ import core from 'kanji-app-core';
 import { KANJI_PROGRESSION_INC, KANJI_PROGRESSION_INC_LOW } from 'constants';
 
 const USER_VALIDATE_POINT = 10;
+const SCORE_DATE_LIMIT = 30; // Day
 
 export default function Modal() {
   const dispatch = useDispatch();
@@ -25,13 +26,22 @@ export default function Modal() {
 
     const quizzScore = Math.round(evaluationState.totalScore);
 
+    const updatedScores = Object.keys(userState.scores)
+      .filter((d) => {
+        const date = new Date();
+        const limit = new Date(date.setDate(date.getDate() - SCORE_DATE_LIMIT));
+
+        return new Date(d) > limit;
+      })
+      .reduce((prev, curr) => ({ ...prev, [curr]: userState.scores[curr] }), {});
+
+    updatedScores[formattedDate] = userState.dailyScore + quizzScore;
+
     const score = {
       total_score: userState.totalScore + quizzScore,
-      scores: { [formattedDate]: userState.dailyScore + quizzScore },
+      scores: updatedScores,
       progression: userState.progression,
     };
-
-    console.log(score);
 
     core.userService?.updateUserScore(score);
     // Update user state

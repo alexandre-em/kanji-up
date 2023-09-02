@@ -15,6 +15,7 @@ export default StyleSheet.create({
   },
   title: {
     fontSize: 18,
+    fontFamily: 'RobotoBold',
     fontWeight: '800',
     margin: 10,
     marginLeft: 20,
@@ -23,6 +24,7 @@ export default StyleSheet.create({
   subtitle: {
     marginTop: 15,
     fontSize: 15,
+    fontFamily: 'RobotoBold',
     fontWeight: '600',
     color: colors.text,
   },
@@ -38,6 +40,7 @@ export default StyleSheet.create({
     backgroundColor: colors.primary,
     padding: 5,
     borderRadius: 25,
+    fontFamily: 'RobotoBold',
   },
   search: {
     backgroundColor: '#fff',

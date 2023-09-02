@@ -1,21 +1,11 @@
 import { useCallback, useEffect } from 'react';
-import { Image, Platform, SafeAreaView, Text } from 'react-native';
-import { Button } from 'react-native-paper';
+import { Image, SafeAreaView, Text } from 'react-native';
+import { ActivityIndicator, Button } from 'react-native-paper';
 import { useAuth, useKanjiAppAuth } from 'kanji-app-auth';
 import config from 'kanji-app-core';
 
 import styles from '../styles/global';
-
-const authUrl = `${process.env.EXPO_PUBLIC_AUTH_BASE_URL}/auth/login?app_id=`;
-const appId = Platform.select({
-  web: process.env.EXPO_PUBLIC_AUTH_APP_ID_WEB,
-  native: process.env.EXPO_PUBLIC_AUTH_APP_ID_NATIVE,
-});
-const endpointUrls = {
-  kanji: process.env.EXPO_PUBLIC_KANJI_BASE_URL,
-  recognition: process.env.EXPO_PUBLIC_RECOGNITION_BASE_URL,
-  user: process.env.EXPO_PUBLIC_AUTH_BASE_URL,
-};
+import { appId, authUrl, endpointUrls } from 'constants';
 
 export default function Page() {
   const AuthContext = useAuth();
@@ -33,15 +23,30 @@ export default function Page() {
   );
 
   const handleAuth = useCallback(async () => {
-    const accessToken = await login(authUrl + appId);
-    signIn(accessToken);
+    AuthContext?.setLoading(true);
+    login(authUrl + appId)
+      .then((accessToken) => {
+        signIn(accessToken);
+      })
+      .finally(() => {
+        AuthContext?.setLoading(false);
+      });
   }, []);
 
   useEffect(() => {
     if (token) {
       signIn(token);
+      AuthContext?.setLoading(false);
     }
   }, [token]);
+
+  if (AuthContext?.loading) {
+    return (
+      <SafeAreaView style={[styles.main, { justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator animating />
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={[styles.main, { justifyContent: 'center', alignItems: 'center' }]}>

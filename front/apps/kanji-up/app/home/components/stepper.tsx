@@ -74,7 +74,10 @@ export default function Stepper({ onRefresh }: StepperProps) {
       <Surface style={styles.surface}>
         <View style={{ marginHorizontal: 20 }}>{stepperIllustration}</View>
         <View style={{ margin: 10 }}>
-          <Text style={{ color: colors.secondary, fontSize: 30, fontWeight: '800', marginHorizontal: 20 }}>{stepperMessage}</Text>
+          <Text
+            style={{ color: colors.secondary, fontSize: 30, fontFamily: 'RobotoBold', fontWeight: '800', marginHorizontal: 20 }}>
+            {stepperMessage}
+          </Text>
           <Text style={[globalStyles.title, { fontSize: 22, marginTop: 0 }]}>{userState.dailyScore || 0} pts</Text>
           <Button icon="reload" onPress={onRefresh} mode="contained" style={{ borderRadius: 25 }}>
             Synchronize

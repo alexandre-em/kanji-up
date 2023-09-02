@@ -26,12 +26,14 @@ export default StyleSheet.create({
   },
   title: {
     color: colors.text,
+    fontFamily: 'RobotoBold',
     fontSize: 30,
     fontWeight: '800',
     marginLeft: 10,
   },
   subtitle: {
     color: colors.text,
+    fontFamily: 'Roboto',
     fontSize: 17,
     marginLeft: 10,
     maxWidth: 280,
