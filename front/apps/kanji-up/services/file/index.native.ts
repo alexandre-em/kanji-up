@@ -29,9 +29,12 @@ export const uploadImage = async (canvasRef: RefObject<any>, kanji: string) => {
   await FileSystem.writeAsStringAsync(filename, imageBase64Code, {
     encoding: FileSystem.EncodingType.Base64,
   });
-  const recognition = await core.recognitionService?.postNative(kanji, filename);
+
+  const recognition = await core.recognitionService?.postNative(kanji, filename, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
 
   await FileSystem.deleteAsync(filename);
 
-  return recognition;
+  return recognition.data;
 };

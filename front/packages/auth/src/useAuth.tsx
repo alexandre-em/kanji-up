@@ -19,8 +19,6 @@ export default function useKanjiAppAuth() {
     }
     const results = await WebBrowser.openAuthSessionAsync(authUrl);
 
-    console.warn(results);
-
     if ((results && results.type === 'success') || results.type === 'opened') {
       const parseParam = results.url.split('?access_token=');
       const newToken = parseParam[1];

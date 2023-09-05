@@ -88,14 +88,14 @@ export default function Quizz() {
         </Appbar.Header>
         <Stack>
           <Stack.Screen
-            name="evaluation/index"
+            name="evaluation"
             options={{
               // Hide the header for all other routes.
               headerShown: false,
             }}
           />
           <Stack.Screen
-            name="flashcard/index"
+            name="flashcard"
             options={{
               // Hide the header for all other routes.
               headerShown: false,

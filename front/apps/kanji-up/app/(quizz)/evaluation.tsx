@@ -5,8 +5,8 @@ import { Button } from 'react-native-paper';
 import Sketch from 'kanji-app-sketch';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 
-import { useQuizzContext } from '../_layout';
-import styles from '../style';
+import { useQuizzContext } from './_layout';
+import styles from './style';
 import { RootState } from 'store';
 import { colors } from 'constants/Colors';
 import { error, evaluation, user } from 'store/slices';

@@ -105,6 +105,7 @@ export default function Home() {
   useEffect(() => {
     if (access_token) {
       if (AuthContext?.signIn) {
+        AsyncStorage.setItem(asyncstorageKeys.ACCESS_TOKEN, access_token as string);
         AuthContext.signIn(access_token as string);
         core.init(endpointUrls, access_token as string);
       }

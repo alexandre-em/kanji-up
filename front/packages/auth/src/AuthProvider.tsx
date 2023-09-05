@@ -3,7 +3,7 @@ import { router, useGlobalSearchParams, useRootNavigation } from 'expo-router';
 
 export type AuthContextValueType = {
   accessToken: string | null;
-  signIn: (token: string | null) => void;
+  signIn: (token: string) => void;
   signOut: () => void;
   loading: boolean;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
@@ -44,10 +44,16 @@ export function Provider({ children }: { children: React.ReactNode }) {
 
   useProtectedRoute(token);
 
+  const handleSignIn = React.useCallback((newToken: string) => {
+    if (newToken) {
+      setToken(newToken);
+    }
+  }, []);
+
   return (
     <AuthContext.Provider
       value={{
-        signIn: setToken,
+        signIn: handleSignIn,
         signOut: () => setToken(null),
         accessToken: token,
         loading,

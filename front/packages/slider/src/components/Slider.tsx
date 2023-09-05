@@ -31,8 +31,11 @@ export default function Slider({ value, min, max, color, onValueChange }: Slider
             ? e.nativeEvent.touches[0].clientX
             : e.nativeEvent.layerX
           : e.nativeEvent.locationX;
-      if (isDragging) {
+      if (isDragging && x >= 0) {
         setPos(x);
+      }
+      if (x <= 5) {
+        setIsDragging(false);
       }
     },
     [isDragging, value, max, min]
@@ -40,6 +43,7 @@ export default function Slider({ value, min, max, color, onValueChange }: Slider
 
   const handlePressOut = useCallback(() => {
     if (isDragging && pos) {
+      // Compute by the min of the screen and max of the content width = 700 minus 20 that is corresponding to the margin = 20
       const newValuePerc = ((pos as number) / (Math.min(width, 700) - 20)) * 100;
       onValueChange(Math.floor((newValuePerc * max) / 100 + min));
       setIsDragging(false);

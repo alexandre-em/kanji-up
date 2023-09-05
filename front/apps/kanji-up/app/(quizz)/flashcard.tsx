@@ -4,10 +4,10 @@ import { Button, Divider, ProgressBar, Surface, TouchableRipple } from 'react-na
 import { useSelector } from 'react-redux';
 import { SVGUriPlatform } from 'kanji-app-svg-ui';
 
-import styles from '../style';
+import styles from './style';
 import { colors } from 'constants/Colors';
 import { RootState } from 'store';
-import { useQuizzContext } from '../_layout';
+import { useQuizzContext } from './_layout';
 import { router } from 'expo-router';
 
 export default function Practice() {

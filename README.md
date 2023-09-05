@@ -14,8 +14,10 @@
 [![Netlify Status](https://api.netlify.com/api/v1/badges/7546e544-6733-4666-b116-97fd9a197f33/deploy-status?branch=main)](https://app.netlify.com/sites/luxury-taffy-de0aa3/deploys)
 
 KanjiUp is an application that will help the user to learn and memorize Japanese kanji with Flashcard and drawing recognition (~2600 kanji can be recognized).
+Web application: [link](https://kanjiup-v2.alexandre-em.fr)
+Android application (APK): [link](https://expo.dev/accounts/em-alexandre/projects/kanji-up/builds/589180b0-1839-4333-b05f-d221d3cb628c)
 
-See KanjiUp [Readme](./front/kanji-up/README.md)
+See KanjiUp [Readme](./front/apps/kanji-up/README.md)
 
 ### KanjiUp Image Data Manager (OUT?)
 
