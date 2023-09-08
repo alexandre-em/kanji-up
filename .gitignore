@@ -19,6 +19,7 @@ uploads/*.png
 uploads/*.jpg
 ignore
 __pycache__
+.DS_STORE
 
 .terraform
 .terraform_env
