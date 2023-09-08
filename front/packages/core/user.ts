@@ -4,11 +4,13 @@ import { PredictionType, UpdatedDataResponse, User, UserScore } from 'kanji-app-
 export default class UserService {
   private _instance: AxiosInstance | null = null;
 
-  constructor(baseUrl: string, accessToken: string) {
-    this._instance = axios.create({
-      baseURL: `${baseUrl}/users`,
-      headers: { 'Access-Control-Allow-Origin': '*', Authorization: `Bearer ${accessToken}` },
-    });
+  constructor(baseUrl?: string, accessToken?: string) {
+    if (baseUrl) {
+      this._instance = axios.create({
+        baseURL: `${baseUrl}/users`,
+        headers: { 'Access-Control-Allow-Origin': '*', Authorization: `Bearer ${accessToken}` },
+      });
+    }
   }
 
   getProfile(options?: AxiosRequestConfig): Promise<AxiosResponse<User>> {
