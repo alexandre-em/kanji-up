@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { InjectModel, Prop } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import Permission from 'src/utils/permission.type';
@@ -11,7 +11,7 @@ export class UsersService {
   constructor(@InjectModel(User.name) private readonly model: Model<UserDocument>) {}
 
   async getOne(user_id: string) {
-    const user = await this.model.findOne({ user_id }).select('-_id -__v -password -image -email_confirmed').exec();
+    const user = await this.model.findOne({ user_id }).select('-_id -__v -password -image -email_confirmed -permissions -applications._id').populate('friends', 'name user_id -_id').exec();
 
     if (user?.deleted_at) {
       throw new NotFoundException(`This user has been deleted at: ${user.deleted_at}`);
@@ -128,6 +128,16 @@ export class UsersService {
     }
   }
 
+  async getUserFriend(user_id: string) {
+    const user = await this.model
+      .findOne({ user_id })
+      .select('-_id -__v -password -image -email_confirmed -email -created_at -deleted_at -applications -permissions -name -user_id')
+      .populate('friends', 'name user_id applications.kanji.total_score applications.word.total_score -_id')
+      .exec();
+
+    return user?.friends;
+  }
+
   async addUserFriend(user_id: string, friend_id: UpdateUserFriendDTO) {
     if (user_id === friend_id.user_id) {
       throw new BadRequestException("You can't add yourself as a friend");
@@ -140,11 +150,22 @@ export class UsersService {
     if (!friend) {
       throw new NotFoundException("User you want to add doesn't exist");
     }
-    if (user.friends.includes(friend)) {
-      throw new UnprocessableEntityException('This user is already your friend');
+    if (user.friends.includes(friend._id)) {
+      // throw new ''();
+      throw new HttpException(
+        {
+          status: 409,
+          error: 'Conflict',
+          message: 'This user is already your friend',
+        },
+        409,
+        {
+          cause: new Error('This user is already your friend'),
+        },
+      );
     }
 
-    const friends = [...user.friends, friend];
+    const friends = [...user.friends, friend._id];
     return this.model.updateOne({ user_id }, { friends }).exec();
   }
 
@@ -157,11 +178,12 @@ export class UsersService {
     if (!friend) {
       throw new NotFoundException("User you want to remove doesn't exist");
     }
-    if (!user.friends.includes(friend)) {
-      throw new UnprocessableEntityException('This user is not your friend');
+    if (!user.friends.includes(friend._id)) {
+      throw new BadRequestException('This user is not your friend');
     }
 
-    const friends = user.friends.filter((f) => f !== friend);
+    const friends = user.friends.filter((f) => !(f as any).equals(friend._id));
+
     return this.model.updateOne({ user_id }, { friends }).exec();
   }
 
@@ -175,6 +197,35 @@ export class UsersService {
         return this.model.updateOne({ user_id }, { 'applications.kanji': body }).exec();
       case 'word':
         return this.model.updateOne({ user_id }, { 'applications.word': body }).exec();
+      default:
+        throw new BadRequestException('Invalid application type');
+    }
+  }
+
+  getRanking(appType: string, limit = 10) {
+    if (!appType) {
+      throw new BadRequestException('Application type not specified');
+    }
+
+    switch (appType) {
+      case 'kanji':
+        return this.model
+          .find({ $and: [{ 'applications.kanji.total_score': { $ne: null } }, { applications: { $ne: null } }] })
+          .select(
+            '-_id -password -email -email_confirmed -friends -permissions -created_at -__v -deleted_at -image -applications.word -applications.kanji.scores -applications.kanji.progression -applications._id',
+          )
+          .sort({ 'applications.kanji.total_score': -1 })
+          .limit(limit)
+          .exec();
+      case 'word':
+        return this.model
+          .find({ $and: [{ 'applications.word.total_score': { $ne: null } }, { applications: { $ne: null } }] })
+          .select(
+            '-_id -password -email -email_confirmed -friends -permissions -created_at -__v -deleted_at -image -applications.kanji -applications.word.scores -applications.word.progression -applications._id',
+          )
+          .sort({ 'applications.word.total_score': -1 })
+          .limit(limit)
+          .exec();
       default:
         throw new BadRequestException('Invalid application type');
     }

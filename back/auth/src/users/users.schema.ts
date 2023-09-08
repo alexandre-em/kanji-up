@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { CallbackWithoutResultAndOptionalError, Document } from 'mongoose';
+import mongoose, { CallbackWithoutResultAndOptionalError, Document } from 'mongoose';
 import { util } from 'mongoose-uuid-parser';
 import * as bcrypt from 'bcryptjs';
 import Permission from 'src/utils/permission.type';
@@ -33,7 +33,7 @@ export class User {
     word: Score;
   };
 
-  @Prop()
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: User.name }] })
   friends: User[];
 
   @Prop()

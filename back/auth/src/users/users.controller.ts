@@ -1,4 +1,21 @@
-import { Body, Controller, Delete, FileTypeValidator, Get, Headers, MaxFileSizeValidator, Param, ParseFilePipe, Patch, Put, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  FileTypeValidator,
+  Get,
+  Headers,
+  MaxFileSizeValidator,
+  Param,
+  ParseFilePipe,
+  Patch,
+  Put,
+  Query,
+  Res,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
@@ -69,7 +86,17 @@ export class UsersController {
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthenticationGuard)
-  @Patch('friend/:id')
+  @Get('friends')
+  getUserFriend(@Headers() headers: any) {
+    const accessToken = headers.authorization.split(' ')[1];
+    const decodedJwtAccessToken = this.jwtService.decode(accessToken);
+
+    return this.service.getUserFriend(decodedJwtAccessToken?.sub);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthenticationGuard)
+  @Patch('friends/:id')
   addUserFriend(@Headers() headers: any, @Param('id') id: string) {
     const accessToken = headers.authorization.split(' ')[1];
     const decodedJwtAccessToken = this.jwtService.decode(accessToken);
@@ -79,7 +106,7 @@ export class UsersController {
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthenticationGuard)
-  @Delete('friend/:id')
+  @Delete('friends/:id')
   removeUserFriend(@Headers() headers: any, @Param('id') id: string) {
     const accessToken = headers.authorization.split(' ')[1];
     const decodedJwtAccessToken = this.jwtService.decode(accessToken);
@@ -103,7 +130,7 @@ export class UsersController {
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthenticationGuard)
-  @Delete('user')
+  @Delete('users')
   deleteUser(@Headers() headers: any) {
     const accessToken = headers.authorization.split(' ')[1];
     const decodedJwtAccessToken = this.jwtService.decode(accessToken);
@@ -119,5 +146,10 @@ export class UsersController {
     const decodedJwtAccessToken = this.jwtService.decode(accessToken);
 
     return this.service.updateUserApp(decodedJwtAccessToken?.sub, app, body);
+  }
+
+  @Get('ranks/:app')
+  getRank(@Param('app') app: string, @Query('limit') limit?: number) {
+    return this.service.getRanking(app, limit);
   }
 }
