@@ -11,7 +11,7 @@
 ![Redux](https://img.shields.io/badge/redux-%23593d88.svg?style=for-the-badge&logo=redux&logoColor=white)
 ![Jest](https://img.shields.io/badge/-jest-%23C21325?style=for-the-badge&logo=jest&logoColor=white)
 
-[![Netlify Status](https://api.netlify.com/api/v1/badges/7546e544-6733-4666-b116-97fd9a197f33/deploy-status?branch=main)](https://app.netlify.com/sites/luxury-taffy-de0aa3/deploys)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/c8fc660d-c473-4df2-aeae-ce6454a195b2/deploy-status)](https://app.netlify.com/sites/kanjiup-v2/deploys)
 
 KanjiUp is an application that will help the user to learn and memorize Japanese kanji with Flashcard and drawing recognition (~2600 kanji can be recognized).
 Web application: [link](https://kanjiup-v2.alexandre-em.fr)

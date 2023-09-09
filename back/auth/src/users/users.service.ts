@@ -46,7 +46,7 @@ export class UsersService {
     stream.push(buffer);
     stream.push(null);
 
-    return { stream, length: buffer.length };
+    return { stream, length: buffer.length, type: user.image.contentType };
   }
 
   updateOne(user_id: string, userinfo: UpdateUserDTO | DeleteUserDTO) {
@@ -65,7 +65,7 @@ export class UsersService {
       contentType: file.mimetype,
     };
 
-    if (Buffer.compare(user.image.data, image.data) === 0) {
+    if (user.image?.data && Buffer.compare(user.image.data, image.data) === 0) {
       throw new UnprocessableEntityException('This file has already been uploaded');
     }
 

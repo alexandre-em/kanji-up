@@ -29,7 +29,7 @@ import JwtAuthenticationGuard from 'src/auth/jwt.guard';
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
-  constructor(private readonly service: UsersService, private readonly jwtService: JwtService) {}
+  constructor(private readonly service: UsersService, private readonly jwtService: JwtService) { }
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthenticationGuard)
@@ -41,12 +41,19 @@ export class UsersController {
     return this.service.getOne(decodedJwtAccessToken?.sub);
   }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthenticationGuard)
+  @Get(':id')
+  getUser(@Param('id') id: string) {
+    return this.service.getOne(id);
+  }
+
   @Get('profile/image/:id')
   async getOneImage(@Param('id') id: string, @Res() res: Response) {
-    const { stream, length } = await this.service.getOneImage(id);
+    const { stream, length, type } = await this.service.getOneImage(id);
 
     res.set({
-      'Content-Type': 'image/png',
+      'Content-Type': type,
       'Content-Length': length,
     });
 
@@ -73,7 +80,7 @@ export class UsersController {
     @Headers() headers: any,
     @UploadedFile(
       new ParseFilePipe({
-        validators: [new MaxFileSizeValidator({ maxSize: 1500000 }), new FileTypeValidator({ fileType: 'png' })],
+        validators: [new MaxFileSizeValidator({ maxSize: 1500000 }), new FileTypeValidator({ fileType: /(jpg|jpeg|png|webp)$/ })],
       }),
     )
     file: Express.Multer.File,
@@ -130,7 +137,7 @@ export class UsersController {
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthenticationGuard)
-  @Delete('users')
+  @Delete('')
   deleteUser(@Headers() headers: any) {
     const accessToken = headers.authorization.split(' ')[1];
     const decodedJwtAccessToken = this.jwtService.decode(accessToken);
