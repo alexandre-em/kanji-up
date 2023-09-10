@@ -1,9 +1,11 @@
-import { Platform, StatusBar, StyleSheet } from 'react-native';
+import { Dimensions, Platform, StatusBar, StyleSheet } from 'react-native';
 
 import { colors } from './Colors';
 
+const { width, height } = Dimensions.get('window');
+
 export default StyleSheet.create({
-  main: {
+  login: {
     flex: 1,
     width: '100%',
     maxWidth: 700,
@@ -11,6 +13,15 @@ export default StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: 'rgb(248, 248, 248)',
     boxShadow: 'rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px',
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+  },
+  main: {
+    display: 'flex',
+    flexDirection: width > height ? 'row' : 'column',
+    alignItems: width > height ? 'flex-start' : 'center',
+    width: '100%',
+    maxWidth: width,
+    minHeight: height,
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
   },
   title: {
@@ -44,8 +55,14 @@ export default StyleSheet.create({
   },
   search: {
     backgroundColor: '#fff',
-    width: '100%',
     borderRadius: 25,
     boxShadow: 'rgba(0, 0, 0, 0.24) 0px 3px 4px',
+  },
+  surface: {
+    display: 'flex',
+    height: 80,
+    width: 80,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

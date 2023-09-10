@@ -7,11 +7,17 @@ import { Provider as PaperProvider, DefaultTheme } from 'react-native-paper';
 import { AuthProvider } from 'kanji-app-auth';
 
 import { colors } from '../constants/Colors';
+import UserProvider from 'components/UserProvider';
 
 export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary,
 } from 'expo-router';
+
+export const unstable_settings = {
+  // Ensure that reloading on `/modal` keeps a back button present.
+  initialRouteName: 'home',
+};
 
 const theme = {
   ...DefaultTheme,
@@ -64,7 +70,9 @@ function RootLayoutNav() {
         <Head>
           <title>KanjiUp User</title>
         </Head>
-        <Stack screenOptions={{ headerShown: false }}></Stack>
+        <UserProvider>
+          <Stack screenOptions={{ headerShown: false }}></Stack>
+        </UserProvider>
       </AuthProvider>
     </PaperProvider>
   );

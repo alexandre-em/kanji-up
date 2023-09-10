@@ -19,6 +19,12 @@ export default class UserService {
     return this._instance?.get('/profile', options);
   }
 
+  getUserById(userId: string, options?: AxiosRequestConfig) {
+    if (!this._instance) throw new Error('User instance not ready...');
+
+    return this._instance?.get(`/${userId}`, options);
+  }
+
   getProfileImage(user_id: string, options?: AxiosRequestConfig) {
     if (!this._instance) throw new Error('User instance not ready...');
 
@@ -57,5 +63,21 @@ export default class UserService {
     if (!scores || scores.total_score === undefined) throw new Error('Invalid score body');
 
     return this._instance.put('/score/kanji', scores, options);
+  }
+
+  getRanking(appType: 'kanji' | 'word', limit = 10, options?: AxiosRequestConfig) {
+    return this._instance?.get(`/ranks/${appType}?limit=${limit}`, options);
+  }
+
+  addFriend(userId: string, option?: AxiosRequestConfig): Promise<AxiosResponse<UpdatedDataResponse>> {
+    if (!this._instance) throw new Error('User instance not ready...');
+
+    return this._instance?.patch(`/friends/${userId}`, option);
+  }
+
+  removeFriend(userId: string, option?: AxiosRequestConfig): Promise<AxiosResponse<UpdatedDataResponse>> {
+    if (!this._instance) throw new Error('User instance not ready...');
+
+    return this._instance?.delete(`/friends/${userId}`, option);
   }
 }
