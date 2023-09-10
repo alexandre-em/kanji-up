@@ -50,7 +50,7 @@ export class UsersService {
   }
 
   updateOne(user_id: string, userinfo: UpdateUserDTO | DeleteUserDTO) {
-    return this.model.updateOne({ user_id }, userinfo).exec();
+    return this.model.findOneAndUpdate({ user_id }, userinfo).exec();
   }
 
   async uploadImage(user_id: string, file: any) {
@@ -128,14 +128,16 @@ export class UsersService {
     }
   }
 
-  async getUserFriend(user_id: string) {
-    const user = await this.model
-      .findOne({ user_id })
-      .select('-_id -__v -password -image -email_confirmed -email -created_at -deleted_at -applications -permissions -name -user_id')
-      .populate('friends', 'name user_id applications.kanji.total_score applications.word.total_score -_id')
-      .exec();
+  async getUserMutualFriend(user_id: string) {
+    const user = await this.model.findOne({ user_id }).exec();
 
-    return user?.friends;
+    if (!user) {
+      throw new NotFoundException("This user doesn't exist");
+    }
+
+    const follower = await this.model.find({ friends: user._id }).select('-_id -__v -password -image -friends -applications -email -email_confirmed -permissions -created_at -deleted_at').exec();
+
+    return follower;
   }
 
   async addUserFriend(user_id: string, friend_id: UpdateUserFriendDTO) {

@@ -20,7 +20,7 @@ import { JwtService } from '@nestjs/jwt';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
-import { UpdateUserAppDTO, UpdateUserPermissionsDTO } from './users.dto';
+import { UpdateUserAppDTO, UpdateUserDTO, UpdateUserPermissionsDTO } from './users.dto';
 import { UsersService } from './users.service';
 import permissions from 'src/utils/permission.type';
 import permissionGuard from 'src/auth/permission.guard';
@@ -29,7 +29,7 @@ import JwtAuthenticationGuard from 'src/auth/jwt.guard';
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
-  constructor(private readonly service: UsersService, private readonly jwtService: JwtService) { }
+  constructor(private readonly service: UsersService, private readonly jwtService: JwtService) {}
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthenticationGuard)
@@ -46,6 +46,16 @@ export class UsersController {
   @Get(':id')
   getUser(@Param('id') id: string) {
     return this.service.getOne(id);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthenticationGuard)
+  @Patch('info')
+  updateUserInfo(@Headers() headers: any, @Body() body: UpdateUserDTO) {
+    const accessToken = headers.authorization.split(' ')[1];
+    const decodedJwtAccessToken = this.jwtService.decode(accessToken);
+
+    return this.service.updateOne(decodedJwtAccessToken?.sub, body);
   }
 
   @Get('profile/image/:id')
@@ -93,12 +103,9 @@ export class UsersController {
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthenticationGuard)
-  @Get('friends')
-  getUserFriend(@Headers() headers: any) {
-    const accessToken = headers.authorization.split(' ')[1];
-    const decodedJwtAccessToken = this.jwtService.decode(accessToken);
-
-    return this.service.getUserFriend(decodedJwtAccessToken?.sub);
+  @Get('friends/:id')
+  getUserMutualFriend(@Param('id') id: string) {
+    return this.service.getUserMutualFriend(id);
   }
 
   @ApiBearerAuth()
