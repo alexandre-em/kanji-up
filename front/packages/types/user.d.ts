@@ -16,6 +16,7 @@ export type UserApplicationScore = {
 export type User = {
   name: string;
   email: string;
+  password?: string;
   friends: Array<Partial<User>>;
   permissions: string[];
   created_at: string;

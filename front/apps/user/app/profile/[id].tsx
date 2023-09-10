@@ -20,6 +20,7 @@ export default function Home() {
   const UserContext = useUserContext();
   const AuthContext = useAuth();
   const [user, setUser] = useState<User | null>(null);
+  const [followers, setFollowers] = useState<Partial<User>[]>([]);
   const [apptype, setAppType] = useState<'kanji' | 'word'>('kanji');
 
   const avatarUri = React.useMemo(
@@ -46,7 +47,7 @@ export default function Home() {
           onPress={() => {
             router.push('/settings');
           }}>
-          Settings
+          Edit
         </Button>
       );
     if (UserContext.state.friends.filter((u) => u.user_id === user?.user_id).length === 0)
@@ -94,6 +95,17 @@ export default function Home() {
     [core.userService, UserContext.state]
   );
 
+  const getFollowers = useCallback(
+    (id: string) => {
+      if (core.userService) {
+        core.userService.getFollowers(id).then(({ data }) => {
+          setFollowers(data);
+        });
+      }
+    },
+    [core.userService, UserContext.state, user]
+  );
+
   const getCurrentUser = useCallback(() => {
     if (access_token && core.userService) {
       core.userService?.getProfile().then(({ data }) => {
@@ -116,7 +128,10 @@ export default function Home() {
   }, [access_token, AuthContext?.signIn]);
 
   useEffect(() => {
-    getUser(id as string);
+    if (id) {
+      getUser(id as string);
+      getFollowers(id as string);
+    }
   }, [id]);
 
   if (!user)
@@ -158,7 +173,7 @@ export default function Home() {
             <Text style={{ textAlign: 'center' }}>Following</Text>
           </View>
           <View style={{ alignItems: 'center' }}>
-            <Text style={style.numberText}>{user.friends.length}</Text>
+            <Text style={style.numberText}>{followers.length}</Text>
             <Text style={{ textAlign: 'center' }}>Followers</Text>
           </View>
         </View>
@@ -167,10 +182,11 @@ export default function Home() {
       </View>
       <View style={style.contents}>
         <Text style={global.title}>Stats</Text>
+        <Chart user={user} apptype={apptype} />
         <SegmentedButtons
           value={apptype}
           onValueChange={setAppType}
-          style={{ alignSelf: 'flex-end', borderRadius: 25, marginRight: 20 }}
+          style={{ alignSelf: 'center', borderRadius: 25, marginRight: 20 }}
           density="high"
           buttons={[
             {
@@ -185,7 +201,6 @@ export default function Home() {
             },
           ]}
         />
-        <Chart user={user} apptype={apptype} />
       </View>
     </SafeAreaView>
   );
