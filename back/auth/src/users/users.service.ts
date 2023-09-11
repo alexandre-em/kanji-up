@@ -8,10 +8,10 @@ import { User, UserDocument } from './users.schema';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private readonly model: Model<UserDocument>) {}
+  constructor(@InjectModel(User.name) private readonly model: Model<UserDocument>) { }
 
   async getOne(user_id: string) {
-    const user = await this.model.findOne({ user_id }).select('-_id -__v -password -image -email_confirmed -permissions -applications._id').populate('friends', 'name user_id -_id').exec();
+    const user = await this.model.findOne({ user_id }).select('-_id -__v -password -image -email_confirmed -applications._id').populate('friends', 'name user_id -_id').exec();
 
     if (user?.deleted_at) {
       throw new NotFoundException(`This user has been deleted at: ${user.deleted_at}`);
