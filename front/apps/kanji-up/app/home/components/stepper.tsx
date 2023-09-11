@@ -16,10 +16,10 @@ import Reminders from '../../../svg/Reminders';
 import Trip from '../../../svg/Trip';
 
 type StepperProps = {
-  onRefresh: () => void;
+  onPress: () => void;
 };
 
-export default function Stepper({ onRefresh }: StepperProps) {
+export default function Stepper({ onPress }: StepperProps) {
   const userState = useSelector((state: RootState) => state.user);
 
   const step = useMemo(() => {
@@ -79,8 +79,8 @@ export default function Stepper({ onRefresh }: StepperProps) {
             {stepperMessage}
           </Text>
           <Text style={[globalStyles.title, { fontSize: 22, marginTop: 0 }]}>{userState.dailyScore || 0} pts</Text>
-          <Button icon="reload" onPress={onRefresh} mode="contained" style={{ borderRadius: 25 }}>
-            Synchronize
+          <Button icon="reload" onPress={onPress} mode="contained" style={{ borderRadius: 25 }}>
+            Profile
           </Button>
         </View>
       </Surface>

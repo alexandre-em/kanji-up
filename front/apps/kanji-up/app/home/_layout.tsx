@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Href, router, useGlobalSearchParams } from 'expo-router';
-import { FlatList, SafeAreaView, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, Linking, Platform, SafeAreaView, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { Avatar, Button, FAB, List, Searchbar } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -19,6 +19,7 @@ import RandomKanji from './components/randomKanji';
 import Stepper from './components/stepper';
 import core from 'kanji-app-core';
 import { endpointUrls } from 'constants';
+import { UserAppRedirection } from 'services/redirections';
 
 export default function Home() {
   const dispatch = useDispatch();
@@ -52,7 +53,7 @@ export default function Home() {
           const date = new Date();
           const formattedDate = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
 
-          dispatch(settings.actions.update({ username: data.name }));
+          dispatch(settings.actions.update({ username: data.name, userId: data.user_id }));
 
           dispatch(
             user.actions.update({
@@ -143,7 +144,7 @@ export default function Home() {
           />
         </View>
 
-        <Stepper onRefresh={refreshUserScore} />
+        <Stepper onPress={() => UserAppRedirection(userId, AuthContext?.accessToken || '')} />
 
         <Text style={globalStyles.title}>Server health</Text>
         <List.Item

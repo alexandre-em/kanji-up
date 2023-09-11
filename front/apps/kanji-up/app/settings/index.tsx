@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { View, ScrollView, Text } from 'react-native';
-import { Appbar, Button, IconButton, Switch } from 'react-native-paper';
+import { View, ScrollView, Text, TouchableOpacity } from 'react-native';
+import { Appbar, Avatar, Button, IconButton, Switch } from 'react-native-paper';
 import { Slider } from 'kanji-app-svg-ui';
 
 import styles from './style';
@@ -13,6 +13,8 @@ import CustomDialog from 'components/CustomDialog';
 import useHandlers from './useHandler';
 import { router } from 'expo-router';
 import global from 'styles/global';
+import { UserAppRedirection } from 'services/redirections';
+import { useAuth } from 'kanji-app-auth';
 
 const defaultValues: Partial<SettingValuesType> = {
   flashcardNumber: 30,
@@ -23,6 +25,7 @@ const defaultValues: Partial<SettingValuesType> = {
 
 export default function Settings() {
   const dispatch = useDispatch();
+  const AuthContext = useAuth();
   const savedSettings = useSelector((state: RootState) => state.settings);
   const [values, setValues] = useState<Partial<SettingValuesType>>(defaultValues);
   const [dialog, setDialog] = useState<boolean>(false);
@@ -59,6 +62,22 @@ export default function Settings() {
         <IconButton icon="content-save" />
       </Appbar.Header>
       <ScrollView style={{ padding: 20 }} showsVerticalScrollIndicator={false}>
+        <Text style={global.title}>User&apos;s settings</Text>
+        <TouchableOpacity
+          style={{ alignSelf: 'center' }}
+          onPress={() => UserAppRedirection(savedSettings.userId, AuthContext?.accessToken || '')}>
+          {savedSettings.userId ? (
+            <Avatar.Image
+              size={100}
+              source={{ uri: `${process.env.EXPO_PUBLIC_AUTH_BASE_URL}/users/profile/image/${savedSettings.userId}` }}
+            />
+          ) : (
+            <Avatar.Text size={40} label={savedSettings.username.charAt(0) || '-'} />
+          )}
+        </TouchableOpacity>
+        <Button style={styles.button} onPress={() => UserAppRedirection(savedSettings.userId, AuthContext?.accessToken || '')}>
+          Edit profile
+        </Button>
         <Text style={global.title}>Application&apos;s settings</Text>
         <View style={styles.switchGroup}>
           <Text style={global.subtitle}>Use offline recognition model</Text>

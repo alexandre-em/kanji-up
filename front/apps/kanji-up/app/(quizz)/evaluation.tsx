@@ -94,7 +94,7 @@ export default function Evaluate() {
               const grade = kanjiQueue[counter].reference?.grade;
               dispatch(
                 evaluation.actions.addPoints(
-                  Math.max(predictedKanji.score * 100 * (grade === 'custom' ? 8 : parseInt(grade || '1', 10)), 10)
+                  Math.max(predictedKanji.score * 10 * (grade === 'custom' ? 8 : parseInt(grade || '1', 10)), 10)
                 )
               );
               dispatch(user.actions.updateProgression({ id: kanjiQueue[counter].kanji_id, inc: KANJI_PROGRESSION_INC }));

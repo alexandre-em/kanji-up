@@ -1,9 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import jwtDecode from 'jwt-decode';
-import { DecodedToken } from 'kanji-app-types';
 
 const initialState: SettingValuesType = {
   username: 'user',
+  userId: '',
   flashcardNumber: 30,
   evaluationCardNumber: 70,
   evaluationTime: 60,
@@ -21,7 +20,7 @@ const update = (state: SettingValuesType, action: PayloadAction<Partial<SettingV
   return updatedState;
 };
 
-const logout = (state: SettingValuesType) => ({ ...state, username: 'user', });
+const logout = (state: SettingValuesType) => ({ ...state, username: 'user', userId: '' });
 
 export const settings = createSlice({
   name: 'settings',

@@ -32,6 +32,7 @@ type EvaluationState = {
 
 type SettingValuesType = {
   username: string;
+  userId: string;
   flashcardNumber: number;
   evaluationCardNumber: number;
   evaluationTime: number;

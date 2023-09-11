@@ -69,10 +69,11 @@ export default function KanjiDetail() {
       <Appbar.Header>
         <Appbar.BackAction onPress={() => router.back()} />
         <Appbar.Content
-          title={`Detail of ${details.kanji.character} ${userState.progression[details.kanji_id] !== undefined
-              ? `(${(userState.progression[details.kanji_id] / KANJI_PROGRESSION_MAX) * 100}%)`
+          title={`Detail of ${details.kanji.character} ${
+            userState.progression[details.kanji_id] !== undefined
+              ? `(${Math.min((userState.progression[details.kanji_id] / KANJI_PROGRESSION_MAX) * 100, 100)}%)`
               : ''
-            }`}
+          }`}
           titleStyle={{ color: '#fff', fontWeight: '700', fontSize: 17 }}
         />
       </Appbar.Header>

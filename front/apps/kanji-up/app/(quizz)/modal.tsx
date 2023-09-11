@@ -35,7 +35,7 @@ export default function Modal() {
       })
       .reduce((prev, curr) => ({ ...prev, [curr]: userState.scores[curr] }), {});
 
-    updatedScores[formattedDate] = userState.dailyScore + quizzScore;
+    updatedScores[formattedDate] = (userState.dailyScore || 0) + quizzScore;
 
     const score = {
       total_score: userState.totalScore + quizzScore,

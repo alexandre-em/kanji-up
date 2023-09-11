@@ -38,6 +38,7 @@ export default function KanjiSurface({ kanji, onPress }: { kanji: KanjiType; onP
         <ProgressBar
           style={{ width: 60, alignSelf: 'center' }}
           progress={userState.progression[kanji.kanji_id] / KANJI_PROGRESSION_MAX}
+          color={(userState.progression[kanji.kanji_id] / KANJI_PROGRESSION_MAX) * 100 < 100 ? colors.secondary : colors.success}
         />
       )}
     </TouchableOpacity>

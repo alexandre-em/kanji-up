@@ -55,7 +55,7 @@ export default function RandomKanji() {
             backgroundColor={colors.primary + '75'}>
             {() => (
               <Text style={{ color: colors.text, fontWeight: '900' }}>
-                {((userState.progression[choosenKanji.kanji_id!] || 0) / KANJI_PROGRESSION_MAX) * 100}
+                {Math.min(((userState.progression[choosenKanji.kanji_id!] || 0) / KANJI_PROGRESSION_MAX) * 100, 100)}
               </Text>
             )}
           </AnimatedCircularProgress>

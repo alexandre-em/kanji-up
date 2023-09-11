@@ -12,7 +12,9 @@ const updateProgression = (state: UserState, action: PayloadAction<{ id: string;
   const { progression } = state;
   const updateKanjiProgression = progression[id] ?? 0;
 
-  return { ...state, progression: { ...progression, [id]: updateKanjiProgression + inc } };
+  const incrementedProgression = Math.min(updateKanjiProgression + inc, 100);
+
+  return { ...state, progression: { ...progression, [id]: incrementedProgression } };
 };
 
 export const user = createSlice({
@@ -23,7 +25,7 @@ export const user = createSlice({
     update: (_, action: PayloadAction<UserState>) => action.payload,
     addScoreDaily: (state: UserState, action: PayloadAction<number>) => ({
       ...state,
-      dailyScore: state.dailyScore + action.payload,
+      dailyScore: (state.dailyScore || 0) + action.payload,
     }),
     updateProgression,
   },
