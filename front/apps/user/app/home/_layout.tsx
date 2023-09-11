@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect } from 'react';
-import { View, Text, SafeAreaView, TouchableOpacity } from 'react-native';
+import { View, Text, SafeAreaView, TouchableOpacity, ScrollView } from 'react-native';
 import { router, useGlobalSearchParams } from 'expo-router';
 import { Appbar, Avatar, Button, Searchbar, Surface, TouchableRipple } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -58,44 +58,46 @@ export default function Home() {
   }, [access_token, AuthContext?.signIn]);
 
   return (
-    <SafeAreaView style={global.main}>
-      <View style={style.avatar}>
-        <TouchableOpacity onPress={() => router.push(`/profile/${UserContext.state.user_id}`)}>
-          {UserContext.state.user_id ? (
-            <Avatar.Image size={150} source={{ uri: avatarUri }} />
-          ) : (
-            <Avatar.Text size={150} label={UserContext.state.name.charAt(0) || '-'} />
-          )}
-        </TouchableOpacity>
-        <Text style={[global.title, { textTransform: 'capitalize', textAlign: 'center' }]}>{UserContext.state.name}</Text>
-      </View>
-      <View style={style.contents}>
-        <Button icon="logout" onPress={handleSignout} style={{ alignSelf: 'flex-end', marginVertical: 10 }}>
-          Logout
-        </Button>
-        <Searchbar style={global.search} placeholder="Search user..." inputStyle={{ color: colors.text, fontSize: 15 }} />
-        <Text style={global.title}>Score</Text>
-        <View style={style.score}>
-          <TouchableRipple onPress={() => setAppType('kanji')}>
-            <Surface
-              style={[global.surface, { backgroundColor: appType === 'kanji' ? colors.elevation.level4 : '#fff' }]}
-              elevation={4}>
-              <Text style={{ fontFamily: 'RobotoBold', fontSize: 18 }}>Kanji</Text>
-              <Text>{UserContext.state.applications.kanji?.total_score || 0}</Text>
-            </Surface>
-          </TouchableRipple>
-          <TouchableRipple onPress={() => setAppType('word')}>
-            <Surface
-              style={[global.surface, { backgroundColor: appType === 'word' ? colors.elevation.level4 : '#fff' }]}
-              elevation={4}>
-              <Text style={{ fontFamily: 'RobotoBold', fontSize: 18 }}>Word</Text>
-              <Text>{UserContext.state.applications.word?.total_score || 0}</Text>
-            </Surface>
-          </TouchableRipple>
+    <ScrollView>
+      <SafeAreaView style={global.main}>
+        <View style={style.avatar}>
+          <TouchableOpacity onPress={() => router.push(`/profile/${UserContext.state.user_id}`)}>
+            {UserContext.state.user_id ? (
+              <Avatar.Image size={150} source={{ uri: avatarUri }} />
+            ) : (
+              <Avatar.Text size={150} label={UserContext.state.name.charAt(0) || '-'} />
+            )}
+          </TouchableOpacity>
+          <Text style={[global.title, { textTransform: 'capitalize', textAlign: 'center' }]}>{UserContext.state.name}</Text>
         </View>
-        <Text style={global.title}>Ranking</Text>
-        <RankList type={appType} />
-      </View>
-    </SafeAreaView>
+        <View style={style.contents}>
+          <Button icon="logout" onPress={handleSignout} style={{ alignSelf: 'flex-end', marginVertical: 10 }}>
+            Logout
+          </Button>
+          <Searchbar style={global.search} placeholder="Search user..." inputStyle={{ color: colors.text, fontSize: 15 }} />
+          <Text style={global.title}>Score</Text>
+          <View style={style.score}>
+            <TouchableRipple onPress={() => setAppType('kanji')}>
+              <Surface
+                style={[global.surface, { backgroundColor: appType === 'kanji' ? colors.elevation.level4 : '#fff' }]}
+                elevation={4}>
+                <Text style={{ fontFamily: 'RobotoBold', fontSize: 18 }}>Kanji</Text>
+                <Text>{UserContext.state.applications.kanji?.total_score || 0}</Text>
+              </Surface>
+            </TouchableRipple>
+            <TouchableRipple onPress={() => setAppType('word')}>
+              <Surface
+                style={[global.surface, { backgroundColor: appType === 'word' ? colors.elevation.level4 : '#fff' }]}
+                elevation={4}>
+                <Text style={{ fontFamily: 'RobotoBold', fontSize: 18 }}>Word</Text>
+                <Text>{UserContext.state.applications.word?.total_score || 0}</Text>
+              </Surface>
+            </TouchableRipple>
+          </View>
+          <Text style={global.title}>Ranking</Text>
+          <RankList type={appType} />
+        </View>
+      </SafeAreaView>
+    </ScrollView>
   );
 }

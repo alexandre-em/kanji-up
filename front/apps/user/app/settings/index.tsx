@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { View, Text, SafeAreaView, TouchableOpacity, Platform } from 'react-native';
+import { View, Text, SafeAreaView, TouchableOpacity, Platform, ScrollView } from 'react-native';
 import { Avatar, Button, Dialog, IconButton, Portal, Snackbar, TextInput } from 'react-native-paper';
 import { router } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
@@ -111,96 +111,100 @@ export default function Home() {
   }, []);
 
   return (
-    <SafeAreaView style={[global.main, { flexDirection: 'column' }]}>
-      <Portal>
-        <Dialog visible={modalVisibility} onDismiss={() => setModalVisibility(false)}>
-          <Dialog.Title>Are you sure to delete this account ?</Dialog.Title>
-          <Dialog.Content>
-            <Text style={{ color: colors.text + '70' }}>you'll have a delay of 7 days before losing your data definitively</Text>
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button onPress={handleRemove}>Delete</Button>
-            <Button onPress={() => setModalVisibility(false)}>Cancel</Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
-      <View style={style.iconsHeader}>
-        <IconButton
-          icon="arrow-left-circle-outline"
-          iconColor={colors.primary}
-          onPress={() => router.back()}
-          style={{ alignSelf: 'flex-start' }}
-        />
-        <Button icon="logout" onPress={handleSignout}>
-          Logout
-        </Button>
-      </View>
-      <View style={style.avatar}>
-        <TouchableOpacity style={{ alignSelf: 'center' }} onPress={pickImage}>
-          {UserContext.state.user_id ? (
-            <Avatar.Image size={150} source={{ uri: image?.uri || avatarUri }} />
-          ) : (
-            <Avatar.Text size={150} label={user.name!.charAt(0) || '-'} />
-          )}
-        </TouchableOpacity>
-        <Button onPress={pickImage} style={{ alignSelf: 'center' }}>
-          Update image
-        </Button>
-      </View>
-      <View style={style.contents}>
-        <Text style={global.title}>Information</Text>
-        <TextInput
-          mode="outlined"
-          label="id"
-          value={UserContext.state.user_id}
-          style={{ marginHorizontal: 20, marginVertical: 5 }}
-          disabled
-        />
-        <TextInput
-          mode="outlined"
-          label="Email"
-          value={UserContext.state.email}
-          style={{ marginHorizontal: 20, marginVertical: 5 }}
-          disabled
-        />
-        <TextInput
-          mode="outlined"
-          label="Name"
-          value={user.name}
-          onChangeText={(text) => setUser((prev) => ({ ...prev, name: text }))}
-          style={{ marginHorizontal: 20, marginVertical: 5 }}
-        />
-        <TextInput
-          mode="outlined"
-          label="Password"
-          value={user.password}
-          onChangeText={(text) => setUser((prev) => ({ ...prev, password: text }))}
-          style={{ marginHorizontal: 20, marginVertical: 5 }}
-          secureTextEntry={passwordVisibility}
-          right={<TextInput.Icon icon="eye" onPress={() => setPasswordVisibility((prev) => !prev)} />}
-        />
-        <Text style={{ marginHorizontal: 20, marginTop: 30, color: colors.text + '70', fontSize: 12, alignSelf: 'flex-end' }}>
-          Accepted image formats : jpg, png and webp and size {'<'} 1.5Mb
-        </Text>
-        <Button
-          mode="contained"
-          style={{ alignSelf: 'flex-end', marginVertical: 5, marginHorizontal: 20 }}
-          onPress={handleSubmit}
-          disabled={!isUserUpdated && !image && !user.password}>
-          Update information
-        </Button>
-        <Text style={global.title}>Delete account</Text>
-        <Text style={{ marginHorizontal: 20, color: colors.text + '70' }}>
-          Your data will be saved 7 days. After that they will be lost
-        </Text>
-        <Button
-          icon="account-remove"
-          style={{ alignSelf: 'flex-end', marginVertical: 5, marginHorizontal: 20 }}
-          onPress={() => setModalVisibility(true)}>
-          Delete account
-        </Button>
-      </View>
-      {snack}
-    </SafeAreaView>
+    <ScrollView>
+      <SafeAreaView style={[global.main, { flexDirection: 'column' }]}>
+        <Portal>
+          <Dialog visible={modalVisibility} onDismiss={() => setModalVisibility(false)}>
+            <Dialog.Title>Are you sure to delete this account ?</Dialog.Title>
+            <Dialog.Content>
+              <Text style={{ color: colors.text + '70' }}>
+                you'll have a delay of 7 days before losing your data definitively
+              </Text>
+            </Dialog.Content>
+            <Dialog.Actions>
+              <Button onPress={handleRemove}>Delete</Button>
+              <Button onPress={() => setModalVisibility(false)}>Cancel</Button>
+            </Dialog.Actions>
+          </Dialog>
+        </Portal>
+        <View style={style.iconsHeader}>
+          <IconButton
+            icon="arrow-left-circle-outline"
+            iconColor={colors.primary}
+            onPress={() => router.back()}
+            style={{ alignSelf: 'flex-start' }}
+          />
+          <Button icon="logout" onPress={handleSignout}>
+            Logout
+          </Button>
+        </View>
+        <View style={style.avatar}>
+          <TouchableOpacity style={{ alignSelf: 'center' }} onPress={pickImage}>
+            {UserContext.state.user_id ? (
+              <Avatar.Image size={150} source={{ uri: image?.uri || avatarUri }} />
+            ) : (
+              <Avatar.Text size={150} label={user.name!.charAt(0) || '-'} />
+            )}
+          </TouchableOpacity>
+          <Button onPress={pickImage} style={{ alignSelf: 'center' }}>
+            Update image
+          </Button>
+        </View>
+        <View style={style.contents}>
+          <Text style={global.title}>Information</Text>
+          <TextInput
+            mode="outlined"
+            label="id"
+            value={UserContext.state.user_id}
+            style={{ marginHorizontal: 20, marginVertical: 5 }}
+            disabled
+          />
+          <TextInput
+            mode="outlined"
+            label="Email"
+            value={UserContext.state.email}
+            style={{ marginHorizontal: 20, marginVertical: 5 }}
+            disabled
+          />
+          <TextInput
+            mode="outlined"
+            label="Name"
+            value={user.name}
+            onChangeText={(text) => setUser((prev) => ({ ...prev, name: text }))}
+            style={{ marginHorizontal: 20, marginVertical: 5 }}
+          />
+          <TextInput
+            mode="outlined"
+            label="Password"
+            value={user.password}
+            onChangeText={(text) => setUser((prev) => ({ ...prev, password: text }))}
+            style={{ marginHorizontal: 20, marginVertical: 5 }}
+            secureTextEntry={passwordVisibility}
+            right={<TextInput.Icon icon="eye" onPress={() => setPasswordVisibility((prev) => !prev)} />}
+          />
+          <Text style={{ marginHorizontal: 20, marginTop: 30, color: colors.text + '70', fontSize: 12, alignSelf: 'flex-end' }}>
+            Accepted image formats : jpg, png and webp and size {'<'} 1.5Mb
+          </Text>
+          <Button
+            mode="contained"
+            style={{ alignSelf: 'flex-end', marginVertical: 5, marginHorizontal: 20 }}
+            onPress={handleSubmit}
+            disabled={!isUserUpdated && !image && !user.password}>
+            Update information
+          </Button>
+          <Text style={global.title}>Delete account</Text>
+          <Text style={{ marginHorizontal: 20, color: colors.text + '70' }}>
+            Your data will be saved 7 days. After that they will be lost
+          </Text>
+          <Button
+            icon="account-remove"
+            style={{ alignSelf: 'flex-end', marginVertical: 5, marginHorizontal: 20 }}
+            onPress={() => setModalVisibility(true)}>
+            Delete account
+          </Button>
+        </View>
+        {snack}
+      </SafeAreaView>
+    </ScrollView>
   );
 }

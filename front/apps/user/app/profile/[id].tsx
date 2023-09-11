@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { View, Text, SafeAreaView, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, SafeAreaView, TouchableOpacity, Dimensions, ScrollView } from 'react-native';
 import { ActivityIndicator, Avatar, Button, Divider, IconButton, SegmentedButtons } from 'react-native-paper';
 import { router, useGlobalSearchParams } from 'expo-router';
 
@@ -143,65 +143,67 @@ export default function Home() {
     );
 
   return (
-    <SafeAreaView style={[global.main, { flexDirection: 'column' }]}>
-      <IconButton
-        icon="arrow-left-circle-outline"
-        iconColor={colors.primary}
-        onPress={() => router.back()}
-        style={{ alignSelf: 'flex-start' }}
-      />
-      <View style={style.avatar}>
-        <TouchableOpacity style={{ alignSelf: 'center' }}>
-          {UserContext.state.user_id ? (
-            <Avatar.Image size={150} source={{ uri: avatarUri }} />
-          ) : (
-            <Avatar.Text size={150} label={user.name.charAt(0) || '-'} />
-          )}
-        </TouchableOpacity>
-        <Text style={[global.title, { textTransform: 'capitalize', textAlign: 'center' }]}>{user.name}</Text>
-        {joinedDate}
-        <Divider style={{ marginVertical: 15 }} />
-        <View style={style.follow}>
-          <View style={{ alignItems: 'center' }}>
-            <Text style={style.numberText}>
-              {(user.applications.kanji?.total_score || 0) + (user.applications.word?.total_score || 0)}
-            </Text>
-            <Text style={{ textAlign: 'center' }}>Points</Text>
-          </View>
-          <View style={{ alignItems: 'center' }}>
-            <Text style={style.numberText}>{user.friends.length}</Text>
-            <Text style={{ textAlign: 'center' }}>Following</Text>
-          </View>
-          <View style={{ alignItems: 'center' }}>
-            <Text style={style.numberText}>{followers.length}</Text>
-            <Text style={{ textAlign: 'center' }}>Followers</Text>
-          </View>
-        </View>
-        <Divider style={{ marginVertical: 15 }} />
-        {followButton}
-      </View>
-      <View style={style.contents}>
-        <Text style={global.title}>Stats</Text>
-        <Chart user={user} apptype={apptype} />
-        <SegmentedButtons
-          value={apptype}
-          onValueChange={setAppType}
-          style={{ alignSelf: 'center', borderRadius: 25, marginRight: 20 }}
-          density="high"
-          buttons={[
-            {
-              value: 'kanji',
-              label: 'Kanji',
-              checkedColor: colors.secondaryDark,
-            },
-            {
-              value: 'word',
-              label: 'Word',
-              checkedColor: colors.secondaryDark,
-            },
-          ]}
+    <ScrollView>
+      <SafeAreaView style={[global.main, { flexDirection: 'column' }]}>
+        <IconButton
+          icon="arrow-left-circle-outline"
+          iconColor={colors.primary}
+          onPress={() => router.back()}
+          style={{ alignSelf: 'flex-start' }}
         />
-      </View>
-    </SafeAreaView>
+        <View style={style.avatar}>
+          <TouchableOpacity style={{ alignSelf: 'center' }}>
+            {UserContext.state.user_id ? (
+              <Avatar.Image size={150} source={{ uri: avatarUri }} />
+            ) : (
+              <Avatar.Text size={150} label={user.name.charAt(0) || '-'} />
+            )}
+          </TouchableOpacity>
+          <Text style={[global.title, { textTransform: 'capitalize', textAlign: 'center' }]}>{user.name}</Text>
+          {joinedDate}
+          <Divider style={{ marginVertical: 15 }} />
+          <View style={style.follow}>
+            <View style={{ alignItems: 'center' }}>
+              <Text style={style.numberText}>
+                {(user.applications.kanji?.total_score || 0) + (user.applications.word?.total_score || 0)}
+              </Text>
+              <Text style={{ textAlign: 'center' }}>Points</Text>
+            </View>
+            <View style={{ alignItems: 'center' }}>
+              <Text style={style.numberText}>{user.friends.length}</Text>
+              <Text style={{ textAlign: 'center' }}>Following</Text>
+            </View>
+            <View style={{ alignItems: 'center' }}>
+              <Text style={style.numberText}>{followers.length}</Text>
+              <Text style={{ textAlign: 'center' }}>Followers</Text>
+            </View>
+          </View>
+          <Divider style={{ marginVertical: 15 }} />
+          {followButton}
+        </View>
+        <View style={style.contents}>
+          <Text style={global.title}>Stats</Text>
+          <Chart user={user} apptype={apptype} />
+          <SegmentedButtons
+            value={apptype}
+            onValueChange={setAppType}
+            style={{ alignSelf: 'center', borderRadius: 25, marginRight: 20 }}
+            density="high"
+            buttons={[
+              {
+                value: 'kanji',
+                label: 'Kanji',
+                checkedColor: colors.secondaryDark,
+              },
+              {
+                value: 'word',
+                label: 'Word',
+                checkedColor: colors.secondaryDark,
+              },
+            ]}
+          />
+        </View>
+      </SafeAreaView>
+    </ScrollView>
   );
 }

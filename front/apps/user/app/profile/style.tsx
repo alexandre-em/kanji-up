@@ -18,6 +18,6 @@ export default StyleSheet.create({
     justifyContent: 'space-evenly',
   },
   ranking: {},
-  follow: { flexDirection: 'row', justifyContent: 'space-between', width: '50%', alignSelf: 'center' },
+  follow: { flexDirection: 'row', justifyContent: 'space-between', width: '80%', alignSelf: 'center' },
   numberText: { fontWeight: '900', color: colors.text, fontSize: 20, textAlign: 'center' },
 });
