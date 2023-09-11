@@ -9,7 +9,7 @@ import { SessionService } from 'src/session/session.service';
 
 @Injectable()
 export class AuthService {
-  constructor(@InjectModel(User.name) private readonly model: Model<UserDocument>, private jwtService: JwtService, private mailService: MailService, private sessionService: SessionService) {}
+  constructor(@InjectModel(User.name) private readonly model: Model<UserDocument>, private jwtService: JwtService, private mailService: MailService, private sessionService: SessionService) { }
 
   async validateUser(email: string, password: string) {
     const user: User | null = await this.model.findOne({ email }).exec();
@@ -116,7 +116,7 @@ export class AuthService {
       throw new NotFoundException('This user does not exist');
     }
 
-    const token = this.jwtService.sign({ id: user.user_id }, { expiresIn: '1d' });
+    const token = this.jwtService.sign({ sub: user.user_id }, { expiresIn: '1d' });
 
     const url = `${process.env.AUTH_BASE_URL}/auth/reset/token?token=${token}`;
 
@@ -134,8 +134,12 @@ export class AuthService {
 
     const user = await this.model.findOne({ email }).exec();
 
-    if (!user || user.user_id !== decodedToken.sub) {
-      throw new UnprocessableEntityException('The token is not valid with this email');
+    if (!user) {
+      throw new NotFoundException('User does not exist');
+    }
+
+    if (user.user_id !== decodedToken.sub) {
+      throw new BadRequestException('The token is not valid with this email');
     }
 
     return this.model.updateOne({ user_id: user.user_id }, { password }).exec();

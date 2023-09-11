@@ -50,7 +50,7 @@ export class UsersService {
   }
 
   updateOne(user_id: string, userinfo: UpdateUserDTO | DeleteUserDTO) {
-    return this.model.findOneAndUpdate({ user_id }, userinfo).exec();
+    return this.model.updateOne({ user_id }, userinfo).exec();
   }
 
   async uploadImage(user_id: string, file: any) {
