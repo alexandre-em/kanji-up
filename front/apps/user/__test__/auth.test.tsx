@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { View } from 'react-native';
 
-import { render, act } from '@testing-library/react-native';
 import { renderRouter, screen } from 'expo-router/src/testing-library';
 import { AuthProvider } from 'kanji-app-auth';
 
