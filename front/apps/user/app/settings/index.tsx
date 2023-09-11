@@ -6,6 +6,7 @@ import * as ImagePicker from 'expo-image-picker';
 
 import core from 'kanji-app-core';
 import { User } from 'kanji-app-types';
+import { useAuth, useKanjiAppAuth } from 'kanji-app-auth';
 
 import style from './style';
 import { colors } from 'constants';
@@ -15,10 +16,13 @@ import actions from 'components/UserProvider/actions';
 
 export default function Home() {
   const UserContext = useUserContext();
+  const AuthContext = useAuth();
+  const { logout } = useKanjiAppAuth();
   const [user, setUser] = useState<Partial<User>>({ name: UserContext.state.name, password: '' });
   const [image, setImage] = useState<ImagePicker.ImagePickerAsset | null>(null);
   const [snackContent, setSnackContent] = useState<string>('');
   const [modalVisibility, setModalVisibility] = useState<boolean>(false);
+  const [passwordVisibility, setPasswordVisibility] = useState<boolean>(true);
 
   const avatarUri = useMemo(
     () => `${process.env.EXPO_PUBLIC_AUTH_BASE_URL}/users/profile/image/${UserContext.state?.user_id}`,
@@ -57,7 +61,7 @@ export default function Home() {
     );
   }, [snackContent]);
 
-  const handleSubmit = useCallback(() => {
+  const submitInfo = useCallback(() => {
     if (isUserUpdated || user.password) {
       core.userService
         ?.updateProfile(user)
@@ -68,6 +72,9 @@ export default function Home() {
         })
         .catch((err) => setSnackContent(err.response.data.message + '. Please refresh the application'));
     }
+  }, [isUserUpdated, user]);
+
+  const submitImage = useCallback(() => {
     if (image) {
       if (Platform.OS === 'web') {
         const dataSplit = image.uri.split(',');
@@ -84,11 +91,23 @@ export default function Home() {
         core.userService?.updateProfileImageNative(image.uri, image.fileName || Date.now().toString());
       }
     }
+  }, [image]);
+
+  const handleSubmit = useCallback(() => {
+    submitInfo();
+    submitImage();
   }, [user, isUserUpdated, image]);
 
   const handleRemove = useCallback(() => {
-    setModalVisibility(false);
-    core.userService?.deleteUser();
+    if (core.userService) {
+      setModalVisibility(false);
+      core.userService.deleteUser();
+    }
+  }, [core.userService]);
+
+  const handleSignout = useCallback(async () => {
+    await logout(process.env.EXPO_PUBLIC_AUTH_BASE_URL + '/auth/logout');
+    AuthContext!.signOut();
   }, []);
 
   return (
@@ -112,7 +131,9 @@ export default function Home() {
           onPress={() => router.back()}
           style={{ alignSelf: 'flex-start' }}
         />
-        <Button icon="logout">Logout</Button>
+        <Button icon="logout" onPress={handleSignout}>
+          Logout
+        </Button>
       </View>
       <View style={style.avatar}>
         <TouchableOpacity style={{ alignSelf: 'center' }} onPress={pickImage}>
@@ -155,8 +176,8 @@ export default function Home() {
           value={user.password}
           onChangeText={(text) => setUser((prev) => ({ ...prev, password: text }))}
           style={{ marginHorizontal: 20, marginVertical: 5 }}
-          secureTextEntry
-          right={<TextInput.Icon icon="eye" />}
+          secureTextEntry={passwordVisibility}
+          right={<TextInput.Icon icon="eye" onPress={() => setPasswordVisibility((prev) => !prev)} />}
         />
         <Text style={{ marginHorizontal: 20, marginTop: 30, color: colors.text + '70', fontSize: 12, alignSelf: 'flex-end' }}>
           Accepted image formats : jpg, png and webp and size {'<'} 1.5Mb

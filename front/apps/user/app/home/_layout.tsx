@@ -5,7 +5,7 @@ import { Appbar, Avatar, Button, Searchbar, Surface, TouchableRipple } from 'rea
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import core from 'kanji-app-core';
-import { asyncstorageKeys, useAuth } from 'kanji-app-auth';
+import { asyncstorageKeys, useAuth, useKanjiAppAuth } from 'kanji-app-auth';
 
 import style from './style';
 import RankList from 'components/Rank';
@@ -17,6 +17,7 @@ import global from 'constants/style';
 export default function Home() {
   const UserContext = useUserContext();
   const AuthContext = useAuth();
+  const { logout } = useKanjiAppAuth();
   const [appType, setAppType] = React.useState<'kanji' | 'word'>('kanji');
   const { access_token } = useGlobalSearchParams();
 
@@ -29,6 +30,11 @@ export default function Home() {
       });
     }
   }, [core.userService, AuthContext?.accessToken]);
+
+  const handleSignout = useCallback(async () => {
+    await logout(process.env.EXPO_PUBLIC_AUTH_BASE_URL + '/auth/logout');
+    AuthContext!.signOut();
+  }, []);
 
   const avatarUri = React.useMemo(
     () => `${process.env.EXPO_PUBLIC_AUTH_BASE_URL}/users/profile/image/${UserContext.state.user_id}`,
@@ -64,6 +70,9 @@ export default function Home() {
         <Text style={[global.title, { textTransform: 'capitalize', textAlign: 'center' }]}>{UserContext.state.name}</Text>
       </View>
       <View style={style.contents}>
+        <Button icon="logout" onPress={handleSignout} style={{ alignSelf: 'flex-end', marginVertical: 10 }}>
+          Logout
+        </Button>
         <Searchbar style={global.search} placeholder="Search user..." inputStyle={{ color: colors.text, fontSize: 15 }} />
         <Text style={global.title}>Score</Text>
         <View style={style.score}>
