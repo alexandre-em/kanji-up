@@ -1,3 +1,10 @@
+<p align="center">
+  <a href="https://kanjiup.alexandre-em.fr" target="blank">
+    <img src="./front/apps/kanji-up/assets/images/adaptive-icon.png" width="200" alt="KanjiUp Logo" />
+  </a>
+</p>
+<h1 align="center">KanjiUp</h1>
+
 # KanjiApp
 
 ![Kubernetes](https://img.shields.io/badge/kubernetes-%23326ce5.svg?style=for-the-badge&logo=kubernetes&logoColor=white)
@@ -17,11 +24,11 @@ KanjiUp is an application that will help the user to learn and memorize Japanese
 
 Web application:
 
- [![image](https://img.shields.io/badge/Netlify-00C7B7?style=for-the-badge&logo=netlify&logoColor=white)](https://kanjiup-v2.alexandre-em.fr)
+[![image](https://img.shields.io/badge/Netlify-00C7B7?style=for-the-badge&logo=netlify&logoColor=white)](https://kanjiup-v2.alexandre-em.fr)
 
-Android application (APK):
+Android application (APK): _Last update : 9/21/2023_
 
-[![image](https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://expo.dev/accounts/em-alexandre/projects/kanji-up/builds/589180b0-1839-4333-b05f-d221d3cb628c)
+[![image](https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/alexandre-em/kanji-up/releases/tag/v0.0.15)
 
 ![image](./doc/images/kanjiup.png)
 
@@ -33,7 +40,7 @@ Manage User's information, friends and visualize scores, progressions
 
 Web application:
 
- [![image](https://img.shields.io/badge/Netlify-00C7B7?style=for-the-badge&logo=netlify&logoColor=white)](https://user.kanjiup.alexandre-em.fr)
+[![image](https://img.shields.io/badge/Netlify-00C7B7?style=for-the-badge&logo=netlify&logoColor=white)](https://user.kanjiup.alexandre-em.fr)
 
 ![image](./doc/images/kanjiup-user.png)
 
