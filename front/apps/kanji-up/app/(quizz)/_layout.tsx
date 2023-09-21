@@ -90,21 +90,18 @@ export default function Quizz() {
           <Stack.Screen
             name="evaluation"
             options={{
-              // Hide the header for all other routes.
               headerShown: false,
             }}
           />
           <Stack.Screen
             name="flashcard"
             options={{
-              // Hide the header for all other routes.
               headerShown: false,
             }}
           />
           <Stack.Screen
             name="modal"
             options={{
-              // Set the presentation mode to modal for our modal route.
               headerShown: false,
               presentation: 'modal',
             }}

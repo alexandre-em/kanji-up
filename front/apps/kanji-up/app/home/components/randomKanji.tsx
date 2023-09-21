@@ -1,7 +1,6 @@
 import { router } from 'expo-router';
-import { Image, Platform, Text } from 'react-native';
+import { Text } from 'react-native';
 import { List } from 'react-native-paper';
-import { SvgUri } from 'react-native-svg';
 import { useSelector } from 'react-redux';
 
 import { KanjiType } from 'kanji-app-types';
@@ -9,6 +8,7 @@ import { KanjiType } from 'kanji-app-types';
 import { RootState } from 'store';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import { KANJI_PROGRESSION_MAX, colors } from 'constants';
+import { SVGUriPlatform } from 'kanji-app-svg-ui';
 
 export default function RandomKanji() {
   const kanjiState = useSelector((state: RootState) => state.kanji);
@@ -19,33 +19,17 @@ export default function RandomKanji() {
     const random: number = Math.floor(Math.random() * kanjiKeys.length);
     const choosenKanji: Partial<KanjiType> = kanjiState.selectedKanji[kanjiKeys[random]];
 
-    const icon = (props: any) => {
-      if (choosenKanji.kanji?.character) {
-        if (Platform.OS === 'web') {
-          return (
-            <Image
-              {...props}
-              style={{ width: 32, height: 32 }}
-              source={{ uri: `https://www.miraisoft.de/anikanjivgx/?svg=${encodeURI(choosenKanji.kanji?.character)}` }}
-            />
-          );
-        }
-        return (
-          <SvgUri
-            width={32}
-            height={32}
-            uri={`https://www.miraisoft.de/anikanjivgx/?svg=${encodeURI(choosenKanji.kanji?.character)}`}
-          />
-        );
-      }
-      return null;
-    };
-
     return (
       <List.Item
         title={choosenKanji.kanji?.meaning}
         description="See details"
-        left={icon}
+        left={() => (
+          <SVGUriPlatform
+            width={32}
+            height={32}
+            uri={`https://www.miraisoft.de/anikanjivgx/?svg=${encodeURI(choosenKanji.kanji?.character || '')}`}
+          />
+        )}
         right={() => (
           <AnimatedCircularProgress
             size={40}

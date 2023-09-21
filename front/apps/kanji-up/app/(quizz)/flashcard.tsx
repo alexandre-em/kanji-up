@@ -15,7 +15,6 @@ export default function Practice() {
   const { width } = useWindowDimensions();
   const spin = useSharedValue<number>(0);
   const [counter, setCounter] = useState<number>(0);
-  const [reverse, setReverse] = useState<boolean>(false);
   const settingsState = useSelector((state: RootState) => state.settings);
   const QuizzContext = useQuizzContext();
 
@@ -58,6 +57,7 @@ export default function Practice() {
   }, [counter, kanjiQueue]);
 
   const cardFrontContent = useMemo(() => {
+    if (!kanjiQueue[counter]) return null;
     return (
       <SVGUriPlatform
         width={imgSize}
@@ -65,10 +65,9 @@ export default function Practice() {
         uri={`https://www.miraisoft.de/anikanjivgx/?svg=${encodeURI(kanjiQueue[counter].kanji!.character as string)}`}
       />
     );
-  }, [imgSize, counter, kanjiQueue, reverse]);
+  }, [imgSize, counter, kanjiQueue]);
 
   const handleReverse = useCallback(() => {
-    setReverse((p) => !p);
     spin.value = spin.value ? 0 : 1;
   }, []);
 
@@ -77,32 +76,42 @@ export default function Practice() {
   }, []);
 
   const animatedFrontStyle = useAnimatedStyle(() => {
-    const spinVal = interpolate(spin.value, [0, 1], reverse ? [0, 180] : [180, 360]);
+    const spinVal = interpolate(spin.value, [0, 1], [0, 180]);
     return {
       transform: [
         {
-          rotateY: withTiming(`${spinVal}deg`, { duration: 500 }),
+          rotateY: withTiming(`${spinVal}deg`, { duration: 300 }),
         },
       ],
     };
-  }, [reverse]);
+  }, []);
 
   const animatedBackStyle = useAnimatedStyle(() => {
-    const spinVal = interpolate(spin.value, [0, 1], reverse ? [180, 360] : [0, 180]);
+    const spinVal = interpolate(spin.value, [0, 1], [180, 360]);
     return {
       transform: [
         {
-          rotateY: withTiming(`${spinVal}deg`, { duration: 500 }),
+          rotateY: withTiming(`${spinVal}deg`, { duration: 300 }),
         },
       ],
     };
-  }, [reverse]);
+  }, []);
 
   useEffect(() => {
+    // Spin the card when pressing on 'next' button
+    spin.value = 0;
+  }, [counter]);
+
+  useEffect(() => {
+    // Redirect on home screen when flashcard series is done
     if (counter >= settingsState.flashcardNumber) {
       router.replace('/home');
     }
   }, [counter, settingsState.flashcardNumber]);
+
+  if (kanjiQueue.length <= counter || !kanjiQueue[counter]) {
+    return <Text>Loading...</Text>;
+  }
 
   return (
     <View style={styles.content}>
@@ -120,15 +129,14 @@ export default function Practice() {
         />
       </Surface>
       <TouchableRipple style={{ width: imgSize, height: imgSize, alignSelf: 'center' }} onPress={handleReverse}>
-        {reverse ? (
-          <Animated.View style={[animatedFrontStyle]}>
+        <View>
+          <Animated.View style={[animatedFrontStyle, { position: 'absolute', backfaceVisibility: 'hidden' }]}>
             <Surface style={{ width: imgSize, height: imgSize }}>{cardFrontContent}</Surface>
           </Animated.View>
-        ) : (
-          <Animated.View style={[animatedBackStyle]}>
+          <Animated.View style={[animatedBackStyle, { position: 'absolute', backfaceVisibility: 'hidden' }]}>
             <Surface style={{ width: imgSize, height: imgSize }}>{cardBackContent}</Surface>
           </Animated.View>
-        )}
+        </View>
       </TouchableRipple>
 
       <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>

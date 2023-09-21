@@ -6,7 +6,7 @@ import axios from 'axios';
 
 import styles from './style';
 import { colors } from 'constants/Colors';
-import SvgUriPlatform from 'components/SVGUriPlatform';
+import { SVGUriPlatform } from 'kanji-app-svg-ui';
 import { KanjiType } from 'kanji-app-types';
 import { error, kanji } from 'store/slices';
 import { RootState } from 'store';
@@ -69,11 +69,10 @@ export default function KanjiDetail() {
       <Appbar.Header>
         <Appbar.BackAction onPress={() => router.back()} />
         <Appbar.Content
-          title={`Detail of ${details.kanji.character} ${
-            userState.progression[details.kanji_id] !== undefined
+          title={`Detail of ${details.kanji.character} ${userState.progression[details.kanji_id] !== undefined
               ? `(${Math.min((userState.progression[details.kanji_id] / KANJI_PROGRESSION_MAX) * 100, 100)}%)`
               : ''
-          }`}
+            }`}
           titleStyle={{ color: '#fff', fontWeight: '700', fontSize: 17 }}
         />
       </Appbar.Header>
@@ -84,7 +83,7 @@ export default function KanjiDetail() {
               style={{ borderColor: '#e0e0e0', borderRightWidth: 1, position: 'absolute', width: '50%', height: '100%' }}></View>
             <View
               style={{ borderColor: '#e0e0e0', borderBottomWidth: 1, position: 'absolute', width: '100%', height: '50%' }}></View>
-            <SvgUriPlatform
+            <SVGUriPlatform
               width={imgSize}
               height={imgSize}
               uri={`https://www.miraisoft.de/anikanjivgx/?svg=${encodeURI(details.kanji.character as string)}`}
