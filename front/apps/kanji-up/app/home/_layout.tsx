@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Href, router, useGlobalSearchParams } from 'expo-router';
-import { FlatList, Linking, Platform, SafeAreaView, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, SafeAreaView, ScrollView, Text, View } from 'react-native';
 import { Avatar, Button, FAB, List, Searchbar } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -20,11 +20,11 @@ import Stepper from './components/stepper';
 import core from 'kanji-app-core';
 import { endpointUrls } from 'constants';
 import { UserAppRedirection } from 'services/redirections';
+import { Pressable } from 'react-native';
 
 export default function Home() {
   const dispatch = useDispatch();
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [isFirstTime, setIsFirstTime] = useState<boolean>(false);
   const [userId, setUserId] = useState<string>('');
   const [recognitionColor, setRecognitionColor] = useState<boolean>(false);
   const AuthContext = useAuth();
@@ -78,22 +78,9 @@ export default function Home() {
     />
   );
 
-  // TODO: Put a modal (see expo doc) with the a quick tuto (old onboarding screen)
   useEffect(() => {
     loadSelectedKanji();
-    AsyncStorage.getItem(asyncstorageKeys.FIRST_TIME)
-      .then((res: string | null) => {
-        if (res !== null) {
-          const firstTime = JSON.parse(res as string);
-          setIsFirstTime(firstTime);
-          if (!firstTime) {
-            readFile('userSettings').then((content) => dispatch(settings.actions.update(JSON.parse(content))));
-          }
-        } else {
-          setIsFirstTime(true);
-        }
-      })
-      .catch(console.error);
+    readFile('userSettings').then((content) => dispatch(settings.actions.update(JSON.parse(content))));
 
     core.recognitionService
       ?.health()
@@ -101,6 +88,14 @@ export default function Home() {
       .catch(() => setRecognitionColor(false));
 
     refreshUserScore();
+  }, []);
+
+  useEffect(() => {
+    AsyncStorage.getItem(asyncstorageKeys.FIRST_TIME).then((res) => {
+      if (!res) {
+        router.push('/Onboarding');
+      }
+    });
   }, []);
 
   useEffect(() => {
@@ -119,13 +114,13 @@ export default function Home() {
         <Button mode="contained" style={{ borderRadius: 25 }}>
           {userState.totalScore}
         </Button>
-        <TouchableOpacity onPress={() => router.push('/settings')}>
+        <Pressable onPress={() => router.push('/settings')}>
           {userId ? (
             <Avatar.Image size={40} source={{ uri: `${process.env.EXPO_PUBLIC_AUTH_BASE_URL}/users/profile/image/${userId}` }} />
           ) : (
             <Avatar.Text size={40} label={settingsState.username.charAt(0) || '-'} />
           )}
-        </TouchableOpacity>
+        </Pressable>
       </View>
 
       <ScrollView style={{ flex: 0.9 }} showsVerticalScrollIndicator={false}>

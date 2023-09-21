@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { View, ScrollView, Text, TouchableOpacity } from 'react-native';
+import { View, ScrollView, Text, Pressable } from 'react-native';
 import { Appbar, Avatar, Button, IconButton, Switch } from 'react-native-paper';
 import { Slider } from 'kanji-app-svg-ui';
 
@@ -63,7 +63,7 @@ export default function Settings() {
       </Appbar.Header>
       <ScrollView style={{ padding: 20 }} showsVerticalScrollIndicator={false}>
         <Text style={global.title}>User&apos;s settings</Text>
-        <TouchableOpacity
+        <Pressable
           style={{ alignSelf: 'center' }}
           onPress={() => UserAppRedirection(savedSettings.userId, AuthContext?.accessToken || '')}>
           {savedSettings.userId ? (
@@ -74,7 +74,7 @@ export default function Settings() {
           ) : (
             <Avatar.Text size={40} label={savedSettings.username.charAt(0) || '-'} />
           )}
-        </TouchableOpacity>
+        </Pressable>
         <Button style={styles.button} onPress={() => UserAppRedirection(savedSettings.userId, AuthContext?.accessToken || '')}>
           Edit profile
         </Button>

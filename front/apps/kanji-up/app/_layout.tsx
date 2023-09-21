@@ -112,7 +112,10 @@ function RootLayoutNav() {
               href="/pwa/apple-touch-startup-image/apple-touch-startup-image-1536x2048.png"></link>
             <link rel="manifest" href="/manifest.json"></link>
           </Head>
-          <Stack screenOptions={{ headerShown: false }}></Stack>
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="home" options={{ headerShown: false }} />
+            <Stack.Screen name="Onboarding" options={{ headerShown: false, presentation: 'modal' }} />
+          </Stack>
         </AuthProvider>
       </Provider>
     </PaperProvider>

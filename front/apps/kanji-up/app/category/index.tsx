@@ -1,6 +1,6 @@
 import React from 'react';
 import { router } from 'expo-router';
-import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Image, ScrollView, Text, Pressable, View } from 'react-native';
 import { Appbar } from 'react-native-paper';
 
 import styles from './style';
@@ -16,15 +16,12 @@ export default function Category() {
       </Appbar.Header>
       <ScrollView showsVerticalScrollIndicator={false}>
         {category.map((c) => (
-          <TouchableOpacity
-            onPress={() => router.push(`/kanjis?grade=${c.id}`)}
-            key={`grade-${c.id}`}
-            style={{ position: 'relative' }}>
+          <Pressable onPress={() => router.push(`/kanjis?grade=${c.id}`)} key={`grade-${c.id}`} style={{ position: 'relative' }}>
             <Image source={c.image} style={styles.tileImage} />
             <Text style={styles.title}>
               {c.title} ({c.count})
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         ))}
       </ScrollView>
     </View>

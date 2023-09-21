@@ -1,5 +1,5 @@
 import React from 'react';
-import { GestureResponderEvent, Text, TouchableOpacity } from 'react-native';
+import { GestureResponderEvent, Text, Pressable } from 'react-native';
 import { ProgressBar, Surface } from 'react-native-paper';
 import { useSelector } from 'react-redux';
 
@@ -30,7 +30,7 @@ export default function KanjiSurface({ kanji, onPress }: { kanji: KanjiType; onP
   );
 
   return (
-    <TouchableOpacity key={kanji.kanji?.character_id} onPress={onPress}>
+    <Pressable key={kanji.kanji?.character_id} onPress={onPress}>
       <Surface style={[styles.kanjiSurface, surfaceStyle(kanji.kanji_id)]} elevation={1}>
         <Text style={styles.kanjiText}>{kanji.kanji?.character}</Text>
       </Surface>
@@ -41,6 +41,6 @@ export default function KanjiSurface({ kanji, onPress }: { kanji: KanjiType; onP
           color={(userState.progression[kanji.kanji_id] / KANJI_PROGRESSION_MAX) * 100 < 100 ? colors.secondary : colors.success}
         />
       )}
-    </TouchableOpacity>
+    </Pressable>
   );
 }
