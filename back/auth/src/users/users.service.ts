@@ -1,6 +1,7 @@
 import { BadRequestException, HttpException, Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { InjectModel, Prop } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { argv0 } from 'process';
 import Permission from 'src/utils/permission.type';
 import { Readable } from 'stream';
 import { DeleteUserDTO, UpdateUserAppDTO, UpdateUserDTO, UpdateUserFriendDTO, UpdateUserPermissionsDTO } from './users.dto';
@@ -8,7 +9,7 @@ import { User, UserDocument } from './users.schema';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private readonly model: Model<UserDocument>) { }
+  constructor(@InjectModel(User.name) private readonly model: Model<UserDocument>) {}
 
   async getOne(user_id: string) {
     const user = await this.model.findOne({ user_id }).select('-_id -__v -password -image -email_confirmed -applications._id').populate('friends', 'name user_id -_id').exec();
@@ -231,5 +232,32 @@ export class UsersService {
       default:
         throw new BadRequestException('Invalid application type');
     }
+  }
+
+  searchUser(query: string) {
+    return this.model
+      .aggregate()
+      .search({
+        index: 'userIndex',
+        text: {
+          query,
+          path: {
+            wildcard: '*',
+          },
+        },
+      })
+      .match({ deleted_at: null })
+      .project({
+        _id: 0,
+        password: 0,
+        email_confirmed: 0,
+        friends: 0,
+        permissions: 0,
+        deleted_at: 0,
+        image: 0,
+        applications: 0,
+        __v: 0,
+      })
+      .exec();
   }
 }

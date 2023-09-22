@@ -166,4 +166,9 @@ export class UsersController {
   getRank(@Param('app') app: string, @Query('limit') limit?: number) {
     return this.service.getRanking(app, limit);
   }
+
+  @Get('search/user')
+  searchUser(@Query('search') search: string) {
+    return this.service.searchUser(search);
+  }
 }
