@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { JwtService } from '@nestjs/jwt';
 import { Model } from 'mongoose';
@@ -9,7 +9,7 @@ import { SessionService } from 'src/session/session.service';
 
 @Injectable()
 export class AuthService {
-  constructor(@InjectModel(User.name) private readonly model: Model<UserDocument>, private jwtService: JwtService, private mailService: MailService, private sessionService: SessionService) { }
+  constructor(@InjectModel(User.name) private readonly model: Model<UserDocument>, private jwtService: JwtService, private mailService: MailService, private sessionService: SessionService) {}
 
   async validateUser(email: string, password: string) {
     const user: User | null = await this.model.findOne({ email }).exec();
@@ -43,11 +43,11 @@ export class AuthService {
     const user = await this.model.findOne({ email }).exec();
 
     if (user && !user.deleted_at) {
-      throw new BadRequestException('This user already exist');
+      throw new ConflictException('This user already exist');
     }
 
     if (user && user.deleted_at) {
-      return user.update({ deleted_at: null });
+      return user.update({ deleted_at: null, expireAt: null });
     }
 
     const info: RegisterDTO = {

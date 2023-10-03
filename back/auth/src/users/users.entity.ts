@@ -19,12 +19,6 @@ export class UserDetailResponse {
   email: string;
 
   @ApiProperty()
-  friends: Array<Partial<UserShortResponse>>;
-
-  @ApiProperty()
-  permissions: string[];
-
-  @ApiProperty()
   created_at: string;
 
   @ApiProperty()
