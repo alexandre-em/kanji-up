@@ -34,6 +34,14 @@ export class UserDetailResponse {
   };
 }
 
+export class UserScoreResponse {
+  @ApiProperty()
+  kanji?: Score;
+
+  @ApiProperty()
+  word?: Score;
+}
+
 export class UpdatedDataResponse {
   @ApiProperty()
   acknowledged: boolean;

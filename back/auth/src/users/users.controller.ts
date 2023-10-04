@@ -1,10 +1,10 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
   FileTypeValidator,
   Get,
-  Headers,
   MaxFileSizeValidator,
   Param,
   ParseFilePipe,
@@ -38,7 +38,7 @@ import { UsersService } from './users.service';
 import permissions from '../utils/permission.type';
 import permissionGuard from '../auth/permission.guard';
 import JwtAuthenticationGuard from '../auth/jwt.guard';
-import { UpdatedDataResponse, UserDetailResponse, UserShortResponse } from './users.entity';
+import { UpdatedDataResponse, UserDetailResponse, UserScoreResponse, UserShortResponse } from './users.entity';
 
 const USER_DELAY_EXPIRATION = 7; // 7 days
 
@@ -53,7 +53,7 @@ export class UsersController {
   @ApiOkResponse({ description: 'Authenticated user profile', type: UserDetailResponse })
   @ApiUnauthorizedResponse({ description: 'Not authenticated' })
   getOne(@Req() req: any) {
-    return this.service.getOne(req.user.user_id);
+    return this.service.getOne(req.user?.user_id);
   }
 
   @ApiBearerAuth()
@@ -129,7 +129,7 @@ export class UsersController {
   @ApiUnauthorizedResponse({ description: 'Not authenticated' })
   @ApiNotFoundResponse({ description: 'User not found' })
   getUserFollow(@Param('id') id: string, @Req() req: any) {
-    return id === req.user.user_id ? req.user.friends : this.service.getUserFollowList(id);
+    return id === req.user?.user_id ? req.user.friends : this.service.getUserFollowList(id);
   }
 
   @ApiBearerAuth()
@@ -195,6 +195,20 @@ export class UsersController {
     const expireAt = new Date(date.setDate(date.getDate() + USER_DELAY_EXPIRATION));
 
     return this.service.updateOne(req.user, { deleted_at: new Date(), expireAt });
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthenticationGuard)
+  @Get('score/:app')
+  @ApiOkResponse({ description: 'User s Application scores', type: UserScoreResponse })
+  @ApiUnauthorizedResponse({ description: 'Not authenticated' })
+  @ApiNotFoundResponse({ description: 'User not found' })
+  getAppUserScore(@Req() req: any, @Param('app') app: string) {
+    if (app !== 'kanji' && app !== 'word') {
+      throw new BadRequestException('Invalid application type');
+    }
+
+    return req.user.applications[app];
   }
 
   @ApiBearerAuth()

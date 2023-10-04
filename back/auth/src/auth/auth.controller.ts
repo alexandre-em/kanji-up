@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Post, Query, Render, Req, UseGuards, Res } from '@nestjs/common';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
-import { AppsService } from 'src/apps/apps.service';
+
+import { AppsService } from '../apps/apps.service';
 import { RegisterDTO } from './auth.dto';
 import { AuthService } from './auth.service';
 import { LocalAuthenticationGuard } from './local.guard';
@@ -48,8 +49,8 @@ export class AuthController {
   }
 
   @Post('logout')
-  logout(@Req() req: any, @Res({ passthrough: true }) res: any) {
-    this.service.logout(req.cookies.access_token);
+  async logout(@Req() req: any, @Res({ passthrough: true }) res: any) {
+    await this.service.logout(req.cookies.access_token);
 
     res
       .cookie('access_token', '', {

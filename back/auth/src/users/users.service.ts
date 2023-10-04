@@ -65,6 +65,10 @@ export class UsersService {
   }
 
   updateOne(user: User, userinfo: UpdateUserDTO | DeleteUserDTO) {
+    if (!user) {
+      throw new NotFoundException("This user doesn't exist");
+    }
+
     return this.model.updateOne({ user_id: user.user_id }, userinfo).exec();
   }
 

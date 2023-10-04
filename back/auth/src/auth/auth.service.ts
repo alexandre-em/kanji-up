@@ -1,14 +1,16 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { JwtService } from '@nestjs/jwt';
 import { Model } from 'mongoose';
 import { User, UserDocument } from '../users/users.schema';
-import { MailService } from 'src/mail/mail.service';
+import { MailService } from '../mail/mail.service';
 import { RegisterDTO } from './auth.dto';
-import { SessionService } from 'src/session/session.service';
+import { SessionService } from '../session/session.service';
 
 @Injectable()
 export class AuthService {
+  private _privateKey = process.env.AUTH_API_SECRET_KEY || 'SECRET';
+
   constructor(@InjectModel(User.name) private readonly model: Model<UserDocument>, private jwtService: JwtService, private mailService: MailService, private sessionService: SessionService) {}
 
   async validateUser(email: string, password: string) {
@@ -59,7 +61,7 @@ export class AuthService {
 
     const createdUser = await this.model.create(info);
 
-    const token = this.jwtService.sign({ id: createdUser.user_id, confirmed: createdUser.email_confirmed }, { expiresIn: '1d' });
+    const token = this.jwtService.sign({ id: createdUser.user_id, confirmed: createdUser.email_confirmed }, { privateKey: this._privateKey, expiresIn: '1d' });
 
     const url = `${process.env.AUTH_BASE_URL}/auth/confirmation?token=${token}`;
     this.mailService.sendMail(email, name, url);
@@ -101,9 +103,9 @@ export class AuthService {
       permissions: user.permissions,
     };
 
-    const accessToken = this.jwtService.sign(payload);
+    const accessToken = this.jwtService.sign(payload, { privateKey: this._privateKey, expiresIn: '259200s' });
 
-    this.sessionService.createSession(accessToken);
+    await this.sessionService.createSession(accessToken);
 
     return {
       access_token: accessToken,
@@ -155,11 +157,11 @@ export class AuthService {
     }
   }
 
-  async logout(token: string) {
+  logout(token: string) {
     if (!token) {
       return;
     }
 
-    this.sessionService.removeSession(token);
+    return this.sessionService.removeSession(token);
   }
 }
