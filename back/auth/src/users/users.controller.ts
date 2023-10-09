@@ -124,7 +124,7 @@ export class UsersController {
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthenticationGuard)
-  @Get('friends/follow/:id')
+  @Get('friends/:id/follow')
   @ApiOkResponse({ description: 'List of all user who are friend of the selected user', type: UserShortResponse, isArray: true })
   @ApiUnauthorizedResponse({ description: 'Not authenticated' })
   @ApiNotFoundResponse({ description: 'User not found' })
@@ -134,7 +134,7 @@ export class UsersController {
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthenticationGuard)
-  @Get('friends/follower/:id')
+  @Get('friends/:id/followers')
   @ApiOkResponse({ description: 'List of all user who are friend of the selected user', type: UserShortResponse, isArray: true })
   @ApiUnauthorizedResponse({ description: 'Not authenticated' })
   @ApiNotFoundResponse({ description: 'User not found' })
@@ -199,22 +199,26 @@ export class UsersController {
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthenticationGuard)
-  @Get('score/:app')
+  @Get('score/:id')
   @ApiOkResponse({ description: 'User s Application scores', type: UserScoreResponse })
   @ApiUnauthorizedResponse({ description: 'Not authenticated' })
   @ApiNotFoundResponse({ description: 'User not found' })
-  getAppUserScore(@Req() req: any, @Param('app') app: string) {
+  async getAppUserScore(@Req() req: any, @Param('id') id: string, @Query('app') app?: 'kanji' | 'word') {
     if (app !== 'kanji' && app !== 'word') {
       throw new BadRequestException('Invalid application type');
     }
 
-    return req.user.applications[app];
+    if (req.user.user_id === id) return req.user.applications[app];
+
+    const scores = await this.service.getUserAppScore(id, app);
+
+    return scores?.applications[app];
   }
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthenticationGuard)
   @Put('score/:app')
-  @ApiOkResponse({ description: 'User s Application scores', type: UpdatedDataResponse })
+  @ApiOkResponse({ description: 'User s Application scores updated', type: UpdatedDataResponse })
   @ApiUnauthorizedResponse({ description: 'Not authenticated' })
   @ApiNotFoundResponse({ description: 'User not found' })
   updateAppUserScore(@Req() req: any, @Param('app') app: string, @Body() body: UpdateUserAppDTO) {

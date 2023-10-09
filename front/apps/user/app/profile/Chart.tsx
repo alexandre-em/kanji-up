@@ -4,11 +4,13 @@ import { LineChart } from 'react-native-chart-kit';
 
 import { colors } from 'constants';
 import global from 'constants/style';
+import { wordColors } from 'constants/Colors';
 
 const DAILY_SCORE_GRAPH_LIMIT = 10;
 
 export default function Chart({ user, apptype }) {
   const scores = user?.applications[apptype]?.scores;
+
   if (!scores || Object.keys(scores).length <= 0)
     return (
       <View style={{ justifyContent: 'center', alignItems: 'center', height: 220 }}>
@@ -34,9 +36,7 @@ export default function Chart({ user, apptype }) {
 
   return (
     <View>
-      <Text style={[global.subtitle, { marginLeft: 20 }]}>
-        {apptype} total score: {user.applications[apptype]?.total_score} points
-      </Text>
+      <Text style={[global.subtitle, { marginLeft: 20 }]}>Score the last 10 days</Text>
       <LineChart
         data={{
           labels: stats.map(({ key }) => key),
@@ -51,8 +51,8 @@ export default function Chart({ user, apptype }) {
         yAxisInterval={1} // optional, defaults to 1
         chartConfig={{
           backgroundColor: colors.secondary,
-          backgroundGradientFrom: colors.primaryDark,
-          backgroundGradientTo: colors.primary,
+          backgroundGradientFrom: apptype === 'kanji' ? colors.primaryDark : wordColors.primaryDark,
+          backgroundGradientTo: apptype === 'kanji' ? colors.primary : wordColors.primary,
           decimalPlaces: 0, // optional, defaults to 2dp
           color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
           labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
@@ -62,7 +62,7 @@ export default function Chart({ user, apptype }) {
           propsForDots: {
             r: '6',
             strokeWidth: '2',
-            stroke: colors.primary,
+            stroke: apptype === 'kanji' ? colors.primary : wordColors.primary,
           },
         }}
         bezier

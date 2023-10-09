@@ -10,10 +10,5 @@ export default StyleSheet.create({
     width: width > height ? width - 200 : width,
     margin: 10,
   },
-  score: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-  },
   ranking: {},
 });

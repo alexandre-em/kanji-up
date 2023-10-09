@@ -162,7 +162,10 @@ export class UsersService {
       throw new NotFoundException("This user doesn't exist");
     }
 
-    const follower = await this.model.find({ friends: user._id }).select('-_id -__v -password -image -friends -applications -email -email_confirmed -permissions -created_at -deleted_at').exec();
+    const follower = await this.model
+      .find({ friends: user._id })
+      .select('-_id -__v -password -image -friends -applications -email -email_confirmed -permissions -created_at -deleted_at -expireAt')
+      .exec();
 
     return follower;
   }
@@ -209,6 +212,15 @@ export class UsersService {
     return this.model.updateOne({ user_id: user.user_id }, updatedField).exec();
   }
 
+  getUserAppScore(user_id: string, app: 'kanji' | 'word') {
+    if (app !== 'kanji' && app !== 'word') throw new BadRequestException('Application type not valid');
+
+    const filter = app === 'kanji' ? '-applications.word' : '-applications.kanji';
+    const selection = `-_id -__v -name -user_id -password -image -friends -email -email_confirmed -permissions -created_at -deleted_at -expireAt` + filter;
+
+    return this.model.findOne({ user_id }).select(selection).exec();
+  }
+
   async updateUserApp(user: User, appType: string, body: UpdateUserAppDTO) {
     if (!appType) {
       throw new BadRequestException('Application type not specified');
@@ -236,7 +248,7 @@ export class UsersService {
         return this.model
           .find({ $and: [{ 'applications.kanji.total_score': { $ne: null } }, { applications: { $ne: null } }] })
           .select(
-            '-_id -password -email -email_confirmed -friends -permissions -created_at -__v -deleted_at -image -applications.word -applications.kanji.scores -applications.kanji.progression -applications._id',
+            '-_id -password -email -email_confirmed -friends -permissions -created_at -__v -deleted_at -image -applications.word -applications.kanji.scores -applications.kanji.progression -applications._id -expireAt',
           )
           .sort({ 'applications.kanji.total_score': -1 })
           .limit(limit)
@@ -245,7 +257,7 @@ export class UsersService {
         return this.model
           .find({ $and: [{ 'applications.word.total_score': { $ne: null } }, { applications: { $ne: null } }] })
           .select(
-            '-_id -password -email -email_confirmed -friends -permissions -created_at -__v -deleted_at -image -applications.kanji -applications.word.scores -applications.word.progression -applications._id',
+            '-_id -password -email -email_confirmed -friends -permissions -created_at -__v -deleted_at -image -applications.kanji -applications.word.scores -applications.word.progression -applications._id -expireAt',
           )
           .sort({ 'applications.word.total_score': -1 })
           .limit(limit)

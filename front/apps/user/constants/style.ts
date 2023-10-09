@@ -57,6 +57,7 @@ export default StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 25,
     boxShadow: 'rgba(0, 0, 0, 0.24) 0px 3px 4px',
+    marginHorizontal: 15,
   },
   surface: {
     display: 'flex',
