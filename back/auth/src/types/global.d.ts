@@ -12,4 +12,3 @@ type Score = {
   scores: { [timestamp: string]: number };
   progressions: { [key: string]: number };
 };
-

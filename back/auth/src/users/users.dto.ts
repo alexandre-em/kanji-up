@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import Permission from 'src/utils/permission.type';
+import Permission from '../utils/permission.type';
 
 export class UpdateUserDTO {
   @ApiProperty()
@@ -12,6 +12,9 @@ export class UpdateUserDTO {
 export class DeleteUserDTO {
   @ApiProperty()
   deleted_at: Date;
+
+  @ApiProperty()
+  expireAt: Date;
 }
 
 export class UpdateUserImageDTO {

@@ -12,4 +12,15 @@ const endpointUrls = {
   user: process.env.EXPO_PUBLIC_AUTH_BASE_URL,
 };
 
-export { colors, authUrl, appId, endpointUrls };
+const applications = {
+  kanji: {
+    url: 'https://kanjiup-v2.alexandre-em.fr',
+    image: require('../assets/images/icon.png'),
+  },
+  word: {
+    url: 'https://word.kanjiup.alexandre-em.fr',
+    image: require('../assets/images/icon_word.png'),
+  },
+};
+
+export { colors, authUrl, appId, endpointUrls, applications };

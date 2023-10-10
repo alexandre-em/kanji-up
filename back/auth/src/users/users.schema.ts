@@ -34,7 +34,7 @@ export class User {
   };
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: User.name }] })
-  friends: User[];
+  friends: [User];
 
   @Prop()
   permissions: Permission[];
@@ -44,6 +44,9 @@ export class User {
 
   @Prop({ default: null })
   deleted_at: Date;
+
+  @Prop({ default: null, type: Date, expires: 0 })
+  expireAt: Date;
 }
 
 export type UserDocument = User & Document;
@@ -78,3 +81,5 @@ UserSchema.path('email').validate(function (email: string) {
 
   return emailRegex.test(email);
 }, 'The email format is incorrect');
+
+UserSchema.index({ expireAt: 1 }, { expireAfterSeconds: 0 });

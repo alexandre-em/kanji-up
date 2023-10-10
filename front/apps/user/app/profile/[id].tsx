@@ -1,25 +1,30 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { View, Text, SafeAreaView, TouchableOpacity, Dimensions, ScrollView } from 'react-native';
-import { ActivityIndicator, Avatar, Button, Divider, IconButton, SegmentedButtons } from 'react-native-paper';
+import { View, Text, SafeAreaView, TouchableOpacity, Dimensions, ScrollView, FlatList } from 'react-native';
+import { ActivityIndicator, Avatar, Button, Dialog, Divider, IconButton, List, TouchableRipple } from 'react-native-paper';
 import { router, useGlobalSearchParams } from 'expo-router';
 
 import core from 'kanji-app-core';
-import { User } from 'kanji-app-types';
+import { User, UserApplicationScore } from 'kanji-app-types';
 
 import style from './style';
-import { colors, endpointUrls } from 'constants';
+import { applications, colors, endpointUrls } from 'constants';
 import global from 'constants/style';
 import { useUserContext } from 'components/UserProvider';
 import actions from 'components/UserProvider/actions';
 import Chart from './Chart';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { asyncstorageKeys, useAuth } from 'kanji-app-auth';
+import AppGroupButton from 'components/AppGroupButton';
+
+const FOLLOWING_MODE = 'Following';
+const FOLLOWER_MODE = 'Follower';
 
 export default function Home() {
   const { id, access_token } = useGlobalSearchParams();
   const UserContext = useUserContext();
   const AuthContext = useAuth();
   const [user, setUser] = useState<User | null>(null);
+  const [dialog, setDialog] = useState({ visible: false, mode: '' });
   const [followers, setFollowers] = useState<Partial<User>[]>([]);
   const [apptype, setAppType] = useState<'kanji' | 'word'>('kanji');
 
@@ -37,6 +42,33 @@ export default function Home() {
     return <Text style={{ textAlign: 'center', color: colors.text + '70' }}>Joined the {formattedDate}</Text>;
   }, [user?.created_at]);
 
+  const isUserFriend = useCallback(
+    (selectedUser: Partial<User>) =>
+      UserContext.state.friends.map((userFriend) => userFriend.user_id).includes(selectedUser.user_id),
+    [UserContext.state.friends]
+  );
+
+  const addRemoveFriend = useCallback(
+    (updatedFriend: Partial<User>) => {
+      const isFriend = isUserFriend(updatedFriend);
+      const payload = !isFriend
+        ? { friends: [...UserContext.state.friends, { name: updatedFriend.name, user_id: updatedFriend.user_id }] }
+        : { friends: UserContext.state.friends.filter(({ user_id }) => updatedFriend.user_id !== user_id) };
+
+      !isFriend ? core.userService?.addFriend(updatedFriend.user_id!) : core.userService?.removeFriend(updatedFriend.user_id!);
+
+      UserContext.dispatch({
+        type: actions.UPDATE,
+        payload,
+      });
+
+      if (user?.user_id === UserContext.state.user_id) {
+        setUser((prev) => ({ ...prev, friends: payload.friends }));
+      }
+    },
+    [user, dialog.mode, UserContext.state.user_id]
+  );
+
   const followButton = useMemo(() => {
     if (!user) return null;
     if (UserContext.state.user_id === user?.user_id)
@@ -50,46 +82,40 @@ export default function Home() {
           Edit
         </Button>
       );
-    if (UserContext.state.friends.filter((u) => u.user_id === user?.user_id).length === 0)
-      return (
-        <Button
-          mode="contained"
-          style={{ alignSelf: 'flex-end', marginRight: 20 }}
-          onPress={() => {
-            core.userService?.addFriend(user.user_id);
-            UserContext.dispatch({
-              type: actions.UPDATE,
-              payload: { friends: [...UserContext.state.friends, { name: user.name, user_id: user.user_id }] },
-            });
-          }}>
-          Follow
-        </Button>
-      );
-    else
-      return (
-        <Button
-          mode="outlined"
-          style={{ alignSelf: 'flex-end', marginRight: 20 }}
-          onPress={() => {
-            core.userService?.removeFriend(user.user_id);
-            UserContext.dispatch({
-              type: actions.UPDATE,
-              payload: { friends: UserContext.state.friends.filter(({ user_id }) => user.user_id !== user_id) },
-            });
-          }}>
-          Unfollow
-        </Button>
-      );
+    const isFriend = isUserFriend(user);
+
+    return (
+      <Button
+        mode={isFriend ? 'outlined' : 'contained'}
+        style={{ alignSelf: 'flex-end', marginRight: 20 }}
+        onPress={() => addRemoveFriend(user)}>
+        {isFriend ? 'Unfollow' : 'Follow'}
+      </Button>
+    );
   }, [UserContext.state, user]);
 
   const getUser = useCallback(
-    (userId: string) => {
+    async (userId: string) => {
       if (userId && userId === UserContext.state.user_id) {
         setUser(UserContext.state);
       } else if (userId && core.userService) {
-        core.userService.getUserById(userId).then(({ data }) => {
-          setUser(data);
-        });
+        const userProfile = await core.userService.getUserById(userId);
+        if (userProfile.data.user_id) {
+          const applications: UserApplicationScore = { kanji: undefined, word: undefined };
+
+          if (userProfile.data.applications?.kanji?.total_score) {
+            applications.kanji = (await core.userService!.getUserScore(userProfile.data.user_id, 'kanji')).data;
+          }
+          if (userProfile.data.applications?.word?.total_score) {
+            applications.word = (await core.userService!.getUserScore(userProfile.data.user_id, 'word')).data;
+          }
+
+          const friends = (await core.userService!.getFollowingList(userProfile.data.user_id)).data;
+
+          const payload = { ...userProfile.data, friends, applications };
+
+          setUser(payload);
+        }
       }
     },
     [core.userService, UserContext.state]
@@ -115,6 +141,55 @@ export default function Home() {
       });
     }
   }, [core.userService, access_token]);
+
+  const closeDialog = useCallback(() => {
+    setDialog({ mode: '', visible: false });
+  }, []);
+
+  const friendDialog = useMemo(() => {
+    if (!user) return null;
+
+    return (
+      <Dialog visible={dialog.visible} onDismiss={closeDialog}>
+        <Dialog.Title>{dialog.mode} list</Dialog.Title>
+        <Dialog.Content style={{ height: Dimensions.get('window').height * 0.8 }}>
+          <ScrollView>
+            <FlatList
+              data={(dialog.mode === FOLLOWER_MODE ? followers : user.friends).map((friend) => ({
+                user_id: friend.user_id,
+                name: friend.name,
+                isFriend: isUserFriend(friend),
+              }))}
+              renderItem={({ item }) => (
+                <List.Item
+                  title={item.name}
+                  left={() => (
+                    <Avatar.Image
+                      size={40}
+                      source={{ uri: `${process.env.EXPO_PUBLIC_AUTH_BASE_URL}/users/profile/image/${item.user_id}` }}
+                    />
+                  )}
+                  right={() =>
+                    item.user_id !== UserContext.state.user_id && (
+                      <Button
+                        mode={item.isFriend ? 'outlined' : 'contained'}
+                        onPress={() => addRemoveFriend({ user_id: item.user_id, name: item.name })}>
+                        {item.isFriend ? 'Unfollow' : 'Follow'}
+                      </Button>
+                    )
+                  }
+                  onPress={() => {
+                    closeDialog();
+                    router.push(`/profile/${item.user_id}`);
+                  }}
+                />
+              )}
+            />
+          </ScrollView>
+        </Dialog.Content>
+      </Dialog>
+    );
+  }, [user, dialog, UserContext.state, followers]);
 
   useEffect(() => {
     if (access_token) {
@@ -153,11 +228,7 @@ export default function Home() {
         />
         <View style={style.avatar}>
           <TouchableOpacity style={{ alignSelf: 'center' }}>
-            {UserContext.state.user_id ? (
-              <Avatar.Image size={150} source={{ uri: avatarUri }} />
-            ) : (
-              <Avatar.Text size={150} label={user.name.charAt(0) || '-'} />
-            )}
+            <Avatar.Image size={150} source={{ uri: avatarUri }} />
           </TouchableOpacity>
           <Text style={[global.title, { textTransform: 'capitalize', textAlign: 'center' }]}>{user.name}</Text>
           {joinedDate}
@@ -169,40 +240,30 @@ export default function Home() {
               </Text>
               <Text style={{ textAlign: 'center' }}>Points</Text>
             </View>
-            <View style={{ alignItems: 'center' }}>
-              <Text style={style.numberText}>{user.friends.length}</Text>
-              <Text style={{ textAlign: 'center' }}>Following</Text>
-            </View>
-            <View style={{ alignItems: 'center' }}>
-              <Text style={style.numberText}>{followers.length}</Text>
-              <Text style={{ textAlign: 'center' }}>Followers</Text>
-            </View>
+            <TouchableRipple onPress={() => setDialog({ visible: true, mode: 'Following' })}>
+              <View style={{ alignItems: 'center' }}>
+                <Text style={style.numberText}>{user.friends.length}</Text>
+                <Text style={{ textAlign: 'center' }}>Following</Text>
+              </View>
+            </TouchableRipple>
+            <TouchableRipple onPress={() => setDialog({ visible: true, mode: 'Follower' })}>
+              <View style={{ alignItems: 'center' }}>
+                <Text style={style.numberText}>{followers.length}</Text>
+                <Text style={{ textAlign: 'center' }}>Followers</Text>
+              </View>
+            </TouchableRipple>
           </View>
           <Divider style={{ marginVertical: 15 }} />
           {followButton}
         </View>
+
         <View style={style.contents}>
           <Text style={global.title}>Stats</Text>
+          <AppGroupButton appType={apptype} setAppType={setAppType} applications={applications} />
           <Chart user={user} apptype={apptype} />
-          <SegmentedButtons
-            value={apptype}
-            onValueChange={setAppType}
-            style={{ alignSelf: 'center', borderRadius: 25, marginRight: 20 }}
-            density="high"
-            buttons={[
-              {
-                value: 'kanji',
-                label: 'Kanji',
-                checkedColor: colors.secondaryDark,
-              },
-              {
-                value: 'word',
-                label: 'Word',
-                checkedColor: colors.secondaryDark,
-              },
-            ]}
-          />
         </View>
+
+        {friendDialog}
       </SafeAreaView>
     </ScrollView>
   );

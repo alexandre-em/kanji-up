@@ -49,20 +49,21 @@ export default function Home() {
       .then(({ data }) => {
         if (data.applications?.kanji) {
           setUserId(data.user_id);
-          const scores = data.applications.kanji;
           const date = new Date();
           const formattedDate = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
 
           dispatch(settings.actions.update({ username: data.name, userId: data.user_id }));
 
-          dispatch(
-            user.actions.update({
-              totalScore: scores.total_score,
-              dailyScore: scores.scores[formattedDate],
-              scores: scores.scores,
-              progression: scores.progression,
-            })
-          );
+          core.userService?.getUserScore(data.user_id, 'kanji').then((score) => {
+            dispatch(
+              user.actions.update({
+                totalScore: score.data.total_score,
+                dailyScore: score.data.scores[formattedDate],
+                scores: score.data.scores,
+                progression: score.data.progression,
+              })
+            );
+          });
         }
       })
       .catch(() => router.replace('/'));

@@ -43,7 +43,7 @@ export class SessionService {
         throw new BadRequestException('This user has already an openned session');
       }
 
-      await this.model.create({
+      return this.model.create({
         user_id: decodedToken.sub,
         token,
         expired_at: new Date(decodedToken.exp * 1000),
@@ -61,9 +61,7 @@ export class SessionService {
     try {
       const decodedToken: DecodedToken = this.jwtService.verify(token, { secret: this._secret });
 
-      await this.model.remove({ user_id: decodedToken.sub }).exec();
-
-      return true;
+      return this.model.deleteOne({ user_id: decodedToken.sub }).exec();
     } catch (e) {
       throw new UnauthorizedException('The token is invalid', e);
     }

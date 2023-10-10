@@ -1,17 +1,17 @@
 import { Schema, model, Document, PaginateModel } from 'mongoose';
-import {util} from 'mongoose-uuid-parser';
+import { util } from 'mongoose-uuid-parser';
 import mongoosePaginate from 'mongoose-paginate-v2';
 
 type RadicalModelType = {
-  radical_id: string,
-  character: string,
-  strokes: number,
-  image: ImageType | string,
+  radical_id: string;
+  character: string;
+  strokes: number;
+  image: ImageType | string;
   name: {
-    hiragana: string,
-    romaji: string,
-  },
-  meaning: Array<string>,
+    hiragana: string;
+    romaji: string;
+  };
+  meaning: Array<string>;
 };
 
 const radicalSchema = new Schema({
@@ -32,6 +32,6 @@ const radicalSchema = new Schema({
 
 radicalSchema.plugin(mongoosePaginate);
 
-interface RadicalDocument extends Document, RadicalModelType {}
+export interface RadicalDocument extends Document, RadicalModelType {}
 
-export default model<RadicalDocument, PaginateModel<RadicalDocument>>("Radical", radicalSchema);
+export default model<RadicalDocument, PaginateModel<RadicalDocument>>('Radical', radicalSchema);

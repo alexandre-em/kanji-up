@@ -19,3 +19,8 @@ export const colors = {
     level5: '#E8E8E8',
   },
 };
+
+export const wordColors = {
+  primary: '#377BC8',
+  primaryDark: '#214a78',
+};

@@ -26,7 +26,7 @@ const initialValue: User = {
 
 const initialUserState = {
   state: initialValue,
-  dispatch: (body: { type: string; payload: typeof initialValue }): void => console.log(body),
+  dispatch: (body: { type: string; payload: Partial<typeof initialValue> }): void => console.log(body),
 };
 
 const UserContext = React.createContext(initialUserState);

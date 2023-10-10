@@ -22,7 +22,13 @@ export default class UserService {
   getUserById(userId: string, options?: AxiosRequestConfig) {
     if (!this._instance) throw new Error('User instance not ready...');
 
-    return this._instance?.get(`/${userId}`, options);
+    return this._instance?.get(`/profile/${userId}`, options);
+  }
+
+  getUserScore(userId: string, appType: string, options?: AxiosRequestConfig): Promise<AxiosResponse<UserScore>> {
+    if (!this._instance) throw new Error('User instance not ready...');
+
+    return this._instance?.get(`/score/${userId}?app=${appType}`, options);
   }
 
   updateProfile(body: Partial<User>, options?: AxiosRequestConfig): Promise<AxiosResponse<UpdatedDataResponse>> {
@@ -30,7 +36,7 @@ export default class UserService {
 
     if (!body.password || body.password === '') delete body.password;
 
-    return this._instance.patch('/info', body, options);
+    return this._instance.patch('/profile', body, options);
   }
 
   getProfileImage(user_id: string, options?: AxiosRequestConfig) {
@@ -53,7 +59,7 @@ export default class UserService {
     const formData = new FormData();
     formData.append('file', file);
 
-    return this._instance.put(`/image`, formData, options);
+    return this._instance.put(`/profile/image`, formData, options);
   }
 
   updateProfileImageNative(
@@ -90,10 +96,16 @@ export default class UserService {
     return this._instance?.get(`/ranks/${appType}?limit=${limit}`, options);
   }
 
+  getFollowingList(userId: string, options?: AxiosRequestConfig): Promise<AxiosResponse<Partial<User>[]>> {
+    if (!this._instance) throw new Error('User instance not ready...');
+
+    return this._instance.get(`/friends/${userId}/follow`, options);
+  }
+
   getFollowers(userId: string, options?: AxiosRequestConfig): Promise<AxiosResponse<Partial<User>[]>> {
     if (!this._instance) throw new Error('User instance not ready...');
 
-    return this._instance.get(`/friends/${userId}`, options);
+    return this._instance.get(`/friends/${userId}/followers`, options);
   }
 
   addFriend(userId: string, options?: AxiosRequestConfig): Promise<AxiosResponse<UpdatedDataResponse>> {
@@ -108,9 +120,16 @@ export default class UserService {
     return this._instance.delete(`/friends/${userId}`, option);
   }
 
-  deleteUser(options?: AxiosRequestConfig): Promise<AxiosRequestConfig<UpdatedDataResponse>> {
+  deleteUser(options?: AxiosRequestConfig): Promise<AxiosResponse<UpdatedDataResponse>> {
     if (!this._instance) throw new Error('User instance not ready...');
 
     return this._instance.delete('', options);
+  }
+
+  searchUser(input: string, options?: AxiosRequestConfig): Promise<AxiosResponse<Partial<User>[]>> {
+    if (!this._instance) throw new Error('User instance not ready...');
+    if (!input) throw new Error('No input');
+
+    return this._instance.get(`/search/user?search=${input}`, options);
   }
 }
