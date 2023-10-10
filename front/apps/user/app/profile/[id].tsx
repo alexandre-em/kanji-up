@@ -50,7 +50,6 @@ export default function Home() {
 
   const addRemoveFriend = useCallback(
     (updatedFriend: Partial<User>) => {
-      console.log(updatedFriend);
       const isFriend = isUserFriend(updatedFriend);
       const payload = !isFriend
         ? { friends: [...UserContext.state.friends, { name: updatedFriend.name, user_id: updatedFriend.user_id }] }
@@ -62,8 +61,6 @@ export default function Home() {
         type: actions.UPDATE,
         payload,
       });
-
-      console.log(dialog.mode);
 
       if (user?.user_id === UserContext.state.user_id) {
         setUser((prev) => ({ ...prev, friends: payload.friends }));

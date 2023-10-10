@@ -10,6 +10,7 @@ const DAILY_SCORE_GRAPH_LIMIT = 10;
 
 export default function Chart({ user, apptype }) {
   const scores = user?.applications[apptype]?.scores;
+  const themeColors = apptype === 'kanji' ? colors : wordColors;
 
   if (!scores || Object.keys(scores).length <= 0)
     return (
@@ -51,8 +52,8 @@ export default function Chart({ user, apptype }) {
         yAxisInterval={1} // optional, defaults to 1
         chartConfig={{
           backgroundColor: colors.secondary,
-          backgroundGradientFrom: apptype === 'kanji' ? colors.primaryDark : wordColors.primaryDark,
-          backgroundGradientTo: apptype === 'kanji' ? colors.primary : wordColors.primary,
+          backgroundGradientFrom: themeColors.primaryDark,
+          backgroundGradientTo: themeColors.primary,
           decimalPlaces: 0, // optional, defaults to 2dp
           color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
           labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
@@ -62,7 +63,7 @@ export default function Chart({ user, apptype }) {
           propsForDots: {
             r: '6',
             strokeWidth: '2',
-            stroke: apptype === 'kanji' ? colors.primary : wordColors.primary,
+            stroke: themeColors.primary,
           },
         }}
         bezier
