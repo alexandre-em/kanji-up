@@ -1,26 +1,26 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Href, router, useGlobalSearchParams } from 'expo-router';
-import { FlatList, SafeAreaView, ScrollView, Text, View } from 'react-native';
+import { Pressable, FlatList, SafeAreaView, ScrollView, Text, View } from 'react-native';
 import { Avatar, Button, FAB, List, Searchbar } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import LogRocket from '@logrocket/react-native';
+
+import core from 'kanji-app-core';
 import { asyncstorageKeys, useAuth } from 'kanji-app-auth';
 
 import { RootState } from 'store';
 import globalStyles from 'styles/global';
-import { colors } from 'constants/Colors';
+import { endpointUrls, colors } from 'constants';
 import GradientCard from 'components/GradientCard';
 import { fileNames, readFile } from 'services/file';
+import { UserAppRedirection } from 'services/redirections';
 import { kanji, settings, user } from 'store/slices';
 
 import styles from './style';
 import { menu, list } from './constants';
 import RandomKanji from './components/randomKanji';
 import Stepper from './components/stepper';
-import core from 'kanji-app-core';
-import { endpointUrls } from 'constants';
-import { UserAppRedirection } from 'services/redirections';
-import { Pressable } from 'react-native';
 
 export default function Home() {
   const dispatch = useDispatch();
@@ -51,6 +51,11 @@ export default function Home() {
           setUserId(data.user_id);
           const date = new Date();
           const formattedDate = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+
+          LogRocket.identify(data.user_id, {
+            name: data.name,
+            email: data.email,
+          });
 
           dispatch(settings.actions.update({ username: data.name, userId: data.user_id }));
 

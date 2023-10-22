@@ -13,7 +13,7 @@ import { RootState } from 'store';
 import global from 'styles/global';
 import core from 'kanji-app-core';
 import { router, useGlobalSearchParams } from 'expo-router';
-import { KANJI_PROGRESSION_MAX } from 'constants';
+import { KANJI_PROGRESSION_MAX, endpointUrls } from 'constants';
 
 export default function KanjiDetail() {
   const { width } = useWindowDimensions();
@@ -69,10 +69,11 @@ export default function KanjiDetail() {
       <Appbar.Header>
         <Appbar.BackAction onPress={() => router.back()} />
         <Appbar.Content
-          title={`Detail of ${details.kanji.character} ${userState.progression[details.kanji_id] !== undefined
+          title={`Detail of ${details.kanji.character} ${
+            userState.progression[details.kanji_id] !== undefined
               ? `(${Math.min((userState.progression[details.kanji_id] / KANJI_PROGRESSION_MAX) * 100, 100)}%)`
               : ''
-            }`}
+          }`}
           titleStyle={{ color: '#fff', fontWeight: '700', fontSize: 17 }}
         />
       </Appbar.Header>
@@ -86,7 +87,7 @@ export default function KanjiDetail() {
             <SVGUriPlatform
               width={imgSize}
               height={imgSize}
-              uri={`https://www.miraisoft.de/anikanjivgx/?svg=${encodeURI(details.kanji.character as string)}`}
+              uri={`${endpointUrls.kanji}/kanjis/image/${encodeURIComponent(details.kanji.character as string)}`}
             />
           </Surface>
           <View style={{ width: (width < 700 ? width : 680) - imgSize }}>

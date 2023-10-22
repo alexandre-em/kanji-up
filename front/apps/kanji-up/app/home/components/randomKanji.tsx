@@ -7,7 +7,7 @@ import { KanjiType } from 'kanji-app-types';
 
 import { RootState } from 'store';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
-import { KANJI_PROGRESSION_MAX, colors } from 'constants';
+import { KANJI_PROGRESSION_MAX, colors, endpointUrls } from 'constants';
 import { SVGUriPlatform } from 'kanji-app-svg-ui';
 
 export default function RandomKanji() {
@@ -27,7 +27,7 @@ export default function RandomKanji() {
           <SVGUriPlatform
             width={32}
             height={32}
-            uri={`https://www.miraisoft.de/anikanjivgx/?svg=${encodeURI(choosenKanji.kanji?.character || '')}`}
+            uri={`${endpointUrls.kanji}/kanjis/image/${encodeURIComponent(choosenKanji.kanji?.character || '')}`}
           />
         )}
         right={() => (

@@ -4,6 +4,7 @@ import { Provider } from 'react-redux';
 import { SplashScreen, Stack } from 'expo-router';
 import Head from 'expo-router/head';
 import { Provider as PaperProvider, DefaultTheme } from 'react-native-paper';
+import LogRocket from '@logrocket/react-native';
 
 import { AuthProvider } from 'kanji-app-auth';
 
@@ -37,6 +38,10 @@ export default function RootLayout() {
     RobotoBlack: require('../assets/fonts/Roboto-Black.ttf'),
     RobotoThin: require('../assets/fonts/Roboto-Thin.ttf'),
   });
+
+  useEffect(() => {
+    LogRocket.init('sogogn/kanji-up');
+  }, []);
 
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {

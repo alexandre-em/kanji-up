@@ -15,6 +15,7 @@
   "dependencies": {
     "@babel/plugin-proposal-export-namespace-from": "^7.18.9",
     "@expo/vector-icons": "^13.0.0",
+    "@logrocket/react-native": "^1.24.2",
     "@react-native-async-storage/async-storage": "1.18.2",
     "@react-navigation/native": "^6.0.2",
     "@reduxjs/toolkit": "^1.9.5",
@@ -37,9 +38,9 @@
     "kanji-app-auth": "*",
     "kanji-app-core": "*",
     "kanji-app-models": "*",
+    "kanji-app-onboarding": "*",
     "kanji-app-sketch": "*",
     "kanji-app-svg-ui": "*",
-    "kanji-app-onboarding": "*",
     "prettier": "^3.0.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",

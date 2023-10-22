@@ -10,6 +10,7 @@ import styles from './style';
 import { colors } from 'constants/Colors';
 import { RootState } from 'store';
 import { useQuizzContext } from './_layout';
+import { endpointUrls } from 'constants';
 
 export default function Practice() {
   const { width } = useWindowDimensions();
@@ -62,7 +63,7 @@ export default function Practice() {
       <SVGUriPlatform
         width={imgSize}
         height={imgSize}
-        uri={`https://www.miraisoft.de/anikanjivgx/?svg=${encodeURI(kanjiQueue[counter].kanji!.character as string)}`}
+        uri={`${endpointUrls.kanji}/kanjis/image/${encodeURIComponent(kanjiQueue[counter].kanji!.character as string)}`}
       />
     );
   }, [imgSize, counter, kanjiQueue]);
