@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import { kanjiService } from '../services';
 import InvalidError from '../error/invalid';
 import { PAGINATION_LIMIT, UpdateKanjiProps } from '../types/enums';
+import NotFoundError from '../error/notFound';
 
 export function getAll(req: Request, res: Response) {
   const page = req.query.page ? parseInt(req.query.page as string) : 1;
@@ -23,6 +24,16 @@ export async function getOne(req: Request, res: Response) {
   const kanji = await kanjiService.getOne(req.params.id);
 
   res.status(200).send(kanji);
+}
+
+export async function getOneImage(req: Request, res: Response) {
+  try {
+    const svg = await kanjiService.getOneImage(req.params.kanji);
+
+    res.status(200).send(svg);
+  } catch (e) {
+    new NotFoundError('Kanji svg image not found').sendResponse(res);
+  }
 }
 
 export function searchKanji(req: Request, res: Response) {

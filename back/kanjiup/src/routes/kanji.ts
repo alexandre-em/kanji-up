@@ -3,7 +3,7 @@ import { Router } from 'express';
 
 import { checkJWT } from '../config/security';
 import KanjiPermission from '../utils/kanjiPermissions';
-import { createOne, deleteOne, getAll, getOne, searchKanji, updateOneCharacter, updateOneRadical, updateOneReference } from '../controllers/kanji';
+import { createOne, deleteOne, getAll, getOne, getOneImage, searchKanji, updateOneCharacter, updateOneRadical, updateOneReference } from '../controllers/kanji';
 
 const router: Router = Router();
 
@@ -52,6 +52,39 @@ const router: Router = Router();
  *                          $ref: '#/components/schemas/Error'
  */
 router.get('', getAll);
+
+/**
+ * @openapi
+ * /api/v1/kanjis/image/{kanji}:
+ *  get:
+ *      tags:
+ *          - Kanji
+ *      description: Animated SVG of the Kanji
+ *      security: []
+ *      parameters:
+ *          - name: kanji
+ *            in: path
+ *            description: Kanji character
+ *            required: true
+ *            schema:
+ *                type: string
+ *      responses:
+ *          200:
+ *              description: Returns kanji's svg
+ *          400:
+ *              description: Bad request Error
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/Error'
+ *          500:
+ *              description: Internal Error
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/Error'
+ */
+router.get('/image/:kanji', getOneImage);
 
 /**
  * @openapi

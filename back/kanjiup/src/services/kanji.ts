@@ -1,4 +1,6 @@
 import { PopulateOptions, UpdateQuery } from 'mongoose';
+import path from 'path';
+import fsPromises from 'fs/promises';
 
 import InvalidError from '../error/invalid';
 import Kanji from '../dto/Kanji';
@@ -8,6 +10,13 @@ import { CharacterModel, KanjiModel, KanjiDocument, RadicalModel, ReferenceModel
 
 export const getOne = (id: string) => {
   return KanjiModel.findOne({ kanji_id: id }).select('-_id -__v -examples._id').populate('kanji', '-_id -__v').populate('radical', '-_id -__v').populate('reference', '-_id -__v').exec();
+};
+
+export const getOneImage = (encodedKanji: string) => {
+  const kanji = decodeURIComponent(encodedKanji);
+  const filePath = path.join(process.cwd(), 'data', 'svg', `${kanji.charCodeAt(0)}.svg`);
+
+  return fsPromises.readFile(filePath, 'utf8');
 };
 
 export const getAll = async (page: number, limit: number, grade?: string) => {
