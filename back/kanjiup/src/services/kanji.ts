@@ -1,6 +1,5 @@
 import { PopulateOptions, UpdateQuery } from 'mongoose';
 import path from 'path';
-import fsPromises from 'fs/promises';
 
 import InvalidError from '../error/invalid';
 import Kanji from '../dto/Kanji';
@@ -14,9 +13,8 @@ export const getOne = (id: string) => {
 
 export const getOneImage = (encodedKanji: string) => {
   const kanji = decodeURIComponent(encodedKanji);
-  const filePath = path.join(process.cwd(), 'data', 'svg', `${kanji.charCodeAt(0)}.svg`);
 
-  return fsPromises.readFile(filePath, 'utf8');
+  return path.join(process.cwd(), 'data', 'svg', `${kanji.charCodeAt(0)}.svg`);
 };
 
 export const getAll = async (page: number, limit: number, grade?: string) => {

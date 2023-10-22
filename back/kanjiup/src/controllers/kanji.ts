@@ -28,9 +28,10 @@ export async function getOne(req: Request, res: Response) {
 
 export async function getOneImage(req: Request, res: Response) {
   try {
-    const svg = await kanjiService.getOneImage(req.params.kanji);
+    const svg = kanjiService.getOneImage(req.params.kanji);
 
-    res.status(200).send(svg);
+    res.setHeader('Content-Type', 'image/svg+xml');
+    res.sendFile(svg);
   } catch (e) {
     new NotFoundError('Kanji svg image not found').sendResponse(res);
   }
