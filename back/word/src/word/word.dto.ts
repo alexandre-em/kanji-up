@@ -2,8 +2,8 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { ArrayNotEmpty, ArrayUnique, IsArray, IsDefined, IsEnum, IsNotEmpty, IsUUID, ValidateNested } from 'class-validator';
 
-import { SentenceResponse } from '../sentence/sentence.entity';
-import { withBaseResponse } from '../utils/generics.entity';
+import { SentenceDTO } from '../sentence/sentence.dto';
+import { withBaseResponse } from '../utils';
 import { DefinitionKeyEnum, DefinitionTypeEnum, WordKeyEnum } from '../types/enum';
 
 export class WordShortDTO {
@@ -37,8 +37,8 @@ export class DefinitionDTO {
   @ApiProperty()
   type: string[];
 
-  @ApiProperty({ isArray: true, type: SentenceResponse })
-  example: SentenceResponse[];
+  @ApiProperty({ isArray: true, type: SentenceDTO })
+  example: SentenceDTO[];
 
   @ApiProperty({ isArray: true, type: RelationWordDTO })
   relation: RelationWordDTO[];
@@ -78,8 +78,8 @@ export class WordDefinitionDto {
   @ApiProperty({ description: 'Word related to the current word', required: false })
   related_word?: string[];
 
-  @ApiProperty({ description: 'Examples using the words', required: false, type: SentenceResponse, isArray: true })
-  example?: SentenceResponse[];
+  @ApiProperty({ description: 'Examples using the words', required: false, type: SentenceDTO, isArray: true })
+  example?: SentenceDTO[];
 }
 
 export class CreateWordDto {

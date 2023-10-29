@@ -1,6 +1,20 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEmpty } from 'class-validator';
 
+export class SentenceDTO {
+  @ApiProperty()
+  word: string;
+
+  @ApiProperty()
+  sentence: string;
+
+  @ApiProperty()
+  translation: string;
+
+  @ApiProperty()
+  sentence_id: string;
+}
+
 export class CreateSentenceDto {
   @IsEmpty()
   @ApiProperty({ description: 'Sentence related word ID', required: true })
