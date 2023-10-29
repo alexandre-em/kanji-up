@@ -2,10 +2,8 @@ import { Query } from 'mongoose';
 
 export async function createPaginateData<T>(page: number, limit: number, query: Query<any, T>) {
   const queryClone = query.clone();
-  console.log('query cloned');
 
   const totalDocs = await queryClone.count().exec();
-  console.log(totalDocs);
   const totalPages = Math.floor(totalDocs / limit);
   const pagingCounter = (page - 1) * limit + 1;
   const hasPrevPage = page * limit - limit > 0;

@@ -9,5 +9,6 @@ import { SentenceService } from './sentence.service';
   controllers: [SentenceController],
   providers: [SentenceService],
   imports: [MongooseModule.forFeature([{ name: Sentence.name, schema: SentenceSchema }])],
+  exports: [SentenceService],
 })
 export class SentenceModule {}

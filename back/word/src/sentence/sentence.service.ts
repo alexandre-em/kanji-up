@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Sentence, SentenceDocument } from './sentence.schema';
-import { Model } from 'mongoose';
+import { FilterQuery, Model } from 'mongoose';
 import { CreateSentenceDto, UpdateSentenceDto } from './sentence.dto';
 
 @Injectable()
@@ -14,6 +14,10 @@ export class SentenceService {
     if (sentence) return sentence;
 
     return this.model.create(body);
+  }
+
+  find(query: FilterQuery<SentenceDocument>) {
+    return this.model.find(query).exec();
   }
 
   findOneById(id: string) {

@@ -3,12 +3,18 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
 import { Word, WordDocument } from './word.schema';
-import { CreateWordDto, UpdateWordDto } from './word.dto';
-import { createPaginateData } from 'src/utils';
+import { CreateWordDto, UpdateWordDefinitionDTO, UpdateWordUUIDDTO, UpdateWordDefinitionTypeDto, UpdateWordReadingDTO } from './word.dto';
+import { createPaginateData } from '../utils';
+import { SentenceService } from '../sentence/sentence.service';
+
+type UpdateWordDefinitionUnionType = UpdateWordUUIDDTO | UpdateWordDefinitionDTO | UpdateWordDefinitionTypeDto;
 
 @Injectable()
 export class WordService {
-  constructor(@InjectModel(Word.name) private readonly model: Model<WordDocument>) {}
+  constructor(
+    @InjectModel(Word.name) private readonly model: Model<WordDocument>,
+    private readonly sentenceService: SentenceService
+  ) {}
 
   create(body: CreateWordDto) {
     return this.model.create(body);
@@ -31,7 +37,7 @@ export class WordService {
   findOneById(id: string) {
     return this.model
       .findOne({ word_id: id, deleted_at: null })
-      .select('-_id -definition._id -definition.relation._id -__v')
+      .select('-_id -definition._id -definition.relation._id -definition.related_word -__v')
       .populate('definition.example', '-_id sentence translation sentence_id')
       .populate('definition.relation.related_word', 'word reading word_id -_id')
       .exec();
@@ -47,8 +53,48 @@ export class WordService {
     return this.model.find({ $or: [{ word }, { reading: word }] }).exec();
   }
 
-  updateOneById(id: string, body: UpdateWordDto) {
+  updateOneById(id: string, body: UpdateWordReadingDTO) {
     return this.model.updateOne({ word_id: id }, body).exec();
+  }
+
+  async addElementToArray(word_id: string, keyDef: string, body: UpdateWordDefinitionUnionType) {
+    return this.model.updateOne({ word_id }, { $addToSet: { [keyDef]: Array.isArray(body.data) ? { $each: body.data } : body.data } }).exec();
+  }
+
+  async removeElementToArray(word_id: string, keyDef: string, body: UpdateWordDefinitionUnionType) {
+    return this.model.updateOne({ word_id }, Array.isArray(body.data) ? { $pullAll: { [keyDef]: body.data } } : { $pull: { [keyDef]: body.data } }).exec();
+  }
+
+  async addDefinitionExample(word_id: string, index: number, body: UpdateWordUUIDDTO) {
+    const keyDefType = `definition.${index}.example`;
+
+    const sentences = await this.sentenceService.find({ sentence_id: { $in: body.data } });
+
+    return this.addElementToArray(word_id, keyDefType, { data: sentences } as unknown as UpdateWordDefinitionUnionType);
+  }
+
+  async removeDefinitionExample(word_id: string, index: number, body: UpdateWordUUIDDTO) {
+    const keyDefType = `definition.${index}.example`;
+
+    const sentences = await this.sentenceService.find({ sentence_id: { $in: body.data } });
+
+    return this.removeElementToArray(word_id, keyDefType, { data: sentences } as unknown as UpdateWordDefinitionUnionType);
+  }
+
+  async addDefinitionRelation(word_id: string, index: number, body: UpdateWordUUIDDTO) {
+    const keyDefType = `definition.${index}.relation`;
+
+    const sentences = await this.model.find({ word_id: { $in: body.data } }).exec();
+
+    return this.addElementToArray(word_id, keyDefType, { data: sentences } as unknown as UpdateWordDefinitionUnionType);
+  }
+
+  async removeDefinitionRelation(word_id: string, index: number, body: UpdateWordUUIDDTO) {
+    const keyDefType = `definition.${index}.relation`;
+
+    const sentences = await this.model.find({ word_id: { $in: body.data } }).exec();
+
+    return this.removeElementToArray(word_id, keyDefType, { data: sentences } as unknown as UpdateWordDefinitionUnionType);
   }
 
   deleteOneById(id: string) {
