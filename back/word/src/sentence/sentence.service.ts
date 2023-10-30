@@ -29,6 +29,7 @@ export class SentenceService {
   }
 
   deleteOneById(id: string) {
+    // TODO: Remove examples in relation with the sentence
     return this.model.updateOne({ word_id: id }, { deleted_at: new Date() }).exec();
   }
 }
