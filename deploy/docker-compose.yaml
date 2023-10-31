@@ -1,18 +1,65 @@
 version: "3.8"
 
 services:
-  api:
+  # api:
+  #   build:
+  #     context: ../back/kanjiup
+  #     args:
+  #       - SAVED_MODEL_URL=${SAVED_MODEL_URL}
+  #     env_file: .env
+  nginx:
+    image: nginx:mainline-alpine
+    restart: unless-stopped
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - web-root:/var/www/html
+      - ./docker/nginx/conf:/etc/nginx/conf.d
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - dhparam:/etc/ssl/certs
+    # depends_on:
+    #   - recognition
+    networks:
+      - kanji-app-network
+  certbot:
+    image: certbot/certbot
+    # restart: unless-stopped
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/www/certbot
+      - web-root:/var/www/html
+    # entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    depends_on:
+      - nginx
+    command: certonly --webroot --webroot-path=/var/www/html --email alexandre.em.em@gmail.com --agree-tos --no-eff-email --force-renewal -d kanjiup-reco.alexandre-em.fr
+  recognition:
     build:
-      context: ../back/kanjiup
+      context: ../back/recognition
       args:
-        - SAVED_MODEL_URL=${SAVED_MODEL_URL}
-    environment:
-      - AWS_ACCESS_ID=${AWS_ACCESS_ID}
-      - AWS_ACCESS_SECRET=${AWS_ACCESS_SECRET}
-      - AWS_BUCKET_NAME=${AWS_BUCKET_NAME}
-      - MONGO_URI=${MONGO_URI}
-      - MONGO_DB_NAME=${MONGO_DB_NAME}
-      - MONGO_COLLECTION=${MONGO_COLLECTION}
-      - KANJI_ALIVE_API_DOMAIN=${KANJI_ALIVE_API_DOMAIN}
-      - KANJI_ALIVE_API_KEY=${KANJI_ALIVE_API_KEY}
-      - PORT=${PORT}
+        - AUTH_API_SECRET_KEY=${AUTH_API_SECRET_KEY}
+        - KANJI_RECOGNIZER_DL_URL=${KANJI_RECOGNIZER_DL_URL}
+    ports:
+      - 8000:8000
+    networks:
+      - kanji-app-network
+volumes:
+  certbot-etc:
+  certbot-var:
+  web-root:
+    driver: local
+    driver_opts:
+      type: none
+      device: /Users/alexandre/Desktop/project/kanji-up/back/recognition/out/
+      o: bind
+  dhparam:
+    driver: local
+    driver_opts:
+      type: none
+      device: /Users/alexandre/Desktop/project/kanji-up/back/recognition/out/dhparam/
+      o: bind
+
+networks:
+  kanji-app-network:
+    driver: bridge

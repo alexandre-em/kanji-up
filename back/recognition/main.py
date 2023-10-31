@@ -8,17 +8,17 @@ from utils.model import RecognitionModel
 
 app = FastAPI()
 
-app.add_middleware(
-    TrustedHostMiddleware,
-    allowed_hosts=[
-        "localhost",
-        "kanjiup-reco.alexandre-em.fr",
-    ],
-)
+# app.add_middleware(
+#     TrustedHostMiddleware,
+#     allowed_hosts=[
+#         "localhost",
+#         "kanjiup-reco.alexandre-em.fr",
+#     ],
+# )
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://kanjiup.alexandre-em.fr", "http://localhost:19006"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
