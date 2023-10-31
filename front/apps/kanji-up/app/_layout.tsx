@@ -10,6 +10,7 @@ import { AuthProvider } from 'kanji-app-auth';
 
 import { colors } from '../constants/Colors';
 import store from '../store';
+import { Platform } from 'react-native';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -56,6 +57,15 @@ export default function RootLayout() {
       SplashScreen.hideAsync();
     }
   }, [loaded]);
+
+  useEffect(() => {
+    if (Platform.OS === 'web') {
+      const ua = navigator.userAgent;
+      if (/iPad|iPhone|iPod/.test(ua)) {
+        document.body.style.position = 'fixed';
+      }
+    }
+  }, []);
 
   if (!loaded) {
     return null;
