@@ -47,7 +47,6 @@ export async function createPaginateDataFromAggregation<T>(page: number, limit: 
     .exec();
 
   const totalDocs = results[0].totalDocs[0].total;
-  console.log(totalDocs);
   const totalPages = Math.floor(totalDocs / limit);
   const pagingCounter = (page - 1) * limit + 1;
   const hasPrevPage = page * limit - limit > 0;
