@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 
 import { Word, WordDocument } from './word.schema';
 import { CreateWordDto, UpdateWordDefinitionDTO, UpdateWordUUIDDTO, UpdateWordDefinitionTypeDto, UpdateWordReadingDTO } from './word.dto';
-import { createPaginateData } from '../utils';
+import { createPaginateData, createPaginateDataFromAggregation } from '../utils';
 import { SentenceService } from '../sentence/sentence.service';
 
 type UpdateWordDefinitionUnionType = UpdateWordUUIDDTO | UpdateWordDefinitionDTO | UpdateWordDefinitionTypeDto;
@@ -99,5 +99,33 @@ export class WordService {
 
   deleteOneById(id: string) {
     return this.model.updateOne({ word_id: id }, { deleted_at: new Date() }).exec();
+  }
+  async searchWord(query: string, page = 1, limit = 20) {
+    const wordAggregate = this.model
+      .aggregate()
+      .search({
+        index: 'default',
+        text: {
+          query,
+          path: {
+            wildcard: '*',
+          },
+        },
+      })
+      .match({ deleted_at: null })
+      .project({
+        _id: 0,
+        'definition.example': 0,
+        'definition._id': 0,
+        'definition.relation': 0,
+        'definition.related_word': 0,
+        'definition.type': 0,
+        'definition.description': 0,
+        __v: 0,
+        created_at: 0,
+        deleted_at: 0,
+      });
+
+    return createPaginateDataFromAggregation(page, limit, wordAggregate);
   }
 }

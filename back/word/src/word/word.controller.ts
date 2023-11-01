@@ -29,6 +29,15 @@ export class WordController {
   }
 
   @ApiTags('Words')
+  @ApiOperation({ summary: 'Search word' })
+  @ApiOkResponse({ description: 'List of words', type: PaginateWordDTO })
+  @ApiBadRequestResponse({ description: 'Query value invalid. Must be a number' })
+  @Get('/search/word')
+  searchWord(@Query('query') query: string, @Query('page') page?: number, @Query('limit') limit?: number) {
+    return this.service.searchWord(query, page, limit);
+  }
+
+  @ApiTags('Words')
   @ApiOperation({ summary: 'Create a word', description: '**Permission required:** \n- `add:word`' })
   @Post('')
   @ApiBearerAuth()

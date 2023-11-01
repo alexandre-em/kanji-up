@@ -1,8 +1,8 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiCreatedResponse, ApiForbiddenResponse, ApiOkResponse, ApiOperation, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiForbiddenResponse, ApiOkResponse, ApiOperation, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 
 import { SentenceService } from './sentence.service';
-import { CreateSentenceDto, UpdateSentenceDto } from './sentence.dto';
+import { CreateSentenceDto, PaginatedSentenceDTO, SentenceByIdDTO, UpdateSentenceDto } from './sentence.dto';
 import PermissionGuard from '../security/permission.guard';
 import permissions from '../utils/permission.type';
 
@@ -11,12 +11,21 @@ import permissions from '../utils/permission.type';
 export class SentenceController {
   constructor(private service: SentenceService) {}
 
-  @ApiOperation({ summary: 'Get a sentence by id' })
-  @ApiOkResponse({ description: 'Authenticated user profile' })
-  @ApiUnauthorizedResponse({ description: 'Not authenticated' })
-  @Get('/:id')
-  getOne(@Param('id') id: string) {
-    return this.service.findOneById(id);
+  @ApiOperation({ summary: 'Get a paginated list of words' })
+  @ApiOkResponse({ description: 'List of words', type: PaginatedSentenceDTO })
+  @ApiBadRequestResponse({ description: 'Query value invalid. Must be a number' })
+  @Get('')
+  getAll(@Query('page', new ParseIntPipe()) page?: number, @Query('limit', new ParseIntPipe()) limit?: number) {
+    return this.service.findAllPaginate(page, limit);
+  }
+
+  @ApiOperation({ summary: 'Get a paginated list of words' })
+  @ApiOkResponse({ description: 'List of words', type: PaginatedSentenceDTO })
+  @ApiBadRequestResponse({ description: 'Query value invalid. Must be a number' })
+  @UsePipes(new ValidationPipe({ transform: true }))
+  @Get('/selected/ids')
+  getByIds(@Query() ids: SentenceByIdDTO) {
+    return this.service.findByIds(ids.ids);
   }
 
   @ApiBearerAuth()

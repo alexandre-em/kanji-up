@@ -1,5 +1,20 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmpty } from 'class-validator';
+import { IsArray, IsEmpty, IsUUID } from 'class-validator';
+import { withBaseResponse } from '../utils';
+import { Transform } from 'class-transformer';
+
+export class SentenceByIdDTO {
+  @IsArray()
+  @IsUUID('all', { each: true })
+  @Transform((param) => {
+    if (Array.isArray(param.value)) {
+      return param.value;
+    }
+    return (param.value as string).split(',');
+  })
+  @ApiProperty({ type: String })
+  ids: string[];
+}
 
 export class SentenceDTO {
   @ApiProperty()
@@ -14,6 +29,10 @@ export class SentenceDTO {
   @ApiProperty()
   sentence_id: string;
 }
+
+export class PaginatedSentenceDTO extends withBaseResponse(SentenceDTO, {
+  description: 'List of returned sentences',
+}) {}
 
 export class CreateSentenceDto {
   @IsEmpty()
