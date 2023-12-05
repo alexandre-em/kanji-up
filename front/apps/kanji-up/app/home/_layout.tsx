@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Href, router, useGlobalSearchParams } from 'expo-router';
-import { Pressable, FlatList, SafeAreaView, ScrollView, Text, View } from 'react-native';
+import { Pressable, FlatList, ScrollView, Text, View } from 'react-native';
 import { Avatar, Button, FAB, List, Searchbar } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -8,6 +8,7 @@ import LogRocket from '@logrocket/react-native';
 
 import core from 'kanji-app-core';
 import { asyncstorageKeys, useAuth } from 'kanji-app-auth';
+import { Content } from 'kanji-app-ui';
 
 import { RootState } from 'store';
 import globalStyles from 'styles/global';
@@ -86,7 +87,9 @@ export default function Home() {
 
   useEffect(() => {
     loadSelectedKanji();
-    readFile('userSettings').then((content) => dispatch(settings.actions.update(JSON.parse(content))));
+    readFile('userSettings')
+      .then((content) => dispatch(settings.actions.update(JSON.parse(content))))
+      .catch(() => console.log('previous setting not found'));
 
     core.recognitionService
       ?.health()
@@ -115,7 +118,7 @@ export default function Home() {
   }, [access_token, AuthContext?.signIn]);
 
   return (
-    <SafeAreaView style={globalStyles.main}>
+    <Content>
       <View style={globalStyles.header}>
         <Button mode="contained" style={{ borderRadius: 25 }}>
           {userState.totalScore}
@@ -184,6 +187,6 @@ export default function Home() {
         onStateChange={setOpen}
       />
       {/* dialog */}
-    </SafeAreaView>
+    </Content>
   );
 }

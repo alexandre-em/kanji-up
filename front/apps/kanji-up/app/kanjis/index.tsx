@@ -1,6 +1,6 @@
-import React, { useCallback, useState } from 'react';
-import { Platform, View } from 'react-native';
-import { Appbar, Divider, IconButton, Menu } from 'react-native-paper';
+import React, { useCallback, useMemo, useState } from 'react';
+import { Platform } from 'react-native';
+import { Divider, IconButton, Menu } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import { router, useLocalSearchParams } from 'expo-router';
 
@@ -10,8 +10,8 @@ import { RootState } from '../../store';
 import CustomDialog from '../../components/CustomDialog';
 import { kanji } from 'store/slices';
 import { KanjiType } from 'kanji-app-types';
-import global from 'styles/global';
 import { fileNames, writeFile } from 'services/file';
+import { Content } from 'kanji-app-ui';
 
 const MORE_ICON = Platform.OS === 'ios' ? 'dots-horizontal' : 'dots-vertical';
 
@@ -55,23 +55,30 @@ export default function KanjiList() {
     }
   }, [kanjiState]);
 
-  return (
-    <View style={global.main}>
-      <Appbar.Header style={{ backgroundColor: selectionMode ? colors.secondary : colors.primary }}>
-        <Appbar.BackAction onPress={handleBack} />
-        <Appbar.Content title={`Grade: ${grade}`} titleStyle={{ color: '#fff', fontWeight: '700', fontSize: 17 }} />
-        <Menu
-          visible={visible}
-          onDismiss={handleCloseMenu}
-          anchor={<IconButton onPress={handleShowMenu} icon={MORE_ICON} color="#fff" />}>
-          <Menu.Item onPress={handleSelect} title={!selectionMode ? 'Selection mode' : 'Close selection mode'} />
-          <Divider />
-          <Menu.Item onPress={handleCancel} title="Cancel selection" />
-          <Menu.Item onPress={handleReset} title="Reset selection" />
-          <Menu.Item onPress={handleSave} title="Save modification" />
-        </Menu>
-      </Appbar.Header>
+  const headerRightComponent = useMemo(
+    () => (
+      <Menu
+        visible={visible}
+        onDismiss={handleCloseMenu}
+        anchor={<IconButton onPress={handleShowMenu} icon={MORE_ICON} color="#fff" />}>
+        <Menu.Item onPress={handleSelect} title={!selectionMode ? 'Selection mode' : 'Close selection mode'} />
+        <Divider />
+        <Menu.Item onPress={handleCancel} title="Cancel selection" />
+        <Menu.Item onPress={handleReset} title="Reset selection" />
+        <Menu.Item onPress={handleSave} title="Save modification" />
+      </Menu>
+    ),
+    [visible, handleCloseMenu, handleShowMenu, handleSelect, handleCancel, handleReset, handleSave]
+  );
 
+  return (
+    <Content
+      header={{
+        title: `Grade: ${grade}`,
+        style: { backgroundColor: selectionMode ? colors.secondary : colors.primary },
+        right: headerRightComponent,
+        onBack: handleBack,
+      }}>
       <KanjiListComponent grade={`${grade}`} selectionMode={selectionMode} />
 
       <CustomDialog
@@ -88,6 +95,6 @@ export default function KanjiList() {
           router.back();
         }}
       />
-    </View>
+    </Content>
   );
 }

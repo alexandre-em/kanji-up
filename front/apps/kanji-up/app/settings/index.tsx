@@ -15,6 +15,7 @@ import { router } from 'expo-router';
 import global from 'styles/global';
 import { UserAppRedirection } from 'services/redirections';
 import { useAuth } from 'kanji-app-auth';
+import { Content } from 'kanji-app-ui';
 
 const defaultValues: Partial<SettingValuesType> = {
   flashcardNumber: 30,
@@ -55,12 +56,7 @@ export default function Settings() {
   }, []);
 
   return (
-    <View style={global.main}>
-      <Appbar.Header>
-        <Appbar.BackAction onPress={handleBack} />
-        <Appbar.Content title="Application's settings" titleStyle={{ color: '#fff', fontWeight: '700', fontSize: 17 }} />
-        <IconButton icon="content-save" />
-      </Appbar.Header>
+    <Content header={{ title: `Application's settings`, onBack: handleBack }}>
       <ScrollView style={{ padding: 20 }} showsVerticalScrollIndicator={false}>
         <Text style={global.title}>User&apos;s settings</Text>
         <Pressable
@@ -134,6 +130,6 @@ export default function Settings() {
         }}
         actions={[true, true]}
       />
-    </View>
+    </Content>
   );
 }

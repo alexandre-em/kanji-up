@@ -1,19 +1,15 @@
 import React from 'react';
 import { router } from 'expo-router';
-import { Image, ScrollView, Text, Pressable, View } from 'react-native';
-import { Appbar } from 'react-native-paper';
+import { Image, ScrollView, Text, Pressable } from 'react-native';
+
+import { Content } from 'kanji-app-ui';
 
 import styles from './style';
-import globalStyles from '../../styles/global';
 import category from './constants';
 
 export default function Category() {
   return (
-    <View style={globalStyles.main}>
-      <Appbar.Header>
-        <Appbar.BackAction onPress={() => router.back()} />
-        <Appbar.Content title="Category" titleStyle={{ color: '#fff', fontWeight: '700', fontSize: 17 }} />
-      </Appbar.Header>
+    <Content header={{ title: 'Category', onBack: () => router.back() }}>
       <ScrollView showsVerticalScrollIndicator={false}>
         {category.map((c) => (
           <Pressable onPress={() => router.push(`/kanjis?grade=${c.id}`)} key={`grade-${c.id}`} style={{ position: 'relative' }}>
@@ -24,6 +20,6 @@ export default function Category() {
           </Pressable>
         ))}
       </ScrollView>
-    </View>
+    </Content>
   );
 }

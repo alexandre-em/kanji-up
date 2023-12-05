@@ -1,11 +1,11 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { View } from 'react-native';
 import { Stack, router } from 'expo-router';
-import { Appbar, Button, Dialog, Paragraph, Portal } from 'react-native-paper';
+import { Button, Dialog, Paragraph, Portal } from 'react-native-paper';
 import { useSelector, useDispatch } from 'react-redux';
-import { KanjiType } from 'kanji-app-types';
 
-import global from 'styles/global';
+import { KanjiType } from 'kanji-app-types';
+import { Content } from 'kanji-app-ui';
+
 import { RootState } from 'store';
 import { evaluation } from 'store/slices';
 
@@ -81,11 +81,7 @@ export default function Quizz() {
 
   return (
     <QuizzContext.Provider value={{ kanjis: sKanji, onFinish: handleConfirmFinish }}>
-      <View style={global.main}>
-        <Appbar.Header>
-          <Appbar.BackAction onPress={handleBack} />
-          <Appbar.Content title="Quizz" titleStyle={{ color: '#fff', fontWeight: '700', fontSize: 17 }} />
-        </Appbar.Header>
+      <Content header={{ title: 'Quizz', onBack: handleBack }}>
         <Stack>
           <Stack.Screen
             name="evaluation"
@@ -108,7 +104,7 @@ export default function Quizz() {
           />
         </Stack>
         {dialogComponent}
-      </View>
+      </Content>
     </QuizzContext.Provider>
   );
 }

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ScrollView, Text, useWindowDimensions, View } from 'react-native';
-import { ActivityIndicator, Appbar, Button, Chip, DataTable, Divider, List, Surface } from 'react-native-paper';
+import { ActivityIndicator, Button, Chip, DataTable, Divider, List, Surface } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 
@@ -14,6 +14,7 @@ import global from 'styles/global';
 import core from 'kanji-app-core';
 import { router, useGlobalSearchParams } from 'expo-router';
 import { KANJI_PROGRESSION_MAX, endpointUrls } from 'constants';
+import { Content } from 'kanji-app-ui';
 
 export default function KanjiDetail() {
   const { width } = useWindowDimensions();
@@ -65,18 +66,15 @@ export default function KanjiDetail() {
   }
 
   return (
-    <View style={global.main}>
-      <Appbar.Header>
-        <Appbar.BackAction onPress={() => router.back()} />
-        <Appbar.Content
-          title={`Detail of ${details.kanji.character} ${
-            userState.progression[details.kanji_id] !== undefined
-              ? `(${Math.min((userState.progression[details.kanji_id] / KANJI_PROGRESSION_MAX) * 100, 100)}%)`
-              : ''
-          }`}
-          titleStyle={{ color: '#fff', fontWeight: '700', fontSize: 17 }}
-        />
-      </Appbar.Header>
+    <Content
+      header={{
+        title: `Detail of ${details.kanji.character} ${
+          userState.progression[details.kanji_id] !== undefined
+            ? `(${Math.min((userState.progression[details.kanji_id] / KANJI_PROGRESSION_MAX) * 100, 100)}%)`
+            : ''
+        }`,
+        onBack: () => router.back(),
+      }}>
       <ScrollView>
         <View style={styles.content}>
           <Surface elevation={4} style={{ marginRight: 12, position: 'relative' }}>
@@ -204,6 +202,6 @@ export default function KanjiDetail() {
           </View>
         )}
       </ScrollView>
-    </View>
+    </Content>
   );
 }

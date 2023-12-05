@@ -7,6 +7,8 @@ import { MailService } from '../mail/mail.service';
 import { RegisterDTO } from './auth.dto';
 import { SessionService } from '../session/session.service';
 
+const USER_DELAY_EXPIRATION = 3; // User has 3 days to confirm his email before deleting
+
 @Injectable()
 export class AuthService {
   private _privateKey = process.env.AUTH_API_SECRET_KEY || 'SECRET';
@@ -48,15 +50,22 @@ export class AuthService {
       throw new ConflictException('This user already exist');
     }
 
+    let expireAt;
+
     if (user && user.deleted_at) {
-      return user.update({ deleted_at: null, expireAt: null });
+      expireAt = null;
+      return user.update({ deleted_at: null });
     }
+
+    const date = new Date();
+    expireAt = new Date(date.setDate(date.getDate() + USER_DELAY_EXPIRATION));
 
     const info: RegisterDTO = {
       name,
       email,
       password,
       created_at: new Date(),
+      expireAt,
     };
 
     const createdUser = await this.model.create(info);
@@ -73,10 +82,10 @@ export class AuthService {
     const userInfo = this.jwtService.verify(token);
 
     if (userInfo.exp * 1000 < Date.now()) {
-      throw new UnauthorizedException('This token is expired.');
+      throw new UnauthorizedException('This token has expired.');
     }
 
-    return this.model.updateOne({ user_id: userInfo.id }, { email_confirmed: true }).exec();
+    return this.model.updateOne({ user_id: userInfo.id }, { email_confirmed: true, expireAt: null }).exec();
   }
 
   async login(user: User) {

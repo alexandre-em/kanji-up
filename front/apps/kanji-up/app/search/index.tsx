@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, ScrollView, SafeAreaView, Text } from 'react-native';
-import { ActivityIndicator, Appbar, DataTable, Divider, List, Searchbar, Surface } from 'react-native-paper';
+import { View, ScrollView, Text } from 'react-native';
+import { ActivityIndicator, DataTable, Divider, List, Searchbar, Surface } from 'react-native-paper';
 import axios, { AxiosResponse } from 'axios';
 import { useDispatch } from 'react-redux';
 import { router, useGlobalSearchParams } from 'expo-router';
@@ -13,6 +13,7 @@ import { error } from '../../store/slices';
 import { colors } from 'constants/Colors';
 import Searching from '../../svg/Searching';
 import global from 'styles/global';
+import { Content } from 'kanji-app-ui';
 
 const numberOfItemsPerPageList = [30, 50, 100, 200];
 
@@ -62,15 +63,7 @@ export default function Search() {
   }, [search]);
 
   return (
-    <SafeAreaView style={global.main}>
-      <Appbar.Header>
-        <Appbar.BackAction onPress={() => router.back()} />
-        <Appbar.Content
-          title={`Searching for ${searchInput}...`}
-          titleStyle={{ color: '#fff', fontWeight: '700', fontSize: 17 }}
-        />
-      </Appbar.Header>
-
+    <Content header={{ title: `Searching for ${searchInput}...`, onBack: () => router.back() }}>
       <Surface style={[styles.surface, styles.search]} elevation={5}>
         <Searchbar
           placeholder="Search"
@@ -128,6 +121,6 @@ export default function Search() {
           </View>
         )}
       </Surface>
-    </SafeAreaView>
+    </Content>
   );
 }

@@ -3,6 +3,7 @@ export class RegisterDTO {
   password: string;
   email: string;
   created_at: Date;
+  expireAt: Date | null;
 }
 
 export class LoginDTO {
