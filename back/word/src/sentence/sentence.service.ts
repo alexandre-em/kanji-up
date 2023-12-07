@@ -46,4 +46,12 @@ export class SentenceService {
     // TODO: Remove examples in relation with the sentence
     return this.model.updateOne({ sentence_id: id }, { deleted_at: new Date() }).exec();
   }
+
+  getNRandomSentence(number: number, inIds?: string[]) {
+    let aggregate = this.model.aggregate();
+
+    if (inIds) aggregate = aggregate.match({ sentence_id: { $in: inIds } });
+
+    return aggregate.sample(number);
+  }
 }

@@ -29,6 +29,14 @@ export class WordController {
   }
 
   @ApiTags('Words')
+  @ApiOperation({ summary: 'Get random words, within an optionnal ids list (separated with a comma ",")' })
+  @ApiOkResponse({ description: 'Random Word', type: WordDTO, isArray: true })
+  @Get('/random/word')
+  getRandom(@Query('number') number: number, @Query('ids') ids?: string) {
+    return this.service.getNRandomWord(number, ids?.split(','));
+  }
+
+  @ApiTags('Words')
   @ApiOperation({ summary: 'Search word' })
   @ApiOkResponse({ description: 'List of words', type: PaginateWordDTO })
   @ApiBadRequestResponse({ description: 'Query value invalid. Must be a number' })

@@ -128,4 +128,12 @@ export class WordService {
 
     return createPaginateDataFromAggregation(page, limit, wordAggregate);
   }
+
+  getNRandomWord(number: number, inIds?: string[]) {
+    let aggregate = this.model.aggregate();
+
+    if (inIds) aggregate = aggregate.match({ word_id: { $in: inIds } });
+
+    return aggregate.sample(number);
+  }
 }

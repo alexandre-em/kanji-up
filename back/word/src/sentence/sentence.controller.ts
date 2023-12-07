@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query,
 import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiForbiddenResponse, ApiOkResponse, ApiOperation, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 
 import { SentenceService } from './sentence.service';
-import { CreateSentenceDto, PaginatedSentenceDTO, SentenceByIdDTO, UpdateSentenceDto } from './sentence.dto';
+import { CreateSentenceDto, PaginatedSentenceDTO, SentenceByIdDTO, SentenceDTO, UpdateSentenceDto } from './sentence.dto';
 import PermissionGuard from '../security/permission.guard';
 import permissions from '../utils/permission.type';
 
@@ -26,6 +26,13 @@ export class SentenceController {
   @Get('/selected/ids')
   getByIds(@Query() ids: SentenceByIdDTO) {
     return this.service.findByIds(ids.ids);
+  }
+
+  @ApiOperation({ summary: 'Get random sentences, within an optionnal ids list (separated with a comma ",")' })
+  @ApiOkResponse({ description: 'Random sentences', type: SentenceDTO, isArray: true })
+  @Get('/random/word')
+  getRandom(@Query('number') number: number, @Query('ids') ids?: string) {
+    return this.service.getNRandomSentence(number, ids?.split(','));
   }
 
   @ApiBearerAuth()
