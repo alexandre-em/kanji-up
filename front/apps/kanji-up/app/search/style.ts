@@ -31,5 +31,6 @@ export default StyleSheet.create({
     backgroundColor: colors.primary,
     borderRadius: 15,
     textAlign: 'center',
+    lineHeight: 45,
   },
 });

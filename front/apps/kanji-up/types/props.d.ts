@@ -18,3 +18,8 @@ interface CustomDialogProps {
   onDismiss: () => void;
   onSave: () => void;
 }
+
+interface SvgProps {
+  width: number;
+  height: number;
+}
