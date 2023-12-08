@@ -8,5 +8,5 @@ interface SvgUriPlatformProps {
 }
 
 export default function SvgUriPlatform({ width, height, uri }: SvgUriPlatformProps) {
-  return <Image source={{ uri }} style={[{ width, height }]} />;
+  return <Image source={{ uri }} width={width} height={height} style={[{ width, height }]} />;
 }
