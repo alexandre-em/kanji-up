@@ -9,7 +9,14 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   app.enableCors({
-    origin: ['http://localhost:8081', 'http://localhost:3000', 'https://kanjiup.alexandre-em.fr', 'https://kanjiup-v2.alexandre-em.fr', 'https://user.kanjiup.alexandre-em.fr'],
+    origin: [
+      'http://localhost:8081',
+      'http://localhost:3000',
+      'https://kanjiup.alexandre-em.fr',
+      'https://kanjiup-v2.alexandre-em.fr',
+      'https://user.kanjiup.alexandre-em.fr',
+      'https://word.kanjiup.alexandre-em.fr',
+    ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     preflightContinue: false,
     optionsSuccessStatus: 204,

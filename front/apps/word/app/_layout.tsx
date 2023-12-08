@@ -67,7 +67,11 @@ function RootLayoutNav() {
         <AuthProvider>
           <ColorProvider colors={colors}>
             <Head>
-              <title>KanjiUp User</title>
+              <title>KanjiUp | Word</title>
+              <meta
+                name="description"
+                content="Learn and memorize Japanese kanji and words with Flashcard, drawing quizz and games"
+              />
             </Head>
             <Stack screenOptions={{ headerShown: false }}></Stack>
           </ColorProvider>

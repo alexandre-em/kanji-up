@@ -15,8 +15,8 @@ export async function KanjiAppRedirection(kanji: string, accessToken: string) {
 
   Linking.openURL(
     Platform.select({
-      web: process.env.EXPO_PUBLIC_KANJI_APP_WEB + `/kanji/${kanjiId}&access_token=${accessToken}`,
-      native: process.env.EXPO_PUBLIC_KANJI_APP_NATIVE + `/kanji/${kanji}&access_token=${accessToken}`,
+      web: process.env.EXPO_PUBLIC_KANJI_APP_WEB + `/kanji/${kanjiId}?access_token=${accessToken}`,
+      native: process.env.EXPO_PUBLIC_KANJI_APP_NATIVE + `/kanji/${kanji}?access_token=${accessToken}`,
     })
   );
 }

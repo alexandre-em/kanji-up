@@ -27,7 +27,7 @@ export default function Home() {
         </View>
         <View style={{ display: 'flex', alignItems: 'center' }}>
           <Searchbar
-            placeholder="Search"
+            placeholder="Search for a word"
             onChangeText={setSearchQuery}
             value={searchQuery}
             style={[globalStyle(colors).search, { width: '90%' }]}
