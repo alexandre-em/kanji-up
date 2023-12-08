@@ -23,14 +23,13 @@ function useProtectedRoute(accessToken: string | null) {
 
   React.useEffect(() => {
     // If the user is not signed in and the initial segment is not anything in the auth group.
-    if (!accessToken && !access_token) {
-      // Redirect to the sign-in page.
-      if (rootNavigation?.isReady()) {
+    if (rootNavigation?.isReady()) {
+      if (!accessToken) {
+        // Redirect to the sign-in page.
         new Promise((r) => setTimeout(r, 1000)).then(() => router.replace('/'));
-      }
-    } else {
-      if (!access_token) {
-        if (rootNavigation?.isReady()) {
+      } else {
+        // Redirect to the home page when signing in
+        if (!access_token) {
           new Promise((r) => setTimeout(r, 1000)).then(() => router.replace('/home'));
         }
       }
@@ -39,7 +38,8 @@ function useProtectedRoute(accessToken: string | null) {
 }
 
 export function Provider({ children }: { children: React.ReactNode }) {
-  const [token, setToken] = React.useState<string | null>(null);
+  const { access_token } = useGlobalSearchParams();
+  const [token, setToken] = React.useState<string | null>(access_token as string);
   const [loading, setLoading] = React.useState<boolean>(false);
 
   useProtectedRoute(token);
