@@ -4,16 +4,16 @@ export const menu = [
     screen: '/words',
     icon: 'format-letter-case',
   },
-  {
-    label: 'Game',
-    screen: '/game',
-    icon: 'gamepad-variant',
-  },
-  {
-    label: 'Evaluate',
-    screen: '/evaluation',
-    icon: 'progress-question',
-  },
+  // {
+  //   label: 'Game',
+  //   screen: '/game',
+  //   icon: 'gamepad-variant',
+  // },
+  // {
+  //   label: 'Evaluate',
+  //   screen: '/evaluation',
+  //   icon: 'progress-question',
+  // },
   {
     label: 'Search',
     screen: '/search',

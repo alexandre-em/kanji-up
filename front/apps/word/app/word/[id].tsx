@@ -1,15 +1,12 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { ActivityIndicator, Chip, Divider, IconButton, List, Surface } from 'react-native-paper';
-import { useDispatch, useSelector } from 'react-redux';
-import axios from 'axios';
+import { useSelector } from 'react-redux';
 
 import Row from './Row';
 import styles from './style';
 import { colors } from 'constants/Colors';
 import { SVGUriPlatform } from 'kanji-app-svg-ui';
-import { WordType } from 'kanji-app-types';
-import { error, word } from 'store/slices';
 import { RootState } from 'store';
 import core from 'kanji-app-core';
 import { router, useGlobalSearchParams } from 'expo-router';
@@ -17,27 +14,14 @@ import { WORD_PROGRESSION_MAX, endpointUrls } from 'constants';
 import { Content, globalStyle } from 'kanji-app-ui';
 import { getKanjiList } from 'services/kanji';
 import { KanjiAppRedirection } from 'services/redirections';
+import useWordHook from 'app/words/hook';
 
 const imgSize = 50;
 
-export default function KanjiDetail() {
-  const dispatch = useDispatch();
-  const wordState = useSelector((state: RootState) => state.word);
+export default function WordDetail() {
+  const { access_token } = useGlobalSearchParams();
   const userState = useSelector((state: RootState) => state.user);
-  const { id, access_token } = useGlobalSearchParams();
-  const [details, setDetails] = useState<WordType | null>(null);
-
-  const isSelected = useMemo(() => wordState.find((w) => w.word_id === id), [wordState, id]);
-
-  const handlePress = useCallback(() => {
-    if (details) {
-      if (isSelected) {
-        dispatch(word.actions.removeWord(details));
-      } else {
-        dispatch(word.actions.addWord(details));
-      }
-    }
-  }, [isSelected, details]);
+  const { details, isSelected, handlePress } = useWordHook();
 
   const headerRightComponent = useMemo(
     () =>
@@ -52,23 +36,6 @@ export default function KanjiDetail() {
       ),
     [access_token, isSelected]
   );
-
-  useEffect(() => {
-    const cancelToken = axios.CancelToken.source();
-
-    if (id && core && core.wordService) {
-      core.wordService
-        .getOne({ id: id as string }, { cancelToken: cancelToken.token })
-        .then((res) => setDetails(res.data))
-        .catch((err) =>
-          dispatch(error.actions.update({ message: axios.isCancel(err) ? 'Previous action cancelled.' : err.message }))
-        );
-    }
-
-    return () => {
-      cancelToken.cancel();
-    };
-  }, [id]);
 
   if (!details) {
     return (

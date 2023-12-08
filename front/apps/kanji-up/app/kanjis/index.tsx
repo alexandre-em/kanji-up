@@ -59,8 +59,8 @@ export default function KanjiList() {
         </View>
       ) : (
         <View style={{ flexDirection: 'row' }}>
-          <IconButton onPress={handleReset} icon="delete" mode="outlined" />
-          <IconButton onPress={() => setSelection(true)} icon="select-drag" color="#fff" />
+          <IconButton onPress={handleReset} icon="delete" />
+          <IconButton onPress={() => setSelection(true)} icon="select-drag" color="#fff" mode="outlined" />
         </View>
       ),
     [selectionMode, handleCancel, handleReset, handleSave]
