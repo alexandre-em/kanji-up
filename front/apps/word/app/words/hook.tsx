@@ -13,7 +13,7 @@ export default function useWordHook() {
   const dispatch = useDispatch();
   const [details, setDetails] = useState<WordType | null>(null);
   const wordState = useSelector((state: RootState) => state.word);
-  const { id, access_token } = useGlobalSearchParams();
+  const { id } = useGlobalSearchParams();
 
   const isSelected = useMemo(() => wordState.find((w) => w.word_id === id), [wordState, id]);
 

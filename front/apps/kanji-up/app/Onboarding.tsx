@@ -51,6 +51,13 @@ const data = [
       'Before running a set of drawing quizz, please do not forget to check the server status. If the server is down it will shows a grey icon. But if it is available, it will be green.',
     image: require('assets/images/reco_offline.png'),
   },
+  {
+    id: '6',
+    title: 'Add to Home screen',
+    subtitle:
+      "For a better experience, an easy and quick access of the application, don't forget to add it on your phone home screen.",
+    image: require('assets/images/add-pwa.jpg'),
+  },
 ];
 export default function OnboardingScreen() {
   const onFinish = useCallback(() => {
