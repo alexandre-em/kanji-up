@@ -51,7 +51,7 @@ export default function Page() {
   return (
     <SafeAreaView style={[styles.main, { justifyContent: 'center', alignItems: 'center' }]}>
       <Image source={require('../assets/images/adaptive-icon.png')} style={{ width: 200, height: 200 }} />
-      <Text style={[styles.title, { marginTop: 0 }]}>Welcome on KanjiUp application</Text>
+      <Text style={[styles.title, { marginTop: 0 }]}>Welcome on KanjiUp Word application</Text>
       <Button icon="account" onPress={handleAuth} mode="contained" style={{ borderRadius: 25, width: '70%' }}>
         Sign in
       </Button>

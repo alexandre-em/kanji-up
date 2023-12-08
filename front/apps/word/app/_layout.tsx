@@ -2,11 +2,14 @@ import { useEffect } from 'react';
 import { useFonts } from 'expo-font';
 import { SplashScreen, Stack } from 'expo-router';
 import Head from 'expo-router/head';
+import { Provider } from 'react-redux';
 import { Provider as PaperProvider, DefaultTheme } from 'react-native-paper';
 
 import { AuthProvider } from 'kanji-app-auth';
+import { ColorProvider } from 'kanji-app-ui';
 
 import { colors } from '../constants/Colors';
+import store from 'store';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -60,12 +63,16 @@ export default function RootLayout() {
 function RootLayoutNav() {
   return (
     <PaperProvider theme={theme}>
-      <AuthProvider>
-        <Head>
-          <title>KanjiUp User</title>
-        </Head>
-        <Stack screenOptions={{ headerShown: false }}></Stack>
-      </AuthProvider>
+      <Provider store={store}>
+        <AuthProvider>
+          <ColorProvider colors={colors}>
+            <Head>
+              <title>KanjiUp User</title>
+            </Head>
+            <Stack screenOptions={{ headerShown: false }}></Stack>
+          </ColorProvider>
+        </AuthProvider>
+      </Provider>
     </PaperProvider>
   );
 }

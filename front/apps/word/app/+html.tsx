@@ -20,6 +20,8 @@ export default function Root({ children }: { children: React.ReactNode }) {
           name="viewport"
           content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1.00001,viewport-fit=cover"
         />
+        <title>KanjiUp | Word</title>
+        <meta name="description" content="Learn and memorize Japanese kanji and words with Flashcard, drawing quizz and games" />
         {/* 
           Disable body scrolling on web. This makes ScrollView components work closer to how they do on native. 
           However, body scrolling is often nice to have for mobile web. If you want to enable it, remove this line.

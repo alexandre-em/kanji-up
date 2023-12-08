@@ -1,13 +1,15 @@
 export const colors = {
-  primary: '#DA2A2D',
-  primaryDark: '#851a1b',
+  primary: '#377BC8',
+  primaryDark: '#26568c',
   background: '#fbe9ea',
+  background1: 'rgb(248,248,248)',
+  background2: '#377BC830',
   warning: '#da822b',
   info: '#2baeda',
-  secondary: '#f56e88',
-  secondaryDark: '#a04859',
+  secondary: '#9adcfb',
+  secondaryDark: '#5a94af',
   text: '#3F3D56',
-  surface: '#DA2A2D',
+  surface: '#377BC8',
   success: '#bdf56e',
   elevation: {
     level0: 'transparent',
@@ -17,4 +19,11 @@ export const colors = {
     level4: '#F0F0F0',
     level5: '#E8E8E8',
   },
+};
+
+export const snackbarColors = {
+  success: '#2e7d32',
+  info: '#0288d1',
+  warning: '#ed6c02',
+  error: '#d32f2f',
 };

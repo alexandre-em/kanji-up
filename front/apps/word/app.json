@@ -5,18 +5,16 @@
     "version": "0.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "kanjiupuser",
+    "scheme": "kanjiupword",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#851a1b"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
-      "bundleIdentifier": "com.aem.kanjiupuser",
+      "bundleIdentifier": "com.aem.kanjiupword",
       "requireFullScreen": true,
       "supportsTablet": true
     },
@@ -25,16 +23,17 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#851a1b"
       },
-      "package": "com.aem.kanjiupuser"
+      "package": "com.aem.kanjiupword"
     },
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/favicon.png",
+      "display": "fullscreen",
+      "orientation": "portrait",
+      "name": "KanjiUp | Word"
     },
-    "plugins": [
-      "expo-router"
-    ],
+    "plugins": ["expo-router"],
     "experiments": {
       "typedRoutes": true
     }
