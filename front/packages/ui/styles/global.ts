@@ -2,7 +2,7 @@ import { StyleSheet } from 'react-native';
 
 import { ColorType } from 'kanji-app-types';
 
-export default function (colors: ColorType) {
+export default function(colors: ColorType) {
   return StyleSheet.create({
     main: {
       flex: 1,
