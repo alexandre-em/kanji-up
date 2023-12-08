@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { Platform } from 'react-native';
+import { Platform, View } from 'react-native';
 import { Divider, IconButton, Menu } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -20,16 +20,9 @@ export default function KanjiList() {
   const { grade } = useLocalSearchParams();
   const [dialog, setDialog] = useState<boolean>(false);
   const [selectionMode, setSelection] = useState<boolean>(false);
-  const [visible, setVisible] = useState<boolean>(false);
   const kanjiState = useSelector((s: RootState) => s.kanji);
 
-  const handleShowMenu = useCallback(() => setVisible(true), []);
-  const handleCloseMenu = useCallback(() => setVisible(false), []);
   const handleCloseDialog = useCallback(() => setDialog(false), []);
-
-  const handleSelect = useCallback(() => {
-    setSelection((prevState: boolean) => !prevState);
-  }, []);
 
   const handleReset = useCallback(() => {
     dispatch(kanji.actions.reset());
@@ -37,12 +30,14 @@ export default function KanjiList() {
 
   const handleCancel = useCallback(() => {
     dispatch(kanji.actions.cancel());
+    setSelection(false);
   }, []);
 
   const handleSave = useCallback(() => {
     dispatch(
       kanji.actions.save((selectedKanji: KanjiType) => writeFile(fileNames.SELECTED_KANJI, JSON.stringify(selectedKanji)))
     );
+    setSelection(false);
   }, []);
 
   const handleBack = useCallback(() => {
@@ -56,19 +51,19 @@ export default function KanjiList() {
   }, [kanjiState]);
 
   const headerRightComponent = useMemo(
-    () => (
-      <Menu
-        visible={visible}
-        onDismiss={handleCloseMenu}
-        anchor={<IconButton onPress={handleShowMenu} icon={MORE_ICON} color="#fff" />}>
-        <Menu.Item onPress={handleSelect} title={!selectionMode ? 'Selection mode' : 'Close selection mode'} />
-        <Divider />
-        <Menu.Item onPress={handleCancel} title="Cancel selection" />
-        <Menu.Item onPress={handleReset} title="Reset selection" />
-        <Menu.Item onPress={handleSave} title="Save modification" />
-      </Menu>
-    ),
-    [visible, handleCloseMenu, handleShowMenu, handleSelect, handleCancel, handleReset, handleSave]
+    () =>
+      selectionMode ? (
+        <View style={{ flexDirection: 'row' }}>
+          <IconButton onPress={handleCancel} icon="close" mode="outlined" />
+          <IconButton onPress={handleSave} icon="content-save" color="#fff" mode="contained" />
+        </View>
+      ) : (
+        <View style={{ flexDirection: 'row' }}>
+          <IconButton onPress={handleReset} icon="delete" mode="outlined" />
+          <IconButton onPress={() => setSelection(true)} icon="select-drag" color="#fff" />
+        </View>
+      ),
+    [selectionMode, handleCancel, handleReset, handleSave]
   );
 
   return (

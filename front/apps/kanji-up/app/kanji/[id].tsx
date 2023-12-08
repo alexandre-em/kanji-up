@@ -15,6 +15,7 @@ import core from 'kanji-app-core';
 import { router, useGlobalSearchParams } from 'expo-router';
 import { KANJI_PROGRESSION_MAX, endpointUrls } from 'constants';
 import { Content } from 'kanji-app-ui';
+import { fileNames, readFile, writeFile } from 'services/file';
 
 export default function KanjiDetail() {
   const { width } = useWindowDimensions();
@@ -24,21 +25,43 @@ export default function KanjiDetail() {
   const imgSize = width < 700 ? width * 0.5 : 250;
   const { id, access_token } = useGlobalSearchParams();
   const [details, setDetails] = useState<KanjiType | null>(null);
+  const [savedKanjis, setSavedKanjis] = useState<Record<string, KanjiType> | undefined>();
 
   const isSelected = useMemo(
-    () => (kanjiState.selectedKanji[id as string] && !kanjiState.toRemove[id as string]) || kanjiState.toAdd[id as string],
-    [kanjiState]
+    () =>
+      (kanjiState.selectedKanji[id as string] && !kanjiState.toRemove[id as string]) ||
+      kanjiState.toAdd[id as string] ||
+      (savedKanjis && details && !!savedKanjis[details.kanji_id]),
+    [kanjiState, details, savedKanjis]
   );
 
   const handlePress = useCallback(() => {
     if (details) {
       if (isSelected) {
-        dispatch(kanji.actions.unSelectKanji(details));
+        if (!access_token) dispatch(kanji.actions.unSelectKanji(details));
+        if (savedKanjis) {
+          const newSavedKanji = Object.keys(savedKanjis)
+            .filter((k) => k !== details.kanji_id)
+            .reduce((prev, curr) => ({ ...prev, [curr]: savedKanjis[curr] }), {});
+
+          console.log(newSavedKanji);
+
+          writeFile(fileNames.SELECTED_KANJI, JSON.stringify(newSavedKanji)).then(() => setSavedKanjis(newSavedKanji));
+        }
       } else {
-        dispatch(kanji.actions.selectKanji(details));
+        if (!access_token) dispatch(kanji.actions.selectKanji(details));
+        writeFile(fileNames.SELECTED_KANJI, JSON.stringify({ ...savedKanjis, [details.kanji_id]: details })).then(() =>
+          setSavedKanjis((prev) => ({ ...prev, [details.kanji_id]: details }))
+        );
       }
     }
-  }, [isSelected, details]);
+  }, [access_token, isSelected, details, savedKanjis]);
+
+  useEffect(() => {
+    readFile(fileNames.SELECTED_KANJI)
+      .then((res) => setSavedKanjis(JSON.parse(res)))
+      .catch(() => setSavedKanjis({}));
+  }, []);
 
   useEffect(() => {
     const cancelToken = axios.CancelToken.source();
@@ -113,11 +136,9 @@ export default function KanjiDetail() {
             </View>
           </View>
         </View>
-        {!access_token && (
-          <Button mode={isSelected ? 'outlined' : 'contained'} onPress={handlePress} style={styles.button}>
-            {isSelected ? 'Unselect' : 'Select'}
-          </Button>
-        )}
+        <Button mode={isSelected ? 'outlined' : 'contained'} onPress={handlePress} style={styles.button}>
+          {isSelected ? 'Unselect' : 'Select'}
+        </Button>
         <View style={styles.details}>
           <List.Accordion title="Details" description="number of stroke, meanings, etc." style={{ backgroundColor: '#f8f8f8' }}>
             <DataTable.Row>

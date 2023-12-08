@@ -22,11 +22,12 @@ export default function Search() {
   const { search, access_token } = useGlobalSearchParams();
   const [loading, setLoading] = useState<boolean>(false);
   const [searchInput, setSearch] = useState<string>('');
+  const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(30);
   const [result, setResult] = useState<Pagination<KanjiType>>();
 
   const handleSubmit = useCallback(
-    async ({ page } = { page: 1 }, customSearch?: string) => {
+    async ({ pge } = { pge: 1 }, customSearch?: string) => {
       if ((customSearch && customSearch !== '') || (searchInput && searchInput !== '')) {
         setLoading(true);
         const cancelToken = axios.CancelToken.source();
@@ -36,7 +37,7 @@ export default function Search() {
           );
         try {
           await core
-            .kanjiService!.search({ query: customSearch || searchInput, page, limit }, { cancelToken: cancelToken.token })
+            .kanjiService!.search({ query: customSearch || searchInput, page: pge, limit }, { cancelToken: cancelToken.token })
             .then((res: AxiosResponse<Pagination<KanjiType>>) => {
               setResult(res.data);
               setLoading(false);
@@ -58,9 +59,9 @@ export default function Search() {
 
   useEffect(() => {
     if (search) {
-      handleSubmit({ page: 1 }, search as string);
+      handleSubmit({ pge: page + 1 }, search as string);
     }
-  }, [search]);
+  }, [search, page]);
 
   return (
     <Content header={{ title: `Searching for ${searchInput}...`, onBack: () => router.back() }}>
@@ -100,9 +101,9 @@ export default function Search() {
               ))}
             </ScrollView>
             <DataTable.Pagination
-              page={result?.page || 1}
+              page={page || 0}
               numberOfPages={result?.totalPages || 0}
-              onPageChange={(page) => handleSubmit({ page })}
+              onPageChange={(pge) => setPage(pge)}
               showFastPaginationControls
               numberOfItemsPerPageList={numberOfItemsPerPageList}
               numberOfItemsPerPage={result?.limit}
