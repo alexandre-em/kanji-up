@@ -10,7 +10,7 @@
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#851a1b"
+      "backgroundColor": "#377BC8"
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
@@ -21,17 +21,21 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#851a1b"
+        "backgroundColor": "#377BC8"
       },
       "package": "com.aem.kanjiupword"
     },
     "web": {
       "bundler": "metro",
-      "output": "static",
       "favicon": "./assets/images/favicon.png",
       "display": "fullscreen",
       "orientation": "portrait",
-      "name": "KanjiUp | Word"
+      "name": "KanjiUp | Word",
+      "backgroundColor": "#377BC8",
+      "display": "fullscreen",
+      "orientation": "portrait",
+      "bundler": "metro",
+      "output": "single"
     },
     "plugins": ["expo-router"],
     "experiments": {
