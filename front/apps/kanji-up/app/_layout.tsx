@@ -39,6 +39,8 @@ export default function RootLayout() {
     RobotoBold: require('../assets/fonts/Roboto-Bold.ttf'),
     RobotoBlack: require('../assets/fonts/Roboto-Black.ttf'),
     RobotoThin: require('../assets/fonts/Roboto-Thin.ttf'),
+    ReggaeOne: require('../assets/fonts/ReggaeOne-Regular.ttf'),
+    ZenMaruGothic: require('../assets/fonts/ZenMaruGothic-Medium.ttf'),
   });
 
   useEffect(() => {

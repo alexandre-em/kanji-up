@@ -64,6 +64,7 @@ export default function Practice() {
         width={imgSize}
         height={imgSize}
         uri={`${endpointUrls.kanji}/kanjis/image/${encodeURIComponent(kanjiQueue[counter].kanji!.character as string)}`}
+        alt={kanjiQueue[counter].kanji!.character}
       />
     );
   }, [imgSize, counter, kanjiQueue]);

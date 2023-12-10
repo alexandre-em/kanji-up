@@ -48,11 +48,10 @@ export default function WordDetail() {
   return (
     <Content
       header={{
-        title: `Detail of ${details.word[0] || details.reading[0]} ${
-          userState.progression[details.word_id] !== undefined
+        title: `Detail of ${details.word[0] || details.reading[0]} ${userState.progression[details.word_id] !== undefined
             ? `(${Math.min((userState.progression[details.word_id] / WORD_PROGRESSION_MAX) * 100, 100)}%)`
             : ''
-        }`,
+          }`,
         onBack: () => router.back(),
         right: headerRightComponent,
       }}>
@@ -114,6 +113,7 @@ export default function WordDetail() {
                   width={imgSize}
                   height={imgSize}
                   uri={`${endpointUrls.kanji}/kanjis/image/${encodeURIComponent(character)}`}
+                  alt={character}
                 />
               </Pressable>
             </Surface>
@@ -125,13 +125,13 @@ export default function WordDetail() {
           {details.definition.map((definition, index) => (
             <View key={definition.meaning.join(',') + index}>
               <List.Accordion
-                title={`Definition ${index}`}
+                title={`Definition #${index + 1}`}
                 description={`${definition.meaning[0]}...`}
                 style={{ backgroundColor: '#f8f8f8' }}>
                 <Row title="Word meaning" description={definition.meaning.join(', ')} />
                 <Row title="Word type" description={definition.type.join(', ')} />
                 <List.Accordion
-                  title={`Relations`}
+                  title={`Relations (${definition.relation.length})`}
                   description={`Words related with ${details.word[0] || details.reading[0]}`}
                   style={{ backgroundColor: '#f8f8f8' }}>
                   {definition.relation.map((relation) =>
@@ -147,7 +147,7 @@ export default function WordDetail() {
                 </List.Accordion>
                 <Divider />
                 <List.Accordion
-                  title={`Examples`}
+                  title={`Examples (${definition.example.length})`}
                   description={`Sentences using ${details.word[0] || details.reading[0]}`}
                   style={{ backgroundColor: '#f8f8f8' }}>
                   {definition.example.map((example) => (

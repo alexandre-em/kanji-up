@@ -108,6 +108,7 @@ export default function KanjiDetail() {
               width={imgSize}
               height={imgSize}
               uri={`${endpointUrls.kanji}/kanjis/image/${encodeURIComponent(details.kanji.character as string)}`}
+              alt={details.kanji.character}
             />
           </Surface>
           <View style={{ width: (width < 700 ? width : 680) - imgSize }}>

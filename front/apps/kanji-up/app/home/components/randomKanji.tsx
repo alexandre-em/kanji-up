@@ -28,6 +28,7 @@ export default function RandomKanji() {
             width={32}
             height={32}
             uri={`${endpointUrls.kanji}/kanjis/image/${encodeURIComponent(choosenKanji.kanji?.character || '')}`}
+            alt={choosenKanji.kanji?.character}
           />
         )}
         right={() => (
