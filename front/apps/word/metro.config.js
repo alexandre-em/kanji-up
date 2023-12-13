@@ -7,4 +7,9 @@ const config = getDefaultConfig(__dirname, {
   isCSSEnabled: true,
 });
 
+const sourceExts = config.resolver.sourceExts ?? [];
+config.resolver.sourceExts = [...sourceExts, 'mp3', 'tflite', 'mjs', 'wav'];
+const assetExts = config.resolver.assetExts ?? [];
+config.resolver.assetExts = [...assetExts, 'mp3', 'tflite', 'mjs', 'wav'];
+
 module.exports = config;

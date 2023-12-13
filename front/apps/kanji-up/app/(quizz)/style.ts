@@ -3,11 +3,10 @@ import { colors } from 'constants/Colors';
 
 export default StyleSheet.create({
   content: {
-    justifyContent: 'space-evenly',
+    justifyContent: 'space-between',
     flex: 1,
-    margin: 20,
+    padding: 20,
     backgroundColor: '#f8f8f8',
-    marginTop: 0,
   },
   contentHeader: {
     flexDirection: 'row',

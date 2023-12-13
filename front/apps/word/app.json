@@ -16,7 +16,10 @@
     "ios": {
       "bundleIdentifier": "com.aem.kanjiupword",
       "requireFullScreen": true,
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "UIBackgroundModes": ["audio"]
+      }
     },
     "android": {
       "adaptiveIcon": {

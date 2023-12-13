@@ -27,6 +27,7 @@ export const user = createSlice({
     update: (state: UserState, action: PayloadAction<Partial<UserState>>) => ({ ...state, ...action.payload }),
     addScoreDaily: (state: UserState, action: PayloadAction<number>) => ({
       ...state,
+      totalScore: (state.totalScore || 0) + action.payload,
       dailyScore: (state.dailyScore || 0) + action.payload,
     }),
     updateProgression,

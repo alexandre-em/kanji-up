@@ -81,7 +81,7 @@ export default function Stepper({ onPress }: StepperProps) {
           </Text>
           <Text style={[globalStyle(colors).title, { fontSize: 22, marginTop: 0 }]}>{userState.dailyScore || 0} pts</Text>
           <Button icon="reload" onPress={onPress} mode="contained" style={{ borderRadius: 25 }}>
-            Profile
+            Start
           </Button>
         </View>
       </Surface>

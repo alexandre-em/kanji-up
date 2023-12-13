@@ -11,7 +11,7 @@ import { endpointUrls } from 'constants';
 import { RootState } from 'store';
 import { settings, user, word } from 'store/slices';
 import { fileNames, readFile } from 'services/file';
-import { UserAppRedirection } from 'services/redirections';
+// import { UserAppRedirection } from 'services/redirections';
 
 export default function useHomeHook() {
   const AuthContext = useAuth();
@@ -19,10 +19,14 @@ export default function useHomeHook() {
   const { access_token } = useGlobalSearchParams();
   const userState = useSelector((state: RootState) => state.user);
 
-  const handleUserRedirection = useCallback(
-    () => UserAppRedirection(userState.userId, (access_token as string) || core.accessToken),
-    [userState.userId, access_token, core.accessToken]
-  );
+  // const handleUserRedirection = useCallback(
+  //   () => UserAppRedirection(userState.userId, (access_token as string) || core.accessToken),
+  //   [userState.userId, access_token, core.accessToken]
+  // );
+
+  const handleUserRedirection = useCallback(() => {
+    router.push('/game/');
+  }, []);
 
   const loadSelectedWord = useCallback(async () => {
     try {

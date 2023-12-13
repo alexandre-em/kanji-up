@@ -8,12 +8,11 @@ import LogRocket from '@logrocket/react-native';
 
 import core from 'kanji-app-core';
 import { asyncstorageKeys, useAuth } from 'kanji-app-auth';
-import { Content } from 'kanji-app-ui';
+import { Content, GradientCard } from 'kanji-app-ui';
 
 import { RootState } from 'store';
 import globalStyles from 'styles/global';
 import { endpointUrls, colors } from 'constants';
-import GradientCard from 'components/GradientCard';
 import { fileNames, readFile } from 'services/file';
 import { UserAppRedirection } from 'services/redirections';
 import { kanji, settings, user } from 'store/slices';
@@ -82,6 +81,7 @@ export default function Home() {
       title={item.title}
       subtitle={item.subtitle}
       buttonTitle={item.buttonTitle}
+      disabled={false}
     />
   );
 

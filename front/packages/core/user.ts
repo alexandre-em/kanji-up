@@ -85,11 +85,15 @@ export default class UserService {
     return this._instance.put(`/image`, formData, options);
   }
 
-  updateUserScore(scores: UserScore, options?: AxiosRequestConfig): Promise<AxiosResponse<UpdatedDataResponse>> {
+  updateUserScore(
+    scores: UserScore,
+    application = 'kanji',
+    options?: AxiosRequestConfig
+  ): Promise<AxiosResponse<UpdatedDataResponse>> {
     if (!this._instance) throw new Error('User instance not ready...');
     if (!scores || scores.total_score === undefined) throw new Error('Invalid score body');
 
-    return this._instance.put('/score/kanji', scores, options);
+    return this._instance.put(`/score/${application}`, scores, options);
   }
 
   getRanking(appType: 'kanji' | 'word', limit = 10, options?: AxiosRequestConfig) {

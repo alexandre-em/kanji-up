@@ -43,7 +43,7 @@ export default function Modal() {
       progression: userState.progression,
     };
 
-    core.userService?.updateUserScore(score);
+    core.userService?.updateUserScore(score, 'kanji');
     // Update user state
     dispatch(user.actions.addScoreDaily(Math.round(evaluationState.totalScore)));
     // Reset evaluation state
