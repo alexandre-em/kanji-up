@@ -7,6 +7,7 @@ import global from 'constants/style';
 import { wordColors } from 'constants/Colors';
 
 const DAILY_SCORE_GRAPH_LIMIT = 10;
+const COLUMN_WIDTH = 50;
 
 export default function Chart({ user, apptype }) {
   const scores = user?.applications[apptype]?.scores;
@@ -19,7 +20,9 @@ export default function Chart({ user, apptype }) {
       </View>
     );
 
-  const arr = Array.from(Array(DAILY_SCORE_GRAPH_LIMIT).keys());
+  const numberColumn = Math.min(Math.floor((Dimensions.get('window').width - 30) / COLUMN_WIDTH), DAILY_SCORE_GRAPH_LIMIT);
+
+  const arr = Array.from(Array(numberColumn).keys());
   const stats = arr
     .map((v) => {
       const date = new Date();
@@ -37,7 +40,7 @@ export default function Chart({ user, apptype }) {
 
   return (
     <View>
-      <Text style={[global.subtitle, { marginLeft: 20 }]}>Score the last 10 days</Text>
+      <Text style={[global.subtitle, { marginLeft: 20 }]}>Score the last {numberColumn} days</Text>
       <LineChart
         data={{
           labels: stats.map(({ key }) => key),
@@ -47,7 +50,7 @@ export default function Chart({ user, apptype }) {
             },
           ],
         }}
-        width={Dimensions.get('window').width - 20}
+        width={Dimensions.get('window').width - 10}
         height={220}
         yAxisInterval={1} // optional, defaults to 1
         chartConfig={{

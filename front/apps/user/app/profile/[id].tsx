@@ -177,7 +177,7 @@ export default function Home() {
 
         <View style={style.contents}>
           <Text style={global.title}>Stats</Text>
-          <AppGroupButton appType={apptype} setAppType={setAppType} applications={applications} />
+          <AppGroupButton appType={apptype} setAppType={setAppType} applications={applications} user={user} />
           <Chart user={user} apptype={apptype} />
         </View>
 
