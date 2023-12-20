@@ -9,6 +9,7 @@ export default function useGameLevel() {
   const GameContext = useGameContext();
   const [timer, setTimer] = useState<number>(QUESTION_TIMER);
   const [input, setInput] = useState<string>('');
+  const [dialog, setDialog] = useState<boolean>(false);
   const [isWrong, setIsWrong] = useState<boolean>(false);
   const textAnimRef = useRef(new Animated.Value(30)).current;
 
@@ -27,6 +28,7 @@ export default function useGameLevel() {
       const answers = GameContext.current.question.answer.concat(GameContext.current.question.other_answer || []);
 
       if (answers.includes(input) && GameContext.life > 0) {
+        setDialog(true);
         GameContext.onNext('valid');
         playSound(require('../../../assets/sounds/hero_decorative-celebration-01.wav'));
       } else {
@@ -35,11 +37,16 @@ export default function useGameLevel() {
       }
       setInput('');
     }
-  }, [input, GameContext.current, GameContext.life, GameContext.onNext]);
+  }, [input, GameContext.current, GameContext.life]);
+
+  const handleNext = useCallback(() => {
+    setDialog(false);
+  }, []);
 
   const handleSkip = useCallback(() => {
-    GameContext.onNext('skipped');
     setInput('');
+    GameContext.onNext('skipped');
+    setDialog(true);
   }, [GameContext.onNext]);
 
   const textAnimation = useMemo(
@@ -57,10 +64,13 @@ export default function useGameLevel() {
       let interval;
       if (timer > 0) {
         interval = setInterval(() => {
-          setTimer((prev: number) => prev - 1);
+          if (!dialog) setTimer((prev: number) => prev - 1);
         }, 1000);
       } else {
-        GameContext.onNext('invalid');
+        if (!dialog) {
+          setDialog(true);
+          GameContext.onNext('invalid');
+        }
       }
 
       return () => {
@@ -69,7 +79,7 @@ export default function useGameLevel() {
     }
 
     return () => {};
-  }, [timer]);
+  }, [timer, dialog]);
 
   useEffect(() => {
     if (GameContext.current?.status === 'ongoing' && GameContext.life > 0) {
@@ -82,12 +92,15 @@ export default function useGameLevel() {
   }, [GameContext.current, GameContext.life, textAnimation]);
 
   return {
+    dialog,
     input,
     isWrong,
     timer,
     textAnimRef,
     handleChangeInput: setInput,
+    handleNext,
     handleSkip,
     handleValidate,
+    hideDialog: () => setDialog(false),
   };
 }
