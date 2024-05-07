@@ -9,7 +9,7 @@ export default StyleSheet.create({
     width: '100%',
   },
   contents: {
-    width: width,
+    width: '100%',
     margin: 10,
   },
   score: {

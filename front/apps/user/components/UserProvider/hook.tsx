@@ -61,7 +61,7 @@ export default function useUserHooks() {
   );
 
   const getCurrentUser = useCallback(async () => {
-    if (core.userService) {
+    if (core.accessToken && core.userService) {
       const userProfile = await core.userService!.getProfile();
       if (userProfile.data.user_id) {
         const payload = await getUserFriendAndScore(userProfile);

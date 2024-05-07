@@ -7,7 +7,8 @@ export default StyleSheet.create({
     margin: 10,
   },
   contents: {
-    width: width > height ? width - 200 : width,
+    width: 'calc(100% - 200px)',
+    minWidth: 300,
     margin: 10,
   },
   ranking: {},

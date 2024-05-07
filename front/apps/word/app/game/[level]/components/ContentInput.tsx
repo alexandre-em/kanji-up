@@ -33,7 +33,7 @@ export default function Content({ input, error, onSkip, onValidate, onChange }: 
           mode="outlined"
           style={{ backgroundColor: '#fff' }}
         />
-        <IconButton icon="send" mode="outlined" onPress={onValidate} />
+        <IconButton icon="check" mode="outlined" onPress={onValidate} />
       </View>
       <Button onPress={onSkip} disabled={GameContext.skipUsed}>
         Skip

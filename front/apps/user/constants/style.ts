@@ -17,7 +17,8 @@ export default StyleSheet.create({
   },
   main: {
     display: 'flex',
-    flexDirection: width > height ? 'row' : 'column',
+    flexWrap: 'wrap',
+    flexDirection: Platform.OS === 'web' && width < height ? 'column' : 'row',
     alignItems: width > height ? 'flex-start' : 'center',
     width: '100%',
     maxWidth: width,

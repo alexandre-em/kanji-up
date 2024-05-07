@@ -1,5 +1,5 @@
 import React from 'react';
-import { router, useGlobalSearchParams, useRootNavigation } from 'expo-router';
+import { router, useGlobalSearchParams, usePathname, useRootNavigation } from 'expo-router';
 
 export type AuthContextValueType = {
   accessToken: string | null;
@@ -18,7 +18,8 @@ export function useAuth() {
 
 // This hook will protect the route access based on user authentication.
 function useProtectedRoute(accessToken: string | null) {
-  const { access_token } = useGlobalSearchParams();
+  const { access_token, search } = useGlobalSearchParams();
+  const pathname = usePathname();
   const rootNavigation = useRootNavigation();
 
   React.useEffect(() => {
@@ -30,11 +31,13 @@ function useProtectedRoute(accessToken: string | null) {
       } else {
         // Redirect to the home page when signing in
         if (!access_token) {
-          new Promise((r) => setTimeout(r, 1000)).then(() => router.replace('/home'));
+          new Promise((r) => setTimeout(r, 1000)).then(() =>
+            router.replace(pathname === '/' ? '/home' : `${pathname}${search ? `?search=${search}` : ''}`)
+          );
         }
       }
     }
-  }, [rootNavigation?.isReady, accessToken, access_token]);
+  }, [rootNavigation?.isReady, accessToken, access_token, pathname, search]);
 }
 
 export function Provider({ children }: { children: React.ReactNode }) {
