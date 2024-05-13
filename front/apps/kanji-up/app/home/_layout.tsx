@@ -8,19 +8,17 @@ import LogRocket from '@logrocket/react-native';
 
 import core from 'kanji-app-core';
 import { asyncstorageKeys, useAuth } from 'kanji-app-auth';
-import { Content, GradientCard } from 'kanji-app-ui';
+import { Content } from 'kanji-app-ui';
 
 import { RootState } from 'store';
 import globalStyles from 'styles/global';
 import { endpointUrls, colors } from 'constants';
-import { fileNames, readFile } from 'services/file';
-import { UserAppRedirection } from 'services/redirections';
+import { fileNames, readFile, UserAppRedirection } from 'services';
 import { kanji, settings, user } from 'store/slices';
 
 import styles from './style';
 import { menu, list } from './constants';
-import RandomKanji from './components/randomKanji';
-import Stepper from './components/stepper';
+import { ListItem, RandomKanji, Stepper } from './components';
 
 export default function Home() {
   const dispatch = useDispatch();
@@ -74,32 +72,22 @@ export default function Home() {
       .catch(() => router.replace('/'));
   }, [core.userService]);
 
-  const renderItem = ({ item }: { item: (typeof list)[0] }) => (
-    <GradientCard
-      onPress={() => router.push(item.screen as Href<string>)}
-      image={item.image}
-      title={item.title}
-      subtitle={item.subtitle}
-      buttonTitle={item.buttonTitle}
-      disabled={false}
-    />
-  );
-
   useEffect(() => {
+    // Loading local data
     loadSelectedKanji();
     readFile('userSettings')
       .then((content) => dispatch(settings.actions.update(JSON.parse(content))))
       .catch(() => console.log('previous setting not found'));
 
+    refreshUserScore();
+
+    // Check if reco service is available
     core.recognitionService
       ?.health()
       .then(({ status }) => setRecognitionColor(status === 200))
       .catch(() => setRecognitionColor(false));
 
-    refreshUserScore();
-  }, []);
-
-  useEffect(() => {
+    // Redirect onboarding screen when first time
     AsyncStorage.getItem(asyncstorageKeys.FIRST_TIME).then((res) => {
       if (!res) {
         router.push('/Onboarding');
@@ -107,6 +95,7 @@ export default function Home() {
     });
   }, []);
 
+  // Setting access_token on app
   useEffect(() => {
     if (access_token) {
       if (AuthContext?.signIn) {
@@ -168,7 +157,7 @@ export default function Home() {
           pagingEnabled
           showsHorizontalScrollIndicator={false}
           scrollEventThrottle={225}
-          renderItem={renderItem}
+          renderItem={ListItem}
           keyExtractor={(item) => item.id}
         />
       </ScrollView>
