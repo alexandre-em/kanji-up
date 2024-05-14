@@ -12,13 +12,17 @@
       "resizeMode": "contain",
       "backgroundColor": "#377BC8"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "bundleIdentifier": "com.aem.kanjiupword",
       "requireFullScreen": true,
       "supportsTablet": true,
       "infoPlist": {
-        "UIBackgroundModes": ["audio"]
+        "UIBackgroundModes": [
+          "audio"
+        ]
       }
     },
     "android": {
@@ -35,12 +39,12 @@
       "orientation": "portrait",
       "name": "KanjiUp | Word",
       "backgroundColor": "#377BC8",
-      "display": "fullscreen",
-      "orientation": "portrait",
-      "bundler": "metro",
       "output": "single"
     },
-    "plugins": ["expo-router"],
+    "plugins": [
+      "expo-router",
+      "expo-font"
+    ],
     "experiments": {
       "typedRoutes": true
     }

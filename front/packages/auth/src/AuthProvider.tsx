@@ -18,7 +18,7 @@ export function useAuth() {
 
 // This hook will protect the route access based on user authentication.
 function useProtectedRoute(accessToken: string | null) {
-  const { access_token, search } = useGlobalSearchParams();
+  const params = useGlobalSearchParams();
   const pathname = usePathname();
   const rootNavigation = useRootNavigation();
 
@@ -30,14 +30,15 @@ function useProtectedRoute(accessToken: string | null) {
         new Promise((r) => setTimeout(r, 1000)).then(() => router.replace('/'));
       } else {
         // Redirect to the home page when signing in
-        if (!access_token) {
-          new Promise((r) => setTimeout(r, 1000)).then(() =>
-            router.replace(pathname === '/' ? '/home' : `${pathname}${search ? `?search=${search}` : ''}`)
-          );
+        if (!params.access_token) {
+          const pathParams = params.screen
+            ? ''
+            : Object.keys(params).reduce((prev, param) => prev + `${param}=${params[param]}&`, '');
+          router.push(pathname === '/' ? '/home' : `${pathname}?${pathParams}`);
         }
       }
     }
-  }, [rootNavigation?.isReady, accessToken, access_token, pathname, search]);
+  }, [rootNavigation?.isReady, accessToken, params.access_token, params.search, params.grade, pathname]);
 }
 
 export function Provider({ children }: { children: React.ReactNode }) {

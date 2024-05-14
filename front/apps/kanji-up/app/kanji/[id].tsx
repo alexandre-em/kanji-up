@@ -91,10 +91,11 @@ export default function KanjiDetail() {
   return (
     <Content
       header={{
-        title: `Detail of ${details.kanji.character} ${userState.progression[details.kanji_id] !== undefined
+        title: `Detail of ${details.kanji.character} ${
+          userState.progression[details.kanji_id] !== undefined
             ? `(${Math.min((userState.progression[details.kanji_id] / KANJI_PROGRESSION_MAX) * 100, 100)}%)`
             : ''
-          }`,
+        }`,
         onBack: () => (router.canGoBack() ? router.back() : router.push('/home')),
       }}>
       <ScrollView>

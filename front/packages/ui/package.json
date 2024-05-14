@@ -4,9 +4,9 @@
   "author": "Alexandre Em",
   "license": "ISC",
   "dependencies": {
-    "expo-router": "^2.0.0",
-    "react": "^18.2.0",
-    "react-native": "^0.72.6",
+    "expo-router": "~3.5.12",
+    "react": "18.2.0",
+    "react-native": "0.74.1",
     "react-native-paper": "^5.11.1"
   },
   "devDependencies": {

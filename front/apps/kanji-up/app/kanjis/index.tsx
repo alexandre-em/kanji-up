@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { Platform, View } from 'react-native';
-import { Divider, IconButton, Menu } from 'react-native-paper';
+import { View } from 'react-native';
+import { IconButton } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import { router, useLocalSearchParams } from 'expo-router';
 
@@ -8,12 +8,11 @@ import KanjiListComponent from './KanjiList';
 import { colors } from '../../constants/Colors';
 import { RootState } from '../../store';
 import CustomDialog from '../../components/CustomDialog';
-import { kanji } from 'store/slices';
-import { KanjiType } from 'kanji-app-types';
-import { fileNames, writeFile } from 'services/file';
-import { Content } from 'kanji-app-ui';
 
-const MORE_ICON = Platform.OS === 'ios' ? 'dots-horizontal' : 'dots-vertical';
+import { KanjiType } from 'kanji-app-types';
+import { Content } from 'kanji-app-ui';
+import { fileNames, writeFile } from 'services/file';
+import { kanji } from 'store/slices';
 
 export default function KanjiList() {
   const dispatch = useDispatch();

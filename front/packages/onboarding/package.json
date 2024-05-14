@@ -2,8 +2,8 @@
   "name": "kanji-app-onboarding",
   "version": "0.0.1",
   "dependencies": {
-    "react": "^18.2.0",
-    "react-native": "^0.72.6",
+    "react": "18.2.0",
+    "react-native": "0.74.1",
     "react-native-circular-progress": "^1.3.9",
     "react-native-paper": "^5.11.1"
   }
