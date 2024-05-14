@@ -1,4 +1,4 @@
-import { colors } from 'constants/Colors';
+import { colors } from '../Colors';
 
 export * as kunyomi from './kunyomiQuestions';
 export * as onyomi from './onyomiQuestions';

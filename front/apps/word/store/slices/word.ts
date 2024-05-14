@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+
 import { WordType } from 'kanji-app-types';
 
 const initialState: WordType[] = [];

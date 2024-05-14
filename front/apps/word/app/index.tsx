@@ -4,8 +4,8 @@ import { ActivityIndicator, Button } from 'react-native-paper';
 import { useAuth, useKanjiAppAuth } from 'kanji-app-auth';
 import config from 'kanji-app-core';
 
-import styles from 'constants/style';
-import { appId, authUrl, endpointUrls } from 'constants';
+import { appId, authUrl, endpointUrls } from '../constants';
+import styles from '../constants/style';
 
 export default function Page() {
   const AuthContext = useAuth();

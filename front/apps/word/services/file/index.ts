@@ -1,7 +1,8 @@
 import { AxiosRequestConfig, AxiosResponse } from 'axios';
+import { RefObject } from 'react';
+
 import core from 'kanji-app-core';
 import { PredictionType } from 'kanji-app-types';
-import { RefObject } from 'react';
 
 export const fileNames = {
   SELECTED_WORD: 'selectedWord',

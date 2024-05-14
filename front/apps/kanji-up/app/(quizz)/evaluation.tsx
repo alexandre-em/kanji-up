@@ -1,18 +1,19 @@
+import { router } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Platform, Text, View } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
 import { Button } from 'react-native-paper';
-import Sketch from 'kanji-app-sketch';
+import { useDispatch, useSelector } from 'react-redux';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
+
+import Sketch from 'kanji-app-sketch';
 
 import { useQuizzContext } from './_layout';
 import styles from './style';
-import { RootState } from 'store';
-import { colors } from 'constants/Colors';
-import { error, evaluation, user } from 'store/slices';
-import { uploadImage } from 'services/file';
-import { router } from 'expo-router';
-import { KANJI_PROGRESSION_INC } from 'constants';
+import { RootState } from '../../store';
+import { colors } from '../../constants/Colors';
+import { error, evaluation, user } from '../../store/slices';
+import { uploadImage } from '../../services/file';
+import { KANJI_PROGRESSION_INC } from '../../constants';
 
 export default function Evaluate() {
   const dispatch = useDispatch();

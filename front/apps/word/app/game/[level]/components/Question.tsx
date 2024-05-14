@@ -1,8 +1,8 @@
 import { View, Animated } from 'react-native';
 import React, { useMemo } from 'react';
 
-import { colors } from 'constants';
-import { useGameContext } from 'providers/game.provider';
+import { colors } from '../../../../constants';
+import { useGameContext } from '../../../../providers/game.provider';
 
 export default function Question({ textAnimRef }) {
   const GameContext = useGameContext();

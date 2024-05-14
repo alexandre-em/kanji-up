@@ -1,11 +1,13 @@
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { asyncstorageKeys, useAuth, useKanjiAppAuth } from 'kanji-app-auth';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { readFile, fileNames, writeFile } from 'services/file';
-import { RootState } from 'store';
-import { error, settings } from 'store/slices';
+
+import { asyncstorageKeys, useAuth, useKanjiAppAuth } from 'kanji-app-auth';
+
+import { readFile, fileNames, writeFile } from '../../services/file';
+import { RootState } from '../../store';
+import { error, settings } from '../../store/slices';
 
 const defaultValues: Partial<SettingValuesType> = {
   flashcardNumber: 30,

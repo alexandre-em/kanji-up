@@ -1,5 +1,6 @@
-import core from 'kanji-app-core';
 import { Linking, Platform } from 'react-native';
+
+import core from 'kanji-app-core';
 
 export function UserAppRedirection(userId: string, accessToken: string) {
   Linking.openURL(

@@ -1,16 +1,17 @@
+import { router } from 'expo-router';
 import React from 'react';
 import { View, ScrollView, Text, Pressable } from 'react-native';
 import { Avatar, Button, Switch } from 'react-native-paper';
-import { Slider } from 'kanji-app-svg-ui';
-
-import styles from './style';
-import { colors } from 'constants/Colors';
-import { router } from 'expo-router';
-import { UserAppRedirection } from 'services/redirections';
-import { Content, CustomDialog, globalStyle } from 'kanji-app-ui';
-import useSettingsHook from './hook';
 import { useSelector } from 'react-redux';
-import { RootState } from 'store';
+
+import { Slider } from 'kanji-app-svg-ui';
+import { Content, CustomDialog, globalStyle } from 'kanji-app-ui';
+
+import useSettingsHook from './hook';
+import styles from './style';
+import { colors } from '../../constants/Colors';
+import { UserAppRedirection } from '../../services/redirections';
+import { RootState } from '../../store';
 
 const globalStyles = globalStyle(colors);
 

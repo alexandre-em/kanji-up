@@ -1,8 +1,9 @@
-import { useEffect } from 'react';
 import { useFonts } from 'expo-font';
-import { Provider } from 'react-redux';
 import { SplashScreen, Stack } from 'expo-router';
 import Head from 'expo-router/head';
+import { useEffect } from 'react';
+import { Platform } from 'react-native';
+import { Provider } from 'react-redux';
 import { Provider as PaperProvider, DefaultTheme } from 'react-native-paper';
 import LogRocket from '@logrocket/react-native';
 
@@ -11,7 +12,6 @@ import { ColorProvider } from 'kanji-app-ui';
 
 import { colors } from '../constants/Colors';
 import store from '../store';
-import { Platform } from 'react-native';
 
 export {
   // Catch any errors thrown by the Layout component.

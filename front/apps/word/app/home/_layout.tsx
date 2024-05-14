@@ -5,12 +5,11 @@ import { FAB, Searchbar } from 'react-native-paper';
 
 import { Content, globalStyle } from 'kanji-app-ui';
 
-import { colors } from 'constants';
-
 import Header from './Header';
 import Stepper from './Stepper';
 import useHomeHook from './hook';
 import { menu } from './constants';
+import { colors } from '../../constants';
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState<string>('');

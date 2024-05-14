@@ -1,7 +1,8 @@
 import { View, Text } from 'react-native';
 import React from 'react';
-import { colorStatus, colors, iconsStatus } from 'constants';
 import { Divider, Icon } from 'react-native-paper';
+
+import { colorStatus, colors, iconsStatus } from '../constants';
 
 export default function AnswerDetail({ item, status }: { item: ProblemType; status?: ProblemStatus }) {
   const question = item.question.question.split(/【|】/);

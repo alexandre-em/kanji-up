@@ -1,16 +1,14 @@
 import React, { useMemo } from 'react';
-
 import { Text, View } from 'react-native';
-import { useSelector } from 'react-redux';
 import { Button, Surface } from 'react-native-paper';
 import StepIndicator from 'react-native-step-indicator';
+import { useSelector } from 'react-redux';
 
 import { colors } from '../../../constants/Colors';
 import { labels } from '../constants';
 import globalStyles from '../../../styles/global';
 import styles, { stepperStyles } from '../style';
 import { RootState } from '../../../store';
-
 import Certification from '../../../svg/Certification';
 import Reminders from '../../../svg/Reminders';
 import Trip from '../../../svg/Trip';

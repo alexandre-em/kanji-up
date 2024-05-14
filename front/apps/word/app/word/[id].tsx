@@ -1,20 +1,21 @@
+import { router, useGlobalSearchParams } from 'expo-router';
 import React, { useMemo } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { ActivityIndicator, Chip, Divider, IconButton, List, Surface } from 'react-native-paper';
 import { useSelector } from 'react-redux';
 
+import core from 'kanji-app-core';
+import { SVGUriPlatform } from 'kanji-app-svg-ui';
+import { Content, globalStyle } from 'kanji-app-ui';
+
 import Row from './Row';
 import styles from './style';
-import { colors } from 'constants/Colors';
-import { SVGUriPlatform } from 'kanji-app-svg-ui';
-import { RootState } from 'store';
-import core from 'kanji-app-core';
-import { router, useGlobalSearchParams } from 'expo-router';
-import { WORD_PROGRESSION_MAX, endpointUrls } from 'constants';
-import { Content, globalStyle } from 'kanji-app-ui';
-import { getKanjiList } from 'services/kanji';
-import { KanjiAppRedirection } from 'services/redirections';
-import useWordHook from 'app/words/hook';
+import useWordHook from '../words/hook';
+import { colors } from '../../constants/Colors';
+import { RootState } from '../../store';
+import { WORD_PROGRESSION_MAX, endpointUrls } from '../../constants';
+import { getKanjiList } from '../../services/kanji';
+import { KanjiAppRedirection } from '../../services/redirections';
 
 const imgSize = 50;
 
@@ -48,10 +49,11 @@ export default function WordDetail() {
   return (
     <Content
       header={{
-        title: `Detail of ${details.word[0] || details.reading[0]} ${userState.progression[details.word_id] !== undefined
+        title: `Detail of ${details.word[0] || details.reading[0]} ${
+          userState.progression[details.word_id] !== undefined
             ? `(${Math.min((userState.progression[details.word_id] / WORD_PROGRESSION_MAX) * 100, 100)}%)`
             : ''
-          }`,
+        }`,
         onBack: () => router.back(),
         right: headerRightComponent,
       }}>

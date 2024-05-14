@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { snackbarColors } from 'constants/Colors';
+import { snackbarColors } from '../../constants/Colors';
 
 const initialState: ErrorState = {
   isErrorTriggered: false,

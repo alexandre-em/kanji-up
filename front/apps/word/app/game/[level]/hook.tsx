@@ -1,9 +1,9 @@
+import { AVPlaybackSource, Audio } from 'expo-av';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, Platform } from 'react-native';
-import { AVPlaybackSource, Audio } from 'expo-av';
 
-import { QUESTION_TIMER } from 'constants';
-import { useGameContext } from 'providers/game.provider';
+import { QUESTION_TIMER } from '../../../constants';
+import { useGameContext } from '../../../providers/game.provider';
 
 export default function useGameLevel() {
   const GameContext = useGameContext();

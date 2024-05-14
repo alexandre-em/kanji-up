@@ -1,17 +1,17 @@
 import { router } from 'expo-router';
-import { FlatList } from 'react-native';
 import React, { useCallback, useMemo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { FlatList } from 'react-native';
 import { Button } from 'react-native-paper';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { Content } from 'kanji-app-ui';
 import core from 'kanji-app-core';
 
-import { SCORE_DATE_LIMIT, scoringByStatus } from 'constants';
-import { useGameContext } from 'providers/game.provider';
-import { RootState } from 'store';
-import { user } from 'store/slices';
-import { AnswerDetail } from 'components';
+import { AnswerDetail } from '../../../../components';
+import { SCORE_DATE_LIMIT, scoringByStatus } from '../../../../constants';
+import { useGameContext } from '../../../../providers/game.provider';
+import { RootState } from '../../../../store';
+import { user } from '../../../../store/slices';
 
 export default function Results() {
   const dispatch = useDispatch();

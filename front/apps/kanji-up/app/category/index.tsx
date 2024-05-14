@@ -1,5 +1,5 @@
-import React from 'react';
 import { router } from 'expo-router';
+import React from 'react';
 import { Image, ScrollView, Text, Pressable } from 'react-native';
 
 import { Content } from 'kanji-app-ui';

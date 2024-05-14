@@ -6,8 +6,8 @@ import { useSelector } from 'react-redux';
 import { KanjiType } from 'kanji-app-types';
 
 import styles from '../style';
-import { RootState } from 'store';
-import { KANJI_PROGRESSION_MAX, colors } from 'constants';
+import { KANJI_PROGRESSION_MAX, colors } from '../../../constants';
+import { RootState } from '../../../store';
 
 export default function KanjiSurface({ kanji, onPress }: { kanji: KanjiType; onPress?: (e: GestureResponderEvent) => void }) {
   const kanjiState = useSelector((s: RootState) => s.kanji);

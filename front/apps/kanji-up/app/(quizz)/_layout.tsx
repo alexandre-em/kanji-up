@@ -1,13 +1,13 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { Stack, router } from 'expo-router';
+import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { Button, Dialog, Paragraph, Portal } from 'react-native-paper';
 import { useSelector, useDispatch } from 'react-redux';
 
 import { KanjiType } from 'kanji-app-types';
 import { Content } from 'kanji-app-ui';
 
-import { RootState } from 'store';
-import { evaluation } from 'store/slices';
+import { RootState } from '../../store';
+import { evaluation } from '../../store/slices';
 
 type QuizzContextValues = { kanjis: KanjiType[]; onFinish: () => void };
 

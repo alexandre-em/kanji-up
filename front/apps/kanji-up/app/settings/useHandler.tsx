@@ -1,12 +1,12 @@
+import * as WebBrowser from 'expo-web-browser';
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as WebBrowser from 'expo-web-browser';
 
-import { asyncstorageKeys } from 'kanji-app-auth';
-import { writeFile } from 'services/file';
-import { settings } from 'store/slices';
-import { useKanjiAppAuth, useAuth } from 'kanji-app-auth';
+import { asyncstorageKeys, useKanjiAppAuth, useAuth } from 'kanji-app-auth';
+
+import { writeFile } from '../../services/file';
+import { settings } from '../../store/slices';
 import { router } from 'expo-router';
 
 interface HandlersProps {

@@ -1,12 +1,13 @@
 import { useCallback, useEffect } from 'react';
 import { Image, SafeAreaView, Text } from 'react-native';
 import { ActivityIndicator, Button } from 'react-native-paper';
+
 import { useAuth, useKanjiAppAuth } from 'kanji-app-auth';
 import config from 'kanji-app-core';
+import { Content } from 'kanji-app-ui';
 
 import styles from '../styles/global';
-import { appId, authUrl, endpointUrls } from 'constants';
-import { Content } from 'kanji-app-ui';
+import { appId, authUrl, endpointUrls } from '../constants';
 
 export default function Page() {
   const AuthContext = useAuth();

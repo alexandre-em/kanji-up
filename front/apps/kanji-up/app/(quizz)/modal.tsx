@@ -1,15 +1,16 @@
+import { router } from 'expo-router';
 import React, { useCallback } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { Avatar, Button, Divider, IconButton, List } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { RootState } from 'store';
-import { colors } from 'constants/Colors';
-import { evaluation, user } from 'store/slices';
-import { router } from 'expo-router';
-import global from 'styles/global';
 import core from 'kanji-app-core';
-import { KANJI_PROGRESSION_INC, KANJI_PROGRESSION_INC_LOW } from 'constants';
+
+import { KANJI_PROGRESSION_INC, KANJI_PROGRESSION_INC_LOW } from '../../constants';
+import { colors } from '../../constants/Colors';
+import { RootState } from '../../store';
+import { evaluation, user } from '../../store/slices';
+import global from '../../styles/global';
 
 const USER_VALIDATE_POINT = 10;
 const SCORE_DATE_LIMIT = 30; // Day

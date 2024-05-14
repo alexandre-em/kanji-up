@@ -1,16 +1,15 @@
+import { router, useGlobalSearchParams } from 'expo-router';
 import React from 'react';
 import { Image, View } from 'react-native';
-import { router, useGlobalSearchParams } from 'expo-router';
+import { Button, Dialog, Divider } from 'react-native-paper';
 
 import { Content } from 'kanji-app-ui';
 
-import { levels } from 'constants';
-
 import useGameLevel from './hook';
 import { ContentInput, Header, Question } from './components';
-import { Button, Dialog, Divider } from 'react-native-paper';
-import { useGameContext } from 'providers/game.provider';
-import { AnswerDetail } from 'components';
+import { AnswerDetail } from '../../../components';
+import { levels } from '../../../constants';
+import { useGameContext } from '../../../providers/game.provider';
 
 export default function GameLevel() {
   const GameContext = useGameContext();

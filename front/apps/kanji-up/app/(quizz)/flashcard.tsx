@@ -1,16 +1,17 @@
+import { router } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Text, useWindowDimensions, View } from 'react-native';
-import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { Button, Divider, ProgressBar, Surface, TouchableRipple } from 'react-native-paper';
+import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { useSelector } from 'react-redux';
-import { SVGUriPlatform } from 'kanji-app-svg-ui';
-import { router } from 'expo-router';
 
-import styles from './style';
-import { colors } from 'constants/Colors';
-import { RootState } from 'store';
+import { SVGUriPlatform } from 'kanji-app-svg-ui';
+
 import { useQuizzContext } from './_layout';
-import { endpointUrls } from 'constants';
+import styles from './style';
+import { colors } from '../../constants/Colors';
+import { RootState } from '../../store';
+import { endpointUrls } from '../../constants';
 
 export default function Practice() {
   const { width } = useWindowDimensions();

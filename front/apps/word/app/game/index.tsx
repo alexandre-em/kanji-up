@@ -1,15 +1,14 @@
 import { Href, router } from 'expo-router';
-import { View, Text, ScrollView } from 'react-native';
 import React, { useCallback } from 'react';
+import { View, Text, ScrollView } from 'react-native';
 import { Chip } from 'react-native-paper';
 
 import { Content, GradientCard, globalStyle } from 'kanji-app-ui';
 
-import { colors } from 'constants';
-
 import style from './style';
-import { GAME_MODE, levels } from 'constants/game';
-import { useGameContext } from 'providers/game.provider';
+import { colors } from '../../constants';
+import { GAME_MODE, levels } from '../../constants/game';
+import { useGameContext } from '../../providers/game.provider';
 
 export default function GameMenu() {
   const GameContext = useGameContext();

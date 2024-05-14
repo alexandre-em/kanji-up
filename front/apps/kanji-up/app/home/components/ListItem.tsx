@@ -1,5 +1,7 @@
 import { Href, router } from 'expo-router';
+
 import { GradientCard } from 'kanji-app-ui';
+
 import { list } from '../constants';
 
 export default function ListItem({ item }: { item: (typeof list)[0] }) {

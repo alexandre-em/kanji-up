@@ -1,8 +1,8 @@
-import { View } from 'react-native';
 import React from 'react';
+import { View } from 'react-native';
 import { Button, IconButton, TextInput } from 'react-native-paper';
 
-import { useGameContext } from 'providers/game.provider';
+import { useGameContext } from '../../../../providers/game.provider';
 
 type ContentType = {
   input: string;

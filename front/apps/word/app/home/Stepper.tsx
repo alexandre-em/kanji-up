@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react';
-
 import { Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { Button, Surface } from 'react-native-paper';
@@ -9,12 +8,11 @@ import { globalStyle } from 'kanji-app-ui';
 
 import { labels } from './constants';
 import styles, { stepperStyles } from './style';
-
-import { colors } from 'constants';
-import { RootState } from 'store';
-import Educator from 'svg/Educator';
-import Pancake from 'svg/Pancakes';
-import WellDone from 'svg/WellDone';
+import { colors } from '../../constants';
+import { RootState } from '../../store';
+import Educator from '../../svg/Educator';
+import Pancake from '../../svg/Pancakes';
+import WellDone from '../../svg/WellDone';
 
 type StepperProps = {
   onPress: () => void;

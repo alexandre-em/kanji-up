@@ -1,16 +1,16 @@
+import { router, useGlobalSearchParams } from 'expo-router';
 import { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { router, useGlobalSearchParams } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { asyncstorageKeys, useAuth } from 'kanji-app-auth';
 import core from 'kanji-app-core';
 import { WordType } from 'kanji-app-types';
 
-import { endpointUrls } from 'constants';
-import { RootState } from 'store';
-import { settings, user, word } from 'store/slices';
-import { fileNames, readFile } from 'services/file';
+import { endpointUrls } from '../../constants';
+import { RootState } from '../../store';
+import { settings, user, word } from '../../store/slices';
+import { fileNames, readFile } from '../../services/file';
 // import { UserAppRedirection } from 'services/redirections';
 
 export default function useHomeHook() {

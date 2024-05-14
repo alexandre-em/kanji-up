@@ -2,11 +2,12 @@ import { router } from 'expo-router';
 import React from 'react';
 import { View, Pressable } from 'react-native';
 import { Avatar, Button } from 'react-native-paper';
+import { useSelector } from 'react-redux';
 
 import { globalStyle } from 'kanji-app-ui';
-import { colors } from 'constants';
-import { useSelector } from 'react-redux';
-import { RootState } from 'store';
+
+import { colors } from '../../constants';
+import { RootState } from '../../store';
 
 export default function Header() {
   const userState = useSelector((root: RootState) => root.user);

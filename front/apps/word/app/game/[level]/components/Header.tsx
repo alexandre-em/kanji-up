@@ -1,9 +1,9 @@
-import { View, Text, Image } from 'react-native';
 import React from 'react';
+import { View, Text, Image } from 'react-native';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 
-import { colors, GAME_LIFE, QUESTION_TIMER, colorStatus } from 'constants';
-import { useGameContext } from 'providers/game.provider';
+import { colors, GAME_LIFE, QUESTION_TIMER, colorStatus } from '../../../../constants';
+import { useGameContext } from '../../../../providers/game.provider';
 
 export default function Header({ timer }: { timer: number }) {
   const GameContext = useGameContext();

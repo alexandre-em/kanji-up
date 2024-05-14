@@ -1,21 +1,22 @@
+import axios from 'axios';
+import { router, useGlobalSearchParams } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ScrollView, Text, useWindowDimensions, View } from 'react-native';
 import { ActivityIndicator, Button, Chip, DataTable, Divider, List, Surface } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
-import axios from 'axios';
 
-import styles from './style';
-import { colors } from 'constants/Colors';
+import core from 'kanji-app-core';
 import { SVGUriPlatform } from 'kanji-app-svg-ui';
 import { KanjiType } from 'kanji-app-types';
-import { error, kanji } from 'store/slices';
-import { RootState } from 'store';
-import global from 'styles/global';
-import core from 'kanji-app-core';
-import { router, useGlobalSearchParams } from 'expo-router';
-import { KANJI_PROGRESSION_MAX, endpointUrls } from 'constants';
 import { Content } from 'kanji-app-ui';
-import { fileNames, readFile, writeFile } from 'services/file';
+
+import styles from './style';
+import { KANJI_PROGRESSION_MAX, endpointUrls } from '../../constants';
+import { colors } from '../../constants/Colors';
+import { fileNames, readFile, writeFile } from '../../services/file';
+import { RootState } from '../../store';
+import { error, kanji } from '../../store/slices';
+import global from '../../styles/global';
 
 export default function KanjiDetail() {
   const { width } = useWindowDimensions();

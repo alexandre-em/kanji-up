@@ -1,19 +1,19 @@
+import axios, { AxiosResponse } from 'axios';
+import { router, useGlobalSearchParams } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { View, ScrollView, Text } from 'react-native';
 import { ActivityIndicator, DataTable, Divider, List, Searchbar, Surface } from 'react-native-paper';
-import axios, { AxiosResponse } from 'axios';
 import { useDispatch } from 'react-redux';
-import { router, useGlobalSearchParams } from 'expo-router';
 
 import core from 'kanji-app-core';
 import { KanjiType, Pagination } from 'kanji-app-types';
+import { Content } from 'kanji-app-ui';
 
 import styles from './style';
+import { colors } from '../../constants/Colors';
 import { error } from '../../store/slices';
-import { colors } from 'constants/Colors';
+import global from '../../styles/global';
 import Searching from '../../svg/Searching';
-import global from 'styles/global';
-import { Content } from 'kanji-app-ui';
 
 const numberOfItemsPerPageList = [30, 50, 100, 200];
 

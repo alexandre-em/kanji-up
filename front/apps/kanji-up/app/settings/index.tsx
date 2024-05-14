@@ -1,21 +1,22 @@
+import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { View, ScrollView, Text, Pressable } from 'react-native';
-import { Appbar, Avatar, Button, IconButton, Switch } from 'react-native-paper';
-import { Slider } from 'kanji-app-svg-ui';
+import { Avatar, Button, Switch } from 'react-native-paper';
 
-import styles from './style';
-import { RootState } from 'store';
-import { colors } from 'constants/Colors';
-import { error } from 'store/slices';
-import { readFile } from 'services/file';
-import CustomDialog from 'components/CustomDialog';
-import useHandlers from './useHandler';
-import { router } from 'expo-router';
-import global from 'styles/global';
-import { UserAppRedirection } from 'services/redirections';
 import { useAuth } from 'kanji-app-auth';
+import { Slider } from 'kanji-app-svg-ui';
 import { Content } from 'kanji-app-ui';
+
+import useHandlers from './useHandler';
+import styles from './style';
+import CustomDialog from '../../components/CustomDialog';
+import { colors } from '../../constants/Colors';
+import { readFile } from '../../services/file';
+import { UserAppRedirection } from '../../services/redirections';
+import { RootState } from '../../store';
+import { error } from '../../store/slices';
+import global from '../../styles/global';
 
 const defaultValues: Partial<SettingValuesType> = {
   flashcardNumber: 30,

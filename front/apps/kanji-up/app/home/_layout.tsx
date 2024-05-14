@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useState } from 'react';
 import { Href, router, useGlobalSearchParams } from 'expo-router';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Pressable, FlatList, ScrollView, Text, View } from 'react-native';
 import { Avatar, Button, FAB, List, Searchbar } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
@@ -10,15 +10,14 @@ import core from 'kanji-app-core';
 import { asyncstorageKeys, useAuth } from 'kanji-app-auth';
 import { Content } from 'kanji-app-ui';
 
-import { RootState } from 'store';
-import globalStyles from 'styles/global';
-import { endpointUrls, colors } from 'constants';
-import { fileNames, readFile, UserAppRedirection } from 'services';
-import { kanji, settings, user } from 'store/slices';
-
 import styles from './style';
 import { menu, list } from './constants';
 import { ListItem, RandomKanji, Stepper } from './components';
+import { endpointUrls, colors } from '../../constants';
+import { fileNames, readFile, UserAppRedirection } from '../../services';
+import { RootState } from '../../store';
+import { kanji, settings, user } from 'store/slices';
+import globalStyles from '../../styles/global';
 
 export default function Home() {
   const dispatch = useDispatch();

@@ -1,14 +1,14 @@
+import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native';
 import React, { useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { router } from 'expo-router';
 
 import { asyncstorageKeys } from 'kanji-app-auth';
 import Onboarding from 'kanji-app-onboarding';
 
-import global from 'styles/global';
-import { colors } from 'constants';
-import data from 'constants/onboarding';
+import { colors } from '../constants';
+import data from '../constants/onboarding';
+import global from '../styles/global';
 
 export default function OnboardingScreen() {
   const onFinish = useCallback(() => {

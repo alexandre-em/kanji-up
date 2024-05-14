@@ -1,20 +1,19 @@
+import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { ActivityIndicator, DataTable } from 'react-native-paper';
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
-import { router } from 'expo-router';
-
-import global from 'styles/global';
-import { error, kanji } from 'store/slices';
-import { colors } from 'constants/Colors';
 
 import core from 'kanji-app-core';
 import { KanjiType, Pagination } from 'kanji-app-types';
 
-import styles from '../style';
 import Surface from './Surface';
-import { RootState } from 'store';
+import styles from '../style';
+import { colors } from '../../../constants/Colors';
+import { RootState } from '../../../store';
+import { error, kanji } from '../../../store/slices';
+import global from '../../../styles/global';
 
 const numberOfItemsPerPageList = [30, 50, 100, 200];
 

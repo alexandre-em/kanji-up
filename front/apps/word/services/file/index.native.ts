@@ -1,6 +1,7 @@
-import { RefObject } from 'react';
-import core from 'kanji-app-core';
 import * as FileSystem from 'expo-file-system';
+import { RefObject } from 'react';
+
+import core from 'kanji-app-core';
 
 export const fileNames = {
   SELECTED_WORD: 'selectedWord',
