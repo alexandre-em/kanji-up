@@ -930,10 +930,10 @@
     mv "~2"
     safe-json-stringify "~1"
 
-"@expo/cli@0.18.11":
-  version "0.18.11"
-  resolved "https://registry.yarnpkg.com/@expo/cli/-/cli-0.18.11.tgz#338215d9aa0d11b0d943814580bf4b9c27f43971"
-  integrity sha512-2xIfvj5RnQbQqZdkYa9a7Roll1ywBER2omCUKdbJazRcJTkkN3HMv/jILztdZ2uKlcfIqPq4VTbKEhV/IkewYg==
+"@expo/cli@0.18.12":
+  version "0.18.12"
+  resolved "https://registry.yarnpkg.com/@expo/cli/-/cli-0.18.12.tgz#86a7a218bba8f868d443a3350e570cd8e7d4c1ee"
+  integrity sha512-rsN8DO3aU3sWFfl1mlIcLOFJUAYxG1U0XalEwQaT7ZkVT+9G70PqEjuraCm/vKc4aOnJ5wsecaHzQOvZywmGmg==
   dependencies:
     "@babel/runtime" "^7.20.0"
     "@expo/code-signing-certificates" "0.0.5"
@@ -4568,10 +4568,10 @@ expo-modules-core@1.12.10:
   dependencies:
     invariant "^2.2.4"
 
-expo-router@^3.4.10, expo-router@~3.5.12:
-  version "3.5.12"
-  resolved "https://registry.yarnpkg.com/expo-router/-/expo-router-3.5.12.tgz#54db0c6360de3c933fd683c3c8c11ea7958da192"
-  integrity sha512-keFOzSpkOWLLsH3H4QpDqtWrdn7OzfKkghnfs+aVesmgqIh3oCht50mF9uICMEd4of5/eL2A9fFvNhEQ8VTPYg==
+expo-router@~3.5.14:
+  version "3.5.14"
+  resolved "https://registry.yarnpkg.com/expo-router/-/expo-router-3.5.14.tgz#5ca0e861271fa716b94a6149d696f7ac1258aad4"
+  integrity sha512-RVsyJLosZSq89ebA5qfPToRcFZJoTTb+6nwPHk6iESD6KON/Q7ZODt5fvCwXkY86tLNEMGo160QvBPfBZmglaA==
   dependencies:
     "@expo/metro-runtime" "3.2.1"
     "@expo/server" "^0.4.0"
@@ -4613,10 +4613,10 @@ expo-updates-interface@~0.16.2:
   resolved "https://registry.yarnpkg.com/expo-updates-interface/-/expo-updates-interface-0.16.2.tgz#ad1ac2ca8ee5a8cc84052ea3c18a11da64da569b"
   integrity sha512-929XBU70q5ELxkKADj1xL0UIm3HvhYhNAOZv5DSk7rrKvLo7QDdPyl+JVnwZm9LrkNbH4wuE2rLoKu1KMgZ+9A==
 
-expo-updates@~0.25.11:
-  version "0.25.11"
-  resolved "https://registry.yarnpkg.com/expo-updates/-/expo-updates-0.25.11.tgz#a477139cfd5f67c7b5fdf41eba3f6dad471eeb14"
-  integrity sha512-ZO+e6bLsEBMz+JdEOlJXGf+3w606si7zKKEEzkwDQWJWP20W0WQAG+MDYgTEgxQboc+jTC+T0MvvOvkVb8cFIQ==
+expo-updates@~0.25.12:
+  version "0.25.12"
+  resolved "https://registry.yarnpkg.com/expo-updates/-/expo-updates-0.25.12.tgz#3c001c50b132b0b2d676468400bfcb5b62a68600"
+  integrity sha512-y3xVCXRfXeIri1fjzwCQRVAovyL0sTc78Rj6cTOMQhtbgIGjF/Ud8aINv+mbi7me4+CljAsCzEDu/Cvngp5EGw==
   dependencies:
     "@expo/code-signing-certificates" "0.0.5"
     "@expo/config" "~9.0.0-beta.0"
@@ -4639,13 +4639,13 @@ expo-web-browser@~13.0.3:
   resolved "https://registry.yarnpkg.com/expo-web-browser/-/expo-web-browser-13.0.3.tgz#dceb05dbc187b498ca937b02adf385b0232a4e92"
   integrity sha512-HXb7y82ApVJtqk8tManyudtTrCtx8xcUnVzmJECeHCB0SsWSQ+penVLZxJkcyATWoJOsFMnfVSVdrTcpKKGszQ==
 
-expo@^51.0.0:
-  version "51.0.5"
-  resolved "https://registry.yarnpkg.com/expo/-/expo-51.0.5.tgz#f39f7dc6d389f893f29c739ad4c8657aa9dea64d"
-  integrity sha512-i+AfkfToYPFCobX0NUT9PmDtsB3L19vhCB/XUE1Ph6FVrBF6GipkHzTADuRLMaVg5u/2sm/fdzGzBcMjXSHqmA==
+expo@~51.0.6:
+  version "51.0.6"
+  resolved "https://registry.yarnpkg.com/expo/-/expo-51.0.6.tgz#d8288dc4653c4b686d34468702955dba9130a7d3"
+  integrity sha512-cl3FBuSZ1gE1UcPqsMinCPmwyqedF1kug7+SK6G4vYSB8JulWmCOwjgpcOIK5lkKgNwU5sQS1nG9hPcXFB79pA==
   dependencies:
     "@babel/runtime" "^7.20.0"
-    "@expo/cli" "0.18.11"
+    "@expo/cli" "0.18.12"
     "@expo/config" "9.0.1"
     "@expo/config-plugins" "8.0.4"
     "@expo/metro-config" "0.18.3"
