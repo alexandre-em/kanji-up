@@ -43,10 +43,11 @@
     </div>
   </body>
   <script>
-    document.getElementById("form").addEventListener("submit", function (e) { e.preventDefault(); fetch('/auth/login', { method: 'POST', mode: 'cors', cache: 'no-cache', headers: { 'Content-Type':
-    'application/json' }, body: JSON.stringify({ username: e.target[0].value, password: e.target[1].value, }) }) .then((res) => { return res.json(); }) .then((res) => { if (res.message != null) {
-    throw new Error(res.message); } window.location.replace("{{redirection_url}}?access_token="+res.access_token); }) .catch((err) => { document.getElementById("banner").style.visibility = "visible";
-    document.getElementById("error").innerHTML = err.message; }) }); const btn = document.getElementById("button-auto"); btn.addEventListener("click", function () { if ({{is_authenticated}}) { const
-    savedToken = "{{access_token}}"; window.location.replace("{{redirection_url}}?access_token="+savedToken) } }); btn.click();
+    document.getElementById("form").addEventListener("submit", function (e) { e.preventDefault(); fetch('/auth/login', { method: 'POST', mode: 'cors', cache: 'no-cache', credentials: 'include' ,
+    headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: e.target[0].value, password: e.target[1].value, }) }) .then((res) => { return res.json(); }) .then((res) => { if
+    (res.message != null) { throw new Error(res.message); } window.location.replace("{{redirection_url}}?access_token="+res.access_token); }) .catch((err) => {
+    document.getElementById("banner").style.visibility = "visible"; document.getElementById("error").innerHTML = err.message; }) }); const btn = document.getElementById("button-auto");
+    btn.addEventListener("click", function () { if ({{is_authenticated}}) { const savedToken = "{{access_token}}"; window.location.replace("{{redirection_url}}?access_token="+savedToken) } });
+    btn.click();
   </script>
 </html>
