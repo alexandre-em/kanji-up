@@ -131,3 +131,11 @@ export const updateOne = async (id: string, type: UpdateKanjiProps, elementId: s
 export const deleteOne = (id: string) => {
   return KanjiModel.findOneAndUpdate({ kanji_id: id }, { deleted_at: new Date() }).select('-_id -__v -examples._id').exec();
 };
+
+export const autocompleteId = (input: string, limit = 10) => {
+  return KanjiModel.find({ kanji_id: { $regex: `^${input}`, $options: 'i' } })
+    .select('kanji_id -_id ')
+    .populate('kanji', 'character meaning -_id')
+    .limit(limit)
+    .exec();
+};

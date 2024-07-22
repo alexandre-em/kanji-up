@@ -236,4 +236,12 @@ export class UsersController {
   searchUser(@Query('search') search: string) {
     return this.service.searchUser(search);
   }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthenticationGuard)
+  @Get('admin/new-user')
+  @ApiOkResponse({ description: 'List of new users registered', type: UserShortResponse, isArray: true })
+  getNewUsers(@Query('limit') limit: number) {
+    return this.service.getNewUser(limit);
+  }
 }

@@ -3,7 +3,7 @@ import { Router } from 'express';
 
 import { checkJWT } from '../config/security';
 import KanjiPermission from '../utils/kanjiPermissions';
-import { createOne, deleteOne, getAll, getOne, getOneImage, searchKanji, updateOneCharacter, updateOneRadical, updateOneReference } from '../controllers/kanji';
+import { createOne, deleteOne, getAll, getOne, getOneImage, searchKanji, searchKanjiId, updateOneCharacter, updateOneRadical, updateOneReference } from '../controllers/kanji';
 
 const router: Router = Router();
 
@@ -169,6 +169,47 @@ router.get('/detail/:id', getOne);
  *                          $ref: '#/components/schemas/Error'
  */
 router.get('/search', searchKanji);
+
+/**
+ * @openapi
+ * /api/v1/kanjis/search/autocomplete/id:
+ *  get:
+ *      tags:
+ *          - Kanji
+ *      description: Autocomplete an input by kanji ids
+ *      security: []
+ *      parameters:
+ *          - in: query
+ *            name: limit
+ *            description: Max element number on a page
+ *            schema:
+ *                type: integer
+ *          - in: query
+ *            name: query
+ *            description: Query to find a Kanji
+ *            schema:
+ *                type: string
+ *      responses:
+ *          200:
+ *              description: Returns the created reference
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/KanjiPaginateResponse'
+ *          400:
+ *              description: Bad request Error
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/Error'
+ *          500:
+ *              description: Internal Error
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/Error'
+ */
+router.get('/search/autocomplete/id', searchKanjiId);
 
 /**
  * @openapi

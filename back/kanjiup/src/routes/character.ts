@@ -4,6 +4,8 @@ import bodyParser from 'body-parser';
 
 import { upload } from '../utils';
 import { createOne, updateOneImage, updateOne } from '../controllers/character';
+import { checkJWT } from '../config/security';
+import KanjiPermission from '../utils/kanjiPermissions';
 
 const router: Router = Router();
 const urlencodedParser = bodyParser.urlencoded({ extended: false });
@@ -42,7 +44,15 @@ const urlencodedParser = bodyParser.urlencoded({ extended: false });
  *                      schema:
  *                          $ref: '#/components/schemas/Error'
  */
-router.post('/', upload.single('image'), urlencodedParser, createOne);
+router.post(
+  '/',
+  upload.single('image'),
+  urlencodedParser,
+  (req, res, next) => {
+    return checkJWT(req, res, next, [KanjiPermission.ADD_KANJI]);
+  },
+  createOne
+);
 
 /**
  * @openapi
@@ -84,7 +94,13 @@ router.post('/', upload.single('image'), urlencodedParser, createOne);
  *                      schema:
  *                          $ref: '#/components/schemas/Error'
  */
-router.patch('/:id/info', updateOne);
+router.patch(
+  '/:id/info',
+  (req, res, next) => {
+    return checkJWT(req, res, next, [KanjiPermission.UPDATE_KANJI]);
+  },
+  updateOne
+);
 
 /**
  * @openapi
@@ -127,7 +143,15 @@ router.patch('/:id/info', updateOne);
  *                      schema:
  *                          $ref: '#/components/schemas/Error'
  */
-router.put('/:id/image', upload.single('image'), urlencodedParser, updateOneImage);
+router.put(
+  '/:id/image',
+  upload.single('image'),
+  urlencodedParser,
+  (req, res, next) => {
+    return checkJWT(req, res, next, [KanjiPermission.UPDATE_KANJI]);
+  },
+  updateOneImage
+);
 
 /**
  * @openapi

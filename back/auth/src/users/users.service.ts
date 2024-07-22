@@ -51,7 +51,7 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException("This user doesn't exist");
     }
-    if (!user.image && !(user as User).image.data) {
+    if (!user.image || !(user as User).image.data) {
       throw new NotFoundException('This user does not have image profile');
     }
 
@@ -292,5 +292,27 @@ export class UsersService {
         __v: 0,
       })
       .exec();
+  }
+
+  async getNewUser(limit = 30) {
+    const d = new Date();
+    d.setDate(d.getDate() - limit);
+
+    const users = await this.model
+      .find({
+        created_at: {
+          $gte: d.toISOString(),
+        },
+      })
+      .select('-_id -password -applications -friends -permissions -__v -deleted_at -image')
+      .exec();
+
+    const response = {
+      users,
+      isVerified: users.filter((usr) => usr.email_confirmed).length,
+      isNotVerified: users.filter((usr) => !usr.email_confirmed).length,
+    };
+
+    return response;
   }
 }

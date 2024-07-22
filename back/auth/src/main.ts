@@ -16,6 +16,7 @@ async function bootstrap() {
       'https://kanjiup-v2.alexandre-em.fr',
       'https://user.kanjiup.alexandre-em.fr',
       'https://word.kanjiup.alexandre-em.fr',
+      'https://dashboard.kanjiup.alexandre-em.fr',
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     preflightContinue: false,

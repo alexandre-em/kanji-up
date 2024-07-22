@@ -50,6 +50,17 @@ export function searchKanji(req: Request, res: Response) {
   });
 }
 
+export function searchKanjiId(req: Request, res: Response) {
+  const query = req.query.query;
+  const lmt = parseInt(req.query.limit as string);
+  const limit = req.query.limit && !isNaN(lmt) ? lmt : PAGINATION_LIMIT.LITTLE;
+
+  if (!query) return new InvalidError('Search input is empty. Please type a keyword to run a search.').sendResponse(res);
+  kanjiService.autocompleteId(query as string, limit).then((queryResult) => {
+    res.status(200).send(queryResult);
+  });
+}
+
 export function createOne(req: Request, res: Response) {
   kanjiService
     .addOne(req.body)
