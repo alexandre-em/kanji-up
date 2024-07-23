@@ -31,7 +31,7 @@ export const uploadFile = async (fileName: string, content: Buffer, customParams
 
   await client.send(command);
 
-  return `${storageUrl}/${Bucket}/${fileName}`;
+  return `${storageUrl}/${fileName}`;
 };
 
 export const deleteFile = async (fileName: string, customParams: Partial<DeleteObjectCommandInput> = {}): Promise<DeleteObjectCommandOutput | ServiceException | null> => {

@@ -8,17 +8,17 @@ export const getAll = async (page: number, limit: number, query?: string) => {
 
 export const addOne = async (kanji: string, image: ImageType, predictions: PredictionResultType[]) => {
   try {
-    const uploadedImage: AWS.S3.ManagedUpload.SendData = (await uploadFile(`uploads/${kanji}/${image.filename}`, image.data)) as AWS.S3.ManagedUpload.SendData;
+    const uploadedImage = await uploadFile(`uploads/${kanji}/${image.filename}`, image.data);
 
-    return RecognitionModel.create({ image: uploadedImage.Location, kanji, predictions });
+    return RecognitionModel.create({ image: uploadedImage, kanji, predictions });
   } catch (err) {
     throw err;
   }
 };
 
-export const addOneData = async (kanji: string, image: ImageType) => {
+export const addOneData = (kanji: string, image: ImageType) => {
   try {
-    return (await uploadFile(`uploads/data/${kanji}/${image.filename}`, image.data)) as AWS.S3.ManagedUpload.SendData;
+    return uploadFile(`/recognition/uploads/data/${kanji}/${image.filename}`, image.data);
   } catch (err) {
     throw err;
   }

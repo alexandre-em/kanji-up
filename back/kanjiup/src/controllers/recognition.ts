@@ -66,7 +66,6 @@ export function createOne(req: Request, res: Response) {
         throw e;
       });
   } catch (e) {
-    console.log(e.message);
     res.status(400).send(e.message);
   }
 }
@@ -85,7 +84,7 @@ export function createTrainData(req: Request, res: Response) {
 
     recognitionService
       .addOneData(kanji, image)
-      .then((recognition: AWS.S3.ManagedUpload.SendData) => {
+      .then((recognition) => {
         unlinkSync(filePath);
 
         res.status(200).send(recognition);

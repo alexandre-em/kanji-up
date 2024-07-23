@@ -1,6 +1,4 @@
-import AWS from 'aws-sdk';
-
-import { deleteFile, uploadFile } from '../config/aws';
+import { deleteFile, storageUrl, uploadFile } from '../config/aws';
 import Character from '../dto/Character';
 import InvalidError from '../error/invalid';
 import { CharacterModel } from '../models';
@@ -14,7 +12,7 @@ export const addOne = async (body: CharacterType): Promise<Partial<CharacterType
   const image = body.image as ImageType;
 
   try {
-    const uploadedImage: AWS.S3.ManagedUpload.SendData = (await uploadFile(`characters/${image.filename}` || '', image.data)) as AWS.S3.ManagedUpload.SendData;
+    const uploadedImage = await uploadFile(`characters/${image.filename}` || '', image.data);
     character.imageUrl = uploadedImage.Location;
   } catch (err) {
     throw err;
@@ -55,10 +53,18 @@ export const updateOne = (id: string, body: Partial<CharacterType>) => {
 
 export const updateOneImage = async (id: string, image: ImageType) => {
   try {
-    const uploadedImage: AWS.S3.ManagedUpload.SendData = (await uploadFile(`characters/${image.filename}`, image.data)) as AWS.S3.ManagedUpload.SendData;
-    const imageUrl = uploadedImage.Location;
+    const uploadedImage = await uploadFile(`characters/${image.filename}`, image.data);
 
-    return CharacterModel.findOneAndUpdate({ character_id: id }, { image: imageUrl }).exec();
+    const updatedDoc = await CharacterModel.findOneAndUpdate({ character_id: id }, { image: uploadedImage }).exec();
+
+    if (updatedDoc?.image) {
+      if (typeof updatedDoc.image === 'string' && updatedDoc.image.includes(`${storageUrl}/`)) {
+        const parsedFilepath = updatedDoc.image.split(`${storageUrl}/`);
+        if (parsedFilepath.length > 1) deleteFile(parsedFilepath[1]);
+      }
+    }
+
+    return updatedDoc;
   } catch (err) {
     throw err;
   }

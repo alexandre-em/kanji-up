@@ -6,6 +6,7 @@ enum KanjiPermission {
   ADD_RECOGNITION = 'add:recognition',
   UPDATE_RECOGNITION = 'update:recognition',
   ADD_RADICAL = 'add:radical',
+  UPDATE_RADICAL = 'update:radical',
   ADD_REFERENCE = 'add:reference',
 }
 
