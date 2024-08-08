@@ -139,3 +139,17 @@ export const autocompleteId = (input: string, limit = 10) => {
     .limit(limit)
     .exec();
 };
+
+export const addExampleId = (id: string, example: ExampleType) => {
+  return KanjiModel.findOneAndUpdate({ kanji_id: id }, { $push: { examples: example } }).exec();
+};
+
+export const removeExampleId = async (id: string, index: number) => {
+  if (isNaN(index)) throw new InvalidError('Invalid example index');
+
+  const kanji = await KanjiModel.findOne({ kanji_id: id }).exec();
+
+  const newExamples = kanji?.examples.filter((_, i) => i !== index);
+
+  return KanjiModel.findOneAndUpdate({ kanji_id: id }, { examples: newExamples }).exec();
+};

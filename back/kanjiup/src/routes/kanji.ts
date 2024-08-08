@@ -3,7 +3,20 @@ import { Router } from 'express';
 
 import { checkJWT } from '../config/security';
 import KanjiPermission from '../utils/kanjiPermissions';
-import { createOne, deleteOne, getAll, getOne, getOneImage, searchKanji, searchKanjiId, updateOneCharacter, updateOneRadical, updateOneReference } from '../controllers/kanji';
+import {
+  addKanjiExample,
+  createOne,
+  deleteOne,
+  getAll,
+  getOne,
+  getOneImage,
+  removeKanjiExample,
+  searchKanji,
+  searchKanjiId,
+  updateOneCharacter,
+  updateOneRadical,
+  updateOneReference,
+} from '../controllers/kanji';
 
 const router: Router = Router();
 
@@ -446,6 +459,126 @@ router.patch(
 
 /**
  * @openapi
+ * /api/v1/kanjis/{id}/examples:
+ *  patch:
+ *      tags:
+ *          - Kanji
+ *      description: <b>Permissions needed to access the resources</b> <li>update:kanji</li>
+ *      parameters:
+ *          - name: id
+ *            in: path
+ *            description: Kanji Id
+ *            required: true
+ *            schema:
+ *                type: string
+ *      requestBody:
+ *          content:
+ *              application/json:
+ *                  schema:
+ *                      required: true
+ *                      $ref: '#/components/schemas/KanjiExampleBody'
+ *      responses:
+ *          200:
+ *              description: Returns the previous kanji values
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/KanjiResponse'
+ *          400:
+ *              description: Bad request Error
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/Error'
+ *          401:
+ *              description: Authentication Error
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/Error'
+ *          403:
+ *              description: Unauthorized Error
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/Error'
+ *          500:
+ *              description: Internal Error
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/Error'
+ */
+router.patch(
+  '/:id/examples',
+  (req, res, next) => {
+    return checkJWT(req, res, next, [KanjiPermission.UPDATE_KANJI]);
+  },
+  addKanjiExample
+);
+
+/**
+ * @openapi
+ * /api/v1/kanjis/{id}/examples/{index}:
+ *  delete:
+ *      tags:
+ *          - Kanji
+ *      description: <h3>Delete a Kanji's example</h3> <b>Permissions needed to access the resources:</b> <li>remove:kanji</li>
+ *      parameters:
+ *          - name: id
+ *            in: path
+ *            description: Kanji Id
+ *            required: true
+ *            schema:
+ *                type: string
+ *          - name: index
+ *            in: path
+ *            description: Example's Index
+ *            required: true
+ *            schema:
+ *                type: number
+ *      responses:
+ *          200:
+ *              description: Returns the deleted kanji
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/KanjiResponse'
+ *          400:
+ *              description: Bad request Error
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/Error'
+ *          401:
+ *              description: Authentication Error
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/Error'
+ *          403:
+ *              description: Unauthorized Error
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/Error'
+ *          500:
+ *              description: Internal Error
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/Error'
+ */
+router.delete(
+  '/:id/examples/:index',
+  (req, res, next) => {
+    return checkJWT(req, res, next, [KanjiPermission.UPDATE_KANJI]);
+  },
+  removeKanjiExample
+);
+
+/**
+ * @openapi
  * /api/v1/kanjis/{id}:
  *  delete:
  *      tags:
@@ -515,6 +648,13 @@ router.delete(
  *                    type: array
  *                    items:
  *                        type: string
+ *        KanjiExampleBody:
+ *            type: object
+ *            properties:
+ *                meaning:
+ *                    type: string
+ *                japanese:
+ *                    type: string
  *        KanjiPostBody:
  *            required:
  *                - kanji

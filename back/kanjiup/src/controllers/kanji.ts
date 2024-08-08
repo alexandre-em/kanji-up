@@ -141,3 +141,53 @@ export function deleteOne(req: Request, res: Response) {
     .then((deletedChar) => res.status(200).send(deletedChar))
     .catch((err) => res.status(400).send(err));
 }
+
+export function addKanjiExample(req: Request, res: Response) {
+  try {
+    const { id } = req.params;
+    const { body } = req;
+
+    if (!body) new InvalidError("Body can't be empty.\nPlease put the field with its value").sendResponse(res);
+
+    const example: ExampleType = {
+      meaning: body.meaning,
+      japanese: body.japanese,
+    };
+
+    kanjiService
+      .addExampleId(id, example)
+      .then((response) => {
+        res.status(200).send(response);
+      })
+      .catch((err) => {
+        if (err instanceof InvalidError) return err.sendResponse(res);
+        res.status(500).send(err);
+      });
+  } catch (e) {
+    console.error(e);
+    if (e instanceof InvalidError) return e.sendResponse(res);
+    if (e instanceof TypeError) res.status(422).send(e);
+    res.status(500).send(e);
+  }
+}
+
+export function removeKanjiExample(req: Request, res: Response) {
+  try {
+    const { id, index } = req.params;
+
+    kanjiService
+      .removeExampleId(id, parseInt(index))
+      .then((response) => {
+        res.status(200).send(response);
+      })
+      .catch((err) => {
+        if (err instanceof InvalidError) return err.sendResponse(res);
+        res.status(500).send(err);
+      });
+  } catch (e) {
+    console.error(e);
+    if (e instanceof InvalidError) return e.sendResponse(res);
+    if (e instanceof TypeError) res.status(422).send(e);
+    res.status(500).send(e);
+  }
+}
