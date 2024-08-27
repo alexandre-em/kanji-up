@@ -1,6 +1,7 @@
 import { Body, Controller, Headers, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ApiBearerAuth, ApiCreatedResponse, ApiForbiddenResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import JwtAuthenticationGuard from 'src/auth/jwt.guard';
 import PermissionGuard from 'src/auth/permission.guard';
 import { UpdatedDataResponse } from 'src/users/users.entity';
 import permissions from 'src/utils/permission.type';
@@ -18,6 +19,14 @@ export class AppsController {
   @ApiNotFoundResponse({ description: 'Application not found' })
   getOne(@Param('id') id: string) {
     return this.service.getOne(id);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthenticationGuard)
+  @Get('')
+  @ApiOkResponse({ description: 'List of KanjiUp applications', type: AppResponse, isArray: true })
+  getAll() {
+    return this.service.getAll();
   }
 
   @ApiBearerAuth()
@@ -62,7 +71,11 @@ export class AppsController {
   @ApiNotFoundResponse({ description: 'Application not found' })
   @ApiUnauthorizedResponse({ description: 'Not authenticated' })
   @ApiForbiddenResponse({ description: 'You do not have the permissions to execute this request' })
-  deleteOne(@Param('id') id: string, @Body() body: DeleteAppDTO) {
+  deleteOne(@Param('id') id: string) {
+    const body: DeleteAppDTO = {
+      deleted_at: new Date(),
+    };
+
     return this.service.updateOne(id, body);
   }
 }

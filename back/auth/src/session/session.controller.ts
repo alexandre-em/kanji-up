@@ -1,4 +1,4 @@
-import { Controller, Get, Headers, UseGuards } from '@nestjs/common';
+import { Controller, Get, Headers, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import JwtAuthenticationGuard from 'src/auth/jwt.guard';
 import { SessionService } from './session.service';
@@ -7,6 +7,13 @@ import { SessionService } from './session.service';
 @Controller('session')
 export class SessionController {
   constructor(private service: SessionService) {}
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthenticationGuard)
+  @Get('')
+  getSessions(@Query('limit') limit: number) {
+    return this.service.getSessions(limit);
+  }
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthenticationGuard)

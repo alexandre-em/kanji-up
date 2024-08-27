@@ -13,6 +13,10 @@ export class AppsService {
     return this.model.findOne({ app_id }).select('-_id -__v').exec();
   }
 
+  getAll() {
+    return this.model.find().select('-_id -deleted_at -__v').exec();
+  }
+
   async createOne(user_id: string, appInfo: CreateAppDTO) {
     const user = await this.userService.getOneDetailed(user_id);
 

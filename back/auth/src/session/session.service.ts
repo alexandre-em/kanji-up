@@ -29,6 +29,10 @@ export class SessionService {
     return this.model.findOne({ user_id }).exec();
   }
 
+  getSessions(limit = 10) {
+    return this.model.find().select('-_id -token -__v').limit(limit).exec();
+  }
+
   async createSession(token: string) {
     if (!token) {
       throw new UnauthorizedException('Please authenticate');
