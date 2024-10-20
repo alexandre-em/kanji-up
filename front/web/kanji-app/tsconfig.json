@@ -1,9 +1,5 @@
 {
   "compilerOptions": {
-    "baseUrl": "./src",
-    "paths": {
-      "*": ["types/*"]
-    },
     "target": "es6",
     "allowJs": true,
     "skipLibCheck": true,

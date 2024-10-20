@@ -6,13 +6,16 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const WorkboxPlugin = require('workbox-webpack-plugin');
 const { ModuleFederationPlugin } = require('webpack').container;
 
+const isWatchMode = process.env.WEBPACK_WATCH === 'true'; // Check if watch mode is enabled
+
 module.exports = {
   mode: 'development', // Change to 'production' for production builds
   entry: './src/index.ts',
+  devtool: 'source-map',
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
-    publicPath: 'http://localhost:3000/', // or '/' based on your server setup
+    publicPath: 'http://localhost:3001/', // or '/' based on your server setup
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
@@ -48,20 +51,21 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: './public/index.html',
       filename: 'index.html',
-      favicon: './public/favicon.ico',
     }),
     new MiniCssExtractPlugin({
       filename: 'generatedStyle.css',
     }),
-    new WorkboxPlugin.GenerateSW({
-      clientsClaim: true,
-      skipWaiting: true,
-      // options supplémentaires pour le service worker
-    }),
+    !isWatchMode &&
+      new WorkboxPlugin.GenerateSW({
+        clientsClaim: true,
+        skipWaiting: true,
+        // options supplémentaires pour le service worker
+      }),
     new ModuleFederationPlugin({
-      name: 'gatewayApp',
-      remotes: {
-        kanjiApp: 'kanjiApp@http://localhost:3001/remoteEntry.js',
+      name: 'kanjiApp',
+      filename: 'remoteEntry.js',
+      exposes: {
+        './KanjiUpAppPage': './src/pages/KanjiUpAppPage',
       },
       shared: {
         react: { singleton: true, eager: true, requiredVersion: '^17.0.0' },
@@ -69,13 +73,13 @@ module.exports = {
       },
     }),
   ],
-  devtool: 'source-map',
   devServer: {
     static: {
       directory: path.join(__dirname, 'dist'), // Use 'static' instead of 'contentBase'
     },
-    compress: true,
-    port: 3000,
+    // compress: true,
+    port: 3001,
+    open: true,
     historyApiFallback: true, // To manage clients routes
   },
   optimization: {
