@@ -1,0 +1,33 @@
+{
+  "name": "kanji-up",
+  "version": "0.0.1",
+  "description": "KanjiUp is an application that will help the user to learn and memorize Japanese kanji",
+  "directories": {
+    "doc": "doc"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 0",
+    "prepare": "husky install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alexandre-em/kanji-up.git"
+  },
+  "keywords": [
+    "kanji",
+    "japanese",
+    "learning",
+    "word",
+    "drawing"
+  ],
+  "author": "Alexandre Em",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alexandre-em/kanji-up/issues"
+  },
+  "homepage": "https://github.com/alexandre-em/kanji-up#readme",
+  "devDependencies": {
+    "husky": "^8.0.0",
+    "lint-staged": "^15.2.10"
+  }
+}
