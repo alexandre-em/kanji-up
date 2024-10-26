@@ -63,6 +63,9 @@ module.exports = {
       remotes: {
         kanjiApp: 'kanjiApp@http://localhost:3001/remoteEntry.js',
       },
+      exposes: {
+        './shared': path.resolve(__dirname, 'src/shared'), // Expose tout le dossier shared
+      },
       shared: {
         react: { singleton: true, eager: true, requiredVersion: '^17.0.0' },
         'react-dom': { singleton: true, eager: true, requiredVersion: '^17.0.0' },
