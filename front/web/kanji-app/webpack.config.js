@@ -13,9 +13,10 @@ module.exports = {
   entry: './src/index.ts',
   devtool: 'source-map',
   output: {
-    filename: 'bundle.js',
+    filename: '[name].[contenthash].js',
     path: path.resolve(__dirname, 'dist'),
     publicPath: 'http://localhost:3001/', // or '/' based on your server setup
+    clean: true,
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
@@ -41,8 +42,8 @@ module.exports = {
         ],
       },
       {
-        test: /\.(png|jpe?g|gif|svg)$/i, // Règles pour les images
-        type: 'asset/resource', // Traitement des images comme ressources
+        test: /\.(png|jpe?g|gif|svg)$/i,
+        type: 'asset/resource',
       },
     ],
   },
@@ -59,7 +60,6 @@ module.exports = {
       new WorkboxPlugin.GenerateSW({
         clientsClaim: true,
         skipWaiting: true,
-        // options supplémentaires pour le service worker
       }),
     new ModuleFederationPlugin({
       name: 'kanjiApp',
@@ -67,13 +67,17 @@ module.exports = {
       exposes: {
         './KanjiUpAppPage': './src/pages/KanjiUpAppPage',
       },
+      remotes: {
+        shared: 'gatewayApp@http://localhost:3000/remoteEntry.js',
+      },
       shared: {
-        react: { singleton: true, eager: true, requiredVersion: '^17.0.0' },
-        'react-dom': { singleton: true, eager: true, requiredVersion: '^17.0.0' },
+        react: { singleton: true, eager: true, requiredVersion: require('./package.json').dependencies.react },
+        'react-dom': { singleton: true, eager: true, requiredVersion: require('./package.json').dependencies['react-dom'] },
       },
     }),
   ],
   devServer: {
+    hot: true,
     static: {
       directory: path.join(__dirname, 'dist'), // Use 'static' instead of 'contentBase'
     },

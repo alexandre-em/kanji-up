@@ -3,6 +3,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import kanji from './reducers/kanji';
 import selectedKanji from './reducers/selectedKanji';
 import selectedWord from './reducers/selectedWord';
+import session from './reducers/session';
 import user from './reducers/user';
 import userScore from './reducers/userScore';
 import word from './reducers/word';
@@ -15,6 +16,7 @@ const store = configureStore({
     userScore,
     selectedKanji,
     selectedWord,
+    session,
   },
 });
 

@@ -48,7 +48,7 @@ export const getKanjiScore = createAsyncThunk<UserScore, GetScoreInput>('userSco
   return response.data;
 });
 
-export const getWordScore = createAsyncThunk<UserScore, GetScoreInput>('userScore/kanji', async ({ id }) => {
+export const getWordScore = createAsyncThunk<UserScore, GetScoreInput>('userScore/word', async ({ id }) => {
   const response = await core.userService!.getScore!(id, 'word');
   return response.data;
 });
