@@ -18,3 +18,6 @@ interface Pagination<T> {
   prevPage: number | null;
   nextPage: number | null;
 }
+
+type RequestStatusType = 'idle' | 'pending' | 'succeeded' | 'failed';
+type AppType = 'kanji' | 'word';

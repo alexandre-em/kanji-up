@@ -13,14 +13,14 @@ export default class WordService {
   getAll({ page = 1, limit = 10 }, options?: AxiosRequestConfig) {
     if (!this._instance) throw new Error('Word instance not ready');
 
-    return this._instance.get(`?page=${page}&limit=${limit}`, options);
+    return this._instance.get<Pagination<WordType>>(`?page=${page}&limit=${limit}`, options);
   }
 
   getOne({ id = '' }, options?: AxiosRequestConfig) {
     if (!this._instance) throw new Error('Word instance not ready');
     if (id === '') throw new Error('Insert a word id');
 
-    return this._instance.get(`/${id}`, options);
+    return this._instance.get<WordType>(`/${id}`, options);
   }
 
   search({ page = 0, limit = 10, query = '' }, options?: AxiosRequestConfig) {
@@ -30,6 +30,6 @@ export default class WordService {
       throw new Error('Insert a search query');
     }
 
-    return this._instance.get(`/search/word?query=${query}&page=${page}&limit=${limit}`, options);
+    return this._instance.get<Pagination<WordType>>(`/search/word?query=${query}&page=${page}&limit=${limit}`, options);
   }
 }

@@ -4,7 +4,7 @@ type UserScore = {
     [timestamp: string]: number;
   };
   progression: {
-    [kanji: string]: number;
+    [elt: string]: number;
   };
 };
 
@@ -17,10 +17,35 @@ type User = {
   name: string;
   email: string;
   password?: string;
-  friends: Array<Partial<User>>;
+  friends?: UserFollow;
+  followers?: UserFollow;
   permissions: string[];
   created_at: string;
   user_id: string;
   deleted_at: string;
-  applications: UserApplicationScore;
+  applications?: UserApplicationScore;
 };
+
+type UserRank = {
+  name: string;
+  user_id: string;
+  applications: {
+    kanji?: {
+      total_score: number;
+    };
+    word?: {
+      total_score: number;
+    };
+  };
+}[];
+
+type UserFollow = {
+  name: string;
+  user_id: string;
+}[];
+
+type UserSearchResult = {
+  name: 'string';
+  created_at: 'string';
+  user_id: 'string';
+}[];

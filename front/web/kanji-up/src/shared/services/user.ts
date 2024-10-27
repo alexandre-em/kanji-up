@@ -15,19 +15,19 @@ export default class UserService {
   getProfile(options?: AxiosRequestConfig): Promise<AxiosResponse<User>> {
     if (!this._instance) throw new Error('User instance not ready...');
 
-    return this._instance?.get('/profile', options);
+    return this._instance?.get<User>('/profile', options);
   }
 
-  getUserById(userId: string, options?: AxiosRequestConfig) {
+  getOne(userId: string, options?: AxiosRequestConfig) {
     if (!this._instance) throw new Error('User instance not ready...');
 
-    return this._instance?.get(`/profile/${userId}`, options);
+    return this._instance?.get<User>(`/profile/${userId}`, options);
   }
 
-  getUserScore(userId: string, appType: string, options?: AxiosRequestConfig): Promise<AxiosResponse<UserScore>> {
+  getScore(userId: string, appType: 'kanji' | 'word', options?: AxiosRequestConfig): Promise<AxiosResponse<UserScore>> {
     if (!this._instance) throw new Error('User instance not ready...');
 
-    return this._instance?.get(`/score/${userId}?app=${appType}`, options);
+    return this._instance?.get<UserScore>(`/score/${userId}?app=${appType}`, options);
   }
 
   updateProfile(body: Partial<User>, options?: AxiosRequestConfig): Promise<AxiosResponse<UpdatedDataResponse>> {
@@ -61,30 +61,7 @@ export default class UserService {
     return this._instance.put(`/profile/image`, formData, options);
   }
 
-  updateProfileImageNative(
-    imagePath: string,
-    filename: string,
-    options?: AxiosRequestConfig
-  ): Promise<AxiosResponse<PredictionType[]>> {
-    if (!this._instance) throw new Error('User instance not ready...');
-    if (!imagePath || imagePath === '') throw new Error('Image is null');
-
-    const nameSplit = imagePath.split('.');
-    const ext = nameSplit[nameSplit.length - 1];
-
-    const file = {
-      uri: imagePath,
-      name: filename,
-      type: `image/${ext}`,
-    };
-    const formData = new FormData();
-    // eslint-disable-next-line
-    formData.append('file', file as any);
-
-    return this._instance.put(`/image`, formData, options);
-  }
-
-  updateUserScore(
+  updateScore(
     scores: UserScore,
     application = 'kanji',
     options?: AxiosRequestConfig
@@ -96,19 +73,19 @@ export default class UserService {
   }
 
   getRanking(appType: 'kanji' | 'word', limit = 10, options?: AxiosRequestConfig) {
-    return this._instance?.get(`/ranks/${appType}?limit=${limit}`, options);
+    return this._instance?.get<UserRank>(`/ranks/${appType}?limit=${limit}`, options);
   }
 
-  getFollowingList(userId: string, options?: AxiosRequestConfig): Promise<AxiosResponse<Partial<User>[]>> {
+  getFollowingList(userId: string, options?: AxiosRequestConfig): Promise<AxiosResponse<UserFollow>> {
     if (!this._instance) throw new Error('User instance not ready...');
 
-    return this._instance.get(`/friends/${userId}/follow`, options);
+    return this._instance.get<UserFollow>(`/friends/${userId}/follow`, options);
   }
 
-  getFollowers(userId: string, options?: AxiosRequestConfig): Promise<AxiosResponse<Partial<User>[]>> {
+  getFollowers(userId: string, options?: AxiosRequestConfig): Promise<AxiosResponse<UserFollow>> {
     if (!this._instance) throw new Error('User instance not ready...');
 
-    return this._instance.get(`/friends/${userId}/followers`, options);
+    return this._instance.get<UserFollow>(`/friends/${userId}/followers`, options);
   }
 
   addFriend(userId: string, options?: AxiosRequestConfig): Promise<AxiosResponse<UpdatedDataResponse>> {
@@ -123,16 +100,16 @@ export default class UserService {
     return this._instance.delete(`/friends/${userId}`, option);
   }
 
-  deleteUser(options?: AxiosRequestConfig): Promise<AxiosResponse<UpdatedDataResponse>> {
+  delete(options?: AxiosRequestConfig): Promise<AxiosResponse<UpdatedDataResponse>> {
     if (!this._instance) throw new Error('User instance not ready...');
 
     return this._instance.delete('', options);
   }
 
-  searchUser(input: string, options?: AxiosRequestConfig): Promise<AxiosResponse<Partial<User>[]>> {
+  search(input: string, options?: AxiosRequestConfig): Promise<AxiosResponse<UserSearchResult>> {
     if (!this._instance) throw new Error('User instance not ready...');
     if (!input) throw new Error('No input');
 
-    return this._instance.get(`/search/user?search=${input}`, options);
+    return this._instance.get<UserSearchResult>(`/search/user?search=${input}`, options);
   }
 }
