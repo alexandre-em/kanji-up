@@ -21,8 +21,7 @@
     "start": "webpack serve --config webpack.config.js",
     "build": "webpack --mode production",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "prepare": "husky install"
+    "eject": "react-scripts eject"
   },
   "browserslist": {
     "production": [
@@ -54,7 +53,6 @@
     "eslint-plugin-react-hooks": "^5.0.0",
     "html-loader": "^5.1.0",
     "html-webpack-plugin": "^5.6.2",
-    "husky": "^8.0.0",
     "mini-css-extract-plugin": "^2.9.1",
     "postcss": "^8.4.47",
     "prettier": "^3.3.3",
@@ -64,11 +62,6 @@
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^5.1.0",
     "workbox-webpack-plugin": "^7.1.0"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
   },
   "lint-staged": {
     "*.ts?(x)": [

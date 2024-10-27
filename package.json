@@ -6,8 +6,7 @@
     "doc": "doc"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 0",
-    "prepare": "husky install"
+    "test": "echo \"Error: no test specified\" && exit 0"
   },
   "repository": {
     "type": "git",
@@ -27,7 +26,6 @@
   },
   "homepage": "https://github.com/alexandre-em/kanji-up#readme",
   "devDependencies": {
-    "husky": "^8.0.0",
     "lint-staged": "^15.2.10"
   }
 }
