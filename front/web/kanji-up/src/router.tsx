@@ -10,7 +10,6 @@ export default function GatewayRouter() {
   return (
     <Router>
       <Suspense fallback={<div>Chargement...</div>}>
-        Gateway
         <Routes>
           <Route path="/login" element={<LoginPage />} />
 

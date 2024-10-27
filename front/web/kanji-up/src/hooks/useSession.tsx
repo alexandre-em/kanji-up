@@ -1,6 +1,6 @@
 import { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { redirect, useLocation } from 'react-router-dom';
+import { redirect, useLocation, useNavigate } from 'react-router-dom';
 
 import { ACCESS_TOKEN } from '../constants';
 import { AppDispatch, RootState } from '../store';
@@ -10,6 +10,7 @@ export default function useSession() {
   const dispatch = useDispatch<AppDispatch>();
   const sessionState = useSelector((state: RootState) => state.session);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const searchParams = new URLSearchParams(location.search);
   const accessToken = searchParams.get(ACCESS_TOKEN);
@@ -45,8 +46,14 @@ export default function useSession() {
     if (sessionState.status === 'failed') {
       dispatch(session.actions.reset());
       redirect('/login');
-    }
-  }, [sessionState.status]);
+    } else if (sessionState.status === 'succeeded') if (location.pathname === '/login') navigate('/');
+  }, [sessionState.status, location.pathname]);
+
+  // After logged in
+  window.addEventListener('storage', () => {
+    const token = localStorage.getItem(ACCESS_TOKEN);
+    if (token) init(token);
+  });
 
   return sessionState;
 }

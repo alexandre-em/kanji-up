@@ -21,3 +21,8 @@ interface Pagination<T> {
 
 type RequestStatusType = 'idle' | 'pending' | 'succeeded' | 'failed';
 type AppType = 'kanji' | 'word';
+type SvgProps = {
+  width: number;
+  height: number;
+  color?: string;
+};
