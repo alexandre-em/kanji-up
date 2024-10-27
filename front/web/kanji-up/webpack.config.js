@@ -23,6 +23,9 @@ module.exports = {
     clean: true,
   },
   resolve: {
+    alias: {
+      '@': path.resolve(__dirname, 'src'),
+    },
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
   },
   module: {
@@ -34,7 +37,7 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        use: [MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader'],
+        use: ['style-loader', 'css-loader', 'postcss-loader'],
       },
       {
         test: /\.html$/,
@@ -58,6 +61,7 @@ module.exports = {
       template: './public/index.html',
       filename: 'index.html',
       favicon: './public/favicon.ico',
+      inject: true,
     }),
     new MiniCssExtractPlugin({
       filename: 'generatedStyle.css',
@@ -74,22 +78,19 @@ module.exports = {
         kanjiApp: 'kanjiApp@http://localhost:3001/remoteEntry.js',
       },
       exposes: {
-        './shared': './src/shared',
+        './shared': path.resolve(__dirname, 'src/shared'),
       },
       shared: {
         react: { singleton: true, eager: true, requiredVersion: require('./package.json').dependencies.react },
         'react-dom': { singleton: true, eager: true, requiredVersion: require('./package.json').dependencies['react-dom'] },
       },
     }),
-    // new webpack.DefinePlugin({
-    //   'process.env': JSON.stringify(process.env),
-    // }),
   ].filter(Boolean),
   devtool: 'source-map',
   devServer: {
     hot: true,
     static: {
-      directory: path.join(__dirname, 'dist'), // Use 'static' instead of 'contentBase'
+      directory: path.join(__dirname, 'dist'),
     },
     compress: true,
     port: 3000,
