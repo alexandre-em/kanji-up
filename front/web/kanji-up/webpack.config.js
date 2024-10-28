@@ -85,6 +85,7 @@ module.exports = {
       name: 'gatewayApp',
       filename: 'remoteEntry.js',
       remotes: {
+        homeApp: 'homeApp@http://localhost:3009/remoteEntry.js',
         kanjiApp: 'kanjiApp@http://localhost:3001/remoteEntry.js',
       },
       exposes: {

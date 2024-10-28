@@ -3,18 +3,21 @@ import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 
 import { PrivateRoute } from './components';
 import LoginPage from './pages/login';
+import { Loading } from './shared';
 
+const HomePage = React.lazy(() => import('homeApp/HomeAppPage'));
 const KanjiPage = React.lazy(() => import('kanjiApp/KanjiUpAppPage'));
 
 export default function GatewayRouter() {
   return (
     <Router>
-      <Suspense fallback={<div>Chargement...</div>}>
+      <Suspense fallback={<Loading />}>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
 
           <Route element={<PrivateRoute />}>
-            <Route path="/" element={<KanjiPage />} />
+            <Route path="/" element={<HomePage />} />
+            <Route path="/kanji" element={<KanjiPage />} />
           </Route>
           {/* Autres routes */}
         </Routes>
