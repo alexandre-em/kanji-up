@@ -6,7 +6,7 @@ import KanjiHome from './pages/KanjiUpAppPage';
 import reportWebVitals from './reportWebVitals';
 import { logger } from 'gatewayApp/shared';
 
-const root = ReactDOM.createRoot(document.getElementById('flashcard-root') as HTMLElement);
+const root = ReactDOM.createRoot(document.getElementById('search-root') as HTMLElement);
 
 root.render(
   <React.StrictMode>
