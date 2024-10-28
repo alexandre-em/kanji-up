@@ -5,11 +5,15 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const WorkboxPlugin = require('workbox-webpack-plugin');
 const { ModuleFederationPlugin } = require('webpack').container;
+const dotenv = require('dotenv');
+const Dotenv = require('dotenv-webpack');
 
-const isWatchMode = process.env.WEBPACK_WATCH === 'true'; // Check if watch mode is enabled
+dotenv.config();
+
+const env = process.env.NODE_ENV; // Check if watch mode is enabled
 
 module.exports = {
-  mode: 'development', // Change to 'production' for production builds
+  mode: env, // Change to 'production' for production builds
   entry: './src/index.ts',
   devtool: 'source-map',
   output: {
@@ -19,6 +23,9 @@ module.exports = {
     clean: true,
   },
   resolve: {
+    alias: {
+      '@': path.resolve(__dirname, 'src'),
+    },
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
   },
   module: {
@@ -30,7 +37,7 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        use: [MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader'],
+        use: ['style-loader', 'css-loader', 'postcss-loader'],
       },
       {
         test: /\.html$/,
@@ -48,15 +55,17 @@ module.exports = {
     ],
   },
   plugins: [
+    new Dotenv({ path: `./.env${process.env.NODE_ENV ? '.' + process.env.NODE_ENV : ''}`, safe: true }),
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
       template: './public/index.html',
       filename: 'index.html',
+      inject: true,
     }),
     new MiniCssExtractPlugin({
       filename: 'generatedStyle.css',
     }),
-    !isWatchMode &&
+    env === 'production' &&
       new WorkboxPlugin.GenerateSW({
         clientsClaim: true,
         skipWaiting: true,
@@ -68,14 +77,14 @@ module.exports = {
         './WordAppPage': './src/pages/WordAppPage',
       },
       remotes: {
-        shared: 'gatewayApp@http://localhost:3000/remoteEntry.js',
+        gatewayApp: 'gatewayApp@http://localhost:3000/remoteEntry.js',
       },
       shared: {
         react: { singleton: true, eager: true, requiredVersion: require('./package.json').dependencies.react },
         'react-dom': { singleton: true, eager: true, requiredVersion: require('./package.json').dependencies['react-dom'] },
       },
     }),
-  ],
+  ].filter(Boolean),
   devServer: {
     hot: true,
     static: {
