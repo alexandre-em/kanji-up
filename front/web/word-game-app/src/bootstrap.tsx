@@ -1,14 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 
-import './index.css';
+import './tailwind.css';
 import KanjiHome from './pages/KanjiUpAppPage';
 import reportWebVitals from './reportWebVitals';
-import logger from './utils/logs';
+import { logger } from 'gatewayApp/shared';
 
-const root = ReactDOM.createRoot(document.getElementById('kanji-root') as HTMLElement);
-
-console.log('Starting the application...');
+const root = ReactDOM.createRoot(document.getElementById('word-game-root') as HTMLElement);
 
 root.render(
   <React.StrictMode>
