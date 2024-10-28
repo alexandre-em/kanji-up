@@ -52,6 +52,16 @@ module.exports = {
         test: /\.(png|jpe?g|gif|svg)$/i, // Règles pour les images
         type: 'asset/resource', // Traitement des images comme ressources
       },
+      {
+        test: /\.(woff|woff2|eot|ttf|otf|svg)$/,
+        use: {
+          loader: 'file-loader',
+          options: {
+            name: '[name].[hash].[ext]', // Customize the output filename
+            outputPath: 'fonts/', // Where to place fonts in the output directory
+          },
+        },
+      },
     ],
   },
   plugins: [
@@ -70,15 +80,15 @@ module.exports = {
       new WorkboxPlugin.GenerateSW({
         clientsClaim: true,
         skipWaiting: true,
-        // options supplémentaires pour le service worker
       }),
     new ModuleFederationPlugin({
       name: 'gatewayApp',
+      filename: 'remoteEntry.js',
       remotes: {
         kanjiApp: 'kanjiApp@http://localhost:3001/remoteEntry.js',
       },
       exposes: {
-        './shared': path.resolve(__dirname, 'src/shared'),
+        './shared': './src/shared',
       },
       shared: {
         react: { singleton: true, eager: true, requiredVersion: require('./package.json').dependencies.react },
@@ -94,6 +104,7 @@ module.exports = {
     },
     compress: true,
     port: 3000,
+    open: true,
     historyApiFallback: true, // To manage clients routes
   },
   optimization: {

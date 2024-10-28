@@ -1,19 +1,19 @@
 import { PropsWithChildren } from 'react';
 
 export function TypographyH1({ children }: PropsWithChildren) {
-  return <h1 className="scroll-m-20 text-3xl font-extrabold tracking-tight lg:text-5xl">{children}</h1>;
+  return <h1 className="font-roboto scroll-m-20 text-2xl font-black tracking-tight lg:text-5xl">{children}</h1>;
 }
 
 export function TypographyH2({ children }: PropsWithChildren) {
-  return <h2 className="scroll-m-20 pb-2 text-2xl font-semibold tracking-tight first:mt-0">{children}</h2>;
+  return <h2 className="scroll-m-20 text-xl font-extrabold tracking-tight">{children}</h2>;
 }
 
 export function TypographyH3({ children }: PropsWithChildren) {
-  return <h3 className="scroll-m-20 text-xl font-semibold tracking-tight">{children}</h3>;
+  return <h3 className="scroll-m-20 text-lg font-bold tracking-tight">{children}</h3>;
 }
 
 export function TypographyH4({ children }: PropsWithChildren) {
-  return <h4 className="scroll-m-20 text-lg font-semibold tracking-tight">{children}</h4>;
+  return <h4 className="scroll-m-20 text-md font-semibold tracking-tight">{children}</h4>;
 }
 
 export function TypographyP({ children }: PropsWithChildren) {

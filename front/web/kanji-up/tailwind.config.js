@@ -1,5 +1,3 @@
-const { fontFamily } = require('tailwindcss/defaultTheme');
-
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: ['class'],
@@ -18,6 +16,21 @@ module.exports = {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ['Roboto', 'sans-serif'], //default
+        roboto: ['Roboto', 'sans-serif'],
+      },
+      fontWeight: {
+        hairline: 100,
+        thin: 200,
+        light: 300,
+        normal: 400,
+        medium: 500,
+        semibold: 600,
+        bold: 700,
+        extrabold: 800,
+        black: 900,
+      },
       colors: {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',

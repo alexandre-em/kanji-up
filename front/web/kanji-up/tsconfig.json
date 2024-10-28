@@ -20,6 +20,6 @@
     "typeRoots": ["./src/types", "./src/shared/types"],
     "jsx": "react-jsx"
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "src/types/remoteModules.d.ts"],
   "exclude": ["node_modules"]
 }
