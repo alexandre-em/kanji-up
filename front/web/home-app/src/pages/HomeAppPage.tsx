@@ -1,14 +1,13 @@
-import { PageLayout, TypographyH2, TypographyP } from 'gatewayApp/shared';
-import React, { useEffect } from 'react';
-import './tailwind.css';
-import { logger } from 'gatewayApp/shared';
+import { PageLayout, TypographyH2, TypographyP, logger } from 'gatewayApp/shared';
+import { useEffect } from 'react';
+import '../tailwind.css';
 
-export default function KanjiHome() {
+export default function HomeAppPage() {
   useEffect(() => {
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker
-          .register('/drawing-service-worker.js')
+          .register('/home-service-worker.js')
           .then((registration) => {
             logger.log(`Service worker successfully registered : ${registration}`);
           })
@@ -17,11 +16,11 @@ export default function KanjiHome() {
           });
       });
     }
-  }, []);
+  });
 
   return (
     <PageLayout>
-      <div>
+      <div className="flex bg-red-500">
         <div>
           <TypographyP>Hello Alexandreさん</TypographyP>
           <TypographyH2>Let&apos;s practice !</TypographyH2>

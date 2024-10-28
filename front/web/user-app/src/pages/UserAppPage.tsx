@@ -2,12 +2,12 @@ import React, { useEffect } from 'react';
 import './tailwind.css';
 import { logger } from 'gatewayApp/shared';
 
-export default function KanjiDetailApp() {
+export default function UserAppPage() {
   useEffect(() => {
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker
-          .register('/kanji-detail-service-worker.js')
+          .register('/user-service-worker.js')
           .then((registration) => {
             logger.log(`Service worker successfully registered : ${registration}`);
           })
