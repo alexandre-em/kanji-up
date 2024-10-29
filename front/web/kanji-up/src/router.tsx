@@ -6,7 +6,7 @@ import LoginPage from './pages/login';
 import { Loading } from './shared';
 
 const HomePage = React.lazy(() => import('homeApp/HomeAppPage'));
-const KanjiPage = React.lazy(() => import('kanjiApp/KanjiUpAppPage'));
+// const KanjiPage = React.lazy(() => import('kanjiApp/KanjiUpAppPage'));
 
 export default function GatewayRouter() {
   return (
@@ -17,7 +17,7 @@ export default function GatewayRouter() {
 
           <Route element={<PrivateRoute />}>
             <Route path="/" element={<HomePage />} />
-            <Route path="/kanji" element={<KanjiPage />} />
+            {/* <Route path="/kanji" element={<KanjiPage />} /> */}
           </Route>
           {/* Autres routes */}
         </Routes>

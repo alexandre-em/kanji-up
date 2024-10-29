@@ -19,7 +19,7 @@ module.exports = {
   output: {
     filename: '[name].[contenthash].js',
     path: path.resolve(__dirname, 'dist'),
-    publicPath: 'http://localhost:3000/', // or '/' based on your server setup
+    publicPath: `${process.env.KANJI_UP_WEB}/`, // or '/' based on your server setup
     clean: true,
   },
   resolve: {
@@ -85,8 +85,8 @@ module.exports = {
       name: 'gatewayApp',
       filename: 'remoteEntry.js',
       remotes: {
-        homeApp: 'homeApp@http://localhost:3009/remoteEntry.js',
-        kanjiApp: 'kanjiApp@http://localhost:3001/remoteEntry.js',
+        homeApp: `homeApp@${process.env.HOME_APP_WEB}/remoteEntry.js`,
+        // kanjiApp: 'kanjiApp@http://localhost:3001/remoteEntry.js',
       },
       exposes: {
         './shared': './src/shared',

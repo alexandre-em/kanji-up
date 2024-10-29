@@ -1,7 +1,15 @@
 declare module 'gatewayApp/shared' {
   export const PageLayout: React.ComponentType<any>;
-  export const useKanji: () => void;
-  export const useKanjiSelection: () => void;
+
+  export const useSession: () => {
+    accessToken: string;
+    name: string;
+    email: string;
+    iat?: number;
+    exp?: number;
+    sub: string;
+    status?: 'idle' | 'pending' | 'succeeded' | 'failed';
+  };
 
   export const TypographyH1: React.ComponentType<any>;
   export const TypographyH2: React.ComponentType<any>;

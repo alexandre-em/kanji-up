@@ -19,7 +19,7 @@ module.exports = {
   output: {
     filename: '[name].[contenthash].js',
     path: path.resolve(__dirname, 'dist'),
-    publicPath: 'http://localhost:3009/', // or '/' based on your server setup
+    publicPath: `${process.env.HOME_APP_WEB}/`, // or '/' based on your server setup
     clean: true,
   },
   resolve: {
@@ -77,7 +77,7 @@ module.exports = {
         './HomeAppPage': './src/pages/HomeAppPage',
       },
       remotes: {
-        gatewayApp: 'gatewayApp@http://localhost:3000/remoteEntry.js',
+        gatewayApp: `gatewayApp@${process.env.KANJI_UP_WEB}/remoteEntry.js`,
       },
       shared: {
         react: { singleton: true, eager: true, requiredVersion: require('./package.json').dependencies.react },
