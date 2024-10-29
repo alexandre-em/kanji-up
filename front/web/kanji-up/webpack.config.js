@@ -96,12 +96,15 @@ module.exports = {
         'react-dom': { singleton: true, eager: true, requiredVersion: require('./package.json').dependencies['react-dom'] },
       },
     }),
+    new webpack.DefinePlugin({
+      'process.env.PUBLIC_URL': JSON.stringify(process.env.PUBLIC_URL || ''),
+    }),
   ].filter(Boolean),
   devtool: 'source-map',
   devServer: {
-    hot: true,
+    hot: false,
     static: {
-      directory: path.join(__dirname, 'dist'),
+      directory: path.join(__dirname, 'public'),
     },
     compress: true,
     port: 3000,
