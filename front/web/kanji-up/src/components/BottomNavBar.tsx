@@ -1,4 +1,4 @@
-import { BookA, HomeIcon, LibraryBig, NotebookPen, Search, SlidersHorizontal } from 'lucide-react';
+import { BookA, CircleUser, HomeIcon, LibraryBig, Search, SlidersHorizontal } from 'lucide-react';
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -36,13 +36,6 @@ export default function BottomNavBar() {
       </button>
 
       <button
-        onClick={() => handleRedirect('/tests')}
-        className="outline-none border-0 w-10 h-10 rounded-lg bg-transparent flex items-center justify-center text-foreground ease-in-out duration-75 cursor-pointer hover:translate-y-[-5px] hover:animate-bounce"
-      >
-        <NotebookPen className="text-white w-5 h-5" />
-      </button>
-
-      <button
         onClick={() => handleRedirect('/search')}
         className="outline-none border-0 w-10 h-10 rounded-lg bg-transparent flex items-center justify-center text-foreground ease-in-out duration-75 cursor-pointer hover:translate-y-[-5px] hover:animate-bounce"
       >
@@ -54,6 +47,13 @@ export default function BottomNavBar() {
         className="outline-none border-0 w-10 h-10 rounded-lg bg-transparent flex items-center justify-center text-foreground ease-in-out duration-75 cursor-pointer hover:translate-y-[-5px] hover:animate-bounce"
       >
         <SlidersHorizontal className="text-white w-5 h-5" />
+      </button>
+
+      <button
+        onClick={() => handleRedirect('/user')}
+        className="outline-none border-0 w-10 h-10 rounded-lg bg-transparent flex items-center justify-center text-foreground ease-in-out duration-75 cursor-pointer hover:translate-y-[-5px] hover:animate-bounce"
+      >
+        <CircleUser className="text-white w-5 h-5" />
       </button>
     </div>
   );

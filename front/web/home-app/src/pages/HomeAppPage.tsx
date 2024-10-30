@@ -1,9 +1,10 @@
-import { PageLayout, logger } from 'gatewayApp/shared';
+import { PageLayout, Spacer, logger } from 'gatewayApp/shared';
 import { useEffect } from 'react';
 
 import Header from '@/components/Header';
 
 import '../tailwind.css';
+import DailyScoreProgression from '@/components/DailyScoreProgression';
 
 export default function HomeAppPage() {
   useEffect(() => {
@@ -24,6 +25,8 @@ export default function HomeAppPage() {
   return (
     <PageLayout>
       <Header />
+      <Spacer size={25} />
+      <DailyScoreProgression />
     </PageLayout>
   );
 }

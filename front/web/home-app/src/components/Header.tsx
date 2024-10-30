@@ -30,7 +30,7 @@ export default function Header() {
       </div>
 
       <form onSubmit={handleSearch} className="mx-5">
-        <Input type="search" placeholder="Search..." className="rounded-full shadow-md" autoFocus={false} />
+        <Input type="search" placeholder="Search..." className="rounded-full shadow-md text-muted-foreground" autoFocus={false} />
       </form>
     </>
   );

@@ -1,5 +1,6 @@
 declare module 'gatewayApp/shared' {
   export const PageLayout: React.ComponentType<any>;
+  export const Spacer: React.ComponentType<any>;
 
   export const useSession: () => {
     accessToken: string;
