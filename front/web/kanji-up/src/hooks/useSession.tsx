@@ -38,6 +38,7 @@ export default function useSession() {
   // Checking if user connected
   useEffect(() => {
     if (sessionState.status === 'idle' && sessionState.accessToken) {
+      init(sessionState.accessToken);
       dispatch(isLoggedIn());
     }
   }, [sessionState.status, sessionState.accessToken]);
@@ -46,7 +47,10 @@ export default function useSession() {
     if (sessionState.status === 'failed') {
       dispatch(session.actions.reset());
       redirect('/login');
-    } else if (sessionState.status === 'succeeded') if (location.pathname === '/login') navigate('/');
+    } else if (sessionState.status === 'succeeded')
+      if (location.pathname === '/login') {
+        navigate('/');
+      }
   }, [sessionState.status, location.pathname]);
 
   // After logged in
