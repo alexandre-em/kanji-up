@@ -4,9 +4,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../store';
 import { initialize as initSelectedWordStore, save as saveSelectedWord, selectedWord } from '../../store/reducers/selectedWord';
 
+import useCore from '@/hooks/useCore';
+
 export default function useWordSelection() {
   const dispatch = useDispatch<AppDispatch>();
   const selection = useSelector((state: RootState) => state.selectedWord);
+
+  useCore();
 
   const initialize = () => {
     dispatch(initSelectedWordStore());

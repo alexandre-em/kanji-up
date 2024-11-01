@@ -1,9 +1,10 @@
 import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
-import core from '../../shared/services';
+import { core } from '../../shared';
 
 type GetScoreInput = {
   id: string;
+  accessToken?: string;
 };
 
 type UserScoreState = {

@@ -14,6 +14,8 @@ import {
   selectSearchStatus,
 } from '../../store/reducers/kanji';
 
+import useCore from '@/hooks/useCore';
+
 export default function useKanji() {
   const dispatch = useDispatch<AppDispatch>();
   const kanji = useSelector(selectGetOne);
@@ -22,6 +24,8 @@ export default function useKanji() {
   const kanjisStatus = useSelector(selectGetAllStatus);
   const searchResult = useSelector(selectSearchResult);
   const searchStatus = useSelector(selectSearchStatus);
+
+  useCore();
 
   const getOne = useCallback(
     (id: string) => {

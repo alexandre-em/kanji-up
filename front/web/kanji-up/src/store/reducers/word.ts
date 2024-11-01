@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import { RootState } from '../';
-import core from '../../shared/services';
+import { core } from '../../shared';
 
 interface WordState {
   entities: { [uuid: string]: WordType };

@@ -14,6 +14,8 @@ import {
   selectSearchStatus,
 } from '../../store/reducers/word';
 
+import useCore from '@/hooks/useCore';
+
 export default function useWord() {
   const dispatch = useDispatch<AppDispatch>();
   const word = useSelector(selectGetOne);
@@ -22,6 +24,8 @@ export default function useWord() {
   const wordsStatus = useSelector(selectGetAllStatus);
   const searchResult = useSelector(selectSearchResult);
   const searchStatus = useSelector(selectSearchStatus);
+
+  useCore();
 
   const getOne = useCallback(
     (id: string) => {

@@ -11,12 +11,16 @@ import {
   selectSearchStatus,
 } from '../../store/reducers/user';
 
+import useCore from '@/hooks/useCore';
+
 export default function useUser() {
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector(selectGetOne);
   const userStatus = useSelector(selectGetOneStatus);
   const searchResult = useSelector(selectSearchResult);
   const searchStatus = useSelector(selectSearchStatus);
+
+  useCore();
 
   const getOne = useCallback(
     (id: string) => {

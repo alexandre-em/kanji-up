@@ -1,7 +1,7 @@
 import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import { RootState } from '../';
-import { fileNames, readFile, writeFile } from '../../shared/services/file';
+import { fileNames, readFile, writeFile } from '../../services/file';
 
 type SaveThunkReturnType = Omit<SelectedWordState, 'initStatus' | 'saveStatus'>;
 

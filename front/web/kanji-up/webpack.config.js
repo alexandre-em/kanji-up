@@ -76,7 +76,7 @@ module.exports = {
     new MiniCssExtractPlugin({
       filename: 'generatedStyle.css',
     }),
-    env === 'production' &&
+    env !== 'development' &&
       new WorkboxPlugin.GenerateSW({
         clientsClaim: true,
         skipWaiting: true,

@@ -3,14 +3,14 @@ import { jwtDecode } from 'jwt-decode';
 
 import { RootState } from '..';
 import { ACCESS_TOKEN } from '../../constants';
-import core from '../../shared/services';
+import { core } from '../../shared';
 
 type SessionStateType = {
   accessToken: string;
   refreshToken?: string;
   name: string;
   email: string;
-  userId: string;
+  sub: string;
   iat?: number;
   exp?: number;
   status?: RequestStatusType;
@@ -20,7 +20,7 @@ const initialState: SessionStateType = {
   accessToken: '',
   name: 'User',
   email: 'email.kanjiup.fr',
-  userId: '',
+  sub: '',
   status: 'idle',
 };
 

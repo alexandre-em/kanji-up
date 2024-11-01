@@ -8,9 +8,13 @@ import {
   selectedKanji,
 } from '../../store/reducers/selectedKanji';
 
+import useCore from '@/hooks/useCore';
+
 export default function useKanjiSelection() {
   const dispatch = useDispatch<AppDispatch>();
   const selection = useSelector((state: RootState) => state.selectedKanji);
+
+  useCore();
 
   const initialize = () => {
     dispatch(initSelectedKanjiStore());

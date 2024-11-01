@@ -90,6 +90,9 @@ module.exports = {
     static: {
       directory: path.join(__dirname, 'dist'), // Use 'static' instead of 'contentBase'
     },
+    headers: {
+      'Access-Control-Allow-Origin': 'http://localhost:3000',
+    },
     // compress: true,
     port: 3009,
     open: true,

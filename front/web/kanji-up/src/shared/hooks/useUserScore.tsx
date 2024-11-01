@@ -1,21 +1,25 @@
 import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import core from '../../shared/services';
+import { core } from '../../shared';
 import { AppDispatch, RootState } from '../../store';
 import { getKanjiScore, getWordScore, userScore } from '../../store/reducers/userScore';
+
+import useCore from '@/hooks/useCore';
 
 export default function useUserScore() {
   const dispatch = useDispatch<AppDispatch>();
   const userScoreState = useSelector((state: RootState) => state.userScore);
 
-  const getKanji = (id: string) => {
-    dispatch(getKanjiScore({ id }));
-  };
+  useCore();
 
-  const getWord = (id: string) => {
+  const getKanji = useCallback((id: string) => {
+    dispatch(getKanjiScore({ id }));
+  }, []);
+
+  const getWord = useCallback((id: string) => {
     dispatch(getWordScore({ id }));
-  };
+  }, []);
 
   const addDaily = useCallback(
     (score: number, app: AppType) => {
