@@ -6,7 +6,7 @@ import swaggerUi from 'swagger-ui-express';
 import dotenv from 'dotenv';
 
 import { mongoConfig, specs } from './config';
-import { KanjiRoute, CharacterRoute, RadicalRoute, ReferenceRoute, RecognitionRoute } from './routes';
+import { KanjiRoute, CharacterRoute, RadicalRoute, ReferenceRoute } from './routes';
 
 dotenv.config();
 
