@@ -97,7 +97,12 @@ module.exports = {
       },
     }),
     new webpack.DefinePlugin({
-      'process.env.PUBLIC_URL': JSON.stringify(process.env.PUBLIC_URL || ''),
+      'process.env.REACT_APP_AUTH_BASE_URL': JSON.stringify(process.env.REACT_APP_AUTH_BASE_URL),
+      'process.env.REACT_APP_KANJI_BASE_URL': JSON.stringify(process.env.REACT_APP_KANJI_BASE_URL),
+      'process.env.REACT_APP_RECOGNITION_BASE_URL': JSON.stringify(process.env.REACT_APP_RECOGNITION_BASE_URL),
+      'process.env.REACT_APP_WORD_BASE_URL': JSON.stringify(process.env.REACT_APP_WORD_BASE_URL),
+      'process.env.REACT_APP_USER_APP_WEB': JSON.stringify(process.env.REACT_APP_USER_APP_WEB),
+      'process.env.REACT_APP_AUTH_APP_ID_WEB': JSON.stringify(process.env.REACT_APP_AUTH_APP_ID_WEB),
     }),
   ].filter(Boolean),
   devtool: 'source-map',
