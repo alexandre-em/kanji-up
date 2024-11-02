@@ -8,8 +8,8 @@ type SpacerPropsType = {
 const Spacer = ({ size, direction = 'vertical' }: SpacerPropsType) => {
   const spacerStyle = {
     display: direction === 'vertical' ? 'block' : 'inline-block',
-    width: direction === 'horizontal' ? size : 1,
-    height: direction === 'vertical' ? size : 1,
+    width: `${direction === 'horizontal' ? size : 0}rem`,
+    height: `${direction === 'vertical' ? size : 0}rem`,
   };
 
   return <div style={spacerStyle} />;
