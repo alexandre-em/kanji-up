@@ -1,37 +1,31 @@
-import { TypographyH1, TypographyP, logger, useSession } from 'gatewayApp/shared';
-import React, { useCallback, useState } from 'react';
+import { TypographyH1, TypographyP, formatScore } from 'gatewayApp/shared';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Input } from '@/components/ui/input';
+import { Badge } from './ui/badge';
 
-export default function Header() {
-  const session = useSession();
-  const [app, setApp] = useState<'kanji' | 'word'>('kanji');
+type HeaderProps = {
+  name: string;
+  userId: string;
+  score: number;
+};
 
-  const handleSearch = useCallback((e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    logger.log('Submit', e);
-  }, []);
-
+export default function Header({ name, userId, score }: HeaderProps) {
   return (
-    <>
-      <div className="flex justify-between items-center m-2">
-        <div>
-          <TypographyP>
-            Hello <span className="font-bold text-primary">Alexandre</span>さん,
-          </TypographyP>
-          <TypographyH1>Let&apos;s practice !</TypographyH1>
-        </div>
-
-        <Avatar className="border-[#3f3d5670] border-[1px]">
-          <AvatarImage src={`https://auth.kanjiup.alexandre-em.fr/users/profile/image/${session?.sub}`} />
-          <AvatarFallback>{session.name.charAt(0)}</AvatarFallback>
-        </Avatar>
+    <div className="flex justify-between items-center">
+      <div>
+        <TypographyP>
+          Hello <span className="font-bold text-primary">{name}</span>さん,
+        </TypographyP>
+        <TypographyH1>Let&apos;s practice !</TypographyH1>
       </div>
 
-      <form onSubmit={handleSearch} className="mx-5">
-        <Input type="search" placeholder="Search..." className="rounded-full shadow-md text-muted-foreground" autoFocus={false} />
-      </form>
-    </>
+      <div className="flex items-center">
+        <Badge className="mr-2 h-8">{formatScore(score)}</Badge>
+        <Avatar className="border-[#3f3d5670] border-[1px]">
+          <AvatarImage src={`https://auth.kanjiup.alexandre-em.fr/users/profile/image/${userId}`} />
+          <AvatarFallback>{name.charAt(0)}</AvatarFallback>
+        </Avatar>
+      </div>
+    </div>
   );
 }

@@ -1,11 +1,11 @@
-import { TypographyH2, TypographyH3, TypographyLarge } from 'gatewayApp/shared';
+import { formatScore, TypographyH2, TypographyH3, TypographyLarge, TypographySmall } from 'gatewayApp/shared';
 import Certification from './svg/Certification';
 import Reminders from './svg/ReminderSvg';
 import Trip from './svg/TripSvg';
 import { Card, CardFooter, CardHeader } from './ui/card';
 import { Progress } from './ui/progress';
 
-const steps = [2000, 5000, 10000];
+const steps = [500, 1500, 5000];
 
 const progression = (value: number) => {
   if (value > steps[2])
@@ -23,21 +23,33 @@ const progression = (value: number) => {
   };
 };
 
-export default function DailyScoreProgression() {
+type DailyScoreProgressionProps = {
+  score: number;
+};
+
+export default function DailyScoreProgression({ score }: DailyScoreProgressionProps) {
   const ProgressionSvg = ({ value }: { value: number }) => progression(value).svg;
 
   return (
-    <Card>
+    <Card className="bg-[#fde2e7]">
       <CardHeader className="flex flex-row justify-between">
         <div>
           <TypographyH2>Today&apos;s objectives</TypographyH2>
           <TypographyH3>Let&apos;s begin !</TypographyH3>
-          <TypographyLarge>{}</TypographyLarge>
+          <span className="flex">
+            <TypographyLarge>
+              <div className="text-primary font-light text-2xl">{formatScore(score)}</div>
+            </TypographyLarge>
+            <TypographySmall>pts</TypographySmall>
+            <TypographyLarge>
+              <div className="font-light text-2xl">/ {steps[2]}</div>
+            </TypographyLarge>
+          </span>
         </div>
-        <ProgressionSvg value={1000} />
+        <ProgressionSvg value={score} />
       </CardHeader>
       <CardFooter>
-        <Progress value={33} />
+        <Progress value={Math.min(score / steps[2], 1) * 100} className="bg-[#ffffff70]" />
       </CardFooter>
     </Card>
   );
