@@ -11,6 +11,21 @@ declare module 'gatewayApp/shared' {
     sub: string;
     status?: 'idle' | 'pending' | 'succeeded' | 'failed';
   };
+  export const useUserScore: () => {
+    [key: string]: {
+      total_score: number;
+      dailyScore: number;
+      scores: {
+        [timestamp: string]: number;
+      };
+      progression: {
+        [kanji: string]: number;
+      };
+      status: 'idle' | 'pending' | 'succeeded' | 'failed';
+    };
+    getKanji: (id: string) => void;
+    getWord: (id: string) => void;
+  };
 
   export const TypographyH1: React.ComponentType<any>;
   export const TypographyH2: React.ComponentType<any>;
@@ -31,4 +46,16 @@ declare module 'gatewayApp/shared' {
     error: (message: string, payload?: any) => void;
     warn: (message: string, payload?: any) => void;
   };
+
+  export const core: {
+    accessToken: string;
+  };
+
+  export const formatScore = (score: number) => string;
+  export const formatDateKey = () => string;
+}
+
+declare module 'searchApp/SearchBar' {
+  const SearchBar: React.ComponentType<any>;
+  export default SearchBar;
 }

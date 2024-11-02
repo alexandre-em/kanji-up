@@ -78,6 +78,7 @@ module.exports = {
       },
       remotes: {
         gatewayApp: `gatewayApp@${process.env.KANJI_UP_WEB}/remoteEntry.js`,
+        searchApp: `searchApp@${process.env.SEARCH_APP_WEB}/remoteEntry.js`,
       },
       shared: {
         react: { singleton: true, eager: true, requiredVersion: require('./package.json').dependencies.react },
