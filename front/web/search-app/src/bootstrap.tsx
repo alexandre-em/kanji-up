@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 
-import SearchAppPage from './pages/SearchAppPage';
+import App from './App';
 import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(document.getElementById('search-root') as HTMLElement);
@@ -9,7 +9,7 @@ const root = ReactDOM.createRoot(document.getElementById('search-root') as HTMLE
 root.render(
   <React.StrictMode>
     Kanji
-    <SearchAppPage />
+    <App />
   </React.StrictMode>
 );
 

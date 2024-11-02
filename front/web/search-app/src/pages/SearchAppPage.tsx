@@ -1,8 +1,18 @@
-import React, { useEffect } from 'react';
-import './tailwind.css';
+import '../tailwind.css';
 import { logger } from 'gatewayApp/shared';
+import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+
+import Results from '@/components/Results';
+import SearchBar from '@/components/SearchBar';
+
+const QUERY_KEY = 'query';
 
 export default function SearchAppPage() {
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const query = searchParams.get(QUERY_KEY);
+
   useEffect(() => {
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
@@ -17,5 +27,12 @@ export default function SearchAppPage() {
       });
     }
   }, []);
-  return <div>Welcome to Word app</div>;
+
+  return (
+    <div>
+      Search App page
+      <SearchBar />
+      <Results query={query} />
+    </div>
+  );
 }

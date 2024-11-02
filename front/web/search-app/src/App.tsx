@@ -1,7 +1,7 @@
-import React from 'react';
+import SearchRouter from './router';
 
 function App() {
-  return <div>Welcome to Kanji App</div>;
+  return <SearchRouter />;
 }
 
 export default App;
