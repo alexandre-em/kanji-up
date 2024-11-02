@@ -1,18 +1,11 @@
 import '../tailwind.css';
-import { logger } from 'gatewayApp/shared';
-import { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { Loading, logger } from 'gatewayApp/shared';
+import { Suspense, useEffect } from 'react';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
-import Results from '@/components/Results';
-import SearchBar from '@/components/SearchBar';
-
-const QUERY_KEY = 'query';
+import SearchPage from './SearchPage';
 
 export default function SearchAppPage() {
-  const location = useLocation();
-  const searchParams = new URLSearchParams(location.search);
-  const query = searchParams.get(QUERY_KEY);
-
   useEffect(() => {
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
@@ -29,10 +22,12 @@ export default function SearchAppPage() {
   }, []);
 
   return (
-    <div>
-      Search App page
-      <SearchBar />
-      <Results query={query} />
-    </div>
+    <BrowserRouter>
+      <Suspense fallback={<Loading />}>
+        <Routes>
+          <Route path="/search" element={<SearchPage />} />
+        </Routes>
+      </Suspense>
+    </BrowserRouter>
   );
 }

@@ -1,7 +1,7 @@
-import SearchRouter from './router';
+import SearchAppPage from './pages/SearchAppPage';
 
 function App() {
-  return <SearchRouter />;
+  return <SearchAppPage />;
 }
 
 export default App;

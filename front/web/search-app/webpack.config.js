@@ -19,7 +19,7 @@ module.exports = {
   output: {
     filename: '[name].[contenthash].js',
     path: path.resolve(__dirname, 'dist'),
-    publicPath: process.env.SEARCH_APP_WEB, // or '/' based on your server setup
+    publicPath: `${process.env.SEARCH_APP_WEB}/`, // or '/' based on your server setup
     clean: true,
   },
   resolve: {

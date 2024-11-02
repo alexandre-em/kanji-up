@@ -1,18 +1,15 @@
-import { logger } from 'gatewayApp/shared';
 import React, { useCallback, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Input } from './ui/input';
 
 export default function SearchBar() {
   const [input, setInput] = useState('');
-  const navigate = useNavigate();
 
   const handleSearch = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      navigate(`/search?query=${input}`);
+      window.location.href = `/search?query=${encodeURIComponent(input)}`;
     },
-    [input, navigate]
+    [input]
   );
   return (
     <form onSubmit={handleSearch} className="mx-3">
