@@ -11,7 +11,7 @@ const Dotenv = require('dotenv-webpack');
 
 dotenv.config();
 
-const env = process.env.NODE_ENV || 'development';
+const env = process.env.NODE_ENV || 'production';
 
 module.exports = {
   mode: env, // Change to 'production' for production builds
@@ -65,7 +65,7 @@ module.exports = {
     ],
   },
   plugins: [
-    new Dotenv({ path: `./.env${process.env.NODE_ENV ? '.' + process.env.NODE_ENV : ''}`, safe: true }),
+    new Dotenv(),
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
       template: './public/index.html',

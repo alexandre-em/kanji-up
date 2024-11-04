@@ -12,6 +12,8 @@ dotenv.config();
 
 const env = process.env.NODE_ENV; // Check if watch mode is enabled
 
+console.log('ENV', env);
+
 module.exports = {
   mode: env, // Change to 'production' for production builds
   entry: './src/index.ts',
@@ -55,7 +57,7 @@ module.exports = {
     ],
   },
   plugins: [
-    new Dotenv({ path: `./.env${process.env.NODE_ENV ? '.' + process.env.NODE_ENV : ''}`, safe: true }),
+    new Dotenv(),
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
       template: './public/index.html',
@@ -65,11 +67,10 @@ module.exports = {
     new MiniCssExtractPlugin({
       filename: 'generatedStyle.css',
     }),
-    env === 'production' &&
-      new WorkboxPlugin.GenerateSW({
-        clientsClaim: true,
-        skipWaiting: true,
-      }),
+    new WorkboxPlugin.GenerateSW({
+      clientsClaim: true,
+      skipWaiting: true,
+    }),
     new ModuleFederationPlugin({
       name: 'searchApp',
       filename: 'remoteEntry.js',
