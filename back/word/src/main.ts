@@ -9,7 +9,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
 
   app.enableCors({
-    origin: ['http://localhost:8081', 'http://localhost:3000', 'https://word.kanjiup.alexandre-em.fr'],
+    origin: ['http://localhost:8081', 'http://localhost:3000', 'https://word.kanjiup.alexandre-em.fr', 'https://app.kanjiup.alexandre-em.fr'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     preflightContinue: false,
     optionsSuccessStatus: 204,

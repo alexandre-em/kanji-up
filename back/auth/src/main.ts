@@ -14,6 +14,7 @@ async function bootstrap() {
       'http://localhost:3000',
       'https://kanjiup.alexandre-em.fr',
       'https://kanjiup-v2.alexandre-em.fr',
+      'https://app.kanjiup.alexandre-em.fr',
       'https://user.kanjiup.alexandre-em.fr',
       'https://word.kanjiup.alexandre-em.fr',
       'https://dashboard.kanjiup.alexandre-em.fr',
