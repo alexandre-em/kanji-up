@@ -39,7 +39,7 @@ export default function useAuth() {
     if (popup) {
       popup.onerror = () => {
         window.clearInterval(checkPopup);
-        // TODO: Add a error toaster
+        // TODO: Add a let boolean variable and if !popup && isError -> toaster
       };
     }
   }, []);

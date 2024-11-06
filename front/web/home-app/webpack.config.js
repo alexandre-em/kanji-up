@@ -55,7 +55,7 @@ module.exports = {
     ],
   },
   plugins: [
-    new Dotenv({ path: `./.env${process.env.NODE_ENV ? '.' + process.env.NODE_ENV : ''}`, safe: true }),
+    new Dotenv(),
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
       template: './public/index.html',
@@ -65,11 +65,10 @@ module.exports = {
     new MiniCssExtractPlugin({
       filename: 'generatedStyle.css',
     }),
-    env === 'production' &&
-      new WorkboxPlugin.GenerateSW({
-        clientsClaim: true,
-        skipWaiting: true,
-      }),
+    new WorkboxPlugin.GenerateSW({
+      clientsClaim: true,
+      skipWaiting: true,
+    }),
     new ModuleFederationPlugin({
       name: 'homeApp',
       filename: 'remoteEntry.js',

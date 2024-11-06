@@ -34,7 +34,9 @@ const init = (state: SessionStateType, action: PayloadAction<string>) => {
   const accessToken = action.payload;
 
   core.init(accessToken);
-  if (!localStorage.getItem(ACCESS_TOKEN)) localStorage.setItem(ACCESS_TOKEN, accessToken);
+  if (accessToken) {
+    localStorage.setItem(ACCESS_TOKEN, accessToken);
+  }
 
   return { ...state, ...(jwtDecode(accessToken) as SessionStateType), accessToken };
 };
