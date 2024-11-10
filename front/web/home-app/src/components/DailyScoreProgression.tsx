@@ -31,7 +31,7 @@ export default function DailyScoreProgression({ score }: DailyScoreProgressionPr
   const ProgressionSvg = ({ value }: { value: number }) => progression(value).svg;
 
   return (
-    <Card className="bg-[#fde2e7]">
+    <Card className="shadow-md">
       <CardHeader className="flex flex-row justify-between">
         <div>
           <TypographyH2>Today&apos;s objectives</TypographyH2>
@@ -49,7 +49,7 @@ export default function DailyScoreProgression({ score }: DailyScoreProgressionPr
         <ProgressionSvg value={score} />
       </CardHeader>
       <CardFooter>
-        <Progress value={Math.min(score / steps[2], 1) * 100} className="bg-[#ffffff70]" />
+        <Progress value={Math.min(score / steps[2], 1) * 100} />
       </CardFooter>
     </Card>
   );

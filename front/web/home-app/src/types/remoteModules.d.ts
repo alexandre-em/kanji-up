@@ -27,6 +27,16 @@ declare module 'gatewayApp/shared' {
     getWord: (id: string) => void;
   };
 
+  export const useNavigation: () => {
+    goToHome: () => void;
+    goToKanjis: () => void;
+    goToKanji: () => void;
+    goToWords: () => void;
+    goToWord: () => void;
+    goToSearch: () => void;
+    goToUser: () => void;
+  };
+
   export const TypographyH1: React.ComponentType<any>;
   export const TypographyH2: React.ComponentType<any>;
   export const TypographyH3: React.ComponentType<any>;

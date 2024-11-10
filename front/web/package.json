@@ -1,0 +1,17 @@
+{
+  "name": "kanji-up",
+  "version": "0.0.3",
+  "description": "## Gateway App",
+  "scripts": {
+    "start:gateway": "cd ./kanji-up/ && yarn start",
+    "start:home": "cd ./home-app/ && yarn start",
+    "start:search": "cd ./search-app/ && yarn start",
+    "start:dev": "concurrently \"yarn start:gateway\" \"yarn start:home\" \"yarn start:search\"",
+    "env": "cp env/.env.*"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "concurrently": "^9.1.0"
+  }
+}

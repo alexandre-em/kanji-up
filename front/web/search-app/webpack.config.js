@@ -67,10 +67,11 @@ module.exports = {
     new MiniCssExtractPlugin({
       filename: 'generatedStyle.css',
     }),
-    new WorkboxPlugin.GenerateSW({
-      clientsClaim: true,
-      skipWaiting: true,
-    }),
+    false &&
+      new WorkboxPlugin.GenerateSW({
+        clientsClaim: true,
+        skipWaiting: true,
+      }),
     new ModuleFederationPlugin({
       name: 'searchApp',
       filename: 'remoteEntry.js',

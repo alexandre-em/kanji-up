@@ -1,6 +1,7 @@
 const path = require('path');
 
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const WorkboxPlugin = require('workbox-webpack-plugin');
@@ -66,17 +67,31 @@ module.exports = {
   },
   plugins: [
     new Dotenv(),
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: path.resolve(__dirname, 'public'), // Source folder to copy from
+          to: path.resolve(__dirname, 'dist'), // Destination build folder
+          globOptions: {
+            ignore: ['**/index.html'],
+          },
+        },
+      ],
+    }),
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
       template: './public/index.html',
       filename: 'index.html',
       favicon: './public/favicon.ico',
       inject: true,
+      templateParameters: {
+        PUBLIC_URL: process.env.PUBLIC_URL || '',
+      },
     }),
     new MiniCssExtractPlugin({
       filename: 'generatedStyle.css',
     }),
-    env !== 'development' &&
+    false &&
       new WorkboxPlugin.GenerateSW({
         clientsClaim: true,
         skipWaiting: true,

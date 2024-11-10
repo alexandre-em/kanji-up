@@ -7,6 +7,7 @@ import SearchBar from 'searchApp/SearchBar';
 import DailyScoreProgression from '@/components/DailyScoreProgression';
 import Header from '@/components/Header';
 import Menu from '@/components/Menu';
+import RandomKanji from '@/components/RandomKanji';
 
 export default function HomeAppPage() {
   const { sub, name } = useSession();
@@ -56,6 +57,8 @@ export default function HomeAppPage() {
       <SearchBar />
       <Spacer size={1.2} />
       <DailyScoreProgression score={dailyScore} />
+      <Spacer size={1.2} />
+      <RandomKanji />
       <Menu />
     </PageLayout>
   );

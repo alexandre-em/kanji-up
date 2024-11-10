@@ -1,3 +1,4 @@
+import '../tailwind.css';
 import React, { useCallback, useState } from 'react';
 import { Input } from './ui/input';
 
@@ -12,13 +13,13 @@ export default function SearchBar() {
     [input]
   );
   return (
-    <form onSubmit={handleSearch} className="mx-3">
+    <form onSubmit={handleSearch}>
       <Input
         type="search"
         value={input}
         onChange={(e) => setInput(e.target.value)}
-        placeholder="Search..."
-        className="rounded-full shadow-md text-muted-foreground"
+        placeholder="🔎 Search..."
+        className="rounded-full text-muted-foreground shadow-md"
         autoFocus={false}
       />
     </form>
