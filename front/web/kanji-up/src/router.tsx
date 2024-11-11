@@ -3,11 +3,12 @@ import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 
 import { PrivateRoute } from './components';
 import LoginPage from './pages/login';
+import NotFoundPage from './pages/notFound';
 import RedirectPage from './pages/redirect';
 import { Loading } from './shared';
 
 const HomePage = React.lazy(() => import('homeApp/HomeAppPage'));
-// const KanjiPage = React.lazy(() => import('kanjiApp/KanjiUpAppPage'));
+const KanjiPage = React.lazy(() => import('kanjiApp/KanjiUpAppPage'));
 
 export default function GatewayRouter() {
   return (
@@ -19,9 +20,9 @@ export default function GatewayRouter() {
 
           <Route element={<PrivateRoute />}>
             <Route path="/" element={<HomePage />} />
-            {/* <Route path="/kanji" element={<KanjiPage />} /> */}
+            <Route path="/kanjis" element={<KanjiPage />} />
           </Route>
-          {/* Autres routes */}
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Suspense>
     </Router>

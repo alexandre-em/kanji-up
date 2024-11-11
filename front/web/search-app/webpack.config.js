@@ -12,12 +12,10 @@ dotenv.config();
 
 const env = process.env.NODE_ENV; // Check if watch mode is enabled
 
-console.log('ENV', env);
-
 module.exports = {
   mode: env, // Change to 'production' for production builds
   entry: './src/index.ts',
-  devtool: 'source-map',
+  devtool: env === 'development' ? 'source-map' : false,
   output: {
     filename: '[name].[contenthash].js',
     path: path.resolve(__dirname, 'dist'),
@@ -67,11 +65,12 @@ module.exports = {
     new MiniCssExtractPlugin({
       filename: 'generatedStyle.css',
     }),
-    false &&
-      new WorkboxPlugin.GenerateSW({
-        clientsClaim: true,
-        skipWaiting: true,
-      }),
+    env !== 'development'
+      ? new WorkboxPlugin.GenerateSW({
+          clientsClaim: true,
+          skipWaiting: true,
+        })
+      : null,
     new ModuleFederationPlugin({
       name: 'searchApp',
       filename: 'remoteEntry.js',
@@ -87,7 +86,7 @@ module.exports = {
         'react-dom': { singleton: true, eager: true, requiredVersion: require('./package.json').dependencies['react-dom'] },
       },
     }),
-  ].filter(Boolean),
+  ].filter((res) => res !== null),
   devServer: {
     hot: true,
     static: {

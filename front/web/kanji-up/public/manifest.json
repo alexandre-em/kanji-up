@@ -6,7 +6,8 @@
   "display": "standalone",
   "orientation": "portrait",
   "short_name": "KanjiUp V2",
-  "background_color": "#851a1b",
+  "theme_color": "#851a1b",
+  "background_color": "#F8F8FF",
   "icons": [
     {
       "src": "icons/icon-72x72.png",

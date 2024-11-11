@@ -19,10 +19,10 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker
       .register('/service-worker.js')
       .then((registration) => {
-        logger.log(`Service worker successfully registered : ${registration}`);
+        logger.log(`Service worker successfully registered`, registration);
       })
       .catch((error) => {
-        logger.error(`Failed to register the service worker : ${error}`);
+        logger.error(`Failed to register the service worker`, error);
       });
   });
 }

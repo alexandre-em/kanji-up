@@ -2,21 +2,24 @@ const path = require('path');
 
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const WorkboxPlugin = require('workbox-webpack-plugin');
-const { ModuleFederationPlugin } = require('webpack').container;
-const webpack = require('webpack');
 const dotenv = require('dotenv');
 const Dotenv = require('dotenv-webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const webpack = require('webpack');
+const { ModuleFederationPlugin } = require('webpack').container;
+const WorkboxPlugin = require('workbox-webpack-plugin');
 
 dotenv.config();
 
-const env = process.env.NODE_ENV || 'production';
+const env = process.env.NODE_ENV || 'development';
+
+console.log('isProd?', env !== 'development');
 
 module.exports = {
   mode: env, // Change to 'production' for production builds
   entry: './src/index.ts',
+  devtool: env === 'development' ? 'source-map' : false,
   output: {
     filename: '[name].[contenthash].js',
     path: path.resolve(__dirname, 'dist'),
@@ -86,22 +89,32 @@ module.exports = {
       inject: true,
       templateParameters: {
         PUBLIC_URL: process.env.PUBLIC_URL || '',
+        manifestUrl: process.env.PUBLIC_URL + '/manifest.json',
       },
     }),
     new MiniCssExtractPlugin({
       filename: 'generatedStyle.css',
     }),
-    false &&
-      new WorkboxPlugin.GenerateSW({
-        clientsClaim: true,
-        skipWaiting: true,
-      }),
+    env !== 'development'
+      ? new WorkboxPlugin.GenerateSW({
+          clientsClaim: true,
+          skipWaiting: true,
+        })
+      : null,
     new ModuleFederationPlugin({
       name: 'gatewayApp',
       filename: 'remoteEntry.js',
       remotes: {
+        kanjiApp: `kanjiApp@${process.env.KANJI_APP_WEB}/remoteEntry.js`,
+        // kanjiDetailApp: `kanjiDetailApp@${process.env.KANJI_DETAIL_APP_WEB}/remoteEntry.js`,
+        // wordApp: `wordApp@${process.env.WORD_APP_WEB}/remoteEntry.js`,
+        // wordDetailApp: `wordDetailApp@${process.env.WORD_DETAIL_APP_WEB}/remoteEntry.js`,
+        searchApp: `searchApp@${process.env.SEARCH_APP_WEB}/remoteEntry.js`,
+        // flashcardApp: `flashcardApp@${process.env.FLASHCARD_APP_WEB}/remoteEntry.js`,
+        // drawingApp: `drawingApp@${process.env.DRAWING_APP_WEB}/remoteEntry.js`,
+        // wordGameApp: `wordGameApp@${process.env.WORD_GAME_APP_WEB}/remoteEntry.js`,
         homeApp: `homeApp@${process.env.HOME_APP_WEB}/remoteEntry.js`,
-        // kanjiApp: 'kanjiApp@http://localhost:3001/remoteEntry.js',
+        // userApp: `userApp@${process.env.USER_APP_WEB}/remoteEntry.js`,
       },
       exposes: {
         './shared': './src/shared',
@@ -119,8 +132,7 @@ module.exports = {
       'process.env.REACT_APP_USER_APP_WEB': JSON.stringify(process.env.REACT_APP_USER_APP_WEB),
       'process.env.REACT_APP_AUTH_APP_ID_WEB': JSON.stringify(process.env.REACT_APP_AUTH_APP_ID_WEB),
     }),
-  ].filter(Boolean),
-  devtool: 'source-map',
+  ].filter((res) => res !== null),
   devServer: {
     hot: false,
     static: {
