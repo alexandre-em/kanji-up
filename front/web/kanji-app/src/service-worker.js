@@ -1,4 +1,4 @@
-const CACHE_NAME = 'v1';
+const CACHE_NAME = 'kanji/v1';
 const urlsToCache = [
   '/',
   '/index.html',
