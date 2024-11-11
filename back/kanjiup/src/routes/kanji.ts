@@ -10,6 +10,7 @@ import {
   getAll,
   getOne,
   getOneImage,
+  randomKanji,
   removeKanjiExample,
   searchKanji,
   searchKanjiId,
@@ -223,6 +224,42 @@ router.get('/search', searchKanji);
  *                          $ref: '#/components/schemas/Error'
  */
 router.get('/search/autocomplete/id', searchKanjiId);
+
+/**
+ * @openapi
+ * /api/v1/kanjis/random:
+ *  get:
+ *      tags:
+ *          - Kanji
+ *      description: list of random kanjis
+ *      security: []
+ *      parameters:
+ *          - in: query
+ *            name: number
+ *            description: number of random kanji to get
+ *            schema:
+ *                type: integer
+ *      responses:
+ *          200:
+ *              description: Returns a random list of kanji
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/KanjiPaginateResponse'
+ *          400:
+ *              description: Bad request Error
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/Error'
+ *          500:
+ *              description: Internal Error
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/Error'
+ */
+router.get('/random', randomKanji);
 
 /**
  * @openapi

@@ -153,3 +153,30 @@ export const removeExampleId = async (id: string, index: number) => {
 
   return KanjiModel.findOneAndUpdate({ kanji_id: id }, { examples: newExamples }).exec();
 };
+
+export const randomKanji = async (number = 1) => {
+  const res = await KanjiModel.aggregate([
+    { $sample: { size: number } },
+    {
+      $lookup: {
+        from: 'characters',
+        localField: 'kanji',
+        foreignField: '_id',
+        as: 'kanji',
+      },
+    },
+    {
+      $project: {
+        __v: 0,
+        _id: 0,
+        creation_date: 0,
+        reference: 0,
+        deleted_at: 0,
+        'kanji._id': 0,
+        'kanji.__v': 0,
+      },
+    },
+  ]);
+
+  return res;
+};

@@ -191,3 +191,11 @@ export function removeKanjiExample(req: Request, res: Response) {
     res.status(500).send(e);
   }
 }
+
+export async function randomKanji(req: Request, res: Response) {
+  const number = parseInt(req.query.number as string);
+
+  const randomKanji = await kanjiService.randomKanji(number);
+
+  res.status(200).send(randomKanji);
+}
