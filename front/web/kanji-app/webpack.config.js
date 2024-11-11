@@ -7,6 +7,7 @@ const WorkboxPlugin = require('workbox-webpack-plugin');
 const { ModuleFederationPlugin } = require('webpack').container;
 const dotenv = require('dotenv');
 const Dotenv = require('dotenv-webpack');
+
 dotenv.config();
 
 const env = process.env.NODE_ENV; // Check if watch mode is enabled
@@ -14,11 +15,11 @@ const env = process.env.NODE_ENV; // Check if watch mode is enabled
 module.exports = {
   mode: env, // Change to 'production' for production builds
   entry: './src/index.ts',
-  devtool: 'source-map',
+  devtool: env === 'development' ? 'source-map' : false,
   output: {
     filename: '[name].[contenthash].js',
     path: path.resolve(__dirname, 'dist'),
-    publicPath: 'http://localhost:3001/', // or '/' based on your server setup
+    publicPath: `${process.env.KANJI_APP_WEB}/`, // or '/' based on your server setup
     clean: true,
   },
   resolve: {
@@ -54,7 +55,7 @@ module.exports = {
     ],
   },
   plugins: [
-    new Dotenv({ path: `./.env${process.env.NODE_ENV ? '.' + process.env.NODE_ENV : ''}`, safe: true }),
+    new Dotenv(),
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
       template: './public/index.html',
@@ -64,11 +65,12 @@ module.exports = {
     new MiniCssExtractPlugin({
       filename: 'generatedStyle.css',
     }),
-    env === 'production' &&
-      new WorkboxPlugin.GenerateSW({
-        clientsClaim: true,
-        skipWaiting: true,
-      }),
+    env !== 'development'
+      ? new WorkboxPlugin.GenerateSW({
+          clientsClaim: true,
+          skipWaiting: true,
+        })
+      : null,
     new ModuleFederationPlugin({
       name: 'kanjiApp',
       filename: 'remoteEntry.js',
@@ -76,14 +78,14 @@ module.exports = {
         './KanjiUpAppPage': './src/pages/KanjiUpAppPage',
       },
       remotes: {
-        gatewayApp: 'gatewayApp@http://localhost:3000/remoteEntry.js',
+        gatewayApp: `gatewayApp@${process.env.KANJI_UP_WEB}/remoteEntry.js`,
       },
       shared: {
         react: { singleton: true, eager: true, requiredVersion: require('./package.json').dependencies.react },
         'react-dom': { singleton: true, eager: true, requiredVersion: require('./package.json').dependencies['react-dom'] },
       },
     }),
-  ].filter(Boolean),
+  ].filter((res) => res !== null),
   devServer: {
     hot: true,
     static: {

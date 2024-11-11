@@ -1,14 +1,13 @@
-import { PageLayout, TypographyH2, TypographyP } from 'gatewayApp/shared';
-import React, { useEffect } from 'react';
-import './tailwind.css';
-import { logger } from 'gatewayApp/shared';
+import { PageLayout, logger } from 'gatewayApp/shared';
+import { useEffect } from 'react';
+import '../tailwind.css';
 
 export default function KanjiHome() {
   useEffect(() => {
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker
-          .register('/drawing-service-worker.js')
+          .register('/service-worker.js')
           .then((registration) => {
             logger.log(`Service worker successfully registered : ${registration}`);
           })
@@ -20,13 +19,11 @@ export default function KanjiHome() {
   }, []);
 
   return (
-    <PageLayout>
-      <div>
-        <div>
-          <TypographyP>Hello Alexandreさん</TypographyP>
-          <TypographyH2>Let&apos;s practice !</TypographyH2>
-        </div>
-      </div>
-    </PageLayout>
+    <PageLayout
+      header={{
+        title: 'Kanji categories',
+        subtitle: 'The 13K differents characters are sorted by difficulties and in order of learning for students in japan',
+      }}
+    ></PageLayout>
   );
 }
