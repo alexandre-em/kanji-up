@@ -36,28 +36,23 @@ export default function Menu() {
   }, []);
 
   return (
-    <div>
-      <Spacer size={1} />
-      <div className="flex justify-center flex-wrap">
-        {menu.map((m) => (
-          <>
-            <div
-              key={m.id}
-              style={{ backgroundImage: `url(${m.image})`, backgroundSize: 'cover' }}
-              className="m-2 min-w-[200px] max-w-[340px] relative w-full h-full bg-center flex flex-col justify-center items-center shadow-lg cursor-pointer rounded-se-lg rounded-es-lg rounded-tl-2xl rounded-br-2xl"
-              onClick={() => navTo(m)}
-            >
-              <div className="absolute inset-0 bg-white opacity-50 rounded-se-lg rounded-es-lg rounded-tl-2xl rounded-br-2xl hover:opacity-0 transition duration-100"></div>
+    <div className="flex justify-center flex-wrap">
+      {menu.map((m) => (
+        <div
+          key={`${m.id}`}
+          style={{ backgroundImage: `url(${m.image})`, backgroundSize: 'cover' }}
+          className="m-2 min-w-[200px] sm:max-w-[340px] relative w-full h-full bg-center flex flex-col justify-center items-center shadow-lg cursor-pointer rounded-se-lg rounded-es-lg rounded-tl-2xl rounded-br-2xl"
+          onClick={() => navTo(m)}
+        >
+          <div className="absolute inset-0 bg-white opacity-50 rounded-se-lg rounded-es-lg rounded-tl-2xl rounded-br-2xl hover:opacity-0 transition duration-100"></div>
 
-              <Spacer size={1} />
-              <m.icon className="text-primary" size={50} />
-              <Spacer size={0.5} />
-              <TypographySmall>{m.title}</TypographySmall>
-              <Spacer size={1} />
-            </div>
-          </>
-        ))}
-      </div>
+          <Spacer size={1} />
+          <m.icon className="text-primary" size={50} />
+          <Spacer size={0.5} />
+          <TypographySmall>{m.title}</TypographySmall>
+          <Spacer size={1} />
+        </div>
+      ))}
     </div>
   );
 }

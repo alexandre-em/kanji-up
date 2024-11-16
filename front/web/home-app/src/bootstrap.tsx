@@ -3,8 +3,11 @@ import ReactDOM from 'react-dom/client';
 
 import reportWebVitals from './reportWebVitals';
 import HomeAppPage from './pages/HomeAppPage';
+import { register } from './components/sw';
 
 const root = ReactDOM.createRoot(document.getElementById('home-root') as HTMLElement);
+
+register();
 
 root.render(
   <React.StrictMode>

@@ -1,4 +1,4 @@
-import { PageLayout, Spacer, formatDateKey, logger, useSession, useUserScore } from 'gatewayApp/shared';
+import { PageLayout, Spacer, TypographyH2, formatDateKey, logger, useSession, useUserScore } from 'gatewayApp/shared';
 import { useEffect, useMemo } from 'react';
 
 import '../tailwind.css';
@@ -35,31 +35,22 @@ export default function HomeAppPage() {
     }
   }, [sub]);
 
-  useEffect(() => {
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker
-          .register('/home-service-worker.js')
-          .then((registration) => {
-            logger.log(`Service worker successfully registered : ${registration}`);
-          })
-          .catch((error) => {
-            logger.error(`Failed to register the service worker : ${error}`);
-          });
-      });
-    }
-  });
-
   return (
     <PageLayout>
       <Header name={name} userId={sub} score={totalScore} />
-      <Spacer size={1.2} />
-      <SearchBar />
-      <Spacer size={1.2} />
-      <DailyScoreProgression score={dailyScore} />
-      <Spacer size={1.2} />
-      <RandomKanji />
-      <Menu />
+      <div className="overflow-y-auto">
+        <Spacer size={1.2} />
+        <SearchBar />
+        <Spacer size={1.2} />
+        <DailyScoreProgression score={dailyScore} />
+        <Spacer size={1.2} />
+        <TypographyH2>Random kanji</TypographyH2>
+        <Spacer size={0.5} />
+        <RandomKanji />
+        <Spacer size={1.2} />
+        <TypographyH2>Menu</TypographyH2>
+        <Menu />
+      </div>
     </PageLayout>
   );
 }
