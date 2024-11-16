@@ -57,3 +57,10 @@ type UserState = {
   progression: { [id: string]: number };
   status: StatusType;
 };
+
+type SearchResult<T> = {
+  query: string;
+  results: Array<T>;
+  current: number;
+  totalPages: number;
+};

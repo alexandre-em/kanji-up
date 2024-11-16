@@ -6,7 +6,7 @@ import { core } from '../../shared';
 interface KanjiState {
   entities: { [uuid: string]: KanjiType };
   kanjis: Pagination<KanjiType> | undefined;
-  search: { [search: string]: Pagination<KanjiType> };
+  search: { [search: string]: SearchResult<KanjiType> };
   getOneStatus: RequestStatusType;
   getAllStatus: RequestStatusType;
   searchStatus: RequestStatusType;
@@ -48,13 +48,19 @@ export const getAll = createAsyncThunk<Pagination<KanjiType>, GetAllInput>(
   }
 );
 
-export const search = createAsyncThunk<Pagination<KanjiType> & { query: string }, SearchKanjiInput>(
+export const search = createAsyncThunk<SearchResult<KanjiType> & { query: string }, SearchKanjiInput>(
   'kanjis/search',
   async ({ query, page = 0, limit = 10 }, { getState }) => {
     const { kanji } = getState() as RootState;
     if (kanji.search[query]) return { ...kanji.search[query], query };
     const response = await core.kanjiService!.search({ query, page, limit });
-    return { ...response.data, query };
+    return {
+      results: [...(kanji.search[query]?.results || []), ...response.data.docs],
+      query,
+      current: response.data.page,
+      totalPages: response.data.totalPages,
+      totalDocs: response.data.totalDocs,
+    };
   }
 );
 

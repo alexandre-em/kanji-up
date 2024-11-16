@@ -99,6 +99,109 @@ module.exports = {
       ? new WorkboxPlugin.GenerateSW({
           clientsClaim: true,
           skipWaiting: true,
+          cleanupOutdatedCaches: true,
+          runtimeCaching: [
+            // KanjipUp API
+            {
+              urlPattern: ({ url }) => url.origin === 'https://api.kanjiup.alexandre-em.fr',
+              handler: 'NetworkFirst',
+              options: {
+                cacheName: 'api-cache',
+                expiration: {
+                  maxEntries: 20,
+                  maxAgeSeconds: 24 * 60 * 60,
+                },
+                cacheableResponse: {
+                  statuses: [0, 200],
+                },
+              },
+            },
+            {
+              urlPattern: ({ url }) => url.origin === 'https://auth.kanjiup.alexandre-em.fr',
+              handler: 'NetworkFirst',
+              options: {
+                cacheName: 'api-cache',
+                expiration: {
+                  maxEntries: 20,
+                  maxAgeSeconds: 24 * 60 * 60,
+                },
+                cacheableResponse: {
+                  statuses: [0, 200],
+                },
+              },
+            },
+            {
+              urlPattern: ({ url }) => url.origin === 'https://api.word.kanjiup.alexandre-em.fr',
+              handler: 'NetworkFirst',
+              options: {
+                cacheName: 'api-cache',
+                expiration: {
+                  maxEntries: 20,
+                  maxAgeSeconds: 24 * 60 * 60,
+                },
+                cacheableResponse: {
+                  statuses: [0, 200],
+                },
+              },
+            },
+            {
+              urlPattern: ({ url }) => url.origin === 'https://rec.kanjiup.alexandre-em.fr',
+              handler: 'NetworkFirst',
+              options: {
+                cacheName: 'api-cache',
+                expiration: {
+                  maxEntries: 20,
+                  maxAgeSeconds: 24 * 60 * 60,
+                },
+                cacheableResponse: {
+                  statuses: [0, 200],
+                },
+              },
+            },
+            // KanjiUP applications
+            {
+              urlPattern: ({ url }) => url.origin === process.env.KANJI_UP_WEB,
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'remote-entries',
+                expiration: {
+                  maxEntries: 10,
+                  maxAgeSeconds: 24 * 60 * 60,
+                },
+                cacheableResponse: {
+                  statuses: [0, 200],
+                },
+              },
+            },
+            {
+              urlPattern: ({ url }) => url.origin === process.env.SEARCH_APP_WEB,
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'remote-entries',
+                expiration: {
+                  maxEntries: 10,
+                  maxAgeSeconds: 24 * 60 * 60,
+                },
+                cacheableResponse: {
+                  statuses: [0, 200],
+                },
+              },
+            },
+            {
+              urlPattern: ({ url }) => url.origin === process.env.HOME_APP_WEB,
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'remote-entries',
+                expiration: {
+                  maxEntries: 10,
+                  maxAgeSeconds: 24 * 60 * 60,
+                },
+                cacheableResponse: {
+                  statuses: [0, 200],
+                },
+              },
+            },
+          ],
         })
       : null,
     new ModuleFederationPlugin({

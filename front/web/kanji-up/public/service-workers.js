@@ -6,17 +6,18 @@ const urlsToCache = [
   '/icons/icon-192x192.png',
   '/icons/icon-512x512.png',
   // local
-  // 'http://localhost:3001/remoteEntry.js',
-  // 'http://localhost:3005/remoteEntry.js',
-  // 'http://localhost:3009/remoteEntry.js',
+  'http://localhost:3001/remoteEntry.js',
+  'http://localhost:3005/remoteEntry.js',
+  'http://localhost:3009/remoteEntry.js',
   // prod
-  'https://home-kanjiup.netlify.app/remoteEntry.js',
-  'https://kanji-app-kanjiup.netlify.app/remoteEntry.js',
-  'https://search-kanjiup.netlify.app/remoteEntry.js',
+  // 'https://home-kanjiup.netlify.app/remoteEntry.js',
+  // 'https://kanji-app-kanjiup.netlify.app/remoteEntry.js',
+  // 'https://search-kanjiup.netlify.app/remoteEntry.js',
 ];
 
 // Event to install the  Service Worker
 self.addEventListener('install', (event) => {
+  console.log('installing cache');
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(urlsToCache);

@@ -35,14 +35,14 @@ export default function useWord() {
   );
 
   const getAll = useCallback(
-    (limit = 10, page = 0) => {
+    (limit = 10, page = 1) => {
       dispatch(getWords({ limit, page }));
     },
     [dispatch]
   );
 
   const search = useCallback(
-    (query: string, limit = 10, page = 0) => {
+    (query: string, limit = 10, page = 1) => {
       dispatch(searchWord({ query, limit, page }));
     },
     [dispatch]

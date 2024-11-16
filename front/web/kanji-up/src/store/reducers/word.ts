@@ -6,7 +6,7 @@ import { core } from '../../shared';
 interface WordState {
   entities: { [uuid: string]: WordType };
   words: Pagination<WordType> | undefined;
-  search: { [search: string]: Pagination<WordType> };
+  search: { [search: string]: SearchResult<WordType> };
   getOneStatus: RequestStatusType;
   getAllStatus: RequestStatusType;
   searchStatus: RequestStatusType;
@@ -39,18 +39,24 @@ export const getOne = createAsyncThunk<WordType, string>('words/getById', async 
   return response.data;
 });
 
-export const getAll = createAsyncThunk<Pagination<WordType>, GetAllInput>('words/getAll', async ({ limit = 0, page = 0 }) => {
+export const getAll = createAsyncThunk<Pagination<WordType>, GetAllInput>('words/getAll', async ({ limit = 0, page = 1 }) => {
   const response = await core.wordService!.getAll({ limit, page });
   return response.data;
 });
 
-export const search = createAsyncThunk<Pagination<WordType> & { query: string }, SearchWordInput>(
+export const search = createAsyncThunk<SearchResult<WordType> & { query: string }, SearchWordInput>(
   'words/search',
-  async ({ query, page = 0, limit = 10 }, { getState }) => {
+  async ({ query, page = 1, limit = 10 }, { getState }) => {
     const { word } = getState() as RootState;
     if (word.search[query]) return { ...word.search[query], query };
     const response = await core.wordService!.search({ query, page, limit });
-    return { ...response.data, query };
+    return {
+      results: [...(word.search[query]?.results || []), ...response.data.docs],
+      query,
+      current: response.data.page,
+      totalPages: response.data.totalPages,
+      totalDocs: response.data.totalDocs,
+    };
   }
 );
 

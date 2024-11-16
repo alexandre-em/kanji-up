@@ -23,7 +23,7 @@ export default class WordService {
     return this._instance.get<WordType>(`/${id}`, options);
   }
 
-  search({ page = 0, limit = 10, query = '' }, options?: AxiosRequestConfig) {
+  search({ page = 1, limit = 10, query = '' }, options?: AxiosRequestConfig) {
     if (!this._instance) throw new Error('Word instance not ready');
 
     if (query === '') {

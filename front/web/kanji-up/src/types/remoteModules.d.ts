@@ -7,3 +7,8 @@ declare module 'homeApp/HomeAppPage' {
   const HomeAppPage: React.ComponentType;
   export default HomeAppPage;
 }
+
+declare module 'searchApp/SearchAppPage' {
+  const SearchAppPage: React.ComponentType;
+  export default SearchAppPage;
+}

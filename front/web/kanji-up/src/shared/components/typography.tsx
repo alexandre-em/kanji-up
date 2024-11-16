@@ -1,7 +1,9 @@
 import { PropsWithChildren } from 'react';
 
 export function TypographyH1({ children }: PropsWithChildren) {
-  return <h1 className="text-[#3f3d56] font-roboto scroll-m-20 text-2xl font-black tracking-tight lg:text-5xl">{children}</h1>;
+  return (
+    <h1 className="text-[#3f3d56] font-roboto scroll-m-20 text-2xl font-black tracking-tight lg:text-5xl m-0">{children}</h1>
+  );
 }
 
 export function TypographyH2({ children }: PropsWithChildren) {
@@ -17,7 +19,7 @@ export function TypographyH4({ children }: PropsWithChildren) {
 }
 
 export function TypographyP({ children }: PropsWithChildren) {
-  return <p className="text-[#3f3d56] leading-7 [&:not(:first-child)]:mt-6">{children}</p>;
+  return <p className="text-[#3f3d56] leading-7">{children}</p>;
 }
 
 export function TypographyBlockquote({ children }: PropsWithChildren) {
