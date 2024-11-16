@@ -1,6 +1,7 @@
 import '../tailwind.css';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Input } from './ui/input';
+import { register } from './sw';
 
 export default function SearchBar() {
   const [input, setInput] = useState('');
@@ -12,14 +13,19 @@ export default function SearchBar() {
     },
     [input]
   );
+
+  useEffect(() => {
+    register();
+  }, []);
+
   return (
-    <form onSubmit={handleSearch}>
+    <form onSubmit={handleSearch} className="w-full">
       <Input
         type="search"
         value={input}
         onChange={(e) => setInput(e.target.value)}
         placeholder="🔎 Search..."
-        className="rounded-full text-muted-foreground shadow-md"
+        className="rounded-full text-muted-foreground shadow-md w-full"
         autoFocus={false}
       />
     </form>

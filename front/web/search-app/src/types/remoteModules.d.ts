@@ -5,27 +5,37 @@ declare module 'gatewayApp/shared' {
   export const useKanji: () => {
     searchResult: {
       [search: string]: {
-        docs: Array<{
-          kanji_id: string;
-          kanji: {
-            character: string;
-            meaning: string[];
-            onyomi: string[];
-            kunyomi: string[];
-          };
-        }>;
-        totalDocs: number;
-        limit: number;
+        query: string;
+        results: Array<T>;
+        current: number;
         totalPages: number;
-        page: number;
-        pagingCounter: number;
-        hasPrevPage: boolean;
-        hasNextPage: boolean;
-        prevPage: number | null;
-        nextPage: number | null;
+        totalDocs: number;
       };
     };
     search: (query: string, limit?: number, page?: number) => void;
+    searchStatus: 'succeeded' | 'pending' | 'failed' | 'idle';
+  };
+
+  export const useWord: () => {
+    searchResult: {
+      [search: string]: {
+        query: string;
+        results: Array<T>;
+        current: number;
+        totalPages: number;
+        totalDocs: number;
+      };
+    };
+    search: (query: string, limit?: number, page?: number) => void;
+    searchStatus: 'succeeded' | 'pending' | 'failed' | 'idle';
+  };
+
+  export const useUser: () => {
+    searchResult: {
+      [search: string]: any;
+    };
+    search: (query: string, limit?: number, page?: number) => void;
+    searchStatus: 'succeeded' | 'pending' | 'failed' | 'idle';
   };
 
   export const TypographyH1: React.ComponentType<any>;
@@ -40,6 +50,8 @@ declare module 'gatewayApp/shared' {
   export const TypographyLarge: React.ComponentType<any>;
   export const TypographySmall: React.ComponentType<any>;
   export const TypographyMuted: React.ComponentType<any>;
+
+  export const Spacer: React.ComponentType<any>;
 
   export const logger: {
     log: (message: string, payload?: any) => void;

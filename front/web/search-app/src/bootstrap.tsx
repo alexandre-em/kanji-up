@@ -2,9 +2,12 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 
 import App from './App';
+import { register } from './components/sw';
 import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(document.getElementById('search-root') as HTMLElement);
+
+register();
 
 root.render(
   <React.StrictMode>

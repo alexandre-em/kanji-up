@@ -12,6 +12,8 @@ dotenv.config();
 
 const env = process.env.NODE_ENV; // Check if watch mode is enabled
 
+console.log('isProd', env !== 'development');
+
 module.exports = {
   mode: env, // Change to 'production' for production builds
   entry: './src/index.ts',
@@ -91,6 +93,9 @@ module.exports = {
     hot: true,
     static: {
       directory: path.join(__dirname, 'dist'), // Use 'static' instead of 'contentBase'
+    },
+    headers: {
+      'Access-Control-Allow-Origin': 'http://localhost:3000',
     },
     // compress: true,
     port: 3005,

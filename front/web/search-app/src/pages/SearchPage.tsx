@@ -1,3 +1,4 @@
+import { PageLayout, Spacer, TypographyH1 } from 'gatewayApp/shared';
 import { useLocation } from 'react-router-dom';
 
 import Results from '@/components/Results';
@@ -10,10 +11,12 @@ export default function SearchPage() {
   const searchParams = new URLSearchParams(location.search);
   const query = searchParams.get(QUERY_KEY);
   return (
-    <div>
-      Search App page
+    <PageLayout>
+      <TypographyH1>Searching : "{query}" </TypographyH1>
+      <Spacer size={0.7} />
       <SearchBar />
+      <Spacer size={1} />
       <Results query={query} />
-    </div>
+    </PageLayout>
   );
 }
