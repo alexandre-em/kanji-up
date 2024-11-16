@@ -5,7 +5,7 @@ const urlsToCache = [
   '/manifest.json',
   '/icons/icon-192x192.png',
   '/icons/icon-512x512.png',
-  // Add more ressources here...
+  // other
 ];
 
 // Event to install the  Service Worker
@@ -22,7 +22,16 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request).then((response) => {
       // Returns cached ressources if exists, otherwise it will search on the network
-      return response || fetch(event.request);
+      return (
+        response ||
+        fetch(event.request).then((res) => {
+          if (event.request.url.includes('remoteEntry.js')) {
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, res.clone());
+            });
+          }
+        })
+      );
     })
   );
 });

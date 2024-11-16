@@ -1,10 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { register } from './components/sw';
 
 import KanjiAppPage from './pages/KanjiUpAppPage';
 import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(document.getElementById('kanji-root') as HTMLElement);
+
+register();
 
 root.render(
   <React.StrictMode>
