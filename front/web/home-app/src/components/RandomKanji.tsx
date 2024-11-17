@@ -1,32 +1,43 @@
 import { AvatarFallback, AvatarImage } from '@radix-ui/react-avatar';
-import { Spacer } from 'gatewayApp/shared';
+import { Spacer, useKanji } from 'gatewayApp/shared';
 import { buildStyles, CircularProgressbar } from 'react-circular-progressbar';
 import { Avatar } from './ui/avatar';
 
 import 'react-circular-progressbar/dist/styles.css';
 import { Skeleton } from './ui/skeleton';
+import { useEffect } from 'react';
 
-type RandomKanjiProps = {
-  loading?: boolean;
-};
+export default function RandomKanji() {
+  const { random, randomStatus, getRandom } = useKanji();
 
-export default function RandomKanji({ loading = false }: RandomKanjiProps) {
-  if (loading) return <Skeleton className="h-[66px] w-full bg-primary rounded-full" />;
+  useEffect(() => {
+    getRandom(1);
+  }, []);
+
+  if (random?.length < 1) return <Skeleton className="h-[66px] w-full bg-primary rounded-full" />;
+  if (randomStatus !== 'succeeded') return <Skeleton className="h-[66px] w-full bg-primary rounded-full" />;
 
   return (
     <div className="w-full bg-primary flex justify-between items-center p-2 rounded-full shadow-md">
       <div className="flex flex-nowrap">
+        <Spacer size={0.5} direction="horizontal" />
         <Avatar>
-          <AvatarImage src="https://api.kanjiup.alexandre-em.fr/api/v1/kanjis/image/%E4%B8%80" alt="1" className="bg-white" />
-          <AvatarFallback>1</AvatarFallback>
+          <AvatarImage
+            src={`${process.env.REACT_APP_KANJI_BASE_URL}/kanjis/image/${encodeURIComponent(random[0].kanji[0].character || '')}`}
+            className="bg-white p-1"
+          />
+          <AvatarFallback>{random[0].kanji[0].character}</AvatarFallback>
         </Avatar>
 
         <Spacer size={0.5} direction="horizontal" />
 
         {/* detail */}
         <div className="flex flex-col justify-center">
-          <div className="text-md font-semibold text-white">One</div>
-          <div className="text-sm font-extralight text-muted">ichi, hitotsu</div>
+          <div className="text-md font-semibold text-white">
+            {random[0].kanji[0].character} 【 {random[0].kanji[0].onyomi?.join(', ')} · {random[0].kanji[0].kunyomi?.join(', ')}{' '}
+            】
+          </div>
+          <div className="text-sm font-extralight text-muted">{random[0].kanji[0].meaning}</div>
         </div>
       </div>
 

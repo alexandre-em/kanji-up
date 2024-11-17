@@ -31,4 +31,10 @@ export default class KanjiService {
     }
     return this._instance.get<Pagination<KanjiType>>(`/search?query=${query}&page=${page}&limit=${limit}`, options);
   }
+
+  getRandom(number: number, options?: AxiosRequestConfig) {
+    if (!this._instance) throw new Error('Kanji instance not ready...');
+
+    return this._instance.get<KanjiType[]>(`/random?number=${number}`, options);
+  }
 }

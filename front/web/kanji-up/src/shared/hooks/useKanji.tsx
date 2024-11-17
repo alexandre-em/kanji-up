@@ -5,11 +5,14 @@ import { AppDispatch } from '../../store';
 import {
   getOne as getById,
   getAll as getKanjis,
+  getRandom as getRandomKanji,
   search as searchKanji,
   selectGetAllResult,
   selectGetAllStatus,
   selectGetOne,
   selectGetOneStatus,
+  selectGetRandomResult,
+  selectGetRandomStatus,
   selectSearchResult,
   selectSearchStatus,
 } from '../../store/reducers/kanji';
@@ -22,6 +25,8 @@ export default function useKanji() {
   const kanjiStatus = useSelector(selectGetOneStatus);
   const kanjis = useSelector(selectGetAllResult);
   const kanjisStatus = useSelector(selectGetAllStatus);
+  const random = useSelector(selectGetRandomResult);
+  const randomStatus = useSelector(selectGetRandomStatus);
   const searchResult = useSelector(selectSearchResult);
   const searchStatus = useSelector(selectSearchStatus);
 
@@ -41,6 +46,10 @@ export default function useKanji() {
     [dispatch]
   );
 
+  const getRandom = useCallback((number: number) => {
+    dispatch(getRandomKanji(number));
+  }, []);
+
   const search = useCallback(
     (query: string, limit = 10, page = 0) => {
       dispatch(searchKanji({ query, limit, page }));
@@ -53,10 +62,13 @@ export default function useKanji() {
     kanjiStatus,
     kanjisStatus,
     kanjis,
+    random,
+    randomStatus,
     searchResult,
     searchStatus,
     getOne,
     getAll,
+    getRandom,
     search,
   };
 }

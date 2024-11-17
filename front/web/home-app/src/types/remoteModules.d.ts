@@ -27,6 +27,21 @@ declare module 'gatewayApp/shared' {
     getWord: (id: string) => void;
   };
 
+  export const useKanji: () => {
+    random: {
+      kanji_id: string;
+      kanji: {
+        character_id: string;
+        character?: string;
+        meaning?: Array<string>;
+        onyomi?: Array<string>;
+        kunyomi?: Array<string>;
+      }[];
+    }[];
+    randomStatus: 'idle' | 'pending' | 'succeeded' | 'failed';
+    getRandom: (number: number) => void;
+  };
+
   export const useNavigation: () => {
     goToHome: () => void;
     goToKanjis: () => void;
