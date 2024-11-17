@@ -30,9 +30,15 @@ declare module 'gatewayApp/shared' {
     searchStatus: 'succeeded' | 'pending' | 'failed' | 'idle';
   };
 
+  type UserType = {
+    name: 'string';
+    created_at: 'string';
+    user_id: 'string';
+  };
+
   export const useUser: () => {
     searchResult: {
-      [search: string]: any;
+      [search: string]: UserType[];
     };
     search: (query: string, limit?: number, page?: number) => void;
     searchStatus: 'succeeded' | 'pending' | 'failed' | 'idle';

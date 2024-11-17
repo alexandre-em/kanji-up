@@ -3,8 +3,8 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Input } from './ui/input';
 import { register } from './sw';
 
-export default function SearchBar() {
-  const [input, setInput] = useState('');
+export default function SearchBar({ query }: { query: string | null }) {
+  const [input, setInput] = useState(query || '');
 
   const handleSearch = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
