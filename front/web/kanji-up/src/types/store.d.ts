@@ -63,4 +63,5 @@ type SearchResult<T> = {
   results: Array<T>;
   current: number;
   totalPages: number;
+  totalDocs: number;
 };

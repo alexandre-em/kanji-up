@@ -52,7 +52,7 @@ export const search = createAsyncThunk<SearchResult<KanjiType> & { query: string
   'kanjis/search',
   async ({ query, page = 0, limit = 10 }, { getState }) => {
     const { kanji } = getState() as RootState;
-    if (kanji.search[query]) return { ...kanji.search[query], query };
+    if (kanji.search[query] && kanji.search[query].current > page) return { ...kanji.search[query], query };
     const response = await core.kanjiService!.search({ query, page, limit });
     return {
       results: [...(kanji.search[query]?.results || []), ...response.data.docs],

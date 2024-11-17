@@ -48,8 +48,9 @@ export const search = createAsyncThunk<SearchResult<WordType> & { query: string 
   'words/search',
   async ({ query, page = 1, limit = 10 }, { getState }) => {
     const { word } = getState() as RootState;
-    if (word.search[query]) return { ...word.search[query], query };
+    if (word.search[query]) return word.search[query];
     const response = await core.wordService!.search({ query, page, limit });
+    if (response.data.nextPage === null) return word.search[query];
     return {
       results: [...(word.search[query]?.results || []), ...response.data.docs],
       query,
