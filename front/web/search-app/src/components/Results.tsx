@@ -62,7 +62,7 @@ export default function Results({ query, type }: Results) {
           break;
       }
     }
-  }, [query, selectedType, searchKanjiResult, searchWordResult, searchUserResult]);
+  }, [query, selectedType, searchKanjiResult, searchWordResult]);
 
   const resultCount = useMemo(() => {
     if (!query) return 0;
@@ -86,7 +86,7 @@ export default function Results({ query, type }: Results) {
 
   return (
     <div className="w-full h-full">
-      <Tabs defaultValue={selectedType} className="w-full h-[calc(100dvh-300px)]" onValueChange={handleChangeSearchType}>
+      <Tabs defaultValue={selectedType} className="w-full h-[calc(100dvh-400px)]" onValueChange={handleChangeSearchType}>
         <TabsList className="w-full">
           <TabsTrigger value="kanji" className="w-full">
             Kanji
@@ -100,7 +100,6 @@ export default function Results({ query, type }: Results) {
         </TabsList>
         <Spacer size={0.7} />
         <TypographyH2>Results ({resultCount}) :</TypographyH2>
-        <Spacer size={0.7} />
         {query && (
           <>
             <ReactVirtualizedAutoSizer>
@@ -134,10 +133,10 @@ export default function Results({ query, type }: Results) {
                     )}
                   </TabsContent>
                   <TabsContent value="word">
-                    {searchWordStatus && searchWordResult[query]?.totalDocs && (
+                    {searchWordStatus === 'succeeded' && searchWordResult[query]?.totalDocs && (
                       <InfiniteLoader
-                        isItemLoaded={(index) => index + 1 < searchKanjiResult[query].results.length}
-                        itemCount={searchKanjiResult[query].results.length}
+                        isItemLoaded={(index) => index + 1 < searchWordResult[query].results.length}
+                        itemCount={searchWordResult[query].results.length}
                         loadMoreItems={handleLoad}
                       >
                         {({ onItemsRendered, ref }) => (

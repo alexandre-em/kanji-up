@@ -1,4 +1,4 @@
-import { PageLayout, Spacer, TypographyH2, formatDateKey, logger, useSession, useUserScore } from 'gatewayApp/shared';
+import { PageLayout, Spacer, TypographyH2, formatDateKey, useSession, useUserScore } from 'gatewayApp/shared';
 import { useEffect, useMemo } from 'react';
 
 import '../tailwind.css';
