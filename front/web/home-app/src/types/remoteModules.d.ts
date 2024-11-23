@@ -78,6 +78,8 @@ declare module 'gatewayApp/shared' {
 
   export const formatScore = (score: number) => string;
   export const formatDateKey = () => string;
+
+  export const KANJI_PROGRESSION_MAX;
 }
 
 declare module 'searchApp/SearchBar' {

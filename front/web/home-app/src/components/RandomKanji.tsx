@@ -1,5 +1,5 @@
 import { AvatarFallback, AvatarImage } from '@radix-ui/react-avatar';
-import { Spacer, useKanji } from 'gatewayApp/shared';
+import { KANJI_PROGRESSION_MAX, Spacer, useKanji, useSession, useUserScore } from 'gatewayApp/shared';
 import { buildStyles, CircularProgressbar } from 'react-circular-progressbar';
 import { Avatar } from './ui/avatar';
 
@@ -9,10 +9,13 @@ import { useEffect } from 'react';
 
 export default function RandomKanji() {
   const { random, randomStatus, getRandom } = useKanji();
+  const { sub } = useSession();
+  const { kanji, getKanji } = useUserScore();
 
   useEffect(() => {
     getRandom(1);
-  }, []);
+    if (sub) getKanji(sub);
+  }, [sub]);
 
   if (random?.length < 1) return <Skeleton className="h-[66px] w-full bg-primary rounded-full" />;
   if (randomStatus !== 'succeeded') return <Skeleton className="h-[66px] w-full bg-primary rounded-full" />;
@@ -33,19 +36,16 @@ export default function RandomKanji() {
 
         {/* detail */}
         <div className="flex flex-col justify-center">
-          <div className="text-md font-semibold text-white">
-            {random[0].kanji[0].character} 【 {random[0].kanji[0].onyomi?.join(', ')} · {random[0].kanji[0].kunyomi?.join(', ')}{' '}
-            】
-          </div>
-          <div className="text-sm font-extralight text-muted">{random[0].kanji[0].meaning}</div>
+          <div className="text-md font-semibold text-white">{random[0].kanji[0].character}</div>
+          <div className="text-sm font-extralight text-muted">{random[0].kanji[0].meaning?.join(', ').substring(0, 30)}...</div>
         </div>
       </div>
 
       <div className="w-[50px] h-[50px]">
         <CircularProgressbar
-          value={0.5}
+          value={(kanji.progression[random[0].kanji_id] || 0) / KANJI_PROGRESSION_MAX}
           maxValue={1}
-          text={`10%`}
+          text={`${((kanji.progression[random[0].kanji_id] || 0) / KANJI_PROGRESSION_MAX) * 100}%`}
           styles={buildStyles({ pathColor: 'white', trailColor: '#ffffff60', textColor: '#fff' })}
         />
       </div>
