@@ -39,7 +39,7 @@ const initialState: KanjiState = {
 
 export const getOne = createAsyncThunk<KanjiType, string>('kanjis/getById', async (id, { getState }) => {
   const { kanji } = getState() as RootState;
-  if (kanji.entities[id].kanji_id) return kanji.entities[id];
+  if (kanji.entities[id]?.kanji_id) return kanji.entities[id];
   const response = await core.kanjiService!.getOne({ id });
   return response.data;
 });

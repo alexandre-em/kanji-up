@@ -174,6 +174,34 @@ module.exports = {
               },
             },
             {
+              urlPattern: ({ url }) => url.origin === process.env.KANJI_APP_WEB,
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'remote-entries',
+                expiration: {
+                  maxEntries: 10,
+                  maxAgeSeconds: 24 * 60 * 60,
+                },
+                cacheableResponse: {
+                  statuses: [0, 200],
+                },
+              },
+            },
+            {
+              urlPattern: ({ url }) => url.origin === process.env.KANJI_APP_DETAIL_WEB,
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'remote-entries',
+                expiration: {
+                  maxEntries: 10,
+                  maxAgeSeconds: 24 * 60 * 60,
+                },
+                cacheableResponse: {
+                  statuses: [0, 200],
+                },
+              },
+            },
+            {
               urlPattern: ({ url }) => url.origin === process.env.SEARCH_APP_WEB,
               handler: 'CacheFirst',
               options: {
@@ -209,7 +237,7 @@ module.exports = {
       filename: 'remoteEntry.js',
       remotes: {
         kanjiApp: `kanjiApp@${process.env.KANJI_APP_WEB}/remoteEntry.js`,
-        // kanjiDetailApp: `kanjiDetailApp@${process.env.KANJI_DETAIL_APP_WEB}/remoteEntry.js`,
+        kanjiDetailApp: `kanjiDetailApp@${process.env.KANJI_DETAIL_APP_WEB}/remoteEntry.js`,
         // wordApp: `wordApp@${process.env.WORD_APP_WEB}/remoteEntry.js`,
         // wordDetailApp: `wordDetailApp@${process.env.WORD_DETAIL_APP_WEB}/remoteEntry.js`,
         searchApp: `searchApp@${process.env.SEARCH_APP_WEB}/remoteEntry.js`,

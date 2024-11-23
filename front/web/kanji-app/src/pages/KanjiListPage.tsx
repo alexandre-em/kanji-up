@@ -1,10 +1,12 @@
 import {
-  Color,
   KANJI_PROGRESSION_MAX,
   KanjiType,
   Loading,
   PageLayout,
+  SELECTED_COLOR,
   Spacer,
+  TO_ADD_COLOR,
+  TO_REMOVE_COLOR,
   TypographyH2,
   TypographyH3,
   useKanji,
@@ -57,14 +59,14 @@ export default function KanjiListPage() {
     (kanji: KanjiType) => {
       if (isSelectionMode) {
         if (toAdd[kanji.kanji_id]) {
-          return `bg-[${Color.toAdd}]`;
+          return `bg-[#10b981]`;
         }
         if (toRemove[kanji.kanji_id]) {
-          return `bg-[${Color.toRemove}] text-white`;
+          return `bg-[#b91c1c]`;
         }
       }
       if (selectedKanji[kanji.kanji_id]) {
-        return `bg-[${Color.selected}]`;
+        return `bg-[#bfdbfe]`;
       }
     },
     [selectedKanji, toAdd, toRemove, isSelectionMode]
@@ -122,7 +124,8 @@ export default function KanjiListPage() {
     <PageLayout
       header={{
         title: `Kanji list for grade ${grade}`,
-        subtitle: 'The 13K differents characters are sorted by difficulties and in order of learning for students in japan',
+        subtitle:
+          'The 13K differents characters are sorted by difficulties and in order of learning for students in japan. You can click on the red button to select the kanji characters you want to learn, practice then save by clicking on the same button',
       }}
     >
       <Spacer size={1} />

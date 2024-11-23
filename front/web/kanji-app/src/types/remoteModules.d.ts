@@ -99,11 +99,9 @@ declare module 'gatewayApp/shared' {
     warn: (message: string, payload?: any) => void;
   };
 
-  export const Color: {
-    selected: string;
-    toAdd: string;
-    toRemove: string;
-  };
+  export const SELECTED_COLOR: string;
+  export const TO_ADD_COLOR: string;
+  export const TO_REMOVE_COLOR: string;
 
   export const KANJI_PROGRESSION_MAX;
 }

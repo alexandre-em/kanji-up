@@ -3,6 +3,11 @@ declare module 'kanjiApp/KanjiUpAppPage' {
   export default KanjiUpAppPage;
 }
 
+declare module 'kanjiDetailApp/KanjiDetailAppPage' {
+  const KanjiDetailAppPage: React.ComponentType;
+  export default KanjiDetailAppPage;
+}
+
 declare module 'homeApp/HomeAppPage' {
   const HomeAppPage: React.ComponentType;
   export default HomeAppPage;
