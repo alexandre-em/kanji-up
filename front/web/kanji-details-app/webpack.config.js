@@ -15,11 +15,11 @@ const env = process.env.NODE_ENV; // Check if watch mode is enabled
 module.exports = {
   mode: env, // Change to 'production' for production builds
   entry: './src/index.ts',
-  devtool: 'source-map',
+  devtool: env === 'development' ? 'source-map' : false,
   output: {
     filename: '[name].[contenthash].js',
     path: path.resolve(__dirname, 'dist'),
-    publicPath: 'http://localhost:3002/', // or '/' based on your server setup
+    publicPath: `${process.env.KANJI_DETAIL_APP_WEB}/`, // or '/' based on your server setup
     clean: true,
   },
   resolve: {
@@ -55,7 +55,7 @@ module.exports = {
     ],
   },
   plugins: [
-    new Dotenv({ path: `./.env${process.env.NODE_ENV ? '.' + process.env.NODE_ENV : ''}`, safe: true }),
+    new Dotenv(),
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
       template: './public/index.html',
@@ -65,11 +65,12 @@ module.exports = {
     new MiniCssExtractPlugin({
       filename: 'generatedStyle.css',
     }),
-    env === 'production' &&
-      new WorkboxPlugin.GenerateSW({
-        clientsClaim: true,
-        skipWaiting: true,
-      }),
+    env !== 'development'
+      ? new WorkboxPlugin.GenerateSW({
+          clientsClaim: true,
+          skipWaiting: true,
+        })
+      : null,
     new ModuleFederationPlugin({
       name: 'kanjiDetailApp',
       filename: 'remoteEntry.js',
@@ -77,18 +78,21 @@ module.exports = {
         './KanjiDetailAppPage': './src/pages/KanjiDetailAppPage',
       },
       remotes: {
-        gatewayApp: 'gatewayApp@http://localhost:3000/remoteEntry.js',
+        gatewayApp: `gatewayApp@${process.env.KANJI_UP_WEB}/remoteEntry.js`,
       },
       shared: {
         react: { singleton: true, eager: true, requiredVersion: require('./package.json').dependencies.react },
         'react-dom': { singleton: true, eager: true, requiredVersion: require('./package.json').dependencies['react-dom'] },
       },
     }),
-  ].filter(Boolean),
+  ].filter((module) => module !== null),
   devServer: {
     hot: true,
     static: {
       directory: path.join(__dirname, 'dist'), // Use 'static' instead of 'contentBase'
+    },
+    headers: {
+      'Access-Control-Allow-Origin': 'http://localhost:3000',
     },
     // compress: true,
     port: 3002,
