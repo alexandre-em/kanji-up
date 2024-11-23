@@ -21,8 +21,9 @@ export const writeFile = (name: string, contents: string) =>
   new Promise((resolve, reject) => {
     try {
       localStorage.setItem(name, contents);
-      resolve(undefined);
+      resolve(contents);
     } catch (err) {
+      console.log(err);
       reject(err);
     }
   });

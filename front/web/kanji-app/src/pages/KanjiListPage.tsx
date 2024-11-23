@@ -1,5 +1,6 @@
 import {
   KANJI_PROGRESSION_MAX,
+  KanjiType,
   Loading,
   PageLayout,
   Spacer,
@@ -10,14 +11,12 @@ import {
   useSession,
   useUserScore,
 } from 'gatewayApp/shared';
+import { Check, SquareDashedMousePointer } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { Card } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Check, SquareDashedMousePointer } from 'lucide-react';
+import { Card } from '@/components/ui/card';
 import {
   Pagination,
   PaginationContent,
@@ -27,6 +26,8 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination';
+import { Progress } from '@/components/ui/progress';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/hooks/use-toast';
 
 const GRADE_KEY = 'grade';
@@ -47,19 +48,48 @@ export default function KanjiListPage() {
   const limit = parseInt(searchParams.get(LIMIT_KEY) || LIMIT);
 
   const { kanjis, getAll, kanjisStatus } = useKanji();
-  const { selectedKanji, initialize } = useKanjiSelection();
+  const { selectedKanji, initialize, select, save, saveStatus, toAdd, toRemove, unselect } = useKanjiSelection();
   const { sub } = useSession();
   const { kanji, getKanji } = useUserScore();
 
   console.log(selectedKanji);
 
-  const handleClickKanji = useCallback(() => {
-    // TODO: code this function
-  }, []);
+  const kanjiSelectedStyle = useCallback(
+    (kanji: KanjiType) => {
+      if (isSelectionMode) {
+        if (toAdd[kanji.kanji_id]) {
+          return 'bg-[#10b981]';
+        }
+        if (toRemove[kanji.kanji_id]) {
+          return 'bg-[#b91c1c] text-white';
+        }
+      }
+      if (selectedKanji[kanji.kanji_id]) {
+        return 'bg-[#bfdbfe]';
+      }
+    },
+    [selectedKanji, toAdd, toRemove, isSelectionMode]
+  );
+
+  const handleClickKanji = useCallback(
+    (kanji: KanjiType) => {
+      if (isSelectionMode) {
+        select(kanji);
+        if (toAdd[kanji.kanji_id] || (selectedKanji[kanji.kanji_id] && !toRemove[kanji.kanji_id])) {
+          unselect(kanji);
+        } else {
+          select(kanji);
+        }
+      } else {
+        window.location.href = `/search?query=${kanji.kanji_id}`;
+      }
+    },
+    [isSelectionMode, toAdd, toRemove, selectedKanji]
+  );
 
   const handleSelectionClick = useCallback(() => {
     if (isSelectionMode) {
-      toast({ description: 'Selection saved successfully', title: 'Success', variant: 'success' });
+      save();
     }
     setIsSelectionMode((prev) => !prev);
   }, [isSelectionMode]);
@@ -71,6 +101,12 @@ export default function KanjiListPage() {
     },
     [page, limit, grade]
   );
+
+  useEffect(() => {
+    if (saveStatus === 'succeeded') toast({ description: 'Selection saved successfully', title: 'Success', variant: 'success' });
+    if (saveStatus === 'failed')
+      toast({ description: 'Failed to save the kanji list. Please try again later', title: 'Error', variant: 'destructive' });
+  }, [saveStatus]);
 
   useEffect(() => {
     if (grade) {
@@ -116,10 +152,14 @@ export default function KanjiListPage() {
       <Spacer size={1} />
       <div className="flex flex-wrap justify-center">
         {kanjis!.docs.map((k) => (
-          <div key={k.kanji_id} className="flex flex-col items-center justify-center">
-            <Card className="w-[60px] h-[60px] flex justify-center items-center m-2">
+          <div
+            key={k.kanji_id}
+            className={'flex flex-col items-center justify-center cursor-pointer'}
+            onClick={() => handleClickKanji(k)}
+          >
+            <Card className={`w-[60px] h-[60px] flex justify-center items-center m-2  ${kanjiSelectedStyle(k)}`}>
               <TypographyH3>
-                <span className="text-2xl">{k.kanji.character}</span>
+                <span className={`text-2xl ${kanjiSelectedStyle(k)}`}>{k.kanji.character}</span>
               </TypographyH3>
             </Card>
             {kanji.progression[k.kanji_id] !== undefined && (

@@ -11,7 +11,6 @@ type SelectedKanjiState = {
   toAdd: { [key: string]: Partial<KanjiType> };
   toRemove: { [key: string]: Partial<KanjiType> };
   initStatus: StatusType;
-  saveStatus: StatusType;
 };
 
 type SelectedWordState = {

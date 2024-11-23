@@ -1,16 +1,12 @@
 import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
-import { RootState } from '../';
 import { fileNames, readFile, writeFile } from '../../services/file';
-
-type SaveThunkReturnType = Omit<SelectedKanjiState, 'initStatus' | 'saveStatus'>;
 
 const initialState: SelectedKanjiState = {
   selectedKanji: {},
   toAdd: {},
   toRemove: {},
   initStatus: 'idle',
-  saveStatus: 'idle',
 };
 
 export const initialize = createAsyncThunk<{ [key: string]: Partial<KanjiType> }>('kanjiSelection/init', async () => {
@@ -43,24 +39,22 @@ const unSelectKanji = (state: SelectedKanjiState, action: PayloadAction<KanjiTyp
   return { ...state, toRemove: { ...state.toRemove, [action.payload.kanji_id]: action.payload } };
 };
 
-export const save = createAsyncThunk<SaveThunkReturnType>('kanjiSelection/save', async (_, { getState }) => {
-  const { selectedKanji } = getState() as RootState;
+export const save = (state: SelectedKanjiState) => {
+  const newSelectedKanji = Object.keys(state.selectedKanji)
+    .concat(Object.keys(state.toAdd))
+    .filter((id) => !state.toRemove[id])
+    .reduce(
+      (prev, curr) => ({
+        ...prev,
+        [curr]: state.selectedKanji[curr] ?? state.toAdd[curr],
+      }),
+      {}
+    );
 
-  const state: Omit<SelectedKanjiState, 'initStatus' | 'saveStatus'> = { ...selectedKanji };
+  writeFile(fileNames.SELECTED_KANJI, JSON.stringify(newSelectedKanji));
 
-  Object.keys(state.toRemove).forEach((id) => {
-    delete state.selectedKanji[id];
-    delete state.toRemove[id];
-  });
-  Object.keys(state.toAdd).forEach((id) => {
-    state.selectedKanji[id] = state.toAdd[id];
-    delete state.toAdd[id];
-  });
-
-  await writeFile(fileNames.SELECTED_KANJI, JSON.stringify(state.selectedKanji));
-
-  return state;
-});
+  return { ...state, toRemove: {}, toAdd: {}, selectedKanji: newSelectedKanji };
+};
 
 const cancel = (state: SelectedKanjiState) => {
   return { ...state, toAdd: {}, toRemove: {} };
@@ -77,6 +71,7 @@ export const selectedKanji = createSlice({
     cancel,
     selectKanji,
     unSelectKanji,
+    save,
     reset,
   },
   extraReducers: (builder) => {
@@ -89,15 +84,8 @@ export const selectedKanji = createSlice({
     });
     builder.addCase(initialize.rejected, (state) => {
       state.initStatus = 'failed';
-    });
-    builder.addCase(save.pending, (state) => {
-      state.initStatus = 'pending';
-    });
-    builder.addCase(save.fulfilled, (state, action) => {
-      state = { ...action.payload, saveStatus: 'succeeded', initStatus: state.initStatus };
-    });
-    builder.addCase(save.rejected, (state) => {
-      state.saveStatus = 'failed';
+      state.toAdd = {};
+      state.toRemove = {};
     });
   },
 });

@@ -12,7 +12,7 @@ type PageLayoutProps = {
 
 export default function PageLayout({ header, canScroll = true, children }: PageLayoutProps & PropsWithChildren) {
   return (
-    <div className="w-full h-dvh flex flex-col items-center bg-[#F8F8FF] overflow-hidden">
+    <div className="w-full h-dvh flex flex-col items-center bg-[#f9fafb] overflow-hidden">
       <div className={`max-w-[750px] w-full min-h-dvh h-dvh p-4 ${canScroll && 'overflow-y-auto'}`}>
         {header?.title && (
           <div className="w-full">

@@ -43,7 +43,7 @@ export default function useKanjiSelection() {
   }, [dispatch]);
 
   const save = useCallback(() => {
-    dispatch(saveSelectedKanji());
+    dispatch(selectedKanji.actions.save());
   }, [dispatch]);
 
   return { ...selection, initialize, select, unselect, save, cancel, reset };

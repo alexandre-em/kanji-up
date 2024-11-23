@@ -28,6 +28,7 @@ export default function GatewayRouter() {
           <Route element={<PrivateRoute />}>
             <Route path="/" element={<HomePage />} />
             <Route path="/kanjis" element={<KanjiPage />} />
+            <Route path="/kanjis/category" element={<KanjiPage />} />
             <Route path="/search" element={<SearchPage />} />
           </Route>
           <Route path="*" element={<NotFoundPage />} />
