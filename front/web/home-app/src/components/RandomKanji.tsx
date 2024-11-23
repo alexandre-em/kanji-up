@@ -1,7 +1,6 @@
-import { AvatarFallback, AvatarImage } from '@radix-ui/react-avatar';
 import { KANJI_PROGRESSION_MAX, Spacer, useKanji, useSession, useUserScore } from 'gatewayApp/shared';
 import { buildStyles, CircularProgressbar } from 'react-circular-progressbar';
-import { Avatar } from './ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 
 import 'react-circular-progressbar/dist/styles.css';
 import { Skeleton } from './ui/skeleton';
