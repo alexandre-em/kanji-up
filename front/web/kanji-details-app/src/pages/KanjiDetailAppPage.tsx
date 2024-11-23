@@ -1,21 +1,17 @@
-import React, { useEffect } from 'react';
-import './tailwind.css';
-import { logger } from 'gatewayApp/shared';
+import { Loading } from 'gatewayApp/shared';
+import { Suspense } from 'react';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import KanjiDetailPage from './KanjiDetailPage';
+import '../tailwind.css';
 
 export default function KanjiDetailApp() {
-  useEffect(() => {
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker
-          .register('/kanji-detail-service-worker.js')
-          .then((registration) => {
-            logger.log(`Service worker successfully registered : ${registration}`);
-          })
-          .catch((error) => {
-            logger.error(`Failed to register the service worker : ${error}`);
-          });
-      });
-    }
-  }, []);
-  return <div>Welcome to Word app</div>;
+  return (
+    <BrowserRouter>
+      <Suspense fallback={<Loading />}>
+        <Routes>
+          <Route path="/kanji/:id" element={<KanjiDetailPage />} />
+        </Routes>
+      </Suspense>
+    </BrowserRouter>
+  );
 }

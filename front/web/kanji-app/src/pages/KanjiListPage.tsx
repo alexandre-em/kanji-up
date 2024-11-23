@@ -1,4 +1,5 @@
 import {
+  Color,
   KANJI_PROGRESSION_MAX,
   KanjiType,
   Loading,
@@ -52,20 +53,18 @@ export default function KanjiListPage() {
   const { sub } = useSession();
   const { kanji, getKanji } = useUserScore();
 
-  console.log(selectedKanji);
-
   const kanjiSelectedStyle = useCallback(
     (kanji: KanjiType) => {
       if (isSelectionMode) {
         if (toAdd[kanji.kanji_id]) {
-          return 'bg-[#10b981]';
+          return `bg-[${Color.toAdd}]`;
         }
         if (toRemove[kanji.kanji_id]) {
-          return 'bg-[#b91c1c] text-white';
+          return `bg-[${Color.toRemove}] text-white`;
         }
       }
       if (selectedKanji[kanji.kanji_id]) {
-        return 'bg-[#bfdbfe]';
+        return `bg-[${Color.selected}]`;
       }
     },
     [selectedKanji, toAdd, toRemove, isSelectionMode]
@@ -81,7 +80,7 @@ export default function KanjiListPage() {
           select(kanji);
         }
       } else {
-        window.location.href = `/search?query=${kanji.kanji_id}`;
+        window.location.href = `/kanji/${kanji.kanji_id}`;
       }
     },
     [isSelectionMode, toAdd, toRemove, selectedKanji]

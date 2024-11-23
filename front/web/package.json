@@ -5,14 +5,16 @@
   "scripts": {
     "start:gateway": "cp ./env/.env.development ./kanji-up/.env && cd ./kanji-up/ && yarn start",
     "start:kanji": "cp ./env/.env.development ./kanji-app/.env && cd ./kanji-app/ && yarn start",
+    "start:kanji-details": "cp ./env/.env.development ./kanji-details-app/.env && cd ./kanji-details-app/ && yarn start",
     "start:home": "cp ./env/.env.development ./home-app/.env && cd ./home-app/ && yarn start",
     "start:search": "cp ./env/.env.development ./search-app/.env && cd ./search-app/ && yarn start",
-    "start:dev": "concurrently --names \"gateway,kanji,home,search\" \"yarn start:gateway\" \"yarn start:kanji\" \"yarn start:home\" \"yarn start:search\"",
+    "start:dev": "concurrently --names \"gateway,kanji,home,search\" \"yarn start:gateway\" \"yarn start:kanji\" \"yarn start:kanji-details\" \"yarn start:home\" \"yarn start:search\"",
     "build:gateway": "cp ./env/.env.production ./kanji-up/.env && cd ./kanji-up/ && yarn build",
     "build:kanji": "cp ./env/.env.production ./kanji-app/.env && cd ./kanji-app/ && yarn build",
+    "build:kanji-details": "cp ./env/.env.production ./kanji-details-app/.env && cd ./kanji-details-app/ && yarn build",
     "build:home": "cp ./env/.env.production ./home-app/.env && cd ./home-app/ && yarn build",
     "build:search": "cp ./env/.env.production ./search-app/.env && cd ./search-app/ && yarn build",
-    "build": "concurrently --names \"gateway,kanji,home,search\" \"yarn build:gateway\" \"yarn build:kanji\" \"yarn build:home\" \"yarn build:search\"",
+    "build": "concurrently --names \"gateway,kanji,home,search\" \"yarn build:gateway\" \"yarn build:kanji\" \"yarn build:kanji-details\" \"yarn build:home\" \"yarn build:search\"",
     "env": "cp env/.env.*"
   },
   "author": "",
