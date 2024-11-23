@@ -44,8 +44,6 @@ export default function KanjiDetailPage() {
   if (kanjiStatus === 'failed') return <div>An error occurred</div>;
   if (kanjiStatus === 'pending' || kanjiStatus === 'idle') return <Loading />;
 
-  console.log(isSelected);
-
   return (
     <>
       <DetailsHeaders character={character} id={id!} />

@@ -4,12 +4,18 @@ import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 
 import 'react-circular-progressbar/dist/styles.css';
 import { Skeleton } from './ui/skeleton';
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 
 export default function RandomKanji() {
   const { random, randomStatus, getRandom } = useKanji();
   const { sub } = useSession();
   const { kanji, getKanji } = useUserScore();
+
+  const handleRedirection = useCallback(() => {
+    if (random) {
+      window.location.href = `/kanji/${random[0].kanji_id}`;
+    }
+  }, [random]);
 
   useEffect(() => {
     getRandom(1);
@@ -20,7 +26,10 @@ export default function RandomKanji() {
   if (randomStatus !== 'succeeded') return <Skeleton className="h-[66px] w-full bg-primary rounded-full" />;
 
   return (
-    <div className="w-full bg-primary flex justify-between items-center p-2 rounded-full shadow-md">
+    <div
+      className="w-full bg-primary flex justify-between items-center p-2 rounded-full shadow-md cursor-pointer"
+      onClick={handleRedirection}
+    >
       <div className="flex flex-nowrap">
         <Spacer size={0.5} direction="horizontal" />
         <Avatar>
