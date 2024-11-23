@@ -1,6 +1,6 @@
 import '../tailwind.css';
-import { Loading, logger } from 'gatewayApp/shared';
-import { Suspense, useEffect } from 'react';
+import { Loading } from 'gatewayApp/shared';
+import { Suspense } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 import SearchPage from './SearchPage';

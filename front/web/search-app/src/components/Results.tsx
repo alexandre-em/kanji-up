@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import ReactVirtualizedAutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList } from 'react-window';
 import InfiniteLoader from 'react-window-infinite-loader';
+
 import KanjiListItem from './resultItem/KanjiItem';
 import UserListItem from './resultItem/UserItem';
 import WordListItem from './resultItem/WordItem';

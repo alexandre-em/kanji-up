@@ -16,7 +16,10 @@ export default function SearchPage() {
   const type = searchParams.get(TYPE_KEY);
   return (
     <PageLayout canScroll={false}>
-      <img src={Library} className="h-[150px] w-full object-cover rounded-br-2xl rounded-tl-2xl rounded-bl-md rounded-tr-md" />
+      <img
+        src={Library}
+        className="h-[100px] w-full object-cover rounded-br-3xl rounded-tl-3xl rounded-bl-md rounded-tr-md shadow-lg"
+      />
       <Spacer size={0.7} />
       <SearchBar query={query} />
       <Spacer size={1} />
