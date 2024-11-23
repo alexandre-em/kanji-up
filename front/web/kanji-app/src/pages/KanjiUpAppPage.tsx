@@ -1,14 +1,22 @@
-import { PageLayout, logger } from 'gatewayApp/shared';
-import { useEffect } from 'react';
 import '../tailwind.css';
+import { Loading } from 'gatewayApp/shared';
+import { Suspense } from 'react';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+
+import KanjiCategoryPage from './KanjiCategoryPage';
+import KanjiListPage from './KanjiListPage';
+import { Toaster } from '@/components/ui/toaster';
 
 export default function KanjiHome() {
   return (
-    <PageLayout
-      header={{
-        title: 'Kanji categories',
-        subtitle: 'The 13K differents characters are sorted by difficulties and in order of learning for students in japan',
-      }}
-    ></PageLayout>
+    <BrowserRouter>
+      <Suspense fallback={<Loading />}>
+        <Routes>
+          <Route path="/kanjis" element={<KanjiCategoryPage />} />
+          <Route path="/kanjis/category" element={<KanjiListPage />} />
+        </Routes>
+      </Suspense>
+      <Toaster />
+    </BrowserRouter>
   );
 }
