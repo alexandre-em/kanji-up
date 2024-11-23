@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 
 import { Card, CardContent } from '../ui/card';
 import { Badge } from '../ui/badge';
@@ -21,8 +21,12 @@ type KanjiListItemProps = {
 };
 
 export default function KanjiListItem({ kanji }: KanjiListItemProps) {
+  const handleRedirection = useCallback(() => {
+    window.location.href = `/kanji/${kanji.kanji_id}`;
+  }, []);
+
   return (
-    <Card>
+    <Card className="cursor-pointer" onClick={handleRedirection}>
       <CardContent>
         <Spacer size={1} />
         <div className="flex items-center">
