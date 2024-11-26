@@ -4,6 +4,9 @@
   "private": true,
   "dependencies": {
     "@radix-ui/react-slot": "^1.1.0",
+    "@tensorflow/tfjs-backend-cpu": "^4.22.0",
+    "@tensorflow/tfjs-core": "^4.22.0",
+    "@tensorflow/tfjs-tflite": "^0.0.1-alpha.10",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -11,6 +14,7 @@
     "@types/node": "^22.7.7",
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.1",
+    "axios": "^1.7.8",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "css-loader": "^7.1.2",
@@ -19,7 +23,6 @@
     "lucide-react": "^0.454.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.27.0",
     "react-scripts": "5.0.1",
     "style-loader": "^4.0.0",
     "tailwind-merge": "^2.5.4",
@@ -29,7 +32,7 @@
   },
   "scripts": {
     "start": "NODE_ENV=development webpack serve --config webpack.config.js",
-    "build": "webpack --mode production",
+    "build": "webpack --mode production && cp ./public/_redirects ./dist/",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
