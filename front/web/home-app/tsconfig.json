@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "target": "es6",
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "types": ["react", "jest"],
+    "typeRoots": ["./src/types", "gatewayApp/shared/types"],
+    "jsx": "react-jsx"
+  },
+  "include": ["src/**/*", "src/types/remoteModules.d.ts", "gatewayApp/shared/types"],
+  "exclude": ["node_modules"]
+}
