@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
 import useSession from '../../hooks/useSession';
 
+import LogoImage from '@/assets/images/icon-144x144.png';
 import { Button } from '@/shared/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/shared/components/ui/card';
 
@@ -22,13 +23,15 @@ export default function LoginPage() {
   return (
     <main className="min-h-dvh flex justify-center items-center bg-gray-50">
       <Card>
-        <CardHeader className="flex items-center">{/* <img src="/icons/icon-192x192.png" alt="logo" /> */}</CardHeader>
+        <CardHeader className="flex items-center">
+          <img src={LogoImage} alt="logo" />
+        </CardHeader>
         <CardContent>
           <CardTitle>KanjiUp App</CardTitle>
           <CardDescription>Wecome to KanjiUp application ! To use the application, please authenticate.</CardDescription>
         </CardContent>
-        <CardFooter className="flex justify-end">
-          <Button onClick={handleSignIn}>Sign in</Button>
+        <CardFooter>
+          <Button onClick={handleSignIn}>Start the application</Button>
         </CardFooter>
       </Card>
     </main>
