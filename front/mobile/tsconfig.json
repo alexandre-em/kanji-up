@@ -17,13 +17,9 @@
     "resolveJsonModule": true,
     "sourceMap": true,
     "jsx": "react-native",
-    "baseUrl": ".",
-    "paths": {
-      "@components/*": ["src/components/*"],
-      "@screens/*": ["src/screens/*"],
-      "@utils/*": ["src/utils/*"]
-    },
-    "typeRoots": ["./src/types"]
+    "baseUrl": "./src",
+    "typeRoots": ["./src/types", "./node_modules/@types"]
   },
+  "include": ["src"],
   "exclude": ["node_modules", "babel.config.js", "metro.config.js", "jest.config.js"]
 }
