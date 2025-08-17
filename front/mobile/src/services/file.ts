@@ -1,3 +1,5 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 export const fileNames = {
   SELECTED_KANJI: 'selectedKanji',
   SELECTED_WORD: 'selectedWord',
@@ -6,11 +8,15 @@ export const fileNames = {
 
 class fileService {
   async read(path: string) {
-    return '';
+    const textContent = await AsyncStorage.getItem(path);
+
+    if (!textContent) return null;
+
+    return JSON.parse(textContent);
   }
 
-  async write(path: string, content: string) {
-    return '';
+  async write(path: string, content: any) {
+    return await AsyncStorage.setItem(path, JSON.stringify(content));
   }
 }
 

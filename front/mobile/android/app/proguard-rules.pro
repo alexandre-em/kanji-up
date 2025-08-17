@@ -16,3 +16,6 @@
 -dontwarn com.facebook.react.**
 -keep class com.qivia.BuildConfig { *; }
 
+-keep class com.android.installreferrer.api.** {
+  *;
+}

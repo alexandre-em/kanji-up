@@ -6,6 +6,7 @@ import { setConfig } from 'react-native-ui-lib/config';
 import { Provider } from 'react-redux';
 
 import { ToasterProvider } from './src/providers/toaster';
+import { RootNavigation } from './src/screens/router';
 import store from './src/store';
 
 setConfig({ appScheme: 'default' });
@@ -67,6 +68,12 @@ ThemeManager.setComponentTheme('Text', (props) => {
   };
 });
 
+ThemeManager.setComponentTheme('View', (props) => {
+  return {
+    backgroundColor: Colors.$backgroundDefault,
+  };
+});
+
 Typography.loadTypographies({
   h1: {
     fontSize: 24,
@@ -118,13 +125,14 @@ Typography.loadTypographies({
 function App() {
   const theme = useColorScheme();
 
-  Colors.setScheme('light');
+  Colors.setScheme('dark');
 
   return (
     <Provider store={store}>
       <ToasterProvider>
-        <View style={styles.container} bg-$backgroundDefault padding-20>
+        <View style={styles.container} padding-20>
           <StatusBar barStyle={theme === 'dark' ? 'light-content' : 'dark-content'} />
+          <RootNavigation />
         </View>
       </ToasterProvider>
     </Provider>
