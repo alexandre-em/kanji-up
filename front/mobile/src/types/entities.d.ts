@@ -93,6 +93,7 @@ type RegisteredUser = {
   email: string | null;
   picture: string | null;
   providerId: string | null;
+  credits: number;
   subscribedAt: Date | null;
   subscribedUntil: Date | null;
 };

@@ -51,6 +51,7 @@ type UserState = {
   providerId: string | null;
   subscribedAt: Date | null;
   subscribedUntil: Date | null;
+  credits: number;
 
   getUserStatus: StatusType;
   createUserStatus: StatusType;

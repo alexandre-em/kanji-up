@@ -6,10 +6,10 @@ import View from 'react-native-ui-lib/view';
 import { useSelector } from 'react-redux';
 
 import { ONBOARDING_FINISHED_KEY } from '../../constants/storage';
-import { useAppDispatch } from '../../hooks/useStore';
+import { useAppDispatch, useAppSelector } from '../../hooks/useStore';
 import { useToaster } from '../../providers/toaster';
 import { fileServiceInstance } from '../../services/file';
-import { createUser, selectCreateStatus, selectUserName } from '../../store/slices/user';
+import { createUser, getUser, selectCreateStatus, selectGetUserStatus, selectUserName } from '../../store/slices/user';
 import Step1 from './step1';
 import Step2 from './step2';
 import Step3 from './step3';
@@ -22,10 +22,25 @@ export default function Onboarding() {
   const toast = useToaster();
   const dispatch = useAppDispatch();
   const userName = useSelector(selectUserName);
+  const userState = useAppSelector((state) => state.user);
+  const getUserStatus = useSelector(selectGetUserStatus);
   const createUserStatus = useSelector(selectCreateStatus);
   const navigation = useNavigation();
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [step, setStep] = useState(0);
+
+  useEffect(() => {
+    getUniqueId().then((deviceId) => {
+      dispatch(getUser({ macAddress: deviceId }));
+    });
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (getUserStatus === 'succeeded' && userState.macAddress) {
+      fileServiceInstance.write(ONBOARDING_FINISHED_KEY, userState);
+      navigation.navigate('Home');
+    }
+  }, [getUserStatus, userState, navigation]);
 
   const handleNext = useCallback(() => {
     setStep((prev) => prev + 1);

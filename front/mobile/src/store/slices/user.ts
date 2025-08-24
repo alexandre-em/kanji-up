@@ -17,6 +17,7 @@ const initialState: UserState = {
   providerId: null,
   subscribedAt: null,
   subscribedUntil: null,
+  credits: 0,
 
   getUserStatus: 'idle',
   createUserStatus: 'idle',
@@ -82,4 +83,7 @@ export const user = createSlice({
 export default user.reducer;
 
 export const selectUserName = (state: RootState) => state.user.name;
+export const selectUserPicture = (state: RootState) => state.user.picture;
+export const selectUserCredit = (state: RootState) => state.user.credits;
+export const selectGetUserStatus = (state: RootState) => state.user.getUserStatus;
 export const selectCreateStatus = (state: RootState) => state.user.createUserStatus;
