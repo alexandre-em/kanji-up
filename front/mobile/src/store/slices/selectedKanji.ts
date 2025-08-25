@@ -107,3 +107,6 @@ export const selectedKanji = createSlice({
 });
 
 export default selectedKanji.reducer;
+
+export const selectSelectedKanji = (state: RootState) => state.selectedKanji.selectedKanji;
+export const selectSelectedKanjiInitStatus = (state: RootState) => state.selectedKanji.initStatus;

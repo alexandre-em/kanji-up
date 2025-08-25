@@ -2,15 +2,29 @@ import { Assets } from 'react-native-ui-lib';
 import { Colors, ThemeManager, Typography } from 'react-native-ui-lib';
 import { setConfig } from 'react-native-ui-lib/config';
 
+import SelectionIcon from '../assets/icons/checkbox.png';
 import CoinIcon from '../assets/icons/diamond.png';
+import DrawIcon from '../assets/icons/draw.png';
+import GoogleIcon from '../assets/icons/google.png';
 import PremiumIcon from '../assets/icons/premium.png';
+import RecognitionIcon from '../assets/icons/recognition.png';
+import SettingIcon from '../assets/icons/setting.png';
+import VideoIcon from '../assets/icons/video.png';
+import YenIcon from '../assets/icons/yen.png';
 import PremiumBanner from '../assets/images/remi-bertogliati-premium.jpg';
 
 setConfig({ appScheme: 'default' });
 
 Assets.loadAssetsGroup('icons', {
   coin: CoinIcon,
+  google: GoogleIcon,
   premium: PremiumIcon,
+  recognition: RecognitionIcon,
+  selection: SelectionIcon,
+  draw: DrawIcon,
+  yen: YenIcon,
+  video: VideoIcon,
+  setting: SettingIcon,
 });
 
 Assets.loadAssetsGroup('banners', {
@@ -63,24 +77,12 @@ Colors.loadSchemes({
     $outlineGeneral: '#c6393c',
   },
 });
-//
-// ThemeManager.setComponentTheme('Text', () => {
-//   return {
-//     color: Colors.$textDefault,
-//   };
-// });
-//
+
 ThemeManager.setComponentTheme('View', () => {
   return {
     backgroundColor: Colors.$backgroundDefault,
   };
 });
-//
-// ThemeManager.setComponentTheme('Badge', () => {
-//   return {
-//     backgroundColor: Colors.$backgroundPrimaryLight,
-//   };
-// });
 
 Typography.loadTypographies({
   h1: {

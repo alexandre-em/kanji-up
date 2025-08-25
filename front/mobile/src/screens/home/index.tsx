@@ -1,5 +1,6 @@
+import { useTranslation } from 'react-i18next';
 import { Dimensions, Image, ScrollView, StyleSheet } from 'react-native';
-import { Assets, Colors, Icon, ProgressBar } from 'react-native-ui-lib';
+import { Assets, Button, Colors, Icon, ProgressBar } from 'react-native-ui-lib';
 import Avatar from 'react-native-ui-lib/avatar';
 import Card from 'react-native-ui-lib/card';
 import Chip from 'react-native-ui-lib/chip';
@@ -11,14 +12,15 @@ import { useSelector } from 'react-redux';
 import Spacing from '../../components/spacing';
 import { homeMenuButtons } from '../../constants/homeButtons';
 import { GENERAL_MARGIN } from '../../constants/styles';
-import { selectUserCredit, selectUserName, selectUserPicture } from '../../store/slices/user';
+import { selectUserName, selectUserPicture, selectUserState } from '../../store/slices/user';
 
 const { width } = Dimensions.get('window');
 
 export default function Home() {
+  const { t } = useTranslation();
   const userName = useSelector(selectUserName);
   const userPicture = useSelector(selectUserPicture);
-  const userCredit = useSelector(selectUserCredit);
+  const userState = useSelector(selectUserState);
 
   return (
     <ScrollView style={styles.container}>
@@ -28,22 +30,20 @@ export default function Home() {
             animate
             name={userName}
             source={userPicture ? { uri: userPicture } : undefined}
-            badgeProps={{ label: 'prem', size: 15 }}
+            badgeProps={{ label: userState.subscriptionPlan.slice(0, 4), size: 15 }}
             badgePosition={'BOTTOM_RIGHT'}
             useAutoColors
           />
           <View style={styles.minContent} marginL-10>
-            <Text h2 marginB-5>
-              Welcome back
-            </Text>
-            <Text h3 highlightString={[userName]} highlightStyle={{ color: Colors.$textPrimary }}>
+            <Text text70BO>{t('home.welcome.title')},</Text>
+            <Text text60BL highlightString={[userName]} highlightStyle={{ color: Colors.$textPrimary }}>
               {userName}
             </Text>
           </View>
         </View>
         <View width={90} height={30}>
           <Chip
-            label={`${userCredit}`}
+            label={`${userState.credits}`}
             size={35}
             iconSource={Assets.icons.coin}
             iconProps={{ size: { width: 20, height: 20 } }}
@@ -51,69 +51,97 @@ export default function Home() {
           />
         </View>
       </View>
-      <SearchInput placeholder="Search..." preset="prominent" autoFocus={false} />
+      <SearchInput placeholder={t('home.search.placeholder')} autoFocus={false} style={styles.search} />
       {/* Selection counter + mastered kanji counter */}
       <Spacing y={GENERAL_MARGIN} />
       <View>
         <Text text40BL>123</Text>
-        <Text>kanji learned</Text>
+        <Text>{t('home.selection.unit')}</Text>
       </View>
 
       {/* Progress bar on mastered kanji / total kanji */}
       <Spacing y={GENERAL_MARGIN} />
       <View>
-        <Text text90BO>Kanji mastering progress</Text>
+        <Text text90BO>{t('home.progression.title')}</Text>
         <Spacing y={5} />
         <ProgressBar progress={5} />
         <Text text100L>5%</Text>
       </View>
+      <Spacing y={GENERAL_MARGIN} />
+      <Button label={t('home.evaluation.button')} iconSource={Assets.icons.draw} iconProps={{ size: 20 }} text80BL />
       {/* Menu */}
       <Spacing y={GENERAL_MARGIN} />
       <View style={styles.flex}>
         {homeMenuButtons.map((button, i) => (
-          <View key={button.textKey} style={{ flexDirection: 'row' }}>
+          <View key={button.textKey} style={styles.row}>
             {i !== 0 && <Spacing x={10} />}
-            <Card
-              height={100}
-              width={(width - GENERAL_MARGIN * 2 + 10) / 2}
-              style={{
-                padding: 15,
-              }}>
-              <Icon source={Assets.icons.coin} size={36} tintColor={Colors.$textPrimary} />
+            <Card height={140} width={(width - GENERAL_MARGIN * 2 - 20) / 2} style={styles.card}>
+              {button.icon}
               <Card.Section
                 flex
                 style={{ backgroundColor: Colors.$backgroundElevated }}
-                content={[{ text: 'Test', text80BL: true, $outlineDefault: true }]}
-                contentStyle={{
-                  flex: 1,
-                  marginTop: GENERAL_MARGIN / 2,
-                  backgroundColor: Colors.$backgroundElevated,
-                }}
+                content={[{ text: t(button.textKey), text80BL: true, $outlineDefault: true }]}
+                contentStyle={styles.cardContent}
               />
+              {button.subtitle && (
+                <Card.Section
+                  flex
+                  content={[{ text: t(button.subtitle), text90M: true }]}
+                  contentStyle={styles.transparent}
+                  style={styles.transparent}
+                />
+              )}
             </Card>
           </View>
         ))}
       </View>
+
+      {userState.subscriptionPlan === 'free' && (
+        <>
+          <Spacing y={GENERAL_MARGIN} />
+          <Card height={105} width={width - GENERAL_MARGIN * 2} style={{ padding: 15 }}>
+            <Icon source={Assets.icons.video} size={36} tintColor={Colors.$textPrimary} />
+            <Card.Section
+              flex
+              content={[{ text: t('home.menu.ad.title'), text80BL: true }]}
+              contentStyle={styles.transparent}
+              style={styles.transparent}
+            />
+            <Card.Section
+              flex
+              content={[{ text: t('home.menu.ad.subtitle'), text90M: true }]}
+              contentStyle={styles.transparent}
+              style={styles.transparent}
+            />
+          </Card>
+          <Spacing y={GENERAL_MARGIN} />
+          <Card height={105} width={width - GENERAL_MARGIN * 2} style={{ padding: 15 }}>
+            <Icon source={Assets.icons.premium} size={36} tintColor="#fff" />
+            <Card.Section
+              flex
+              content={[{ text: t('home.menu.premium.title'), text70BL: true, white: true }]}
+              contentStyle={styles.transparent}
+              style={styles.transparent}
+            />
+            <Card.Section
+              flex
+              content={[{ text: t('home.menu.premium.subtitle'), text80BO: true, white: true }]}
+              contentStyle={styles.transparent}
+              style={styles.transparent}
+            />
+            <Image source={Assets.banners.premium} style={styles.bannerImage} />
+          </Card>
+        </>
+      )}
       <Spacing y={GENERAL_MARGIN} />
-      <Card height={105} width={width - GENERAL_MARGIN * 2} style={{ padding: 15 }}>
-        <Icon source={Assets.icons.premium} size={36} tintColor="#fff" />
+      <Card height={90} width={width - GENERAL_MARGIN * 2} style={{ padding: 15 }}>
+        <Icon source={Assets.icons.setting} size={36} tintColor={Colors.$textPrimary} />
         <Card.Section
           flex
-          content={[{ text: 'Premium', text80BL: true, white: true }]}
-          contentStyle={{
-            backgroundColor: '#00000000',
-          }}
-          style={{ backgroundColor: '#00000000' }}
+          content={[{ text: t('home.menu.setting.title'), text80BL: true }]}
+          contentStyle={styles.transparent}
+          style={styles.transparent}
         />
-        <Card.Section
-          flex
-          content={[{ text: 'Your kanji journey, unlimited', text90BO: true, white: true }]}
-          contentStyle={{
-            backgroundColor: '#00000000',
-          }}
-          style={{ backgroundColor: '#00000000' }}
-        />
-        <Image source={Assets.banners.premium} style={styles.bannerImage} />
       </Card>
     </ScrollView>
   );
@@ -124,6 +152,9 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: Colors.$backgroundDefault,
   },
+  row: {
+    flexDirection: 'row',
+  },
   flex: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -132,5 +163,14 @@ const styles = StyleSheet.create({
   minContent: {
     alignSelf: 'flex-start',
   },
+  card: {
+    padding: 15,
+  },
+  cardContent: {
+    marginTop: GENERAL_MARGIN / 2,
+    backgroundColor: Colors.$backgroundElevated,
+  },
+  transparent: { backgroundColor: '#00000000' },
   bannerImage: { position: 'absolute', left: 0, zIndex: -10, width: width - GENERAL_MARGIN * 2, height: 105, borderRadius: 10 },
+  search: { borderWidth: 0.5, borderColor: Colors.$backgroundInverted + '25', borderRadius: 25 },
 });

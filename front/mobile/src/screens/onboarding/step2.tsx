@@ -1,9 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Colors, Text, View } from 'react-native-ui-lib';
 
 import AnimatedSvgRenderer from '../../components/AnimatedSvgRenderer';
 import Frame from '../../components/frame';
-import { core } from '../../services/http';
 import { StepProps } from '.';
 
 const exampleHardValue = `<!--
@@ -67,6 +66,7 @@ svg.acjk path[id] {fill:#ccc;}
 </svg>`;
 
 export default function Step2({ step }: StepProps) {
+  const { t } = useTranslation();
   if (step !== 1) return null;
 
   return (
@@ -74,14 +74,29 @@ export default function Step2({ step }: StepProps) {
       <Frame width={300} height={300}>
         <AnimatedSvgRenderer width={300} height={300} svgString={exampleHardValue} strokeColor={Colors.$textPrimary} loop />
       </Frame>
-      <Text h3 center marginT-50 highlightString={['kanji', 'writing']} highlightStyle={{ color: Colors.$textMajor }}>
-        Learn kanji by writing them
+      <Text
+        h3
+        center
+        marginT-50
+        highlightString={[t('onboarding.learn.title.highlight.kanji'), t('onboarding.learn.title.highlight.write')]}
+        highlightStyle={{ color: Colors.$textPrimary }}>
+        {t('onboarding.learn.title')}
       </Text>
-      <Text p1 center marginT-20 highlightString="movement" highlightStyle={{ color: Colors.$textMajor }}>
-        Build memory through movement, not just memorization
+      <Text
+        p1
+        center
+        marginT-20
+        highlightString={t('onboarding.learn.subtitle1.highlight.movement')}
+        highlightStyle={{ color: Colors.$textPrimary }}>
+        {t('onboarding.learn.subtitle1')}
       </Text>
-      <Text p1 center marginT-2 highlightString={['order', 'direction']} highlightStyle={{ color: Colors.$textMajor }}>
-        Stroke order and direction are key, trace carefully! ☺️
+      <Text
+        p1
+        center
+        marginT-2
+        highlightString={[t('onboarding.learn.subtitle2.highlight.order'), t('onboarding.learn.subtitle2.highlight.direction')]}
+        highlightStyle={{ color: Colors.$textPrimary }}>
+        {t('onboarding.learn.subtitle2')} ☺️
       </Text>
     </View>
   );

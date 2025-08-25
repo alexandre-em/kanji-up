@@ -46,5 +46,5 @@ export const useIsNotRegistered = () => {
     });
   }, []);
 
-  return userName === '' && !isUserDataStocked && getUserStatus === 'succeeded';
+  return userName === '' && isUserDataStocked === false && getUserStatus === 'failed';
 };

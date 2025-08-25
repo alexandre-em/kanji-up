@@ -1,5 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { getUniqueId } from 'react-native-device-info';
 import Button from 'react-native-ui-lib/button';
 import View from 'react-native-ui-lib/view';
@@ -20,6 +21,7 @@ export type StepProps = {
 
 export default function Onboarding() {
   const toast = useToaster();
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const userName = useSelector(selectUserName);
   const userState = useAppSelector((state) => state.user);
@@ -59,9 +61,9 @@ export default function Onboarding() {
   useEffect(() => {
     if (createUserStatus === 'succeeded') {
       navigation.navigate('Home');
-      toast?.show({ message: 'Welcome to KanjiUp !', type: 'success' });
+      toast?.show({ message: t('onboarding.toast.success'), type: 'success' });
     } else if (createUserStatus === 'failed') {
-      toast?.show({ message: 'Something went wrong', type: 'failure' });
+      toast?.show({ message: t('onboarding.toast.error'), type: 'failure' });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [createUserStatus]);
@@ -76,7 +78,7 @@ export default function Onboarding() {
       <Step2 step={step} />
       <Step3 step={step} />
       <Button
-        label={step === 2 ? "Let's Begin  🚀" : 'Next'}
+        label={step === 2 ? t('onboarding.submit.button') + ' 🚀' : t('onboarding.next.button')}
         outline={step !== 2}
         onPress={step === 2 ? handleSubmit : handleNext}
         disabled={step === 2 && userName.length === 0 && createUserStatus === 'pending'}

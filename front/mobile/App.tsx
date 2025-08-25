@@ -7,7 +7,7 @@ import { Provider } from 'react-redux';
 
 import { ToasterProvider } from './src/providers/toaster';
 import { UserProvider } from './src/providers/user';
-import { RootNavigation } from './src/screens/router';
+import RootNavigation from './src/screens/router';
 import store from './src/store';
 
 function App() {
@@ -36,7 +36,6 @@ const styles = StyleSheet.create({
     flex: 1,
     height: Dimensions.get('window').height - (StatusBar.currentHeight || 0),
     width: Dimensions.get('window').width,
-    // backgroundColor: Colors.$backgroundGeneralHeavy,
   },
   container: {
     flex: 1,

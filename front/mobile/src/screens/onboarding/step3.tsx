@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Colors, Text, TextField, View } from 'react-native-ui-lib';
 import { useSelector } from 'react-redux';
 
@@ -7,6 +8,7 @@ import { selectUserName, user } from '../../store/slices/user';
 import { StepProps } from '.';
 
 export default function Step3({ step }: StepProps) {
+  const { t } = useTranslation();
   const userName = useSelector(selectUserName);
   const dispatch = useAppDispatch();
 
@@ -25,11 +27,11 @@ export default function Step3({ step }: StepProps) {
         こんにちは 👋
       </Text>
       <Text h3 marginB-20>
-        how should we call you ?
+        {t('onboarding.register.subtitle')}
       </Text>
       <View width="100%">
         <TextField
-          label="Name"
+          label={t('onboarding.register.input.label')}
           placeholder="John Smith"
           value={userName}
           onChangeText={handleChange}

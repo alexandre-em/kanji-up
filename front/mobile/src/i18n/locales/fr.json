@@ -1,0 +1,19 @@
+{
+  "onboarding.welcome.title": "Welcome to KanjiUp",
+  "onboarding.welcome.subtitle": "Level up your kanji knowledge with KanjiUp!",
+  "onboarding.welcome.subtitle.highlight": "Level up",
+  "onboarding.learn.title": "Learn kanji by writing them",
+  "onboarding.learn.title.highlight.kanji": "kanji",
+  "onboarding.learn.title.highlight.write": "writing",
+  "onboarding.learn.subtitle1": "Build memory through movement, not just memorization",
+  "onboarding.learn.subtitle1.highlight.movement": "movement",
+  "onboarding.learn.subtitle2": "Stroke order and direction are key, tract carefully!",
+  "onboarding.learn.subtitle2.highlight.order": "order",
+  "onboarding.learn.subtitle2.highlight.direction": "direction",
+  "onboarding.register.subtitle": "How should we call you?",
+  "onboarding.register.input.label": "Name",
+  "onboarding.next.button": "Next",
+  "onboarding.submit.button": "Let's begin",
+  "onboarding.toast.success": "Welcome to KanjiUp!",
+  "onboarding.toast.error": "Something went wrong"
+}
