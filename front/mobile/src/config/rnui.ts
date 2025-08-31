@@ -3,6 +3,7 @@ import { Colors, ThemeManager, Typography } from 'react-native-ui-lib';
 import { setConfig } from 'react-native-ui-lib/config';
 
 import SelectionIcon from '../assets/icons/checkbox.png';
+import ClearIcon from '../assets/icons/clear.png';
 import CoinIcon from '../assets/icons/diamond.png';
 import DrawIcon from '../assets/icons/draw.png';
 import GoogleIcon from '../assets/icons/google.png';
@@ -17,6 +18,7 @@ setConfig({ appScheme: 'default' });
 
 Assets.loadAssetsGroup('icons', {
   coin: CoinIcon,
+  clear: ClearIcon,
   google: GoogleIcon,
   premium: PremiumIcon,
   recognition: RecognitionIcon,
