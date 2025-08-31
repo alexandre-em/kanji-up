@@ -1,3 +1,5 @@
+import { useNavigation } from '@react-navigation/native';
+import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dimensions, Image, ScrollView, StyleSheet } from 'react-native';
 import { Assets, Button, Colors, Icon, ProgressBar } from 'react-native-ui-lib';
@@ -9,6 +11,7 @@ import Text from 'react-native-ui-lib/text';
 import View from 'react-native-ui-lib/view';
 import { useSelector } from 'react-redux';
 
+import Layout from '../../components/layout';
 import Spacing from '../../components/spacing';
 import { homeMenuButtons } from '../../constants/homeButtons';
 import { GENERAL_MARGIN } from '../../constants/styles';
@@ -18,12 +21,20 @@ const { width } = Dimensions.get('window');
 
 export default function Home() {
   const { t } = useTranslation();
+  const navigation = useNavigation();
   const userName = useSelector(selectUserName);
   const userPicture = useSelector(selectUserPicture);
   const userState = useSelector(selectUserState);
 
+  const handleRediction = useCallback(
+    (screen: string) => {
+      navigation.navigate(screen);
+    },
+    [navigation],
+  );
+
   return (
-    <ScrollView style={styles.container}>
+    <Layout>
       <View style={styles.flex} marginB-15>
         <View style={styles.flex}>
           <Avatar
@@ -68,14 +79,26 @@ export default function Home() {
         <Text text100L>5%</Text>
       </View>
       <Spacing y={GENERAL_MARGIN} />
-      <Button label={t('home.evaluation.button')} iconSource={Assets.icons.draw} iconProps={{ size: 20 }} text80BL />
+      <Button
+        label={t('home.evaluation.button')}
+        iconSource={Assets.icons.draw}
+        iconProps={{ size: 20 }}
+        text80BL
+        onPress={() => {
+          navigation.navigate('Evaluation');
+        }}
+      />
       {/* Menu */}
       <Spacing y={GENERAL_MARGIN} />
       <View style={styles.flex}>
         {homeMenuButtons.map((button, i) => (
           <View key={button.textKey} style={styles.row}>
             {i !== 0 && <Spacing x={10} />}
-            <Card height={140} width={(width - GENERAL_MARGIN * 2 - 20) / 2} style={styles.card}>
+            <Card
+              height={140}
+              width={(width - GENERAL_MARGIN * 2 - 20) / 2}
+              style={styles.card}
+              onPress={() => handleRediction(button.screen)}>
               {button.icon}
               <Card.Section
                 flex
@@ -143,15 +166,11 @@ export default function Home() {
           style={styles.transparent}
         />
       </Card>
-    </ScrollView>
+    </Layout>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    height: '100%',
-    backgroundColor: Colors.$backgroundDefault,
-  },
   row: {
     flexDirection: 'row',
   },
