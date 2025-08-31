@@ -20,6 +20,7 @@ const characterSchema = new Schema({
   onyomi: [String],
   kunyomi: [String],
   image: { type: String },
+  jlpt: { type: Number, index: true, default: null },
   // image: {
   //   data: Buffer,
   //   contentType: String,

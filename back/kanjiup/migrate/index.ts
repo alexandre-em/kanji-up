@@ -1,4 +1,5 @@
 import { mongoConfig } from '../src/config';
+import { migrateJlpt } from './jlpt';
 import { migrateFromKanjiApi } from './KanjiApi';
 import { migrateFromKanjiDic } from './kanjiDic';
 
@@ -6,8 +7,9 @@ import { migrateFromKanjiDic } from './kanjiDic';
 mongoConfig()
   .then(() => {
     (async () => {
-      await migrateFromKanjiApi();
+      // await migrateFromKanjiApi();
       // await migrateFromKanjiDic();
+      await migrateJlpt();
     })();
   })
   .catch((err) => console.warn('DB: KO ' + err));
