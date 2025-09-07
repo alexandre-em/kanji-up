@@ -9,6 +9,7 @@ import { screenNames } from '../constants/screens';
 import { useIsNotRegistered } from '../hooks/useIsAlreadyRegistered';
 import Home from './home';
 import KanjiCategoriesScreen from './kanji';
+import KanjiDifficulties from './kanji/difficulty';
 import Onboarding from './onboarding';
 
 const Stack = createNativeStackNavigator();
@@ -28,6 +29,7 @@ export default function RootNavigation() {
         <Stack.Screen name={screenNames.ONBOARDING} component={Onboarding} />
         <Stack.Screen name={screenNames.HOME} component={Home} />
         <Stack.Screen name={screenNames.CATEGORIES} component={KanjiCategoriesScreen} />
+        <Stack.Screen name={screenNames.DIFFICULTIES} component={KanjiDifficulties} />
       </Stack.Navigator>
     </NavigationContainer>
   );
