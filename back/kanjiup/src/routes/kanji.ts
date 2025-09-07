@@ -45,6 +45,11 @@ const router: Router = Router();
  *            description: Filter kanji by `grade`
  *            schema:
  *                type: string
+ *          - in: query
+ *            name: jlpt
+ *            description: Filter kanji by `jlpt`
+ *            schema:
+ *                type: string
  *      responses:
  *          200:
  *              description: Returns a paginated list of kanji

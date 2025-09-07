@@ -17,12 +17,14 @@ export const getOneImage = (encodedKanji: string) => {
   return path.join(process.cwd(), 'data', 'svg', `${kanji.charCodeAt(0)}.svg`);
 };
 
-export const getAll = async (page: number, limit: number, grade?: string) => {
-  const query: Partial<{ deleted_at: string | null; reference: { $in: string[] } | null }> = { deleted_at: null };
+export const getAll = async (page: number, limit: number, grade?: string, jlpt?: string) => {
+  const query: Partial<{ deleted_at: string | null; jlpt: string; reference: { $in: string[] } | null }> = { deleted_at: null };
   if (grade)
     query['reference'] = {
       $in: await ReferenceModel.find({ grade }).select('id').exec(),
     };
+    else if (jlpt)
+      query['jlpt'] = jlpt;
 
   const populate = [
     { path: 'kanji', select: 'character_id character meaning onyomi kunyomi strokes -_id' } as PopulateOptions,

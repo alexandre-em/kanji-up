@@ -15,6 +15,7 @@ type KanjiModelType = {
     }
   ];
   deleted_at: string;
+  jlpt: string | null;
 };
 
 const ObjectId = Schema.Types.ObjectId;
@@ -31,6 +32,7 @@ const kanjiSchema = new Schema({
     },
   ],
   deleted_at: { type: Date, default: null },
+  jlpt: { type: String, default: null },
 });
 
 kanjiSchema.plugin(mongoosePaginate);
