@@ -12,6 +12,11 @@ import RecognitionIcon from '../assets/icons/recognition.png';
 import SettingIcon from '../assets/icons/setting.png';
 import VideoIcon from '../assets/icons/video.png';
 import YenIcon from '../assets/icons/yen.png';
+import SchoolBanner from '../assets/images/hiroyoshi-urushima-school.jpg';
+import SchoolBannerDisabled from '../assets/images/hiroyoshi-urushima-school-disabled.jpg';
+import AdvancedBanner from '../assets/images/marco-zuppone-advanced.jpg';
+import AdvancedBannerDisabled from '../assets/images/marco-zuppone-advanced-disabled.jpg';
+import JlptBanner from '../assets/images/nguyen-dang-hoang-nhu-jlpt.jpg';
 import PremiumBanner from '../assets/images/remi-bertogliati-premium.jpg';
 
 setConfig({ appScheme: 'default' });
@@ -30,7 +35,12 @@ Assets.loadAssetsGroup('icons', {
 });
 
 Assets.loadAssetsGroup('banners', {
+  advanced: AdvancedBanner,
+  advancedDisabled: AdvancedBannerDisabled,
   premium: PremiumBanner,
+  school: SchoolBanner,
+  schoolDisabled: SchoolBannerDisabled,
+  jlpt: JlptBanner,
 });
 
 Colors.loadSchemes({
