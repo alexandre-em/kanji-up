@@ -6,6 +6,7 @@ import Button from 'react-native-ui-lib/button';
 import View from 'react-native-ui-lib/view';
 import { useSelector } from 'react-redux';
 
+import { screenNames } from '../../constants/screens';
 import { ONBOARDING_FINISHED_KEY } from '../../constants/storage';
 import { useAppDispatch, useAppSelector } from '../../hooks/useStore';
 import { useToaster } from '../../providers/toaster';
@@ -40,7 +41,7 @@ export default function Onboarding() {
   useEffect(() => {
     if (getUserStatus === 'succeeded' && userState.macAddress) {
       fileServiceInstance.write(ONBOARDING_FINISHED_KEY, userState);
-      navigation.navigate('Home');
+      navigation.navigate(screenNames.HOME);
     }
   }, [getUserStatus, userState, navigation]);
 

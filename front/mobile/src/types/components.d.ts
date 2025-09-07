@@ -7,3 +7,9 @@ type SpacerProps = {
   x?: number;
   y?: number;
 };
+
+type RouteParamsProps<T> = {
+  route: {
+    params: T;
+  };
+};

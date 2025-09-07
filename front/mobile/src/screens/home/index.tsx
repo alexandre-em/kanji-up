@@ -2,7 +2,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dimensions, Image, ScrollView, StyleSheet } from 'react-native';
-import { Assets, Button, Colors, Icon, ProgressBar } from 'react-native-ui-lib';
+import { Assets, Badge, Button, Colors, Icon, ProgressBar } from 'react-native-ui-lib';
 import Avatar from 'react-native-ui-lib/avatar';
 import Card from 'react-native-ui-lib/card';
 import Chip from 'react-native-ui-lib/chip';
@@ -14,6 +14,7 @@ import { useSelector } from 'react-redux';
 import Layout from '../../components/layout';
 import Spacing from '../../components/spacing';
 import { homeMenuButtons } from '../../constants/homeButtons';
+import { screenNames } from '../../constants/screens';
 import { GENERAL_MARGIN } from '../../constants/styles';
 import { selectUserName, selectUserPicture, selectUserState } from '../../store/slices/user';
 
@@ -62,7 +63,13 @@ export default function Home() {
           />
         </View>
       </View>
-      <SearchInput placeholder={t('home.search.placeholder')} autoFocus={false} style={styles.search} />
+      <SearchInput
+        placeholder={t('home.search.placeholder')}
+        autoFocus={false}
+        style={styles.search}
+        containerStyle={{ backgroundColor: Colors.$backgroundDefault }}
+        useSafeArea
+      />
       {/* Selection counter + mastered kanji counter */}
       <Spacing y={GENERAL_MARGIN} />
       <View>
@@ -85,7 +92,7 @@ export default function Home() {
         iconProps={{ size: 20 }}
         text80BL
         onPress={() => {
-          navigation.navigate('Evaluation');
+          handleRediction(screenNames.EVALUATION);
         }}
       />
       {/* Menu */}
@@ -94,10 +101,19 @@ export default function Home() {
         {homeMenuButtons.map((button, i) => (
           <View key={button.textKey} style={styles.row}>
             {i !== 0 && <Spacing x={10} />}
+            {button.premium && userState.subscriptionPlan === 'free' && (
+              <Badge
+                label={t('premium.feature.badge')}
+                size={20}
+                backgroundColor={Colors.$backgroundGeneralMedium}
+                style={styles.badge}
+              />
+            )}
             <Card
               height={140}
               width={(width - GENERAL_MARGIN * 2 - 20) / 2}
               style={styles.card}
+              disabled={button.premium && userState.subscriptionPlan === 'free'}
               onPress={() => handleRediction(button.screen)}>
               {button.icon}
               <Card.Section
@@ -122,12 +138,12 @@ export default function Home() {
       {userState.subscriptionPlan === 'free' && (
         <>
           <Spacing y={GENERAL_MARGIN} />
-          <Card height={105} width={width - GENERAL_MARGIN * 2} style={{ padding: 15 }}>
+          <Card height={105} width={width - GENERAL_MARGIN * 2} style={styles.card}>
             <Icon source={Assets.icons.video} size={36} tintColor={Colors.$textPrimary} />
             <Card.Section
               flex
-              content={[{ text: t('home.menu.ad.title'), text80BL: true }]}
-              contentStyle={styles.transparent}
+              content={[{ text: t('home.menu.ad.title'), text80BL: true, $outlineDefault: true }]}
+              contentStyle={styles.cardContent}
               style={styles.transparent}
             />
             <Card.Section
@@ -138,7 +154,7 @@ export default function Home() {
             />
           </Card>
           <Spacing y={GENERAL_MARGIN} />
-          <Card height={105} width={width - GENERAL_MARGIN * 2} style={{ padding: 15 }}>
+          <Card height={105} width={width - GENERAL_MARGIN * 2} style={styles.card}>
             <Icon source={Assets.icons.premium} size={36} tintColor="#fff" />
             <Card.Section
               flex
@@ -157,12 +173,12 @@ export default function Home() {
         </>
       )}
       <Spacing y={GENERAL_MARGIN} />
-      <Card height={90} width={width - GENERAL_MARGIN * 2} style={{ padding: 15 }}>
+      <Card height={90} width={width - GENERAL_MARGIN * 2} style={styles.card}>
         <Icon source={Assets.icons.setting} size={36} tintColor={Colors.$textPrimary} />
         <Card.Section
           flex
           content={[{ text: t('home.menu.setting.title'), text80BL: true }]}
-          contentStyle={styles.transparent}
+          contentStyle={styles.cardContent}
           style={styles.transparent}
         />
       </Card>
@@ -191,5 +207,10 @@ const styles = StyleSheet.create({
   },
   transparent: { backgroundColor: '#00000000' },
   bannerImage: { position: 'absolute', left: 0, zIndex: -10, width: width - GENERAL_MARGIN * 2, height: 105, borderRadius: 10 },
-  search: { borderWidth: 0.5, borderColor: Colors.$backgroundInverted + '25', borderRadius: 25 },
+  search: {
+    borderWidth: 0.5,
+    borderColor: Colors.$backgroundInverted + '25',
+    borderRadius: 25,
+  },
+  badge: { position: 'absolute', right: 10, top: 10, zIndex: 10 },
 });
