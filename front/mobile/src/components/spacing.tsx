@@ -1,10 +1,15 @@
-import { View } from 'react-native';
+import { Dimensions } from 'react-native';
+import View from 'react-native-ui-lib/view';
+
+import { GENERAL_MARGIN } from '../constants/styles';
 
 type SpacingProps = {
   x?: number;
   y?: number;
 };
 
-export default function Spacing({ x = 1, y = 1 }: SpacingProps) {
-  return <View style={{ width: x, height: y }} />;
+const { width, height } = Dimensions.get('window');
+
+export default function Spacing({ x = width, y = 1 }: SpacingProps) {
+  return <View width={x} height={y} />;
 }
