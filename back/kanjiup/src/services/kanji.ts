@@ -18,13 +18,21 @@ export const getOneImage = (encodedKanji: string) => {
 };
 
 export const getAll = async (page: number, limit: number, grade?: string, jlpt?: string) => {
-  const query: Partial<{ deleted_at: string | null; jlpt: string; reference: { $in: string[] } | null }> = { deleted_at: null };
+  const query: Partial<{ deleted_at: string | null; kanji: { $in: string[] } | null; reference: { $in: string[] } | null }> = { deleted_at: null };
   if (grade)
     query['reference'] = {
       $in: await ReferenceModel.find({ grade }).select('id').exec(),
     };
-    else if (jlpt)
-      query['jlpt'] = jlpt;
+  else if (jlpt)
+    query['kanji'] = {
+      $in: (
+        await CharacterModel.find({ jlpt: Number(jlpt) })
+          .select('id')
+          .exec()
+      ).map((char) => char._id),
+    };
+
+  console.log({ query });
 
   const populate = [
     { path: 'kanji', select: 'character_id character meaning onyomi kunyomi strokes jlpt -_id' } as PopulateOptions,
