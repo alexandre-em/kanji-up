@@ -17,8 +17,8 @@ export const initialize = createAsyncThunk<{ [key: string]: Partial<KanjiType> }
   return JSON.parse(content) as { [key: string]: Partial<KanjiType> };
 });
 
-const selectKanji = (state: SelectedKanjiState, action: PayloadAction<KanjiType>) => {
-  if (state.selectedKanji[action.payload.kanji_id] && !state.toRemove[action.payload.kanji_id]) {
+const selectKanji = (state: SelectedKanjiState, action: PayloadAction<Partial<KanjiType>>) => {
+  if (state.selectedKanji[action.payload.kanji_id!] && !state.toRemove[action.payload.kanji_id!]) {
     return state;
   }
 
@@ -29,36 +29,35 @@ const selectKanji = (state: SelectedKanjiState, action: PayloadAction<KanjiType>
     }
   });
 
-  return { ...state, toAdd: { ...state.toAdd, [action.payload.kanji_id]: action.payload }, toRemove };
+  return { ...state, toAdd: { ...state.toAdd, [action.payload.kanji_id!]: action.payload }, toRemove };
 };
 
-const unSelectKanji = (state: SelectedKanjiState, action: PayloadAction<KanjiType>) => {
-  if (state.toAdd[action.payload.kanji_id]) {
-    delete state.toAdd[action.payload.kanji_id];
+const unSelectKanji = (state: SelectedKanjiState, action: PayloadAction<Partial<KanjiType>>) => {
+  if (state.toAdd[action.payload.kanji_id!]) {
+    delete state.toAdd[action.payload.kanji_id!];
     return;
   }
 
-  return { ...state, toRemove: { ...state.toRemove, [action.payload.kanji_id]: action.payload } };
+  return { ...state, toRemove: { ...state.toRemove, [action.payload.kanji_id!]: action.payload } };
 };
 
 export const save = createAsyncThunk<typeof initialState.selectedKanji, undefined>('kanjis/getById', async (_, { getState }) => {
   const { selectedKanji } = getState() as RootState;
   const selectedKanjiNewState = { ...selectedKanji.selectedKanji };
 
-  const newSelectedKanji = Object.keys(selectedKanjiNewState.selectedKanji)
-    .concat(Object.keys(selectedKanji.toAdd))
-    .filter((id) => !selectedKanji.toRemove[id])
-    .reduce(
-      (prev, curr) => ({
-        ...prev,
-        [curr]: selectedKanjiNewState[curr] ?? selectedKanji.toAdd[curr],
-      }),
-      {},
-    );
+  const addedKanjiList = Object.keys(selectedKanjiNewState).concat(Object.keys(selectedKanji.toAdd));
+  const filteredKanji = addedKanjiList.filter((id) => !selectedKanji.toRemove[id]);
+  const newSelectedKanjiState = filteredKanji.reduce(
+    (prev, curr) => ({
+      ...prev,
+      [curr]: selectedKanjiNewState[curr] ?? selectedKanji.toAdd[curr],
+    }),
+    {},
+  );
 
-  await fileServiceInstance.write(fileNames.SELECTED_KANJI, JSON.stringify(newSelectedKanji));
+  await fileServiceInstance.write(fileNames.SELECTED_KANJI, JSON.stringify(newSelectedKanjiState));
 
-  return newSelectedKanji;
+  return newSelectedKanjiState;
 });
 
 const cancel = (state: SelectedKanjiState) => {
@@ -109,4 +108,6 @@ export const selectedKanji = createSlice({
 export default selectedKanji.reducer;
 
 export const selectSelectedKanji = (state: RootState) => state.selectedKanji.selectedKanji;
+export const selectKanjiToAdd = (state: RootState) => state.selectedKanji.toAdd;
+export const selectKanjiToDelete = (state: RootState) => state.selectedKanji.toRemove;
 export const selectSelectedKanjiInitStatus = (state: RootState) => state.selectedKanji.initStatus;

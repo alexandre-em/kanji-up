@@ -152,7 +152,7 @@ const kanjiSlice = createSlice({
 });
 
 export const selectLastGet = (state: RootState) => state.kanji.last;
-export const selectGetOne = (state: RootState) => state.kanji.entities;
+export const selectEntities = (state: RootState) => state.kanji.entities;
 export const selectGetOneStatus = (state: RootState) => state.kanji.getOneStatus;
 export const selectGetAllResult = (state: RootState) => state.kanji.kanjis;
 export const selectGetAllStatus = (state: RootState) => state.kanji.getAllStatus;

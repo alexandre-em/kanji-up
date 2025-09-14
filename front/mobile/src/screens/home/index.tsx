@@ -16,6 +16,7 @@ import Spacing from '../../components/spacing';
 import { homeMenuButtons } from '../../constants/homeButtons';
 import { screenNames } from '../../constants/screens';
 import { GENERAL_MARGIN } from '../../constants/styles';
+import { selectSelectedKanji } from '../../store/slices/selectedKanji';
 import { selectUserName, selectUserPicture, selectUserState } from '../../store/slices/user';
 
 const { width } = Dimensions.get('window');
@@ -26,6 +27,7 @@ export default function Home() {
   const userName = useSelector(selectUserName);
   const userPicture = useSelector(selectUserPicture);
   const userState = useSelector(selectUserState);
+  const selectedKanjiState = useSelector(selectSelectedKanji);
 
   const handleRediction = useCallback(
     (screen: string) => {
@@ -73,7 +75,7 @@ export default function Home() {
       {/* Selection counter + mastered kanji counter */}
       <Spacing y={GENERAL_MARGIN} />
       <View>
-        <Text text40BL>123</Text>
+        <Text text40BL>{Object.keys(selectedKanjiState).length}</Text>
         <Text>{t('home.selection.unit')}</Text>
       </View>
 

@@ -2,13 +2,17 @@ import { Assets } from 'react-native-ui-lib';
 import { Colors, ThemeManager, Typography } from 'react-native-ui-lib';
 import { setConfig } from 'react-native-ui-lib/config';
 
+import AddIcon from '../assets/icons/add.png';
+import CheckIcon from '../assets/icons/check.png';
 import SelectionIcon from '../assets/icons/checkbox.png';
 import ClearIcon from '../assets/icons/clear.png';
+import CrossIcon from '../assets/icons/cross.png';
 import CoinIcon from '../assets/icons/diamond.png';
 import DrawIcon from '../assets/icons/draw.png';
 import GoogleIcon from '../assets/icons/google.png';
 import PremiumIcon from '../assets/icons/premium.png';
 import RecognitionIcon from '../assets/icons/recognition.png';
+import RemoveIcon from '../assets/icons/remove.png';
 import SettingIcon from '../assets/icons/setting.png';
 import VideoIcon from '../assets/icons/video.png';
 import YenIcon from '../assets/icons/yen.png';
@@ -22,13 +26,17 @@ import PremiumBanner from '../assets/images/remi-bertogliati-premium.jpg';
 setConfig({ appScheme: 'default' });
 
 Assets.loadAssetsGroup('icons', {
+  add: AddIcon,
+  check: CheckIcon,
   coin: CoinIcon,
   clear: ClearIcon,
+  cross: CrossIcon,
   google: GoogleIcon,
   premium: PremiumIcon,
   recognition: RecognitionIcon,
   selection: SelectionIcon,
   draw: DrawIcon,
+  remove: RemoveIcon,
   yen: YenIcon,
   video: VideoIcon,
   setting: SettingIcon,

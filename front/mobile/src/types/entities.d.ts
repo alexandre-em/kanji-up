@@ -6,6 +6,7 @@ type CharacterType = {
   kunyomi?: Array<string>;
   strokes?: number;
   image?: string;
+  jlpt: number;
 };
 
 type RadicalType = {
