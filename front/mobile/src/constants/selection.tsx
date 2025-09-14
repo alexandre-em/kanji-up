@@ -42,7 +42,7 @@ export const selectionMenuButtons: SelectionButtonsType[] = [
     textKey: 'selection.menu.school.title',
     subtitle: 'selection.menu.school.subtitle',
     image: <Image source={Assets.banners.school} style={styles.bannerImage} />,
-    screen: 'school',
+    screen: 'grade',
     premium: false,
   },
   {

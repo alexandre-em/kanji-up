@@ -26,11 +26,39 @@
   "home.evaluation.button": "Level up today!",
   "home.menu.selection.title": "SELECT",
   "home.menu.selection.subtitle": "Select kanji to learn",
-  "home.menu.ocr.title": "SCAN (PREMIUM)",
+  "home.menu.ocr.title": "SCAN",
   "home.menu.ocr.subtitle": "Translate, and look up words",
   "home.menu.premium.title": "PREMIUM",
   "home.menu.premium.subtitle": "Your kanji journey, unlimited",
   "home.menu.ad.title": "WIN CREDITS",
   "home.menu.ad.subtitle": "A short ad for a big leap in learning",
-  "home.menu.setting.title": "SETTING"
+  "home.menu.setting.title": "SETTING",
+
+  "selection.title": "Selection",
+  "selection.subtitle": "Choose your way of learning, either in school order or JLPT order",
+  "selection.menu.jlpt.title": "JLPT LEVELS",
+  "selection.menu.jlpt.subtitle": "Learn characters by JLPT levels from N5 to N1",
+  "selection.menu.school.title": "SCHOOL GRADES",
+  "selection.menu.school.subtitle": "Learn characters by school grade from 1 to 12",
+  "selection.menu.advanced.title": "ADVANCED KANJI",
+  "selection.menu.advanced.subtitle": "Unlock the next level of kanji knowledge",
+
+  "difficulties.jlpt.title": "JLPT Levels",
+  "difficulties.jlpt.subtitle": "Climb through JLPT levels or grab any kanji you like — the challenge is in your hands!",
+  "difficulties.jlpt.level5.title": "JLPT N5",
+  "difficulties.jlpt.level4.title": "JLPT N4",
+  "difficulties.jlpt.level3.title": "JLPT N3",
+  "difficulties.jlpt.level2.title": "JLPT N2",
+  "difficulties.jlpt.level1.title": "JLPT N1",
+  "difficulties.jlpt.unit": "characters",
+
+  "difficulties.school.title": "School grades",
+  "difficulties.school.subtitle": "School grade order helps you level up naturally, but you can grab any kanji and start your adventure!",
+
+  "kanjiList.title": "Kanji List",
+  "kanjiList.subtitle": "Tap a kanji to select or unselect it, then press Save to confirm. Long-press any kanji to view its details",
+
+  "premium.feature.badge": "premium",
+
+  "loading.title": "Loading..."
 }

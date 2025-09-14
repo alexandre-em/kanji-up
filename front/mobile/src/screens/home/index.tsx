@@ -119,17 +119,12 @@ export default function Home() {
               <Card.Section
                 flex
                 style={{ backgroundColor: Colors.$backgroundElevated }}
-                content={[{ text: t(button.textKey), text80BL: true, $outlineDefault: true }]}
+                content={[
+                  { text: t(button.textKey), text80BL: true, $outlineDefault: true },
+                  { text: t(button.subtitle!), text90M: true },
+                ]}
                 contentStyle={styles.cardContent}
               />
-              {button.subtitle && (
-                <Card.Section
-                  flex
-                  content={[{ text: t(button.subtitle), text90M: true }]}
-                  contentStyle={styles.transparent}
-                  style={styles.transparent}
-                />
-              )}
             </Card>
           </View>
         ))}
@@ -138,33 +133,27 @@ export default function Home() {
       {userState.subscriptionPlan === 'free' && (
         <>
           <Spacing y={GENERAL_MARGIN} />
-          <Card height={105} width={width - GENERAL_MARGIN * 2} style={styles.card}>
+          <Card height={115} width={width - GENERAL_MARGIN * 2} style={styles.card}>
             <Icon source={Assets.icons.video} size={36} tintColor={Colors.$textPrimary} />
             <Card.Section
               flex
-              content={[{ text: t('home.menu.ad.title'), text80BL: true, $outlineDefault: true }]}
+              content={[
+                { text: t('home.menu.ad.title'), text80BL: true, $outlineDefault: true },
+                { text: t('home.menu.ad.subtitle'), text90M: true },
+              ]}
               contentStyle={styles.cardContent}
-              style={styles.transparent}
-            />
-            <Card.Section
-              flex
-              content={[{ text: t('home.menu.ad.subtitle'), text90M: true }]}
-              contentStyle={styles.transparent}
               style={styles.transparent}
             />
           </Card>
           <Spacing y={GENERAL_MARGIN} />
-          <Card height={105} width={width - GENERAL_MARGIN * 2} style={styles.card}>
+          <Card height={115} width={width - GENERAL_MARGIN * 2} style={styles.card}>
             <Icon source={Assets.icons.premium} size={36} tintColor="#fff" />
             <Card.Section
               flex
-              content={[{ text: t('home.menu.premium.title'), text70BL: true, white: true }]}
-              contentStyle={styles.transparent}
-              style={styles.transparent}
-            />
-            <Card.Section
-              flex
-              content={[{ text: t('home.menu.premium.subtitle'), text80BO: true, white: true }]}
+              content={[
+                { text: t('home.menu.premium.title'), text70BL: true, white: true },
+                { text: t('home.menu.premium.subtitle'), text80BO: true, white: true },
+              ]}
               contentStyle={styles.transparent}
               style={styles.transparent}
             />
@@ -173,7 +162,7 @@ export default function Home() {
         </>
       )}
       <Spacing y={GENERAL_MARGIN} />
-      <Card height={90} width={width - GENERAL_MARGIN * 2} style={styles.card}>
+      <Card height={110} width={width - GENERAL_MARGIN * 2} style={styles.card}>
         <Icon source={Assets.icons.setting} size={36} tintColor={Colors.$textPrimary} />
         <Card.Section
           flex
@@ -206,7 +195,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.$backgroundElevated,
   },
   transparent: { backgroundColor: '#00000000' },
-  bannerImage: { position: 'absolute', left: 0, zIndex: -10, width: width - GENERAL_MARGIN * 2, height: 105, borderRadius: 10 },
+  bannerImage: { position: 'absolute', left: 0, zIndex: -10, width: width - GENERAL_MARGIN * 2, height: 115, borderRadius: 10 },
   search: {
     borderWidth: 0.5,
     borderColor: Colors.$backgroundInverted + '25',

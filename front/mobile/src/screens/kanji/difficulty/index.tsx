@@ -26,7 +26,7 @@ export default function KanjiDifficulties({ route }: KanjiDifficultiesProps) {
 
   const handleRedirect = useCallback(
     (difficulty: string) => {
-      navigation.navigate(screenNames.KANJIS, { difficulty });
+      navigation.navigate(screenNames.KANJIS, { difficulty, category });
     },
     [navigation],
   );
@@ -42,25 +42,18 @@ export default function KanjiDifficulties({ route }: KanjiDifficultiesProps) {
             <View style={styles.cardContainer}>
               <Card.Section
                 flex
-                content={[{ text: t(button.textKey), text60BL: true }]}
+                content={[
+                  { text: t(button.textKey), text60BL: true },
+                  {
+                    text: `${button.count} ${t(button.subtitle)}`,
+                    highlightString: `${button.count}`,
+                    highlightStyle: { color: Colors.$backgroundPrimaryHeavy, fontWeight: '700' },
+                    text80M: true,
+                  },
+                ]}
                 contentStyle={styles.transparent}
                 style={styles.transparent}
               />
-              {button.subtitle && (
-                <Card.Section
-                  flex
-                  content={[
-                    {
-                      text: `${button.count} ${t(button.subtitle)}`,
-                      highlightString: `${button.count}`,
-                      highlightStyle: { color: Colors.$backgroundPrimaryHeavy, fontWeight: '700' },
-                      text80M: true,
-                    },
-                  ]}
-                  contentStyle={styles.transparent}
-                  style={styles.transparent}
-                />
-              )}
             </View>
           </Card>
         </View>

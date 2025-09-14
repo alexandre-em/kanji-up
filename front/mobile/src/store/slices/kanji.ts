@@ -5,7 +5,13 @@ import { RootState } from '../';
 
 interface KanjiState {
   entities: { [uuid: string]: KanjiType };
-  kanjis: Pagination<KanjiType> | undefined;
+  kanjis: KanjiType[];
+  last: {
+    page: number;
+    type: 'grade' | 'jlpt';
+    difficulty: string;
+    totalPage: number;
+  } | null;
   search: { [search: string]: SearchResult<KanjiType> };
   random: KanjiType[] | undefined;
   getOneStatus: RequestStatusType;
@@ -14,11 +20,11 @@ interface KanjiState {
   searchStatus: RequestStatusType;
 }
 
-interface GetAllInput {
-  grade: string;
+type GetAllInput = {
+  difficulty: string;
   page?: number;
-  limit?: number;
-}
+  type: 'grade' | 'jlpt';
+};
 
 interface SearchKanjiInput {
   query: string;
@@ -28,9 +34,10 @@ interface SearchKanjiInput {
 
 const initialState: KanjiState = {
   entities: {},
-  kanjis: undefined,
+  kanjis: [],
   random: undefined,
   search: {},
+  last: null,
   getOneStatus: 'idle',
   getAllStatus: 'idle',
   getRandomStatus: 'idle',
@@ -44,13 +51,29 @@ export const getOne = createAsyncThunk<KanjiType, string>('kanjis/getById', asyn
   return response.data;
 });
 
-export const getAll = createAsyncThunk<Pagination<KanjiType>, GetAllInput>(
-  'kanjis/getAll',
-  async ({ limit = 0, page = 0, grade }) => {
-    const response = await core.kanjiService!.getAll({ limit, page, grade });
-    return response.data;
-  },
-);
+export const getAll = createAsyncThunk<
+  (Pagination<KanjiType> & { difficulty: string; type: 'grade' | 'jlpt' }) | null,
+  GetAllInput
+>('kanjis/getAll', async ({ page = 1, ...params }, { getState }) => {
+  const { kanji } = getState() as RootState;
+  if (params.type === kanji.last?.type && params.difficulty === kanji.last?.difficulty && page <= kanji.last.page) {
+    console.log('same difficulty and page <= last.page', page, kanji.last?.page);
+    return null;
+  }
+
+  const response = await core.kanjiService!.getAll({ page, [params.type]: params.difficulty, limit: 50 });
+
+  console.log({ response });
+
+  if (params.difficulty !== kanji.last?.difficulty) {
+    console.log('different difficulty', params.difficulty, kanji.last?.difficulty);
+    return { ...response.data, difficulty: params.difficulty, type: params.type };
+  }
+
+  console.log('same difficulty but page > last.page', page, kanji.last?.page);
+
+  return { ...response.data, docs: kanji.kanjis.concat(response.data.docs), difficulty: params.difficulty, type: params.type };
+});
 
 export const getRandom = createAsyncThunk<KanjiType[], number>('kanjis/getRandom', async (number) => {
   const response = await core.kanjiService!.getRandom(number);
@@ -92,7 +115,14 @@ const kanjiSlice = createSlice({
       state.getAllStatus = 'pending';
     });
     builder.addCase(getAll.fulfilled, (state, action) => {
-      state.kanjis = action.payload;
+      if (action.payload === null) return;
+      state.kanjis = action.payload.docs;
+      state.last = {
+        page: action.payload.page,
+        difficulty: action.payload.difficulty,
+        type: action.payload.type,
+        totalPage: action.payload.totalPages,
+      };
       state.getAllStatus = 'succeeded';
     });
     builder.addCase(getAll.rejected, (state) => {
@@ -121,6 +151,7 @@ const kanjiSlice = createSlice({
   },
 });
 
+export const selectLastGet = (state: RootState) => state.kanji.last;
 export const selectGetOne = (state: RootState) => state.kanji.entities;
 export const selectGetOneStatus = (state: RootState) => state.kanji.getOneStatus;
 export const selectGetAllResult = (state: RootState) => state.kanji.kanjis;

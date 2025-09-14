@@ -1,5 +1,12 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 
+type GetAllParams = {
+  page?: number;
+  limit?: number;
+  grade?: string;
+  jlpt?: string;
+};
+
 export default class KanjiService {
   private _instance: AxiosInstance | null = null;
 
@@ -10,10 +17,10 @@ export default class KanjiService {
     });
   }
 
-  getAll({ page = 0, limit = 10, grade = '1' }, options?: AxiosRequestConfig) {
+  getAll({ page = 0, limit = 10, grade = undefined, jlpt = undefined }: GetAllParams, options?: AxiosRequestConfig) {
     if (!this._instance) throw new Error('Kanji instance not ready...');
 
-    return this._instance.get<Pagination<KanjiType>>(`?page=${page}&limit=${limit}&grade=${grade}`, options);
+    return this._instance.get<Pagination<KanjiType>>(``, { ...options, params: { page, limit, grade, jlpt } });
   }
 
   getOne({ id = '' }, options?: AxiosRequestConfig) {
