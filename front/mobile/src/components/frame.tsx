@@ -10,7 +10,7 @@ type FrameProps = {
 export default function Frame({ width, height, children }: FrameProps & PropsWithChildren) {
   if (!children) return null;
   return (
-    <View style={[styles.frame, { borderColor: Colors.$textDefault }]}>
+    <View style={[styles.frame, { width, height, borderColor: Colors.$textDefault }]}>
       <View style={styles.children}>{children}</View>
       <View
         style={[
@@ -20,6 +20,8 @@ export default function Frame({ width, height, children }: FrameProps & PropsWit
             height: height,
             borderRightWidth: 0.5,
             borderColor: Colors.$textDefault + '75',
+            zIndex: 100,
+            backgroundColor: 'transparent',
           },
         ]}
       />
@@ -31,6 +33,8 @@ export default function Frame({ width, height, children }: FrameProps & PropsWit
             height: height / 2,
             borderBottomWidth: 0.5,
             borderColor: Colors.$textDefault + '50',
+            zIndex: 100,
+            backgroundColor: 'transparent',
           },
         ]}
       />
@@ -40,8 +44,10 @@ export default function Frame({ width, height, children }: FrameProps & PropsWit
 
 const styles = StyleSheet.create({
   frame: {
-    borderWidth: 0.75,
     position: 'relative',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   frameInner: {
     position: 'absolute',

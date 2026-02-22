@@ -7,12 +7,13 @@ import { LoaderScreen } from 'react-native-ui-lib';
 
 import { screenNames } from '../constants/screens';
 import { useIsNotRegistered } from '../hooks/useIsAlreadyRegistered';
-import Evaluation from './evaluation';
+// import Evaluation from './evaluation';
 import Home from './home';
 import KanjiCategoriesScreen from './kanji';
 import KanjiDifficulties from './kanji/difficulty';
 import KanjiList from './kanji/difficulty/kanjiList';
 import Onboarding from './onboarding';
+import KanjiDetail from './kanji/difficulty/kanjiList/kanji';
 
 const Stack = createNativeStackNavigator();
 
@@ -30,10 +31,11 @@ export default function RootNavigation() {
       <Stack.Navigator defaultScreenName={isNotRegistered ? 'Onboarding' : 'Home'} screenOptions={{ headerShown: false }}>
         <Stack.Screen name={screenNames.ONBOARDING} component={Onboarding} />
         <Stack.Screen name={screenNames.HOME} component={Home} />
-        <Stack.Screen name={screenNames.EVALUATION} component={Evaluation} />
+        {/*<Stack.Screen name={screenNames.EVALUATION} component={Evaluation} />*/}
         <Stack.Screen name={screenNames.CATEGORIES} component={KanjiCategoriesScreen} />
         <Stack.Screen name={screenNames.DIFFICULTIES} component={KanjiDifficulties} />
         <Stack.Screen name={screenNames.KANJIS} component={KanjiList} />
+        <Stack.Screen name={screenNames.KANJI} component={KanjiDetail} />
       </Stack.Navigator>
     </NavigationContainer>
   );

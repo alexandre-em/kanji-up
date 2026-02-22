@@ -82,7 +82,7 @@ export const selectedKanji = createSlice({
       state.initStatus = 'pending';
     });
     builder.addCase(initialize.fulfilled, (state, action) => {
-      state.selectedKanji = action.payload;
+      state.selectedKanji = action.payload ?? {};
       state.initStatus = 'succeeded';
     });
     builder.addCase(initialize.rejected, (state) => {

@@ -57,20 +57,14 @@ export const getAll = createAsyncThunk<
 >('kanjis/getAll', async ({ page = 1, ...params }, { getState }) => {
   const { kanji } = getState() as RootState;
   if (params.type === kanji.last?.type && params.difficulty === kanji.last?.difficulty && page <= kanji.last.page) {
-    console.log('same difficulty and page <= last.page', page, kanji.last?.page);
     return null;
   }
 
   const response = await core.kanjiService!.getAll({ page, [params.type]: params.difficulty, limit: 50 });
 
-  console.log({ response });
-
   if (params.difficulty !== kanji.last?.difficulty) {
-    console.log('different difficulty', params.difficulty, kanji.last?.difficulty);
     return { ...response.data, difficulty: params.difficulty, type: params.type };
   }
-
-  console.log('same difficulty but page > last.page', page, kanji.last?.page);
 
   return { ...response.data, docs: kanji.kanjis.concat(response.data.docs), difficulty: params.difficulty, type: params.type };
 });

@@ -1,12 +1,11 @@
 import { useNavigation } from '@react-navigation/native';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Dimensions, Image, ScrollView, StyleSheet } from 'react-native';
-import { Assets, Badge, Button, Colors, Icon, ProgressBar } from 'react-native-ui-lib';
+import { Dimensions, Image, StyleSheet } from 'react-native';
+import { Assets, Badge, Button, Colors, Icon, ProgressBar, SearchInput } from 'react-native-ui-lib';
 import Avatar from 'react-native-ui-lib/avatar';
 import Card from 'react-native-ui-lib/card';
 import Chip from 'react-native-ui-lib/chip';
-import SearchInput from 'react-native-ui-lib/searchInput';
 import Text from 'react-native-ui-lib/text';
 import View from 'react-native-ui-lib/view';
 import { useSelector } from 'react-redux';
@@ -75,7 +74,7 @@ export default function Home() {
       {/* Selection counter + mastered kanji counter */}
       <Spacing y={GENERAL_MARGIN} />
       <View>
-        <Text text40BL>{Object.keys(selectedKanjiState).length}</Text>
+        <Text text40BL>{selectedKanjiState ? Object.keys(selectedKanjiState).length : 0}</Text>
         <Text>{t('home.selection.unit')}</Text>
       </View>
 
