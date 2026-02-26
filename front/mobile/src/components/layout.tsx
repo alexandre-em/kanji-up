@@ -18,6 +18,7 @@ export default function Layout({ screen, children }: LayoutProps & PropsWithChil
   return (
     <ScrollView style={styles.container}>
       <View height="100%">
+        <Spacing y={20} />
         {title !== `${screen}.title` && <Text h1>{title}</Text>}
         {title !== `${screen}.title` && subtitle !== `${screen}.subtitle` && <Spacing y={5} />}
         {subtitle !== `${screen}.subtitle` && <Text text80L>{t(`${screen}.subtitle`)}</Text>}

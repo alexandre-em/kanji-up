@@ -100,6 +100,7 @@ const kanjiSlice = createSlice({
     });
     builder.addCase(getOne.fulfilled, (state, action) => {
       state.entities[action.payload.kanji_id] = action.payload;
+
       state.getOneStatus = 'succeeded';
     });
     builder.addCase(getOne.rejected, (state) => {

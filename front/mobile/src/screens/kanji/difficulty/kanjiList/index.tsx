@@ -17,8 +17,10 @@ import {
   selectedKanji,
   selectKanjiToAdd,
   selectKanjiToDelete,
+  selectSaveStatus,
   selectSelectedKanji,
 } from '../../../../store/slices/selectedKanji';
+import { useToaster } from '../../../../providers/toaster.tsx';
 
 type KanjiListProps = RouteParamsProps<{
   difficulty: string;
@@ -100,9 +102,9 @@ export default function KanjiList(props: KanjiListProps) {
   const entities = useSelector(selectSelectedKanji);
   const toAdd = useSelector(selectKanjiToAdd);
   const toRemove = useSelector(selectKanjiToDelete);
+  const saveStatus = useSelector(selectSaveStatus);
   const { difficulty, category } = props.route.params;
-
-  console.log({ toAdd, toRemove, entities });
+  const toaster = useToaster();
 
   const kanjiList = useMemo(() => {
     const isOnline = true;
@@ -118,7 +120,7 @@ export default function KanjiList(props: KanjiListProps) {
   }, [dispatch, last?.difficulty, last?.type, last?.page, last?.totalPage, category, difficulty]);
 
   const handleRedirect = useCallback(
-    (kanji: KanjiType) => {
+    (kanji: Partial<KanjiType>) => {
       navigation.navigate(screenNames.KANJI, { character: kanji.kanji_id });
     },
     [navigation],
@@ -158,6 +160,17 @@ export default function KanjiList(props: KanjiListProps) {
       dispatch(getAll({ type: category, difficulty, page: 1 }));
     }
   }, [category, difficulty, dispatch, last?.page, last?.difficulty, last?.type]);
+
+  useEffect(() => {
+    if (toaster) {
+      if (saveStatus === 'succeeded') {
+        toaster.show({ message: t('kanji.select.toast.success'), type: 'success' });
+        dispatch(selectedKanji.actions.resetSaveStatus());
+      }
+      if (saveStatus === 'failed') {
+      }
+    }
+  }, [saveStatus]);
 
   return (
     <Layout screen="kanjiList">

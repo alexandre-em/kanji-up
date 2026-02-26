@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
   canvas: {
     position: 'relative',
     borderWidth: 0.75,
-    borderColor: Colors.$textDefault + '50',
+    borderColor: Colors.$textDefault + '30',
     borderRadius: 8,
   },
   canvasBackground: {

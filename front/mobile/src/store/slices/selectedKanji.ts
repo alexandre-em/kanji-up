@@ -29,7 +29,9 @@ const selectKanji = (state: SelectedKanjiState, action: PayloadAction<Partial<Ka
     }
   });
 
-  return { ...state, toAdd: { ...state.toAdd, [action.payload.kanji_id!]: action.payload }, toRemove };
+  const toAdd = { ...state.toAdd, [action.payload.kanji_id!]: action.payload };
+
+  return { ...state, toAdd, toRemove };
 };
 
 const unSelectKanji = (state: SelectedKanjiState, action: PayloadAction<Partial<KanjiType>>) => {
@@ -41,24 +43,28 @@ const unSelectKanji = (state: SelectedKanjiState, action: PayloadAction<Partial<
   return { ...state, toRemove: { ...state.toRemove, [action.payload.kanji_id!]: action.payload } };
 };
 
-export const save = createAsyncThunk<typeof initialState.selectedKanji, undefined>('kanjis/getById', async (_, { getState }) => {
-  const { selectedKanji } = getState() as RootState;
-  const selectedKanjiNewState = { ...selectedKanji.selectedKanji };
+export const save = createAsyncThunk<typeof initialState.selectedKanji, undefined>(
+  'kanjiSelection/save',
+  async (_, { getState }) => {
+    const { selectedKanji } = getState() as RootState;
 
-  const addedKanjiList = Object.keys(selectedKanjiNewState).concat(Object.keys(selectedKanji.toAdd));
-  const filteredKanji = addedKanjiList.filter((id) => !selectedKanji.toRemove[id]);
-  const newSelectedKanjiState = filteredKanji.reduce(
-    (prev, curr) => ({
-      ...prev,
-      [curr]: selectedKanjiNewState[curr] ?? selectedKanji.toAdd[curr],
-    }),
-    {},
-  );
+    const selectedKanjiNewState = { ...selectedKanji.selectedKanji };
 
-  await fileServiceInstance.write(fileNames.SELECTED_KANJI, JSON.stringify(newSelectedKanjiState));
+    const addedKanjiList = Object.keys(selectedKanjiNewState).concat(Object.keys(selectedKanji.toAdd));
+    const filteredKanji = addedKanjiList.filter((id) => !selectedKanji.toRemove[id]);
+    const newSelectedKanjiState = filteredKanji.reduce(
+      (prev, curr) => ({
+        ...prev,
+        [curr]: selectedKanjiNewState[curr] ?? selectedKanji.toAdd[curr],
+      }),
+      {},
+    );
 
-  return newSelectedKanjiState;
-});
+    await fileServiceInstance.write(fileNames.SELECTED_KANJI, JSON.stringify(newSelectedKanjiState));
+
+    return newSelectedKanjiState;
+  },
+);
 
 const cancel = (state: SelectedKanjiState) => {
   return { ...state, toAdd: {}, toRemove: {} };
@@ -76,6 +82,9 @@ export const selectedKanji = createSlice({
     selectKanji,
     unSelectKanji,
     reset,
+    resetSaveStatus: (state: SelectedKanjiState) => {
+      state.saveStatus = 'idle';
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(initialize.pending, (state) => {
@@ -111,3 +120,4 @@ export const selectSelectedKanji = (state: RootState) => state.selectedKanji.sel
 export const selectKanjiToAdd = (state: RootState) => state.selectedKanji.toAdd;
 export const selectKanjiToDelete = (state: RootState) => state.selectedKanji.toRemove;
 export const selectSelectedKanjiInitStatus = (state: RootState) => state.selectedKanji.initStatus;
+export const selectSaveStatus = (state: RootState) => state.selectedKanji.saveStatus;

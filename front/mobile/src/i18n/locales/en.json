@@ -58,6 +58,13 @@
   "kanjiList.title": "Kanji List",
   "kanjiList.subtitle": "Tap a kanji to select or unselect it, then press Save to confirm. Long-press any kanji to view its details",
 
+  "kanjiDetails.viewMode.button": "Animation mode",
+  "kanjiDetails.drawMode.button": "Practice mode",
+  "kanjiDetails.select.button": "Select",
+  "kanjiDetails.unselect.button": "Unselect",
+  "kanji.select.toast.success": "Characters added to selection",
+  "kanji.unselect.toast.success": "Updates saved with unselected characters",
+
   "premium.feature.badge": "premium",
 
   "loading.title": "Loading..."
