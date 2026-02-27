@@ -62,6 +62,12 @@
   "kanjiDetails.drawMode.button": "Practice mode",
   "kanjiDetails.select.button": "Select",
   "kanjiDetails.unselect.button": "Unselect",
+  "kanjiDetails.strokes": "Strokes",
+  "kanjiDetails.meanings": "Meanings",
+  "kanjiDetails.grade.school": "School",
+  "kanjiDetails.grade.jlpt": "JLPT",
+  "kanjiDetails.section.radical.title": "Radical",
+  "kanjiDetails.section.example.title": "Example",
   "kanji.select.toast.success": "Characters added to selection",
   "kanji.unselect.toast.success": "Updates saved with unselected characters",
 

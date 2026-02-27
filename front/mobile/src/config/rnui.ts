@@ -16,6 +16,8 @@ import RemoveIcon from '../assets/icons/remove.png';
 import SettingIcon from '../assets/icons/setting.png';
 import VideoIcon from '../assets/icons/video.png';
 import YenIcon from '../assets/icons/yen.png';
+import UpIcon from '../assets/icons/up.png';
+import DownIcon from '../assets/icons/down.png';
 import SchoolBanner from '../assets/images/hiroyoshi-urushima-school.jpg';
 import SchoolBannerDisabled from '../assets/images/hiroyoshi-urushima-school-disabled.jpg';
 import AdvancedBanner from '../assets/images/marco-zuppone-advanced.jpg';
@@ -40,6 +42,8 @@ Assets.loadAssetsGroup('icons', {
   yen: YenIcon,
   video: VideoIcon,
   setting: SettingIcon,
+  up: UpIcon,
+  down: DownIcon,
 });
 
 Assets.loadAssetsGroup('banners', {

@@ -11,5 +11,5 @@ type SpacingProps = {
 const { width, height } = Dimensions.get('window');
 
 export default function Spacing({ x = width, y = 1 }: SpacingProps) {
-  return <View width={x} height={y} />;
+  return <View width={x} height={y} style={{ backgroundColor: 'transparent' }} />;
 }

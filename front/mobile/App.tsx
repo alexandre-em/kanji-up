@@ -20,7 +20,7 @@ function App() {
       <UserProvider>
         <ToasterProvider>
           <RNView style={styles.screen}>
-            <View style={styles.container} padding-20>
+            <View style={styles.container}>
               <StatusBar barStyle={theme === 'dark' ? 'light-content' : 'dark-content'} />
               <RootNavigation />
             </View>

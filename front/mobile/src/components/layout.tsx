@@ -33,5 +33,8 @@ const styles = StyleSheet.create({
   container: {
     height: '100%',
     backgroundColor: Colors.$backgroundDefault,
+    paddingLeft: 20,
+    paddingRight: 20,
+    paddingBottom: 20,
   },
 });

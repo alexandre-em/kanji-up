@@ -35,7 +35,7 @@ export default function RootNavigation() {
         <Stack.Screen name={screenNames.CATEGORIES} component={KanjiCategoriesScreen} />
         <Stack.Screen name={screenNames.DIFFICULTIES} component={KanjiDifficulties} />
         <Stack.Screen name={screenNames.KANJIS} component={KanjiList} />
-        <Stack.Screen name={screenNames.KANJI} component={KanjiDetail} />
+        <Stack.Screen name={screenNames.KANJI} component={KanjiDetail} options={{ headerShown: true }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
