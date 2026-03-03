@@ -14,12 +14,12 @@ import { save, selectedKanji, selectSaveStatus, selectSelectedKanji } from '../.
 import { useToaster } from '../../../../../providers/toaster.tsx';
 import Card from 'react-native-ui-lib/card';
 import Text from 'react-native-ui-lib/text';
+import { CANVAS_HEIGHT, CANVAS_WIDTH } from '../../../../../constants/styles.ts';
 
 type KanjiDetailsProps = RouteParamsProps<{
   character: string;
 }>;
 
-const [CANVAS_WIDTH, CANVAS_HEIGHT] = [300, 300];
 const { width } = Dimensions.get('window');
 
 export default function KanjiDetail(props: KanjiDetailsProps) {

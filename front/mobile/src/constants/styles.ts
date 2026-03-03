@@ -1,1 +1,3 @@
 export const GENERAL_MARGIN = 20;
+export const [CANVAS_WIDTH, CANVAS_HEIGHT] = [300, 300];
+export const [MODEL_IMAGE_WIDTH, MODEL_IMAGE_HEIGHT] = [64, 64];

@@ -35,97 +35,129 @@ type CanvasProps = {
   strokeWidth?: number;
   color?: string;
   hideBackground?: boolean;
+  hideGuides?: boolean;
+  hideClearButton?: boolean;
+  hideBorder?: boolean;
 };
 
-const Canvas = forwardRef(({ width = 300, height = 300, strokeWidth = 3, color = 'black', hideBackground }: CanvasProps, ref) => {
-  const [paths, setPaths] = useState<{ x: number; y: number }[][]>([]);
-  const [currentPoints, setCurrentPoints] = useState<{ x: number; y: number }[]>([]);
+const Canvas = forwardRef(
+  (
+    {
+      width = 300,
+      height = 300,
+      strokeWidth = 5,
+      color = 'black',
+      hideBackground,
+      hideClearButton,
+      hideGuides,
+      hideBorder,
+    }: CanvasProps,
+    ref,
+  ) => {
+    const [paths, setPaths] = useState<{ x: number; y: number }[][]>([]);
+    const [currentPoints, setCurrentPoints] = useState<{ x: number; y: number }[]>([]);
 
-  const handleClear = useCallback(() => {
-    setPaths([]);
-    setCurrentPoints([]);
-  }, []);
+    const handleClear = useCallback(() => {
+      setPaths([]);
+      setCurrentPoints([]);
+    }, []);
 
-  useImperativeHandle(ref, () => ({
-    clear: handleClear,
-  }));
+    useImperativeHandle(ref, () => ({
+      clear: handleClear,
+    }));
 
-  const panResponder = useMemo(
-    () =>
-      PanResponder.create({
-        onStartShouldSetPanResponder: () => true,
-        onPanResponderGrant: (evt) => {
-          const { locationX, locationY } = evt.nativeEvent;
-          setCurrentPoints([{ x: locationX, y: locationY }]);
-        },
-        onPanResponderMove: (evt) => {
-          const { locationX, locationY } = evt.nativeEvent;
-          setCurrentPoints((prev) => [...prev, { x: locationX, y: locationY }]);
-        },
-        onPanResponderRelease: () => {
-          if (currentPoints.length > 0) {
-            setPaths((prev) => [...prev, currentPoints]);
-          }
-          setCurrentPoints([]);
-        },
-        onPanResponderTerminate: () => {
-          if (currentPoints.length > 0) {
-            setPaths((prev) => [...prev, currentPoints]);
-          }
-          setCurrentPoints([]);
-        },
-      }),
-    [currentPoints],
-  );
+    const panResponder = useMemo(
+      () =>
+        PanResponder.create({
+          onStartShouldSetPanResponder: () => true,
+          onPanResponderGrant: (evt) => {
+            const { locationX, locationY } = evt.nativeEvent;
+            setCurrentPoints([{ x: locationX, y: locationY }]);
+          },
+          onPanResponderMove: (evt) => {
+            const { locationX, locationY } = evt.nativeEvent;
+            setCurrentPoints((prev) => [...prev, { x: locationX, y: locationY }]);
+          },
+          onPanResponderRelease: () => {
+            if (currentPoints.length > 0) {
+              setPaths((prev) => [...prev, currentPoints]);
+            }
+            setCurrentPoints([]);
+          },
+          onPanResponderTerminate: () => {
+            if (currentPoints.length > 0) {
+              setPaths((prev) => [...prev, currentPoints]);
+            }
+            setCurrentPoints([]);
+          },
+        }),
+      [currentPoints],
+    );
 
-  return (
-    <View {...panResponder.panHandlers} style={[{ width, height }, styles.canvas, hideBackground ? {} : styles.canvasBackground]}>
-      <Button
-        iconSource={Assets.icons.clear}
-        iconProps={{ size: 25 }}
-        onPress={handleClear}
-        outline
-        size="medium"
-        style={styles.clean}
-      />
-      <Svg width={width} height={height}>
-        {paths.map((points, i) => (
-          <Path
-            key={i}
-            d={pointsToSvgPath(points)}
-            stroke={color}
-            strokeWidth={strokeWidth}
-            fill="none"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        ))}
-        {currentPoints.length > 0 && (
-          <Path
-            d={pointsToSvgPath(currentPoints)}
-            stroke={color}
-            strokeWidth={strokeWidth}
-            fill="none"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+    return (
+      <View
+        {...panResponder.panHandlers}
+        style={[
+          { width, height },
+          styles.canvas,
+          hideBackground ? {} : styles.canvasBackground,
+          hideBorder ? {} : styles.canvasBorder,
+        ]}>
+        {!hideClearButton && (
+          <Button
+            iconSource={Assets.icons.clear}
+            iconProps={{ size: 25 }}
+            onPress={handleClear}
+            outline
+            size="medium"
+            style={styles.clean}
           />
         )}
-      </Svg>
-      <View style={styles.vertical} />
-      <View style={styles.horizontal} />
-    </View>
-  );
-});
+        <Svg width={width} height={height}>
+          {paths.map((points, i) => (
+            <Path
+              key={i}
+              d={pointsToSvgPath(points)}
+              stroke={color}
+              strokeWidth={strokeWidth}
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          ))}
+          {currentPoints.length > 0 && (
+            <Path
+              d={pointsToSvgPath(currentPoints)}
+              stroke={color}
+              strokeWidth={strokeWidth}
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          )}
+        </Svg>
+        {!hideGuides && (
+          <>
+            <View style={styles.vertical} />
+            <View style={styles.horizontal} />
+          </>
+        )}
+      </View>
+    );
+  },
+);
 
 const styles = StyleSheet.create({
   canvas: {
     position: 'relative',
-    borderWidth: 0.75,
-    borderColor: Colors.$textDefault + '30',
-    borderRadius: 8,
   },
   canvasBackground: {
     backgroundColor: '#fff',
+  },
+  canvasBorder: {
+    borderWidth: 0.75,
+    borderColor: Colors.$textDefault + '30',
+    borderRadius: 8,
   },
   vertical: {
     position: 'absolute',
