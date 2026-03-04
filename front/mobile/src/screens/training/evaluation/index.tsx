@@ -2,6 +2,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet } from 'react-native';
 import ViewShot from 'react-native-view-shot';
+import { load, predict, urlToBase64 } from '@kanjiup/recognition';
 
 import Layout from '../../../components/layout.tsx';
 import { CANVAS_HEIGHT, CANVAS_WIDTH, MODEL_IMAGE_HEIGHT, MODEL_IMAGE_WIDTH } from '../../../constants/styles.ts';
@@ -36,19 +37,26 @@ export default function EvaluationScreen() {
 
   useEffect(() => {
     if (source) {
-      console.log('source', source);
+      console.log({ source });
+      load()
+        .then((res) => {
+          console.log('Is the model is loaded the first tim? ', res);
+          predict(source)
+            .then((res) => {
+              console.log('predicted', res);
+            })
+            .catch((err) => {
+              console.error('Catched error', err);
+            });
+        })
+        .catch(console.error);
     }
   }, [source]);
-
-  console.log({ source });
 
   return (
     <Layout screen="evaluation">
       <View centerH>
-        <ViewShot
-          ref={viewShotRef}
-          style={styles.viewShot}
-          options={{ result: 'data-uri', format: 'jpg', width: MODEL_IMAGE_WIDTH, height: MODEL_IMAGE_HEIGHT }}>
+        <ViewShot ref={viewShotRef} style={styles.viewShot} options={{ result: 'base64' }}>
           <Canvas
             ref={canvasRef}
             width={CANVAS_WIDTH}
@@ -61,6 +69,7 @@ export default function EvaluationScreen() {
       </View>
       <Spacing y={20} />
       <Button label="Next" onPress={onCapture} />
+      <Image source={{ uri: 'data:image/png;base64,' + source }} width={MODEL_IMAGE_WIDTH} height={MODEL_IMAGE_HEIGHT} />
     </Layout>
   );
 }

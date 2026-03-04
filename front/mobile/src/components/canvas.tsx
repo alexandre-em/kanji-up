@@ -45,7 +45,7 @@ const Canvas = forwardRef(
     {
       width = 300,
       height = 300,
-      strokeWidth = 5,
+      strokeWidth = 10,
       color = 'black',
       hideBackground,
       hideClearButton,
