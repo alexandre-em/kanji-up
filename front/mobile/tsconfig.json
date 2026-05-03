@@ -1,7 +1,6 @@
 {
   "extends": "@react-native/typescript-config",
   "compilerOptions": {
-    "moduleResolution": "node16",
     "strict": true,
     "alwaysStrict": true,
     "isolatedModules": true,
@@ -17,8 +16,7 @@
     "resolveJsonModule": true,
     "sourceMap": true,
     "jsx": "react-native",
-    "baseUrl": "./src",
-    "typeRoots": ["./src/types", "./node_modules/@types"]
+    "baseUrl": "./src"
   },
   "include": ["src"],
   "exclude": ["node_modules", "babel.config.js", "metro.config.js", "jest.config.js"]

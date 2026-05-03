@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback, useImperativeHandle, useMemo, useState } from 'react';
+import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import { PanResponder, StyleSheet, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { Assets, Button, Colors } from 'react-native-ui-lib';
@@ -38,6 +38,7 @@ type CanvasProps = {
   hideGuides?: boolean;
   hideClearButton?: boolean;
   hideBorder?: boolean;
+  onStrokeUpdate?: (strokesCount: number) => void;
 };
 
 const Canvas = forwardRef(
@@ -51,6 +52,7 @@ const Canvas = forwardRef(
       hideClearButton,
       hideGuides,
       hideBorder,
+      onStrokeUpdate,
     }: CanvasProps,
     ref,
   ) => {
@@ -93,6 +95,12 @@ const Canvas = forwardRef(
         }),
       [currentPoints],
     );
+
+    useEffect(() => {
+      if (paths.length > 0 && onStrokeUpdate) {
+        onStrokeUpdate(paths.length);
+      }
+    }, [paths.length, onStrokeUpdate]);
 
     return (
       <View

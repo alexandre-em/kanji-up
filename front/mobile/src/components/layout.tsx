@@ -1,6 +1,7 @@
+import { useHeaderHeight } from '@react-navigation/elements';
 import { PropsWithChildren } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ScrollView, StyleSheet } from 'react-native';
+import { Dimensions, ScrollView, StyleSheet } from 'react-native';
 import { Colors, Text, View } from 'react-native-ui-lib';
 
 import Spacing from './spacing';
@@ -9,15 +10,19 @@ type LayoutProps = {
   screen?: string;
 };
 
+const { height } = Dimensions.get('window');
+
 export default function Layout({ screen, children }: LayoutProps & PropsWithChildren) {
   const { t } = useTranslation();
+
+  const headerHeight = useHeaderHeight();
 
   const title = t(`${screen}.title`);
   const subtitle = t(`${screen}.subtitle`);
 
   return (
     <ScrollView style={styles.container}>
-      <View height="100%">
+      <View height={height - headerHeight}>
         <Spacing y={20} />
         {title !== `${screen}.title` && <Text h1>{title}</Text>}
         {title !== `${screen}.title` && subtitle !== `${screen}.subtitle` && <Spacing y={5} />}

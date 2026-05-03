@@ -3,7 +3,7 @@ import '../i18n';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
-import { LoaderScreen } from 'react-native-ui-lib';
+import { Colors, LoaderScreen } from 'react-native-ui-lib';
 
 import { screenNames } from '../constants/screens';
 import { useIsNotRegistered } from '../hooks/useIsAlreadyRegistered';
@@ -16,6 +16,17 @@ import Onboarding from './onboarding';
 import EvaluationHoc from './training/evaluation/hoc';
 
 const Stack = createNativeStackNavigator();
+
+const headerOptions = {
+  headerShown: true,
+  headerStyle: {
+    backgroundColor: Colors.$backgroundPrimaryHeavy,
+  },
+  headerTintColor: '#fff',
+  headerTitleStyle: {
+    fontWeight: 'bold' as 'bold',
+  },
+};
 
 export default function RootNavigation() {
   const { t } = useTranslation();
@@ -31,11 +42,11 @@ export default function RootNavigation() {
       <Stack.Navigator defaultScreenName={isNotRegistered ? 'Onboarding' : 'Home'} screenOptions={{ headerShown: false }}>
         <Stack.Screen name={screenNames.ONBOARDING} component={Onboarding} />
         <Stack.Screen name={screenNames.HOME} component={Home} />
-        <Stack.Screen name={screenNames.EVALUATION} component={EvaluationHoc} options={{ headerShown: true }} />
+        <Stack.Screen name={screenNames.EVALUATION} component={EvaluationHoc} options={headerOptions} />
         <Stack.Screen name={screenNames.CATEGORIES} component={KanjiCategoriesScreen} />
         <Stack.Screen name={screenNames.DIFFICULTIES} component={KanjiDifficulties} />
         <Stack.Screen name={screenNames.KANJIS} component={KanjiList} />
-        <Stack.Screen name={screenNames.KANJI} component={KanjiDetail} options={{ headerShown: true }} />
+        <Stack.Screen name={screenNames.KANJI} component={KanjiDetail} options={headerOptions} />
       </Stack.Navigator>
     </NavigationContainer>
   );

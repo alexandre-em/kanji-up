@@ -1,19 +1,37 @@
 import { load } from '@kanjiup/recognition';
-import { useNavigation } from '@react-navigation/native';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator } from 'react-native';
 import { Colors, Text, View } from 'react-native-ui-lib';
 
+import Layout from '../../../components/layout';
 import Spacing from '../../../components/spacing';
+import { useAppDispatch, useAppSelector } from '../../../hooks/useStore';
 import { useToaster } from '../../../providers/toaster';
+import { init, selectEvaluationItems } from '../../../store/slices/evaluation';
+import { selectSelectedKanji } from '../../../store/slices/selectedKanji';
 import EvaluationScreen from '.';
 
 const numberKanji = 20;
 
 export default function EvaluationHoc() {
-  const navigation = useNavigation();
+  const kanjis = useAppSelector(selectSelectedKanji);
+  const evaluationItems = useAppSelector(selectEvaluationItems);
+  const dispatch = useAppDispatch();
   const [isModelLoaded, setModelLoaded] = useState(false);
   const toast = useToaster();
+
+  const kanjiQueue = useCallback(() => {
+    const kanjiValues = Object.values(kanjis);
+
+    if (kanjiValues.length > 0) {
+      return Array.from(Array(numberKanji).keys()).map(() => ({
+        kanji: kanjiValues[Math.floor(Math.random() * kanjiValues.length)],
+        score: null,
+        status: 'idle' as 'idle',
+      }));
+    }
+    return [];
+  }, [kanjis]);
 
   useEffect(() => {
     load()
@@ -25,13 +43,26 @@ export default function EvaluationHoc() {
       });
   }, [toast]);
 
+  useEffect(() => {
+    console.log('init evaluation');
+    void dispatch(init({ items: kanjiQueue() }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  console.log({ evaluationItems });
+
   if (!isModelLoaded)
     return (
-      <View center>
-        <ActivityIndicator color={Colors.$textPrimary} size="large" />
-        <Spacing y={10} />
-        <Text>Loading kanji recognition model...</Text>
-      </View>
+      <Layout screen="evaluation">
+        <View center>
+          <ActivityIndicator color={Colors.$textPrimary} size="large" />
+          <Spacing y={10} />
+          <Text>Loading kanji recognition model...</Text>
+        </View>
+      </Layout>
     );
+
+  //TODO: add finish screen component
+
   return <EvaluationScreen />;
 }

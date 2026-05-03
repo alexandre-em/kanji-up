@@ -29,8 +29,8 @@ type ReferenceType = {
 };
 
 type PredictionType = {
-  score: number;
-  prediction: string;
+  confidence: number;
+  label: string;
 };
 
 type RecognitionType = {
