@@ -8,16 +8,17 @@ import SelectionIcon from '../assets/icons/checkbox.png';
 import ClearIcon from '../assets/icons/clear.png';
 import CrossIcon from '../assets/icons/cross.png';
 import CoinIcon from '../assets/icons/diamond.png';
+import DownIcon from '../assets/icons/down.png';
 import DrawIcon from '../assets/icons/draw.png';
 import GoogleIcon from '../assets/icons/google.png';
 import PremiumIcon from '../assets/icons/premium.png';
 import RecognitionIcon from '../assets/icons/recognition.png';
 import RemoveIcon from '../assets/icons/remove.png';
 import SettingIcon from '../assets/icons/setting.png';
+import TimerIcon from '../assets/icons/timer.png';
+import UpIcon from '../assets/icons/up.png';
 import VideoIcon from '../assets/icons/video.png';
 import YenIcon from '../assets/icons/yen.png';
-import UpIcon from '../assets/icons/up.png';
-import DownIcon from '../assets/icons/down.png';
 import SchoolBanner from '../assets/images/hiroyoshi-urushima-school.jpg';
 import SchoolBannerDisabled from '../assets/images/hiroyoshi-urushima-school-disabled.jpg';
 import AdvancedBanner from '../assets/images/marco-zuppone-advanced.jpg';
@@ -44,6 +45,7 @@ Assets.loadAssetsGroup('icons', {
   setting: SettingIcon,
   up: UpIcon,
   down: DownIcon,
+  timer: TimerIcon,
 });
 
 Assets.loadAssetsGroup('banners', {

@@ -97,10 +97,10 @@ const Canvas = forwardRef(
     );
 
     useEffect(() => {
-      if (paths.length > 0 && onStrokeUpdate) {
+      if (paths && onStrokeUpdate) {
         onStrokeUpdate(paths.length);
       }
-    }, [paths.length, onStrokeUpdate]);
+    }, [paths, onStrokeUpdate]);
 
     return (
       <View

@@ -24,8 +24,14 @@ const initialState: UserState = {
 };
 
 export const getUser = createAsyncThunk<UserType, GetUserInput>('user/get', async ({ macAddress }) => {
-  const response = await core.authService!.get(macAddress);
-  return response.data;
+  try {
+    const response = await core.authService!.get(macAddress);
+
+    return response.data;
+  } catch (error) {
+    console.error('Error getting user', error);
+    return null;
+  }
 });
 
 export const createUser = createAsyncThunk<void, Pick<UserType, 'name' | 'macAddress'>>('user/create', async (payload) => {
