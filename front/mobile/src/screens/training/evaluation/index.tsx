@@ -1,19 +1,17 @@
-import { useNavigation } from '@react-navigation/native';
+import { predict } from '@kanjiup/recognition';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet } from 'react-native';
-import ViewShot from 'react-native-view-shot';
-import { load, predict, urlToBase64 } from '@kanjiup/recognition';
-
-import Layout from '../../../components/layout.tsx';
-import { CANVAS_HEIGHT, CANVAS_WIDTH, MODEL_IMAGE_HEIGHT, MODEL_IMAGE_WIDTH } from '../../../constants/styles.ts';
-import Canvas from '../../../components/canvas.tsx';
-import { useCallback, useEffect, useRef, useState } from 'react';
 import { Button, Image, View } from 'react-native-ui-lib';
+import ViewShot from 'react-native-view-shot';
+
+import Canvas from '../../../components/canvas.tsx';
+import Layout from '../../../components/layout.tsx';
 import Spacing from '../../../components/spacing.tsx';
+import { CANVAS_HEIGHT, CANVAS_WIDTH } from '../../../constants/styles.ts';
 
 export default function EvaluationScreen() {
   const { t } = useTranslation();
-  const navigation = useNavigation();
   const viewShotRef = useRef(null);
   const canvasRef = useRef(null);
   const [isCapturing, setIsCapturing] = useState(false);
@@ -37,19 +35,13 @@ export default function EvaluationScreen() {
 
   useEffect(() => {
     if (source) {
-      console.log({ source });
-      load()
+      predict(source)
         .then((res) => {
-          console.log('Is the model is loaded the first tim? ', res);
-          predict(source)
-            .then((res) => {
-              console.log('predicted', res);
-            })
-            .catch((err) => {
-              console.error('Catched error', err);
-            });
+          console.log('predicted', res);
         })
-        .catch(console.error);
+        .catch((err) => {
+          console.error('Catched error', err);
+        });
     }
   }, [source]);
 
@@ -69,7 +61,7 @@ export default function EvaluationScreen() {
       </View>
       <Spacing y={20} />
       <Button label="Next" onPress={onCapture} />
-      <Image source={{ uri: 'data:image/png;base64,' + source }} width={MODEL_IMAGE_WIDTH} height={MODEL_IMAGE_HEIGHT} />
+      <Image source={{ uri: 'data:image/png;base64,' + source }} />
     </Layout>
   );
 }
@@ -78,7 +70,7 @@ const styles = StyleSheet.create({
   card: {
     padding: 15,
   },
-  transparent: { backgroundColor: '#00000000' },
+  // transparent: { backgroundColor: '#00000000' },
   badge: { position: 'absolute', right: 10, top: 10 },
   viewShot: {
     width: CANVAS_WIDTH,

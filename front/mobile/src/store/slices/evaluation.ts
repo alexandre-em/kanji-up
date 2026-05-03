@@ -5,13 +5,21 @@ type EvaluationState = {
     kanji: KanjiType;
     score?: number | null;
   }[];
+  currentIndex: number;
   status: RequestStatusType;
 };
 
 const initialState: EvaluationState = {
   items: [],
+  currentIndex: 0,
   status: 'idle',
 };
+
+const init = createAsyncThunk('evaluation/init', async () => {
+  console.log('init');
+  // const response = await core.get('/evaluation/init');
+  // return response.data;
+});
 
 const getPendingEvaluation = createAsyncThunk('evaluation/getEvaluation', async () => {
   console.log('getPendingEvaluation');
