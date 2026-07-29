@@ -1,8 +1,6 @@
 import { Dimensions } from 'react-native';
 import View from 'react-native-ui-lib/view';
 
-import { GENERAL_MARGIN } from '../constants/styles';
-
 type SpacingProps = {
   x?: number;
   y?: number;

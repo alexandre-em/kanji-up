@@ -1,6 +1,5 @@
 import { DOMParser } from '@xmldom/xmldom';
-import React, { useEffect, useRef } from 'react';
-import { Animated, Easing } from 'react-native';
+import React from 'react';
 import Svg, { ClipPath, Defs, Path } from 'react-native-svg';
 
 type StrokePath = {

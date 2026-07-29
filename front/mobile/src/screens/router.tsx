@@ -39,7 +39,7 @@ export default function RootNavigation() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator defaultScreenName={isNotRegistered ? 'Onboarding' : 'Home'} screenOptions={{ headerShown: false }}>
+      <Stack.Navigator initialRouteName={isNotRegistered ? 'Onboarding' : 'Home'} screenOptions={{ headerShown: false }}>
         <Stack.Screen name={screenNames.ONBOARDING} component={Onboarding} />
         <Stack.Screen name={screenNames.HOME} component={Home} />
         <Stack.Screen name={screenNames.EVALUATION} component={EvaluationHoc} options={headerOptions} />

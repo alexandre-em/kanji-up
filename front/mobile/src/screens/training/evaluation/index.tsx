@@ -117,13 +117,13 @@ export default function EvaluationScreen() {
             </Text>
           </RNView>
           <Spacing y={10} />
-          <Text h1>{currentKanji.kanji?.kanji?.meaning?.join(', ')}</Text>
+          <Text h1>{currentKanji?.kanji?.kanji?.meaning?.join(', ')}</Text>
           <Spacing y={20} />
           <RNView style={styles.yomi}>
             <Chip label={'ON'} />
             <Spacing x={10} />
             <Text h4 $textNeutralHeavy>
-              {currentKanji.kanji?.kanji?.onyomi?.join(', ')}
+              {currentKanji?.kanji?.kanji?.onyomi?.join(', ')}
             </Text>
           </RNView>
           <Spacing y={5} />
@@ -131,7 +131,7 @@ export default function EvaluationScreen() {
             <Chip label={'KUN'} />
             <Spacing x={10} />
             <Text h4 $textNeutralHeavy>
-              {currentKanji.kanji?.kanji?.kunyomi?.join(', ')}
+              {currentKanji?.kanji?.kanji?.kunyomi?.join(', ')}
             </Text>
           </RNView>
         </View>
