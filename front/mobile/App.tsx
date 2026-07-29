@@ -2,9 +2,11 @@ import './src/services/http';
 import './src/config/rnui';
 
 import { Dimensions, StatusBar, StyleSheet, useColorScheme, View as RNView } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Colors, View } from 'react-native-ui-lib';
 import { Provider } from 'react-redux';
 
+import { TabBarProvider } from './src/providers/tabBar';
 import { ToasterProvider } from './src/providers/toaster';
 import { UserProvider } from './src/providers/user';
 import RootNavigation from './src/screens/router';
@@ -16,18 +18,22 @@ function App() {
   Colors.setScheme('light');
 
   return (
-    <Provider store={store}>
-      <UserProvider>
-        <ToasterProvider>
-          <RNView style={styles.screen}>
-            <View style={styles.container}>
-              <StatusBar barStyle={theme === 'dark' ? 'light-content' : 'dark-content'} />
-              <RootNavigation />
-            </View>
-          </RNView>
-        </ToasterProvider>
-      </UserProvider>
-    </Provider>
+    <SafeAreaProvider>
+      <Provider store={store}>
+        <UserProvider>
+          <ToasterProvider>
+            <TabBarProvider>
+              <RNView style={styles.screen}>
+                <View style={styles.container}>
+                  <StatusBar barStyle={theme === 'dark' ? 'light-content' : 'dark-content'} />
+                  <RootNavigation />
+                </View>
+              </RNView>
+            </TabBarProvider>
+          </ToasterProvider>
+        </UserProvider>
+      </Provider>
+    </SafeAreaProvider>
   );
 }
 

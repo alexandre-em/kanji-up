@@ -19,6 +19,10 @@
 
   "home.loading.title": "Starting the application...",
 
+  "tabs.home.label": "Home",
+  "tabs.selection.label": "Select",
+  "tabs.training.label": "Train",
+
   "home.welcome.title": "Welcome back",
   "home.search.placeholder": "Search...",
   "home.selection.unit": "kanji selected",

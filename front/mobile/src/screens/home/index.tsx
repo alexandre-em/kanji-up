@@ -36,7 +36,7 @@ export default function Home() {
   );
 
   return (
-    <Layout>
+    <Layout withTabBar>
       <View style={styles.flex} marginB-15>
         <View style={styles.flex}>
           <Avatar

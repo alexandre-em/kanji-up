@@ -1,318 +1,195 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Dimensions, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { LayoutChangeEvent, Platform, StyleSheet, TouchableOpacity } from 'react-native';
+import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Colors } from 'react-native-ui-lib';
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-export interface NavTab {
-  key: string;
-  label: string;
-  /** Pass any icon component renderer — e.g. from @expo/vector-icons or lucide-react-native */
-  icon: (props: { color: string; size: number; filled: boolean }) => React.ReactNode;
-  badge?: number; // optional notification badge count
-}
-
-interface BottomNavBarProps {
-  tabs: NavTab[];
-  initialTab?: string;
-  onTabChange?: (key: string) => void;
-  /** Accent colour used for the active pill + icon */
-  accentColor?: string;
-  /** Background colour of the bar */
-  backgroundColor?: string;
-  /** Label colour when inactive */
-  inactiveColor?: string;
-}
+import { tabs } from '../constants/tabs';
+import { useTabBarHidden } from '../providers/tabBar';
 
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const BAR_HEIGHT = 64;
-const PILL_HEIGHT = 46;
-const PILL_RADIUS = 23;
+const BAR_HEIGHT = 68;
+const BAR_MARGIN_BOTTOM = 20;
+const BAR_MARGIN_HORIZONTAL = 16;
+const PILL_HEIGHT = 56;
+const ICON_SIZE = 22;
+const SPRING = { damping: 18, stiffness: 220 };
+// Inverted bar: brand red background, white content
+const BAR_COLOR = Colors.$backgroundPrimaryHeavy + 'e6'; // slightly translucent so content shows through
+const ACTIVE_COLOR = '#fff';
+const INACTIVE_COLOR = '#ffffffaa';
+const PILL_COLOR = '#ffffff33';
+
+/** Vertical room the floating bar takes: consumed by Layout to keep content reachable above it */
+export const TAB_BAR_TOTAL_HEIGHT = BAR_HEIGHT + BAR_MARGIN_BOTTOM;
+
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
+type TabLayout = {
+  x: number;
+  width: number;
+};
+
+type BottomNavBarProps = {
+  /** Name of the current route, matched against the tab keys */
+  activeRoute?: string;
+  onTabPress: (route: string) => void;
+};
 
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
-const BottomNavBar: React.FC<BottomNavBarProps> = ({
-  tabs,
-  initialTab,
-  onTabChange,
-  accentColor = '#6C63FF',
-  backgroundColor = '#0F0F14',
-  inactiveColor = '#5A5A72',
-}) => {
+export default function BottomNavBar({ activeRoute, onTabPress }: BottomNavBarProps) {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
-  const [activeKey, setActiveKey] = useState(initialTab ?? tabs[0]?.key);
+  const tabBarHidden = useTabBarHidden();
+  // Tabs are sized by their content (the active one also shows a label), so the pill
+  // follows the measured layout instead of a computed screen fraction
+  const [layouts, setLayouts] = useState<Record<string, TabLayout>>({});
 
-  // One Animated.Value per tab for icon scale + label fade
-  const scaleAnims = useRef<Record<string, Animated.Value>>({});
-  const labelAnims = useRef<Record<string, Animated.Value>>({});
-  // Sliding pill X position
-  const pillX = useRef(new Animated.Value(0)).current;
+  const pillX = useSharedValue(0);
+  const pillWidth = useSharedValue(0);
+  const pillOpacity = useSharedValue(0);
 
-  // Initialise per-tab animations
-  tabs.forEach((t) => {
-    if (!scaleAnims.current[t.key]) {
-      scaleAnims.current[t.key] = new Animated.Value(t.key === activeKey ? 1 : 0.85);
-    }
-    if (!labelAnims.current[t.key]) {
-      labelAnims.current[t.key] = new Animated.Value(t.key === activeKey ? 1 : 0);
-    }
-  });
+  const activeLayout = activeRoute ? layouts[activeRoute] : undefined;
 
-  const tabWidth = SCREEN_WIDTH / tabs.length;
-
-  // Drive pill to the correct position on mount
   useEffect(() => {
-    const idx = tabs.findIndex((t) => t.key === activeKey);
-    pillX.setValue(idx * tabWidth + tabWidth / 2 - 52); // 52 = half pill width
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (!activeLayout) return;
+
+    if (pillOpacity.value === 0) {
+      // First measure: place the pill where it belongs instead of sliding it in from the left edge
+      pillX.value = activeLayout.x;
+      pillWidth.value = activeLayout.width;
+      pillOpacity.value = withTiming(1, { duration: 150 });
+      return;
+    }
+
+    pillX.value = withSpring(activeLayout.x, SPRING);
+    pillWidth.value = withSpring(activeLayout.width, SPRING);
+  }, [activeLayout, pillOpacity, pillWidth, pillX]);
+
+  const pillStyle = useAnimatedStyle(() => ({
+    width: pillWidth.value,
+    opacity: pillOpacity.value,
+    transform: [{ translateX: pillX.value }],
+  }));
+
+  // Slides the whole bar out below the screen when the user scrolls down
+  const hiddenOffset = BAR_HEIGHT + BAR_MARGIN_BOTTOM + insets.bottom;
+  const barStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: (tabBarHidden?.value ?? 0) * hiddenOffset }],
+  }));
+
+  const handleTabLayout = useCallback((key: string, event: LayoutChangeEvent) => {
+    const { x, width } = event.nativeEvent.layout;
+
+    setLayouts((previous) => {
+      const known = previous[key];
+
+      if (known?.x === x && known?.width === width) return previous;
+
+      return { ...previous, [key]: { x, width } };
+    });
   }, []);
 
-  const handlePress = (key: string) => {
-    if (key === activeKey) return;
-
-    const prevKey = activeKey;
-    const nextIdx = tabs.findIndex((t) => t.key === key);
-
-    setActiveKey(key);
-    onTabChange?.(key);
-
-    // Slide pill
-    Animated.spring(pillX, {
-      toValue: nextIdx * tabWidth + tabWidth / 2 - 52,
-      useNativeDriver: true,
-      damping: 18,
-      stiffness: 220,
-    }).start();
-
-    // Animate outgoing tab
-    Animated.parallel([
-      Animated.spring(scaleAnims.current[prevKey], {
-        toValue: 0.85,
-        useNativeDriver: true,
-        damping: 15,
-        stiffness: 200,
-      }),
-      Animated.timing(labelAnims.current[prevKey], {
-        toValue: 0,
-        duration: 150,
-        useNativeDriver: true,
-      }),
-    ]).start();
-
-    // Animate incoming tab
-    Animated.parallel([
-      Animated.spring(scaleAnims.current[key], {
-        toValue: 1,
-        useNativeDriver: true,
-        damping: 14,
-        stiffness: 260,
-      }),
-      Animated.timing(labelAnims.current[key], {
-        toValue: 1,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  };
-
   return (
-    <View
-      style={[
-        styles.wrapper,
-        {
-          backgroundColor,
-          paddingBottom: insets.bottom,
-          height: BAR_HEIGHT + insets.bottom,
-        },
-      ]}>
-      {/* Sliding pill background */}
-      <Animated.View
-        style={[
-          styles.pill,
-          {
-            backgroundColor: accentColor + '22', // ~13 % opacity tint
-            borderColor: accentColor + '44',
-            transform: [{ translateX: pillX }],
-          },
-        ]}
-      />
+    <Animated.View style={[styles.bar, { bottom: insets.bottom + BAR_MARGIN_BOTTOM }, barStyle]}>
+      <Animated.View style={[styles.pill, pillStyle]} />
 
-      {/* Tabs */}
       {tabs.map((tab) => {
-        const isActive = tab.key === activeKey;
-        const scale = scaleAnims.current[tab.key];
-        const labelOpacity = labelAnims.current[tab.key];
-        const iconColor = isActive ? accentColor : inactiveColor;
+        const isActive = tab.key === activeRoute;
+        const label = t(tab.labelKey);
 
         return (
           <TouchableOpacity
             key={tab.key}
-            style={[styles.tab, { width: tabWidth }]}
+            style={styles.tab}
             activeOpacity={0.7}
-            onPress={() => handlePress(tab.key)}
+            onPress={() => onTabPress(tab.key)}
+            onLayout={(event) => handleTabLayout(tab.key, event)}
             accessibilityRole="tab"
             accessibilityState={{ selected: isActive }}
-            accessibilityLabel={tab.label}>
-            <Animated.View style={[styles.iconWrapper, { transform: [{ scale }] }]}>
-              {tab.icon({ color: iconColor, size: 22, filled: isActive })}
-
-              {/* Badge */}
-              {tab.badge != null && tab.badge > 0 && (
-                <View style={styles.badge}>
-                  <Text style={styles.badgeText}>{tab.badge > 99 ? '99+' : tab.badge}</Text>
-                </View>
-              )}
-            </Animated.View>
-
-            {/* Label — fades in when active */}
-            <Animated.Text
-              style={[
-                styles.label,
-                {
-                  color: accentColor,
-                  opacity: labelOpacity,
-                  transform: [
-                    {
-                      translateY: labelOpacity.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: [4, 0],
-                      }),
-                    },
-                  ],
-                },
-              ]}
-              numberOfLines={1}>
-              {tab.label}
-            </Animated.Text>
+            accessibilityLabel={label}>
+            {tab.icon({ size: ICON_SIZE, color: isActive ? ACTIVE_COLOR : INACTIVE_COLOR })}
+            {isActive && <TabLabel label={label} />}
           </TouchableOpacity>
         );
       })}
-    </View>
+    </Animated.View>
   );
-};
+}
+
+/** Label of the active tab: fades up as the tab becomes active */
+function TabLabel({ label }: { label: string }) {
+  const progress = useSharedValue(0);
+
+  useEffect(() => {
+    progress.value = withTiming(1, { duration: 180 });
+  }, [progress]);
+
+  const style = useAnimatedStyle(() => ({
+    opacity: progress.value,
+    transform: [{ translateY: (1 - progress.value) * 4 }],
+  }));
+
+  return (
+    <Animated.Text style={[styles.label, style]} numberOfLines={1}>
+      {label}
+    </Animated.Text>
+  );
+}
 
 // ---------------------------------------------------------------------------
 // Styles
 // ---------------------------------------------------------------------------
 const styles = StyleSheet.create({
-  wrapper: {
+  bar: {
+    position: 'absolute',
+    left: BAR_MARGIN_HORIZONTAL,
+    right: BAR_MARGIN_HORIZONTAL,
+    height: BAR_HEIGHT,
+    borderRadius: BAR_HEIGHT / 2,
+    backgroundColor: BAR_COLOR,
     flexDirection: 'row',
     alignItems: 'center',
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.06)',
-    // Subtle top shadow on iOS
+    justifyContent: 'space-evenly',
     ...Platform.select({
       ios: {
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: -4 },
-        shadowOpacity: 0.25,
-        shadowRadius: 12,
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.12,
+        shadowRadius: 16,
       },
       android: {
-        elevation: 16,
+        elevation: 12,
       },
     }),
   },
   pill: {
     position: 'absolute',
+    left: 0,
     top: (BAR_HEIGHT - PILL_HEIGHT) / 2,
-    width: 104,
     height: PILL_HEIGHT,
-    borderRadius: PILL_RADIUS,
-    borderWidth: 1,
+    borderRadius: PILL_HEIGHT / 2,
+    backgroundColor: PILL_COLOR,
   },
   tab: {
-    height: BAR_HEIGHT,
+    height: PILL_HEIGHT,
+    paddingHorizontal: 16,
+    flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 2,
-  },
-  iconWrapper: {
-    position: 'relative',
-    alignItems: 'center',
-    justifyContent: 'center',
+    gap: 3,
   },
   label: {
     fontSize: 10,
-    fontWeight: '600',
-    letterSpacing: 0.4,
-    textTransform: 'uppercase',
-  },
-  badge: {
-    position: 'absolute',
-    top: -5,
-    right: -8,
-    minWidth: 16,
-    height: 16,
-    borderRadius: 8,
-    backgroundColor: '#FF4757',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 3,
-    borderWidth: 1.5,
-    borderColor: '#0F0F14',
-  },
-  badgeText: {
-    color: '#fff',
-    fontSize: 9,
     fontWeight: '700',
-    lineHeight: 13,
+    letterSpacing: 0.3,
+    textTransform: 'uppercase',
+    color: ACTIVE_COLOR,
   },
 });
-
-export default BottomNavBar;
-
-// ---------------------------------------------------------------------------
-// USAGE EXAMPLE
-// ---------------------------------------------------------------------------
-//
-// import { Feather } from '@expo/vector-icons';
-// import BottomNavBar, { NavTab } from './BottomNavBar';
-//
-// const TABS: NavTab[] = [
-//   {
-//     key: 'home',
-//     label: 'Home',
-//     icon: ({ color, size, filled }) =>
-//       <Feather name={filled ? 'home' : 'home'} size={size} color={color} />,
-//   },
-//   {
-//     key: 'explore',
-//     label: 'Explore',
-//     icon: ({ color, size }) =>
-//       <Feather name="compass" size={size} color={color} />,
-//   },
-//   {
-//     key: 'inbox',
-//     label: 'Inbox',
-//     icon: ({ color, size }) =>
-//       <Feather name="bell" size={size} color={color} />,
-//     badge: 3,
-//   },
-//   {
-//     key: 'profile',
-//     label: 'Profile',
-//     icon: ({ color, size }) =>
-//       <Feather name="user" size={size} color={color} />,
-//   },
-// ];
-//
-// export default function App() {
-//   return (
-//     <SafeAreaProvider>
-//       <View style={{ flex: 1 }}>
-//         {/* your screens here */}
-//         <BottomNavBar
-//           tabs={TABS}
-//           accentColor="#6C63FF"
-//           onTabChange={(key) => console.log('active tab:', key)}
-//         />
-//       </View>
-//     </SafeAreaProvider>
-//   );
-// }

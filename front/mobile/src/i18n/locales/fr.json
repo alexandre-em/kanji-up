@@ -15,5 +15,9 @@
   "onboarding.next.button": "Next",
   "onboarding.submit.button": "Let's begin",
   "onboarding.toast.success": "Welcome to KanjiUp!",
-  "onboarding.toast.error": "Something went wrong"
+  "onboarding.toast.error": "Something went wrong",
+
+  "tabs.home.label": "Accueil",
+  "tabs.selection.label": "Sélection",
+  "tabs.training.label": "Entraînement"
 }
