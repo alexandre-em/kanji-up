@@ -1,4 +1,5 @@
 import { predict } from '@kanjiup/recognition';
+import { useNavigation } from '@react-navigation/native';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, View as RNView } from 'react-native';
@@ -12,11 +13,13 @@ import { CANVAS_HEIGHT, CANVAS_WIDTH } from '../../../constants/styles.ts';
 import { useAppDispatch, useAppSelector } from '../../../hooks/useStore';
 import { useToaster } from '../../../providers/toaster';
 import { selectCurrentIndex, selectEvaluationItems, updateItemScore } from '../../../store/slices/evaluation';
+import EvaluationResult from './result.tsx';
 
 const TIMER_DURATION = 60;
 
 export default function EvaluationScreen() {
   const { t } = useTranslation();
+  const navigation = useNavigation();
   const dispatch = useAppDispatch();
   const currentIndex = useAppSelector(selectCurrentIndex);
   const evaluationItems = useAppSelector(selectEvaluationItems);
@@ -86,6 +89,12 @@ export default function EvaluationScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timer, dispatch, isSessionOver]);
 
+  // The result view replaces the quiz in place (see the render below): update the header to
+  // match, since it otherwise keeps showing the quiz's default title (the route name)
+  useEffect(() => {
+    if (isSessionOver) navigation.setOptions({ title: t('evaluationResult.title') });
+  }, [isSessionOver, navigation, t]);
+
   useEffect(() => {
     if (isCapturing) {
       if (viewShotRef.current) {
@@ -101,6 +110,10 @@ export default function EvaluationScreen() {
       }
     }
   }, [isCapturing, onPredict]);
+
+  // Same route as the quiz (see EvaluationHoc): no separate screen to navigate to, so there is
+  // no "back into the quiz" state for the Android back button to return to
+  if (isSessionOver) return <EvaluationResult />;
 
   return (
     <Layout screen="evaluation">

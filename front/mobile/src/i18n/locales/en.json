@@ -75,6 +75,19 @@
   "kanji.select.toast.success": "Characters added to selection",
   "kanji.unselect.toast.success": "Updates saved with unselected characters",
 
+  "evaluationResult.title": "Results",
+  "evaluationResult.summary.score": "{{correct}} / {{total}} correct",
+  "evaluationResult.summary.pending": "{{count}} to check",
+  "evaluationResult.status.correct": "Recognized",
+  "evaluationResult.status.timeout": "Time's up",
+  "evaluationResult.status.empty": "Nothing drawn",
+  "evaluationResult.status.wrongStrokes": "{{expected}} strokes expected, you drew {{actual}}",
+  "evaluationResult.status.review": "For you to check",
+  "evaluationResult.status.confirmedCorrect": "Confirmed by you",
+  "evaluationResult.status.confirmedIncorrect": "Not validated by you",
+  "evaluationResult.button.review": "Check {{count}} answers",
+  "evaluationResult.button.validate": "Validate result",
+
   "premium.feature.badge": "premium",
 
   "loading.title": "Loading..."

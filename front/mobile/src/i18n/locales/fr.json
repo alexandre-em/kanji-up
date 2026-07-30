@@ -19,5 +19,18 @@
 
   "tabs.home.label": "Accueil",
   "tabs.selection.label": "Sélection",
-  "tabs.training.label": "Entraînement"
+  "tabs.training.label": "Entraînement",
+
+  "evaluationResult.title": "Résultats",
+  "evaluationResult.summary.score": "{{correct}} / {{total}} réussis",
+  "evaluationResult.summary.pending": "{{count}} à vérifier",
+  "evaluationResult.status.correct": "Reconnu",
+  "evaluationResult.status.timeout": "Temps écoulé",
+  "evaluationResult.status.empty": "Aucun tracé",
+  "evaluationResult.status.wrongStrokes": "{{expected}} traits attendus, tu en as tracé {{actual}}",
+  "evaluationResult.status.review": "À vérifier par toi",
+  "evaluationResult.status.confirmedCorrect": "Confirmé par toi",
+  "evaluationResult.status.confirmedIncorrect": "Non validé par toi",
+  "evaluationResult.button.review": "Vérifier {{count}} réponses",
+  "evaluationResult.button.validate": "Valider le résultat"
 }

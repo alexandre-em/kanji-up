@@ -79,6 +79,13 @@ Colors.loadSchemes({
     $outlinePrimary: '#d42528',
     $outlinePrimaryMedium: '#f7d4d4',
     $outlineGeneral: '#7e2526',
+    // Status colors: 'incorrect' reuses the brand red above, these two cover the other verdicts
+    $backgroundSuccessLight: '#e3f6ea',
+    $textSuccess: '#1f9254',
+    $iconSuccess: '#1f9254',
+    $backgroundWarningLight: '#fdf0d5',
+    $textWarning: '#b06f00',
+    $iconWarning: '#b06f00',
   },
   dark: {
     $backgroundDefault: '#060504',
@@ -101,6 +108,12 @@ Colors.loadSchemes({
     $outlinePrimary: '#e87d7f',
     $outlinePrimaryMedium: '#821719',
     $outlineGeneral: '#c6393c',
+    $backgroundSuccessLight: '#123822',
+    $textSuccess: '#4ade80',
+    $iconSuccess: '#4ade80',
+    $backgroundWarningLight: '#4a3510',
+    $textWarning: '#f5b942',
+    $iconWarning: '#f5b942',
   },
 });
 
