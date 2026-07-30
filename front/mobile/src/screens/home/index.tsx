@@ -1,11 +1,12 @@
 import { useNavigation } from '@react-navigation/native';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Dimensions, Image, StyleSheet } from 'react-native';
+import { Dimensions, Image, StyleSheet, View as RNView } from 'react-native';
 import { Assets, Badge, Button, Colors, Icon, ProgressBar, SearchInput } from 'react-native-ui-lib';
 import Avatar from 'react-native-ui-lib/avatar';
 import Card from 'react-native-ui-lib/card';
 import Chip from 'react-native-ui-lib/chip';
+import Incubator from 'react-native-ui-lib/incubator';
 import Text from 'react-native-ui-lib/text';
 import View from 'react-native-ui-lib/view';
 import { useSelector } from 'react-redux';
@@ -19,6 +20,7 @@ import { selectSelectedKanji } from '../../store/slices/selectedKanji';
 import { selectUserName, selectUserPicture, selectUserState } from '../../store/slices/user';
 
 const { width } = Dimensions.get('window');
+const { Dialog } = Incubator;
 
 export default function Home() {
   const { t } = useTranslation();
@@ -28,12 +30,30 @@ export default function Home() {
   const userState = useSelector(selectUserState);
   const selectedKanjiState = useSelector(selectSelectedKanji);
 
+  const [isEmptySelectionVisible, setEmptySelectionVisible] = useState(false);
+
   const handleRediction = useCallback(
     (screen: string) => {
       navigation.navigate(screen);
     },
     [navigation],
   );
+
+  const handleEvaluationPress = useCallback(() => {
+    const hasSelectedKanji = Object.keys(selectedKanjiState ?? {}).length > 0;
+
+    if (!hasSelectedKanji) {
+      setEmptySelectionVisible(true);
+      return;
+    }
+
+    handleRediction(screenNames.EVALUATION);
+  }, [selectedKanjiState, handleRediction]);
+
+  const handleGoToSelection = useCallback(() => {
+    setEmptySelectionVisible(false);
+    handleRediction(screenNames.CATEGORIES);
+  }, [handleRediction]);
 
   return (
     <Layout withTabBar>
@@ -92,9 +112,7 @@ export default function Home() {
         iconSource={Assets.icons.draw}
         iconProps={{ size: 20 }}
         text80BL
-        onPress={() => {
-          handleRediction(screenNames.EVALUATION);
-        }}
+        onPress={handleEvaluationPress}
       />
       {/* Menu */}
       <Spacing y={GENERAL_MARGIN} />
@@ -172,6 +190,29 @@ export default function Home() {
           style={styles.transparent}
         />
       </Card>
+      <Dialog visible={isEmptySelectionVisible} onDismiss={() => setEmptySelectionVisible(false)} bottom useSafeArea width="100%">
+        <RNView style={styles.emptySelectionModal}>
+          <Text text70BO>{t('home.evaluation.emptySelection.title')}</Text>
+          <Spacing y={8} />
+          <Text text80M $textGeneral>
+            {t('home.evaluation.emptySelection.message')}
+          </Text>
+          <Spacing y={20} />
+          <RNView style={styles.emptySelectionActions}>
+            <Button
+              label={t('home.evaluation.emptySelection.cancel')}
+              outline
+              onPress={() => setEmptySelectionVisible(false)}
+              style={styles.emptySelectionButton}
+            />
+            <Button
+              label={t('home.evaluation.emptySelection.confirm')}
+              onPress={handleGoToSelection}
+              style={styles.emptySelectionButton}
+            />
+          </RNView>
+        </RNView>
+      </Dialog>
     </Layout>
   );
 }
@@ -203,4 +244,17 @@ const styles = StyleSheet.create({
     borderRadius: 25,
   },
   badge: { position: 'absolute', right: 10, top: 10, zIndex: 10 },
+  emptySelectionModal: {
+    padding: 20,
+    backgroundColor: Colors.$backgroundDefault,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  emptySelectionActions: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  emptySelectionButton: {
+    flex: 1,
+  },
 });

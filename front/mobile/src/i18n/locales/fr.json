@@ -39,5 +39,10 @@
   "evaluationResult.review.yes": "Oui, ça correspond",
   "evaluationResult.review.no": "Non",
   "evaluationResult.toast.success": "Progression enregistrée",
-  "evaluationResult.toast.error": "Impossible d'enregistrer ta progression, réessaie"
+  "evaluationResult.toast.error": "Impossible d'enregistrer ta progression, réessaie",
+
+  "home.evaluation.emptySelection.title": "Aucun kanji sélectionné",
+  "home.evaluation.emptySelection.message": "Choisis les kanji que tu veux pratiquer avant de commencer une évaluation.",
+  "home.evaluation.emptySelection.confirm": "Choisir des kanji",
+  "home.evaluation.emptySelection.cancel": "Annuler"
 }
