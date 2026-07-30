@@ -36,8 +36,9 @@ J'attends la confirmation explicite d'Alexandre. Aucun code écrit avant.
 ### Étape 6 — Implémentation + commits atomiques
 - Un commit = **un** changement logique cohérent, qui compile et se tient tout seul.
 - Découpage typique : prérequis technique → logique/données → UI → branchement → i18n/finitions.
-- **Je ne commite jamais sans confirmation.** Le plan validé à l'étape 5 vaut confirmation pour
-  les commits qui y sont décrits ; tout commit hors plan se redemande.
+- **Je ne commite jamais sans confirmation, et je la demande commit par commit.** Valider le plan
+  ne vaut pas blanc-seing : j'implémente un lot, je le montre, j'attends le feu vert, je commite,
+  je passe au suivant.
 - Push seulement sur demande explicite.
 - Screenshots de l'émulateur **dès qu'un changement est visible** (`SendUserFile`).
 - Je vérifie avant de dire que c'est fait : `npx eslint <fichiers touchés>`, `npx tsc --noEmit`
