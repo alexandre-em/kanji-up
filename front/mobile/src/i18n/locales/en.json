@@ -75,7 +75,6 @@
   "kanji.select.toast.success": "Characters added to selection",
   "kanji.unselect.toast.success": "Updates saved with unselected characters",
 
-  "evaluationResult.title": "Results",
   "evaluationResult.summary.score": "{{correct}} / {{total}} correct",
   "evaluationResult.summary.pending": "{{count}} to check",
   "evaluationResult.status.correct": "Recognized",

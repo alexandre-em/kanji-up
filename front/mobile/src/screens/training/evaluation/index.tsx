@@ -1,7 +1,6 @@
 import { predict } from '@kanjiup/recognition';
 import { useNavigation } from '@react-navigation/native';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { StyleSheet, View as RNView } from 'react-native';
 import { Assets, Button, Chip, Colors, Icon, ProgressBar, Text, View } from 'react-native-ui-lib';
 import ViewShot from 'react-native-view-shot';
@@ -18,7 +17,6 @@ import EvaluationResult from './result.tsx';
 const TIMER_DURATION = 60;
 
 export default function EvaluationScreen() {
-  const { t } = useTranslation();
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
   const currentIndex = useAppSelector(selectCurrentIndex);
@@ -89,11 +87,11 @@ export default function EvaluationScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timer, dispatch, isSessionOver]);
 
-  // The result view replaces the quiz in place (see the render below): update the header to
-  // match, since it otherwise keeps showing the quiz's default title (the route name)
+  // The result view replaces the quiz in place (see the render below): hide the header's back
+  // arrow once there, so leaving is only possible through the result screen's own validate flow
   useEffect(() => {
-    if (isSessionOver) navigation.setOptions({ title: t('evaluationResult.title') });
-  }, [isSessionOver, navigation, t]);
+    if (isSessionOver) navigation.setOptions({ headerShown: false });
+  }, [isSessionOver, navigation]);
 
   useEffect(() => {
     if (isCapturing) {

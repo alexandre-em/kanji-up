@@ -21,7 +21,6 @@
   "tabs.selection.label": "Sélection",
   "tabs.training.label": "Entraînement",
 
-  "evaluationResult.title": "Résultats",
   "evaluationResult.summary.score": "{{correct}} / {{total}} réussis",
   "evaluationResult.summary.pending": "{{count}} à vérifier",
   "evaluationResult.status.correct": "Reconnu",
