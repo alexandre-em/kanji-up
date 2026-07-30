@@ -31,6 +31,9 @@ export default function EvaluationScreen() {
     return evaluationItems[currentIndex];
   }, [evaluationItems, currentIndex]);
 
+  // Every answer has been saved: there is no item left to time nor to score
+  const isSessionOver = currentIndex >= evaluationItems.length;
+
   const onCapture = useCallback(() => {
     setIsCapturing(true);
   }, []);
@@ -65,6 +68,8 @@ export default function EvaluationScreen() {
 
   // Timer use effect
   useEffect(() => {
+    if (isSessionOver) return;
+
     let interval: NodeJS.Timeout;
     if (timer > 0) {
       interval = setInterval(() => {
@@ -77,7 +82,7 @@ export default function EvaluationScreen() {
 
     return () => clearInterval(interval);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [timer, dispatch]);
+  }, [timer, dispatch, isSessionOver]);
 
   useEffect(() => {
     if (isCapturing) {
@@ -153,7 +158,7 @@ export default function EvaluationScreen() {
           </Text>
         </View>
         {/* <Spacing y={20} /> */}
-        <Button label="Validate" onPress={onCapture} />
+        <Button label="Validate" onPress={onCapture} disabled={isSessionOver} />
       </View>
       {/* <Image source={{ uri: 'data:image/png;base64,' + source }} /> */}
     </Layout>
