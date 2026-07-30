@@ -92,6 +92,8 @@
   "evaluationResult.review.question": "Does your drawing look like the model?",
   "evaluationResult.review.yes": "Yes, it matches",
   "evaluationResult.review.no": "No",
+  "evaluationResult.toast.success": "Progress saved",
+  "evaluationResult.toast.error": "Could not save your progress, please try again",
 
   "premium.feature.badge": "premium",
 

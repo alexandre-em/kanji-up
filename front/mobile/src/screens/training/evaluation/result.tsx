@@ -1,18 +1,23 @@
+import { useNavigation } from '@react-navigation/native';
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Image, ScrollView, StyleSheet, TouchableOpacity, View as RNView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Assets, Button, Colors, Icon, Text, View } from 'react-native-ui-lib';
 
+import { screenNames } from '../../../constants/screens';
 import { useAppDispatch, useAppSelector } from '../../../hooks/useStore';
+import { useToaster } from '../../../providers/toaster';
 import {
   confirmItem,
   EvaluationItemType,
   getEffectiveStatus,
+  reset as resetEvaluation,
   selectCorrectCount,
   selectEvaluationItems,
   selectPendingReviewCount,
 } from '../../../store/slices/evaluation';
+import { recordResults } from '../../../store/slices/progression';
 import ReviewModal from './reviewModal';
 
 function useItemMessage(item: EvaluationItemType) {
@@ -101,14 +106,18 @@ function ResultItemRow({ item, onPress }: ResultItemRowProps) {
 
 export default function EvaluationResult() {
   const { t } = useTranslation();
+  const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const dispatch = useAppDispatch();
+  const toast = useToaster();
   const items = useAppSelector(selectEvaluationItems);
   const correctCount = useAppSelector(selectCorrectCount);
   const pendingReviewCount = useAppSelector(selectPendingReviewCount);
 
   // Index into `items` of the answer currently shown in the review modal, null when closed
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  // Guards against a double tap firing two saves while the AsyncStorage write is in flight
+  const [isSaving, setIsSaving] = useState(false);
 
   // All 'review' answers, resolved or not: gives the modal's "2 / 6" position, stable across choices
   const reviewItems = useMemo(() => items.filter((item) => item.status === 'review'), [items]);
@@ -137,6 +146,26 @@ export default function EvaluationResult() {
     },
     [activeIndex, dispatch, items],
   );
+
+  const handleValidate = useCallback(async () => {
+    // One entry per tested kanji: a kanji drawn twice in the session counts as two attempts
+    const results = items
+      .filter((item): item is typeof item & { kanji: { kanji_id: string } } => !!item.kanji.kanji_id)
+      .map((item) => ({ kanjiId: item.kanji.kanji_id, isCorrect: getEffectiveStatus(item) === 'correct' }));
+
+    setIsSaving(true);
+    const action = await dispatch(recordResults(results));
+    setIsSaving(false);
+
+    if (recordResults.fulfilled.match(action)) {
+      dispatch(resetEvaluation());
+      navigation.navigate(screenNames.HOME);
+      toast?.show({ message: t('evaluationResult.toast.success'), type: 'success' });
+    } else {
+      // Left on this screen with the button re-enabled: nothing is lost, they can just retry
+      toast?.show({ message: t('evaluationResult.toast.error'), type: 'failure' });
+    }
+  }, [items, dispatch, navigation, toast, t]);
 
   const buttonLabel = useMemo(
     () =>
@@ -167,8 +196,7 @@ export default function EvaluationResult() {
         ))}
       </ScrollView>
       <RNView style={[styles.stickyBar, { paddingBottom: insets.bottom + 16 }]}>
-        {/* Validation (next commit) will replace this onPress when nothing is left pending */}
-        <Button label={buttonLabel} disabled={pendingReviewCount === 0} onPress={openFirstPending} />
+        <Button label={buttonLabel} disabled={isSaving} onPress={pendingReviewCount > 0 ? openFirstPending : handleValidate} />
       </RNView>
       <ReviewModal
         item={activeItem}

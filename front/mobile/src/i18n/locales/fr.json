@@ -37,5 +37,7 @@
   "evaluationResult.review.expected": "Attendu",
   "evaluationResult.review.question": "Ton tracé ressemble-t-il au modèle ?",
   "evaluationResult.review.yes": "Oui, ça correspond",
-  "evaluationResult.review.no": "Non"
+  "evaluationResult.review.no": "Non",
+  "evaluationResult.toast.success": "Progression enregistrée",
+  "evaluationResult.toast.error": "Impossible d'enregistrer ta progression, réessaie"
 }
