@@ -24,11 +24,7 @@ export default function EvaluationHoc() {
     const kanjiValues = Object.values(kanjis);
 
     if (kanjiValues.length > 0) {
-      return Array.from(Array(numberKanji).keys()).map(() => ({
-        kanji: kanjiValues[Math.floor(Math.random() * kanjiValues.length)],
-        score: null,
-        status: 'idle' as 'idle',
-      }));
+      return Array.from(Array(numberKanji).keys()).map(() => kanjiValues[Math.floor(Math.random() * kanjiValues.length)]);
     }
     return [];
   }, [kanjis]);
@@ -45,7 +41,7 @@ export default function EvaluationHoc() {
 
   useEffect(() => {
     console.log('init evaluation');
-    void dispatch(init({ items: kanjiQueue() }));
+    void dispatch(init({ kanjis: kanjiQueue() }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

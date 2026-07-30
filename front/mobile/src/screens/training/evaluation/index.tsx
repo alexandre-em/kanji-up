@@ -44,7 +44,8 @@ export default function EvaluationScreen() {
         predict(uri)
           .then((res: PredictionType[]) => {
             console.log('predicted', res);
-            dispatch(updateItemScore({ result: res, strokesCount }));
+            // The drawing is kept: the user needs to see it again to arbitrate a doubtful answer
+            dispatch(updateItemScore({ result: res, strokesCount, image: uri }));
             toast?.show({ message: 'Answer saved', type: 'success' });
           })
           .catch((err) => {
@@ -76,7 +77,8 @@ export default function EvaluationScreen() {
         setTimer((prev) => prev - 1);
       }, 1000);
     } else {
-      dispatch(updateItemScore({ result: [], strokesCount }));
+      // No image: the drawing was never submitted, so the answer cannot be arbitrated
+      dispatch(updateItemScore({ result: [], strokesCount, image: null }));
       setTimer(TIMER_DURATION);
     }
 
