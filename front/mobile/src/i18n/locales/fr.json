@@ -32,5 +32,11 @@
   "evaluationResult.status.confirmedCorrect": "Confirmé par toi",
   "evaluationResult.status.confirmedIncorrect": "Non validé par toi",
   "evaluationResult.button.review": "Vérifier {{count}} réponses",
-  "evaluationResult.button.validate": "Valider le résultat"
+  "evaluationResult.button.validate": "Valider le résultat",
+  "evaluationResult.review.title": "Vérifie tes réponses",
+  "evaluationResult.review.yourDrawing": "Ton tracé",
+  "evaluationResult.review.expected": "Attendu",
+  "evaluationResult.review.question": "Ton tracé ressemble-t-il au modèle ?",
+  "evaluationResult.review.yes": "Oui, ça correspond",
+  "evaluationResult.review.no": "Non"
 }

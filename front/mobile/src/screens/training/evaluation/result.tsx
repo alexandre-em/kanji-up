@@ -1,17 +1,19 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Image, ScrollView, StyleSheet, View as RNView } from 'react-native';
+import { Image, ScrollView, StyleSheet, TouchableOpacity, View as RNView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Assets, Button, Colors, Icon, Text, View } from 'react-native-ui-lib';
-import { useSelector } from 'react-redux';
 
+import { useAppDispatch, useAppSelector } from '../../../hooks/useStore';
 import {
+  confirmItem,
   EvaluationItemType,
   getEffectiveStatus,
   selectCorrectCount,
   selectEvaluationItems,
   selectPendingReviewCount,
 } from '../../../store/slices/evaluation';
+import ReviewModal from './reviewModal';
 
 function useItemMessage(item: EvaluationItemType) {
   const { t } = useTranslation();
@@ -60,11 +62,17 @@ function StatusIcon({ item }: { item: EvaluationItemType }) {
   );
 }
 
-function ResultItemRow({ item }: { item: EvaluationItemType }) {
+type ResultItemRowProps = {
+  item: EvaluationItemType;
+  /** Only 'review' answers are interactive: tapping one opens the review modal on it */
+  onPress?: () => void;
+};
+
+function ResultItemRow({ item, onPress }: ResultItemRowProps) {
   const message = useItemMessage(item);
 
-  return (
-    <RNView style={styles.row}>
+  const content = (
+    <>
       {item.image ? (
         <Image source={{ uri: `data:image/png;base64,${item.image}` }} style={styles.thumbnail} />
       ) : (
@@ -79,16 +87,56 @@ function ResultItemRow({ item }: { item: EvaluationItemType }) {
           {message}
         </Text>
       </RNView>
-    </RNView>
+    </>
+  );
+
+  if (!onPress) return <RNView style={styles.row}>{content}</RNView>;
+
+  return (
+    <TouchableOpacity style={styles.row} onPress={onPress} accessibilityRole="button" accessibilityLabel={message}>
+      {content}
+    </TouchableOpacity>
   );
 }
 
 export default function EvaluationResult() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
-  const items = useSelector(selectEvaluationItems);
-  const correctCount = useSelector(selectCorrectCount);
-  const pendingReviewCount = useSelector(selectPendingReviewCount);
+  const dispatch = useAppDispatch();
+  const items = useAppSelector(selectEvaluationItems);
+  const correctCount = useAppSelector(selectCorrectCount);
+  const pendingReviewCount = useAppSelector(selectPendingReviewCount);
+
+  // Index into `items` of the answer currently shown in the review modal, null when closed
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+
+  // All 'review' answers, resolved or not: gives the modal's "2 / 6" position, stable across choices
+  const reviewItems = useMemo(() => items.filter((item) => item.status === 'review'), [items]);
+  const activeItem = activeIndex !== null ? items[activeIndex] : undefined;
+  const activePosition = activeItem ? reviewItems.indexOf(activeItem) + 1 : 0;
+
+  const openFirstPending = useCallback(() => {
+    const firstPendingIndex = items.findIndex((item) => item.status === 'review' && item.userConfirmation === null);
+    if (firstPendingIndex !== -1) setActiveIndex(firstPendingIndex);
+  }, [items]);
+
+  const closeReview = useCallback(() => setActiveIndex(null), []);
+
+  const handleChoose = useCallback(
+    (isCorrect: boolean) => {
+      if (activeIndex === null) return;
+
+      dispatch(confirmItem({ index: activeIndex, isCorrect }));
+
+      // Chain to the next still-undecided review answer, excluding the one just resolved
+      // (its userConfirmation in this pre-dispatch snapshot is still null)
+      const nextPendingIndex = items.findIndex(
+        (item, index) => index !== activeIndex && item.status === 'review' && item.userConfirmation === null,
+      );
+      setActiveIndex(nextPendingIndex === -1 ? null : nextPendingIndex);
+    },
+    [activeIndex, dispatch, items],
+  );
 
   const buttonLabel = useMemo(
     () =>
@@ -111,13 +159,24 @@ export default function EvaluationResult() {
       <ScrollView style={styles.list} contentContainerStyle={styles.listContent}>
         {items.map((item, index) => (
           // Multiple items can share the same kanji: index is the stable identity here
-          <ResultItemRow key={`${item.kanji.kanji_id}-${index}`} item={item} />
+          <ResultItemRow
+            key={`${item.kanji.kanji_id}-${index}`}
+            item={item}
+            onPress={item.status === 'review' ? () => setActiveIndex(index) : undefined}
+          />
         ))}
       </ScrollView>
       <RNView style={[styles.stickyBar, { paddingBottom: insets.bottom + 16 }]}>
-        {/* Actionable once the review flow (commit 5) and validation (commit 6) are wired */}
-        <Button label={buttonLabel} disabled />
+        {/* Validation (next commit) will replace this onPress when nothing is left pending */}
+        <Button label={buttonLabel} disabled={pendingReviewCount === 0} onPress={openFirstPending} />
       </RNView>
+      <ReviewModal
+        item={activeItem}
+        position={activePosition}
+        total={reviewItems.length}
+        onChoose={handleChoose}
+        onClose={closeReview}
+      />
     </View>
   );
 }

@@ -87,6 +87,12 @@
   "evaluationResult.status.confirmedIncorrect": "Not validated by you",
   "evaluationResult.button.review": "Check {{count}} answers",
   "evaluationResult.button.validate": "Validate result",
+  "evaluationResult.review.title": "Check your answers",
+  "evaluationResult.review.yourDrawing": "Your drawing",
+  "evaluationResult.review.expected": "Expected",
+  "evaluationResult.review.question": "Does your drawing look like the model?",
+  "evaluationResult.review.yes": "Yes, it matches",
+  "evaluationResult.review.no": "No",
 
   "premium.feature.badge": "premium",
 
