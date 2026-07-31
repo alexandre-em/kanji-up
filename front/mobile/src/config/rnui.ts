@@ -75,7 +75,10 @@ Colors.loadSchemes({
     $iconPrimaryLight: '#f7d4d4',
     $iconGeneral: '#7e2526',
     $iconGeneralLight: '#dd888a',
-    $outlineDefault: '#191010',
+    // Softened from a near-black #191010: this is RNUI's implicit fallback outline for many
+    // components (e.g. SegmentedControl), so a dark value here read as a harsh, dated border
+    // anywhere a component didn't get an explicit override
+    $outlineDefault: '#d8d9dc',
     $outlinePrimary: '#d42528',
     $outlinePrimaryMedium: '#f7d4d4',
     $outlineGeneral: '#7e2526',
@@ -86,9 +89,19 @@ Colors.loadSchemes({
     $backgroundWarningLight: '#fdf0d5',
     $textWarning: '#b06f00',
     $iconWarning: '#b06f00',
+    // True grey, no red tint — distinct from $textGeneral/$backgroundGeneral*, which stay a dark
+    // brand red for secondary brand accents. This is for anything that should read as neutral:
+    // track backgrounds, card borders, secondary text/icons.
+    $backgroundNeutralLight: '#f1f2f4',
+    $backgroundNeutralMedium: '#e4e6e9',
+    $backgroundNeutralHeavy: '#c7cad0',
+    $textNeutral: '#6b7280',
+    $iconNeutral: '#6b7280',
+    $outlineNeutral: '#e2e4e8',
   },
   dark: {
-    $backgroundDefault: '#060504',
+    // Lifted off true black: a pure #060504 read as harsh/OLED-test-pattern rather than premium
+    $backgroundDefault: '#121110',
     $backgroundPrimaryHeavy: '#e87d7f',
     $backgroundPrimaryMedium: '#821719',
     $backgroundPrimaryLight: '#570f10',
@@ -104,7 +117,9 @@ Colors.loadSchemes({
     $iconPrimaryLight: '#570f10',
     $iconGeneral: '#c6393c',
     $iconGeneralLight: '#4f1718',
-    $outlineDefault: '#efe6e6',
+    // Softened from a near-white #efe6e6, same reasoning as the light scheme's fix: too stark
+    // as an implicit fallback border against a now-dark-charcoal background
+    $outlineDefault: '#3a3835',
     $outlinePrimary: '#e87d7f',
     $outlinePrimaryMedium: '#821719',
     $outlineGeneral: '#c6393c',
@@ -114,6 +129,12 @@ Colors.loadSchemes({
     $backgroundWarningLight: '#4a3510',
     $textWarning: '#f5b942',
     $iconWarning: '#f5b942',
+    $backgroundNeutralLight: '#1c1b1a',
+    $backgroundNeutralMedium: '#2a2927',
+    $backgroundNeutralHeavy: '#3d3b38',
+    $textNeutral: '#9a9a9a',
+    $iconNeutral: '#9a9a9a',
+    $outlineNeutral: '#33322f',
   },
 });
 

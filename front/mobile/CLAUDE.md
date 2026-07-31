@@ -119,8 +119,34 @@ npx react-native run-android --no-packager                        # build (~20 m
   retombe sur `en` via `fallbackLng`.
 - Routes déclarées sans écran : `Ocr`, `Premium`, et la carte « SETTING » de Home ne navigue pas.
 - Le mode sombre est désactivé en dur (`Colors.setScheme('light')` dans `App.tsx`) : la palette
-  `dark` de `rnui.ts` est du code mort.
+  `dark` de `rnui.ts` est du code mort. Aperçu réel fait le 2026-07-31 (bascule temporaire de
+  `setScheme`) : les tokens de `rnui.ts` s'appliquent correctement, mais plusieurs écrans ont des
+  bugs d'affichage jamais vus puisque jamais testés — sur Home, le texte « Welcome back » / « X
+  kanji selected » est quasi invisible (texte sombre sur fond sombre), et les `Card.Section` de
+  SELECT/SCAN/WIN CREDITS gardent un fond blanc plein derrière leur titre. Cause probable : usage
+  de tokens RNUI jamais définis dans notre thème (`$backgroundElevated`, `$backgroundElevatedLight`,
+  `$backgroundInverted`, `$textNeutralHeavy` — voir aussi la nouvelle famille `$*Neutral*` ajoutée
+  pour remplacer ces fallbacks non contrôlés). Activer le mode sombre pour de vrai est un chantier
+  à part, non demandé pour l'instant.
 - Sur l'émulateur, l'API renvoie des 500 (`Error getting user`) → toasts LogBox parasites.
+- **Certaines interactions font planter l'app sur l'AVD `Pixel_7_Pro_API_34`**, de façon pas
+  totalement prévisible — `NullPointerException: onBatchComplete() on a null object reference` +
+  `ReactHost.getOrCreateDestroyTask()`. Isolé le 2026-07-31 en construisant la page Search :
+  - Taper un caractère dans un champ de texte plante systématiquement — reproduit à l'identique
+    avec `adb shell input text`, `adb shell input keyevent` touche par touche, un `SearchInput`
+    RNUI *et* un `TextInput` RN totalement vanilla sans personnalisation. Précédé d'un cycle
+    d'échec d'affichage du clavier (`ImeTracker ... onFailed at PHASE_CLIENT_VIEW_SERVED`).
+  - Le simple tap sur un `SegmentedControl` (RNUI), sans aucun clavier impliqué, plante aussi avec
+    la même signature.
+  - À l'inverse : navigation entre écrans, tap sur un bouton simple, et la barre d'onglets flottante
+    maison (`bottomNavBar.tsx`, animée en Reanimated) sont stables et ont été tapés à répétition
+    tout au long de cette session sans jamais planter.
+  Le dénominateur commun n'est pas clair (pas juste « IME », pas juste « RNUI ») — pointe vers une
+  fragilité générale de cet émulateur/build face à certaines interactions plutôt qu'un bug de code
+  précis. **Non résolu** : à retester sur un appareil physique ou un autre AVD. En attendant,
+  toute interaction au-delà d'un tap de navigation simple reste **non vérifiable en live** sur cet
+  émulateur pour un composant nouvellement ajouté — vérifier ce qui est vérifiable (rendu initial,
+  navigation, lint, types, relecture de code) et laisser le test interactif réel à un appareil.
 
 ---
 
