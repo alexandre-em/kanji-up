@@ -41,7 +41,7 @@ const KanjiCardElement = ({ kanji, onPress }: KanjiCardElementProps) => {
 
   const color = useMemo(() => {
     if (toRemove[kanji.kanji_id!]) {
-      return Colors.$backgroundDangerHeavy;
+      return Colors.$backgroundPrimaryHeavy;
     }
     if (toAdd[kanji.kanji_id!]) {
       console.log('Added !', kanji.kanji_id);
@@ -51,7 +51,7 @@ const KanjiCardElement = ({ kanji, onPress }: KanjiCardElementProps) => {
       console.log('Removed !', kanji.kanji_id);
       return Colors.$backgroundNeutralHeavy;
     }
-    return Colors.$backgroundElevated;
+    return Colors.$backgroundNeutralLight;
   }, [kanji.kanji_id, entities, toAdd, toRemove]);
 
   const label = useMemo(() => {
@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
   cardContent: {
     width: '100%',
     height: '100%',
-    backgroundColor: Colors.$backgroundElevated,
+    backgroundColor: Colors.$backgroundNeutralLight,
     justifyContent: 'center',
     alignItems: 'center',
   },

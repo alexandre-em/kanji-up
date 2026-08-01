@@ -140,7 +140,7 @@ export default function EvaluationScreen() {
           <RNView style={styles.yomi}>
             <Chip label={'ON'} />
             <Spacing x={10} />
-            <Text h4 $textNeutralHeavy>
+            <Text h4 $textDefault>
               {currentKanji?.kanji?.kanji?.onyomi?.join(', ')}
             </Text>
           </RNView>
@@ -148,7 +148,7 @@ export default function EvaluationScreen() {
           <RNView style={styles.yomi}>
             <Chip label={'KUN'} />
             <Spacing x={10} />
-            <Text h4 $textNeutralHeavy>
+            <Text h4 $textDefault>
               {currentKanji?.kanji?.kanji?.kunyomi?.join(', ')}
             </Text>
           </RNView>

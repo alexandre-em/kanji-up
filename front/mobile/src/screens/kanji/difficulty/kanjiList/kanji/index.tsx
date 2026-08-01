@@ -189,11 +189,11 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
                   {
                     text: t('kanjiDetails.meanings'),
                     text70BL: true,
-                    style: { backgroundColor: Colors.$backgroundElevatedLight },
+                    style: { backgroundColor: Colors.$backgroundNeutralLight },
                   },
                   ...(entities[character]?.kanji?.meaning?.map((meaning) => ({
                     text: meaning,
-                    style: { backgroundColor: Colors.$backgroundElevatedLight },
+                    style: { backgroundColor: Colors.$backgroundNeutralLight },
                     text80L: true,
                   })) ?? []),
                 ]}
@@ -248,11 +248,11 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
             <View>
               <Spacing y={10} />
               <Card style={styles.card}>
-                <View row style={{ justifyContent: 'space-around', backgroundColor: Colors.$backgroundElevatedLight }}>
+                <View row style={{ justifyContent: 'space-around', backgroundColor: Colors.$backgroundNeutralLight }}>
                   <Text text40BO $textPrimary>
                     {kanji.radical.character}
                   </Text>
-                  <View style={{ backgroundColor: Colors.$backgroundElevatedLight }}>
+                  <View style={{ backgroundColor: Colors.$backgroundNeutralLight }}>
                     <Text text70BL>{kanji.radical.name?.hiragana ?? ''}</Text>
                     <Text text80>{kanji.radical.name?.romaji ?? ''}</Text>
                   </View>
@@ -323,10 +323,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
-    backgroundColor: Colors.$backgroundElevated,
+    backgroundColor: Colors.$backgroundNeutralLight,
     borderRadius: 10,
     borderWidth: 0.5,
-    borderColor: Colors.$textDefault + '30',
+    borderColor: Colors.$outlineNeutral,
   },
   character: {
     width: CANVAS_WIDTH,
@@ -357,6 +357,6 @@ const styles = StyleSheet.create({
   card: {
     width: '100%',
     padding: 10,
-    backgroundColor: Colors.$backgroundElevatedLight,
+    backgroundColor: Colors.$backgroundNeutralLight,
   },
 });

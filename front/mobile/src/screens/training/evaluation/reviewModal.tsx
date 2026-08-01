@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: '#fff',
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: Colors.$outlineDefault + '22',
+    borderColor: Colors.$outlineNeutral,
   },
   expectedBox: {
     width: CANVAS_PREVIEW_SIZE,
@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: '#fff',
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: Colors.$outlineDefault + '22',
+    borderColor: Colors.$outlineNeutral,
     alignItems: 'center',
     justifyContent: 'center',
   },

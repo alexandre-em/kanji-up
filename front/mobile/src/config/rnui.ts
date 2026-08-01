@@ -84,6 +84,7 @@ Colors.loadSchemes({
     $outlineGeneral: '#7e2526',
     // Status colors: 'incorrect' reuses the brand red above, these two cover the other verdicts
     $backgroundSuccessLight: '#e3f6ea',
+    $backgroundSuccessHeavy: '#1f9254',
     $textSuccess: '#1f9254',
     $iconSuccess: '#1f9254',
     $backgroundWarningLight: '#fdf0d5',
@@ -124,6 +125,7 @@ Colors.loadSchemes({
     $outlinePrimaryMedium: '#821719',
     $outlineGeneral: '#c6393c',
     $backgroundSuccessLight: '#123822',
+    $backgroundSuccessHeavy: '#4ade80',
     $textSuccess: '#4ade80',
     $iconSuccess: '#4ade80',
     $backgroundWarningLight: '#4a3510',

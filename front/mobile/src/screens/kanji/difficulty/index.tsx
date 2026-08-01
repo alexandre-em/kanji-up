@@ -64,7 +64,7 @@ export default function KanjiDifficulties({ route }: KanjiDifficultiesProps) {
 
 const styles = StyleSheet.create({
   cardContainer: {
-    backgroundColor: Colors.$backgroundElevated,
+    backgroundColor: Colors.$backgroundNeutralLight,
     display: 'flex',
     justifyContent: 'center',
     width: '100%',

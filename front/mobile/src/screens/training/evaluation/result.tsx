@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
     gap: 12,
     paddingVertical: 12,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: Colors.$outlineDefault + '22',
+    borderBottomColor: Colors.$outlineNeutral,
   },
   thumbnail: {
     width: 56,
@@ -264,6 +264,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 12,
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: Colors.$outlineDefault + '22',
+    borderTopColor: Colors.$outlineNeutral,
   },
 });
