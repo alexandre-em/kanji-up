@@ -97,6 +97,14 @@ Reanimated 4, i18next. **Android uniquement pour l'instant : il n'y a pas de dos
   `react-native-svg` dans `src/components/svg/`.
 - i18n : **clés plates** (`"home.menu.selection.title"`), à ajouter dans `en.json` **et** `fr.json`.
 - Espacements : `GENERAL_MARGIN` de `src/constants/styles.ts`, composant `Spacing`.
+- Découpage fichiers : un fichier = une responsabilité claire, devinable par son nom. Il peut
+  contenir plusieurs fonctions/composants/hooks **tant qu'ils sont liés entre eux et répondent
+  tous à ce que le nom du fichier décrit** — ex. une page (`index.tsx`) qui orchestre plusieurs
+  sous-composants et appelle des hooks pour l'affichage, ou un fichier utilitaire qui regroupe
+  plusieurs fonctions liées. Dès qu'un composant/fonction/hook a sa propre responsabilité
+  indépendante du fichier qui le contient, il part dans son propre fichier nommé en conséquence
+  (ex. `kanjiResultCard.tsx` pour la carte, `difficultyTag.tsx` pour la logique de tag de
+  difficulté, séparés de `kanjiResults.tsx` qui ne garde que la liste/pagination).
 
 **Émulateur / screenshots** (SDK dans `~/Library/Android/sdk`, AVD `Pixel_7_Pro_API_34`)
 ```sh
