@@ -52,5 +52,8 @@
   "search.noResults": "Aucun résultat pour « {{query}} »",
   "search.resultCount": "{{count}} résultats",
   "search.error": "La recherche a échoué, réessaie",
-  "search.clear": "Effacer la recherche"
+  "search.clear": "Effacer la recherche",
+  "search.tag.elementary": "Primaire {{grade}}",
+  "search.tag.juniorHigh": "Collège",
+  "search.tag.jlpt": "JLPT N{{level}}"
 }

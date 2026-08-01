@@ -16,6 +16,7 @@ import {
   selectSearchResult as selectWordSearchResult,
   selectSearchStatus as selectWordSearchStatus,
 } from '../../store/slices/word';
+import KanjiResults from './kanjiResults';
 
 // Waits for a pause in typing before hitting the API, so every keystroke doesn't fire a request
 const DEBOUNCE_MS = 350;
@@ -143,30 +144,42 @@ export default function Search() {
           );
         })}
       </RNView>
-      <RNView style={styles.body}>
-        {trimmedQuery === '' ? (
+      {trimmedQuery === '' ? (
+        <RNView style={styles.body}>
           <Text text80M $textGeneral center>
             {t('search.empty.message')}
           </Text>
-        ) : activeStatus === 'failed' && !activeCache ? (
-          // A failed request never populates the cache, so it would otherwise fall into the
-          // "no cache yet" branch below and spin forever instead of reflecting the failure
+        </RNView>
+      ) : activeStatus === 'failed' && !activeCache ? (
+        // A failed request never populates the cache, so it would otherwise fall into the
+        // "no cache yet" branch below and spin forever instead of reflecting the failure
+        <RNView style={styles.body}>
           <Text text80M $textGeneral center>
             {t('search.error')}
           </Text>
-        ) : !activeCache ? (
-          // No cache yet for this exact query (still debouncing, or the fetch is in flight):
-          // avoid flashing "no results" using a previous query's leftover status
+        </RNView>
+      ) : !activeCache ? (
+        // No cache yet for this exact query (still debouncing, or the fetch is in flight):
+        // avoid flashing "no results" using a previous query's leftover status
+        <RNView style={styles.body}>
           <ActivityIndicator color={Colors.$textPrimary} size="small" />
-        ) : activeResultCount === 0 ? (
+        </RNView>
+      ) : activeResultCount === 0 ? (
+        <RNView style={styles.body}>
           <Text text80M $textGeneral center>
             {t('search.noResults', { query: trimmedQuery })}
           </Text>
-        ) : (
-          // Replaced by the real result list once the kanji/word sections are built
+        </RNView>
+      ) : activeSegment === KANJI_SEGMENT ? (
+        <RNView style={styles.listContainer}>
+          <KanjiResults query={trimmedQuery} />
+        </RNView>
+      ) : (
+        // Word results land in a follow-up: kanji comes first
+        <RNView style={styles.body}>
           <Text text70M>{t('search.resultCount', { count: activeResultCount })}</Text>
-        )}
-      </RNView>
+        </RNView>
+      )}
     </View>
   );
 }
@@ -228,5 +241,9 @@ const styles = StyleSheet.create({
     padding: 20,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  listContainer: {
+    flex: 1,
+    marginTop: 8,
   },
 });
