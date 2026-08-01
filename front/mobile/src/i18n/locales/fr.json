@@ -55,5 +55,17 @@
   "search.clear": "Effacer la recherche",
   "search.tag.elementary": "Primaire {{grade}}",
   "search.tag.juniorHigh": "Collège",
-  "search.tag.jlpt": "JLPT N{{level}}"
+  "search.tag.jlpt": "JLPT N{{level}}",
+  "settings.title": "Réglages",
+  "settings.section.preferences": "Préférences",
+  "settings.language.title": "Langue d'affichage",
+  "settings.language.fr": "Français",
+  "settings.language.en": "English",
+  "settings.language.toast": "Langue mise à jour",
+  "settings.language.choose": "Choisir une langue",
+  "settings.theme.title": "Thème",
+  "settings.theme.comingSoon": "Bientôt disponible",
+  "settings.subscription.free": "Offre gratuite",
+  "settings.subscription.premium": "Premium",
+  "settings.subscription.expiresOn": "Renouvellement le {{date}}"
 }
