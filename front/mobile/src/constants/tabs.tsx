@@ -35,7 +35,9 @@ export const tabs: TabType[] = [
 ];
 
 /**
- * Routes displaying the floating tab bar: the browsing roots only.
- * Evaluation is a tab entry point but hides the bar, since it is a full screen drawing session.
+ * Routes displaying the floating tab bar. Kanji List is a browsing screen (scroll through a grid,
+ * tap in and out), not a narrow detail view, so it keeps the bar too. Difficulties and Kanji
+ * detail (drawing/practice) stay excluded — genuine full-screen detail views. Evaluation is a tab
+ * entry point but hides the bar, since it is a full screen drawing session.
  */
-export const TAB_VISIBLE_ROUTES = [screenNames.HOME, screenNames.CATEGORIES];
+export const TAB_VISIBLE_ROUTES = [screenNames.HOME, screenNames.CATEGORIES, screenNames.KANJIS];

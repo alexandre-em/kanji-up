@@ -3,9 +3,11 @@ import { FlashList } from '@shopify/flash-list';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Assets, Badge, Button, Card, Colors, Text, View } from 'react-native-ui-lib';
 import { useSelector } from 'react-redux';
 
+import { TAB_BAR_TOTAL_HEIGHT } from '../../../../components/bottomNavBar';
 import Layout from '../../../../components/layout';
 import Spacing from '../../../../components/spacing';
 import { screenNames } from '../../../../constants/screens';
@@ -94,6 +96,7 @@ const KanjiCardElement = ({ kanji, onPress }: KanjiCardElementProps) => {
 export default function KanjiList(props: KanjiListProps) {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
+  const insets = useSafeAreaInsets();
   const [isSelectModeOn, setIsSelectModeOn] = useState(false);
   const navigation = useNavigation();
   const last = useAppSelector(selectLastGet);
@@ -173,6 +176,9 @@ export default function KanjiList(props: KanjiListProps) {
   }, [saveStatus]);
 
   return (
+    // FlashList scrolls itself and owns its own bottom clearance (contentContainerStyle below):
+    // withTabBar on Layout would reserve clearance on the outer (inert) ScrollView too, creating
+    // a double gap and letting that outer scroll fire the scroll-hide-bar behavior wrongly
     <Layout screen="kanjiList">
       {!isSelectModeOn ? (
         <Button label="Select" onPress={() => setIsSelectModeOn(!isSelectModeOn)} size="xSmall" />
@@ -190,6 +196,9 @@ export default function KanjiList(props: KanjiListProps) {
         renderItem={({ item }) => <KanjiCardElement kanji={item} onPress={() => handlePress(item)} />}
         onEndReached={handleEndReached}
         onEndReachedThreshold={0.15}
+        // FlashList scrolls itself, so Layout's own bottom clearance (built for its outer
+        // ScrollView) never reaches it: the floating tab bar would sit on top of the last row
+        contentContainerStyle={{ paddingBottom: TAB_BAR_TOTAL_HEIGHT + insets.bottom }}
         ListFooterComponent={
           kanjisStatus === 'pending' ? (
             <View style={styles.loader}>
