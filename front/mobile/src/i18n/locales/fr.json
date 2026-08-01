@@ -44,5 +44,13 @@
   "home.evaluation.emptySelection.title": "Aucun kanji sélectionné",
   "home.evaluation.emptySelection.message": "Choisis les kanji que tu veux pratiquer avant de commencer une évaluation.",
   "home.evaluation.emptySelection.confirm": "Choisir des kanji",
-  "home.evaluation.emptySelection.cancel": "Annuler"
+  "home.evaluation.emptySelection.cancel": "Annuler",
+
+  "search.segment.kanji": "Kanji",
+  "search.segment.word": "Mots",
+  "search.empty.message": "Cherche un kanji ou un mot",
+  "search.noResults": "Aucun résultat pour « {{query}} »",
+  "search.resultCount": "{{count}} résultats",
+  "search.error": "La recherche a échoué, réessaie",
+  "search.clear": "Effacer la recherche"
 }

@@ -1,8 +1,8 @@
 import { useNavigation } from '@react-navigation/native';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Dimensions, Image, StyleSheet, View as RNView } from 'react-native';
-import { Assets, Badge, Button, Colors, Icon, ProgressBar, SearchInput } from 'react-native-ui-lib';
+import { Dimensions, Image, StyleSheet, TouchableOpacity, View as RNView } from 'react-native';
+import { Assets, Badge, Button, Colors, Icon, ProgressBar } from 'react-native-ui-lib';
 import Avatar from 'react-native-ui-lib/avatar';
 import Card from 'react-native-ui-lib/card';
 import Chip from 'react-native-ui-lib/chip';
@@ -13,6 +13,7 @@ import { useSelector } from 'react-redux';
 
 import Layout from '../../components/layout';
 import Spacing from '../../components/spacing';
+import SearchIcon from '../../components/svg/search';
 import { homeMenuButtons } from '../../constants/homeButtons';
 import { screenNames } from '../../constants/screens';
 import { GENERAL_MARGIN } from '../../constants/styles';
@@ -84,13 +85,19 @@ export default function Home() {
           />
         </View>
       </View>
-      <SearchInput
-        placeholder={t('home.search.placeholder')}
-        autoFocus={false}
+      {/* A styled button, not a real text field: no TextInput here means no keyboard/focus
+          handling to fight with — a disabled SearchInput fought the native focus system and
+          crashed the bridge on tap. The real, editable field lives on the Search screen. */}
+      <TouchableOpacity
+        onPress={() => handleRediction(screenNames.SEARCH)}
         style={styles.search}
-        containerStyle={{ backgroundColor: Colors.$backgroundDefault }}
-        useSafeArea
-      />
+        accessibilityRole="button"
+        accessibilityLabel={t('home.search.placeholder')}>
+        <SearchIcon size={18} color={Colors.$iconNeutral} />
+        <Text text80M $textGeneral>
+          {t('home.search.placeholder')}
+        </Text>
+      </TouchableOpacity>
       {/* Selection counter + mastered kanji counter */}
       <Spacing y={GENERAL_MARGIN} />
       <View>
@@ -137,9 +144,9 @@ export default function Home() {
               {button.icon}
               <Card.Section
                 flex
-                style={{ backgroundColor: Colors.$backgroundElevated }}
+                style={styles.transparent}
                 content={[
-                  { text: t(button.textKey), text80BL: true, $outlineDefault: true },
+                  { text: t(button.textKey), text80BL: true, $textDefault: true },
                   { text: t(button.subtitle!), text90M: true },
                 ]}
                 contentStyle={styles.cardContent}
@@ -157,7 +164,7 @@ export default function Home() {
             <Card.Section
               flex
               content={[
-                { text: t('home.menu.ad.title'), text80BL: true, $outlineDefault: true },
+                { text: t('home.menu.ad.title'), text80BL: true, $textDefault: true },
                 { text: t('home.menu.ad.subtitle'), text90M: true },
               ]}
               contentStyle={styles.cardContent}
@@ -234,13 +241,18 @@ const styles = StyleSheet.create({
   },
   cardContent: {
     marginTop: GENERAL_MARGIN / 2,
-    backgroundColor: Colors.$backgroundElevated,
+    backgroundColor: 'transparent',
   },
   transparent: { backgroundColor: '#00000000' },
   bannerImage: { position: 'absolute', left: 0, zIndex: -10, width: width - GENERAL_MARGIN * 2, height: 115, borderRadius: 10 },
   search: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    height: 44,
+    paddingHorizontal: 16,
     borderWidth: 0.5,
-    borderColor: Colors.$backgroundInverted + '25',
+    borderColor: Colors.$outlineNeutral,
     borderRadius: 25,
   },
   badge: { position: 'absolute', right: 10, top: 10, zIndex: 10 },

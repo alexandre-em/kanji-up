@@ -25,6 +25,14 @@
 
   "home.welcome.title": "Welcome back",
   "home.search.placeholder": "Search...",
+
+  "search.segment.kanji": "Kanji",
+  "search.segment.word": "Words",
+  "search.empty.message": "Search for a kanji or a word",
+  "search.noResults": "No results for “{{query}}”",
+  "search.resultCount": "{{count}} results",
+  "search.error": "Search failed, please try again",
+  "search.clear": "Clear search",
   "home.selection.unit": "kanji selected",
   "home.progression.title": "Kanji mastered so far",
   "home.evaluation.button": "Level up today!",

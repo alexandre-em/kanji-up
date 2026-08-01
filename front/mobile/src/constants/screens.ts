@@ -8,4 +8,5 @@ export const screenNames = {
   OCR: 'Ocr',
   EVALUATION: 'Evaluation',
   PREMIUM: 'Premium',
+  SEARCH: 'Search',
 };
