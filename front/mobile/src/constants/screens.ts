@@ -9,4 +9,5 @@ export const screenNames = {
   EVALUATION: 'Evaluation',
   PREMIUM: 'Premium',
   SEARCH: 'Search',
+  SETTINGS: 'Settings',
 };

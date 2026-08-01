@@ -32,6 +32,11 @@ export const tabs: TabType[] = [
     labelKey: 'tabs.training.label',
     icon: ({ size, color }) => <Icon source={Assets.icons.draw} size={size} tintColor={color} />,
   },
+  {
+    key: screenNames.SETTINGS,
+    labelKey: 'tabs.settings.label',
+    icon: ({ size, color }) => <Icon source={Assets.icons.setting} size={size} tintColor={color} />,
+  },
 ];
 
 /**
@@ -40,4 +45,4 @@ export const tabs: TabType[] = [
  * detail (drawing/practice) stay excluded — genuine full-screen detail views. Evaluation is a tab
  * entry point but hides the bar, since it is a full screen drawing session.
  */
-export const TAB_VISIBLE_ROUTES = [screenNames.HOME, screenNames.CATEGORIES, screenNames.KANJIS];
+export const TAB_VISIBLE_ROUTES = [screenNames.HOME, screenNames.CATEGORIES, screenNames.KANJIS, screenNames.SETTINGS];

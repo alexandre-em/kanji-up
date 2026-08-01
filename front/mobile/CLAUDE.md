@@ -165,8 +165,9 @@ npx react-native run-android --no-packager                        # build (~20 m
 
 ## 5. Décisions produit actées
 
-- **Barre d'onglets flottante** (2026-07-30) : 3 onglets vers des écrans réels — Home, Sélection,
-  Entraînement. Masquée sur l'onboarding, l'écran d'évaluation (session de dessin plein écran) et
-  tous les écrans de détail poussés. Elle se cache au scroll descendant.
-  Pas de `@react-navigation/bottom-tabs` : la barre pilote le stack existant via le container ref.
-  Compromis accepté : pas d'état conservé par onglet, le retour Android suit l'historique du stack.
+- **Barre d'onglets flottante** (2026-07-30) : 4 onglets vers des écrans réels — Home, Sélection,
+  Entraînement, Réglages (ajouté le 2026-08-01). Masquée sur l'onboarding, l'écran d'évaluation
+  (session de dessin plein écran) et tous les écrans de détail poussés. Elle se cache au scroll
+  descendant. Pas de `@react-navigation/bottom-tabs` : la barre pilote le stack existant via le
+  container ref. Compromis accepté : pas d'état conservé par onglet, le retour Android suit
+  l'historique du stack.

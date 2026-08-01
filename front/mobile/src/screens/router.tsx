@@ -18,6 +18,7 @@ import KanjiList from './kanji/difficulty/kanjiList';
 import KanjiDetail from './kanji/difficulty/kanjiList/kanji';
 import Onboarding from './onboarding';
 import Search from './search';
+import Settings from './settings';
 import EvaluationHoc from './training/evaluation/hoc';
 
 const Stack = createNativeStackNavigator();
@@ -68,6 +69,7 @@ export default function RootNavigation() {
           <Stack.Screen name={screenNames.DIFFICULTIES} component={KanjiDifficulties} />
           <Stack.Screen name={screenNames.KANJIS} component={KanjiList} />
           <Stack.Screen name={screenNames.KANJI} component={KanjiDetail} options={headerOptions} />
+          <Stack.Screen name={screenNames.SETTINGS} component={Settings} />
         </Stack.Navigator>
         {activeRoute && TAB_VISIBLE_ROUTES.includes(activeRoute) && (
           <BottomNavBar activeRoute={activeRoute} onTabPress={handleTabPress} />

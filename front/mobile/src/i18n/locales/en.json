@@ -22,6 +22,7 @@
   "tabs.home.label": "Home",
   "tabs.selection.label": "Select",
   "tabs.training.label": "Train",
+  "tabs.settings.label": "Settings",
 
   "home.welcome.title": "Welcome back",
   "home.search.placeholder": "Search...",

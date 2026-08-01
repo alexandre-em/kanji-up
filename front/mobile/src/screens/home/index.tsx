@@ -188,7 +188,11 @@ export default function Home() {
         </>
       )}
       <Spacing y={GENERAL_MARGIN} />
-      <Card height={110} width={width - GENERAL_MARGIN * 2} style={styles.card}>
+      <Card
+        height={110}
+        width={width - GENERAL_MARGIN * 2}
+        style={styles.card}
+        onPress={() => handleRediction(screenNames.SETTINGS)}>
         <Icon source={Assets.icons.setting} size={36} tintColor={Colors.$textPrimary} />
         <Card.Section
           flex
