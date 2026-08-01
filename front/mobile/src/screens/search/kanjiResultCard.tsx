@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { StyleSheet, TouchableOpacity, View as RNView } from 'react-native';
 import { Colors, Text } from 'react-native-ui-lib';
 
-import DifficultyTag, { getGradeTag, getJlptTag } from './difficultyTag';
+import DifficultyTag, { getGradeTag } from './difficultyTag';
 
 type KanjiResultCardProps = {
   kanji: Partial<KanjiType>;
@@ -14,7 +14,8 @@ export default function KanjiResultCard({ kanji, onPress }: KanjiResultCardProps
   const readings = [...(kanji.kanji?.onyomi ?? []), ...(kanji.kanji?.kunyomi ?? [])].join(', ');
   const meaning = kanji.kanji?.meaning?.join(', ');
   const gradeTag = getGradeTag(kanji.reference?.grade, t);
-  const jlptTag = getJlptTag(kanji.kanji?.jlpt, t);
+  // JLPT tag hidden for now: the backend's search populate doesn't select `jlpt` on the kanji
+  // sub-document (see CLAUDE.md §4), so it would always be empty against the real API
 
   return (
     <TouchableOpacity style={styles.card} onPress={onPress} accessibilityRole="button">
@@ -28,10 +29,9 @@ export default function KanjiResultCard({ kanji, onPress }: KanjiResultCardProps
         <Text text90M $textNeutral numberOfLines={2}>
           {meaning}
         </Text>
-        {(gradeTag || jlptTag) && (
+        {gradeTag && (
           <RNView style={styles.tagRow}>
-            {gradeTag && <DifficultyTag tag={gradeTag} />}
-            {jlptTag && <DifficultyTag tag={jlptTag} />}
+            <DifficultyTag tag={gradeTag} />
           </RNView>
         )}
       </RNView>

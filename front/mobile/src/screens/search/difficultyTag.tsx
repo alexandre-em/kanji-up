@@ -27,7 +27,9 @@ export function getGradeTag(grade: string | undefined, t: TFunction): Tag | unde
   return { label: t('search.tag.juniorHigh'), tier: 'hard' };
 }
 
-// JLPT runs the opposite direction: N5 is the easiest level, N1 the hardest
+// JLPT runs the opposite direction: N5 is the easiest level, N1 the hardest.
+// Not called from kanjiResultCard for now — the search endpoint doesn't return `jlpt` yet
+// (backend dette, see CLAUDE.md §4) — kept here ready for when that's fixed.
 export function getJlptTag(jlpt: number | undefined, t: TFunction): Tag | undefined {
   if (!jlpt) return undefined;
   const label = t('search.tag.jlpt', { level: jlpt });

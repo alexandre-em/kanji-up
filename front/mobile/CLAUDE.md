@@ -137,6 +137,11 @@ npx react-native run-android --no-packager                        # build (~20 m
   pour remplacer ces fallbacks non contrôlés). Activer le mode sombre pour de vrai est un chantier
   à part, non demandé pour l'instant.
 - Sur l'émulateur, l'API renvoie des 500 (`Error getting user`) → toasts LogBox parasites.
+- **Backend** : `searchCharacter` (`back/kanjiup/src/services/kanji.ts:64`) ne sélectionne pas
+  `jlpt` dans le `populate` du sous-document `kanji`, contrairement à `getAll` (ligne 38) qui
+  l'inclut. Conséquence côté mobile : le tag JLPT des résultats de recherche kanji
+  (`src/screens/search/difficultyTag.tsx`, `getJlptTag`) serait toujours vide contre la vraie API
+  — volontairement pas appelé depuis `kanjiResultCard.tsx` en attendant ce fix backend.
 - **Certaines interactions font planter l'app sur l'AVD `Pixel_7_Pro_API_34`**, de façon pas
   totalement prévisible — `NullPointerException: onBatchComplete() on a null object reference` +
   `ReactHost.getOrCreateDestroyTask()`. Isolé le 2026-07-31 en construisant la page Search :
