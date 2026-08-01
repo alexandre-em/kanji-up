@@ -1,10 +1,8 @@
 import React, { useEffect } from 'react';
-import { getUniqueId } from 'react-native-device-info';
 
 import { useAppDispatch } from '../hooks/useStore';
 import { initialize as initializeProgression } from '../store/slices/progression';
 import { initialize as initializeKanji } from '../store/slices/selectedKanji';
-import { getUser } from '../store/slices/user';
 
 const UserContext = React.createContext<null>(null);
 
@@ -16,12 +14,9 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    // TODO: Check internet connection, if offline use local data
-    getUniqueId().then((deviceId) => {
-      dispatch(getUser({ macAddress: deviceId }));
-      dispatch(initializeKanji());
-      dispatch(initializeProgression());
-    });
+    // TEMP: auth (getUser) call skipped for dev — API returns 500/503 on the emulator, revert before shipping
+    dispatch(initializeKanji());
+    dispatch(initializeProgression());
   }, [dispatch]);
 
   return <UserContext.Provider value={null}>{children}</UserContext.Provider>;
