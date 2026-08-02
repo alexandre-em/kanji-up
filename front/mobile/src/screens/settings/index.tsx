@@ -11,7 +11,7 @@ export default function Settings() {
   const { t } = useTranslation();
 
   return (
-    <Layout screen="settings" withTabBar withBanner>
+    <Layout screen="settings" withTabBar>
       <AccountSummary />
       <Spacing y={28} />
       <Text text70BO>{t('settings.section.preferences')}</Text>

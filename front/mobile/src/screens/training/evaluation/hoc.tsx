@@ -49,7 +49,7 @@ export default function EvaluationHoc() {
 
   if (!isModelLoaded)
     return (
-      <Layout screen="evaluation">
+      <Layout screen="evaluation" hideBanner>
         <View center>
           <ActivityIndicator color={Colors.$textPrimary} size="large" />
           <Spacing y={10} />

@@ -123,7 +123,7 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
   }, [entities[character]?.kanji?.character]);
 
   return (
-    <Layout screen="kanji" withBanner>
+    <Layout screen="kanji">
       <View style={styles.header}>{isDrawMode ? CanvasMode : ViewMode}</View>
       <Spacing y={20} />
       <View style={styles.buttonGroup}>

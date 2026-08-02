@@ -29,7 +29,7 @@ export default function KanjiCategoriesScreen() {
   );
 
   return (
-    <Layout screen="selection" withTabBar withBanner>
+    <Layout screen="selection" withTabBar>
       {selectionMenuButtons.map((button) => (
         <View key={button.textKey}>
           <Spacing y={15} />

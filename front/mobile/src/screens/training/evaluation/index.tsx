@@ -114,7 +114,7 @@ export default function EvaluationScreen() {
   if (isSessionOver) return <EvaluationResult />;
 
   return (
-    <Layout screen="evaluation">
+    <Layout screen="evaluation" hideBanner>
       <View flex height="100%" spread>
         <View centerH>
           <View width="100%">

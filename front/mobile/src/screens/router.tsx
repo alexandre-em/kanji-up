@@ -5,11 +5,9 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors, LoaderScreen } from 'react-native-ui-lib';
 
-import AppBannerAd from '../components/bannerAd';
-import BottomNavBar, { TAB_BAR_TOTAL_HEIGHT } from '../components/bottomNavBar';
+import BottomNavBar from '../components/bottomNavBar';
 import { screenNames } from '../constants/screens';
 import { TAB_VISIBLE_ROUTES } from '../constants/tabs';
 import { useIsNotRegistered } from '../hooks/useIsAlreadyRegistered';
@@ -25,10 +23,6 @@ import EvaluationHoc from './training/evaluation/hoc';
 
 const Stack = createNativeStackNavigator();
 
-// Onboarding (first launch, nothing to monetize yet) and Evaluation (full-screen drawing
-// session) are the only screens that never show the persistent banner
-const BANNER_HIDDEN_ROUTES = [screenNames.ONBOARDING, screenNames.EVALUATION];
-
 const headerOptions = {
   headerShown: true,
   headerStyle: {
@@ -43,7 +37,6 @@ const headerOptions = {
 export default function RootNavigation() {
   const { t } = useTranslation();
   const isNotRegistered = useIsNotRegistered();
-  const insets = useSafeAreaInsets();
   // The tab bar lives outside the navigator, so it reads/drives navigation through the container ref
   const navigationRef = useNavigationContainerRef();
   const [activeRoute, setActiveRoute] = useState<string | undefined>();
@@ -78,14 +71,6 @@ export default function RootNavigation() {
           <Stack.Screen name={screenNames.KANJI} component={KanjiDetail} options={headerOptions} />
           <Stack.Screen name={screenNames.SETTINGS} component={Settings} />
         </Stack.Navigator>
-        {activeRoute && !BANNER_HIDDEN_ROUTES.includes(activeRoute) && (
-          <AppBannerAd
-            style={[
-              styles.banner,
-              { bottom: (TAB_VISIBLE_ROUTES.includes(activeRoute) ? TAB_BAR_TOTAL_HEIGHT : 0) + insets.bottom },
-            ]}
-          />
-        )}
         {activeRoute && TAB_VISIBLE_ROUTES.includes(activeRoute) && (
           <BottomNavBar activeRoute={activeRoute} onTabPress={handleTabPress} />
         )}
@@ -97,11 +82,5 @@ export default function RootNavigation() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  banner: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    alignItems: 'center',
   },
 });

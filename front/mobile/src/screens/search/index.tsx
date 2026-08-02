@@ -1,10 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, StyleSheet, TextInput, TouchableOpacity, View as RNView } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Assets, Colors, Icon, Text, View } from 'react-native-ui-lib';
 
-import { BANNER_AD_HEIGHT } from '../../components/bannerAd';
+import AppBannerAd from '../../components/bannerAd';
 import SearchIcon from '../../components/svg/search';
 import { useAppDispatch, useAppSelector } from '../../hooks/useStore';
 import { useToaster } from '../../providers/toaster';
@@ -29,7 +28,6 @@ export default function Search() {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const toast = useToaster();
-  const insets = useSafeAreaInsets();
 
   const [query, setQuery] = useState('');
   const [activeSegment, setActiveSegment] = useState(KANJI_SEGMENT);
@@ -106,7 +104,7 @@ export default function Search() {
   useEffect(() => () => clearTimeout(debounceRef.current), []);
 
   return (
-    <View style={[styles.container, { paddingBottom: BANNER_AD_HEIGHT + insets.bottom }]}>
+    <View style={styles.container}>
       <RNView style={styles.searchBar}>
         {/* A plain TextInput, not react-native-ui-lib's SearchInput: typing a character into
             *either* one crashes the native bridge on this RN 0.80 New Architecture emulator setup
@@ -147,6 +145,7 @@ export default function Search() {
           );
         })}
       </RNView>
+      <AppBannerAd style={styles.banner} />
       {trimmedQuery === '' ? (
         <RNView style={styles.body}>
           <Text text80M $textGeneral center>
@@ -220,6 +219,10 @@ const styles = StyleSheet.create({
     gap: 4,
     backgroundColor: Colors.$backgroundNeutralMedium,
     borderRadius: 25,
+  },
+  banner: {
+    alignItems: 'center',
+    marginTop: 16,
   },
   segment: {
     flex: 1,
