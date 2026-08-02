@@ -55,6 +55,58 @@ export const selectionMenuButtons: SelectionButtonsType[] = [
   },
 ];
 
+export const schoolDifficulties = [
+  {
+    textKey: 'difficulties.grade.level1.title',
+    subtitle: `difficulties.jlpt.unit`,
+    screen: '1',
+    count: 80,
+    image: <Card.Image source={Assets.banners.school} style={styles.smallBannerImage} />,
+  },
+  {
+    textKey: 'difficulties.grade.level2.title',
+    subtitle: `difficulties.jlpt.unit`,
+    screen: '2',
+    count: 160,
+    image: <Card.Image source={Assets.banners.school} style={styles.smallBannerImage} />,
+  },
+  {
+    textKey: 'difficulties.grade.level3.title',
+    subtitle: `difficulties.jlpt.unit`,
+    screen: '3',
+    count: 200,
+    image: <Card.Image source={Assets.banners.school} style={styles.smallBannerImage} />,
+  },
+  {
+    textKey: 'difficulties.grade.level4.title',
+    subtitle: `difficulties.jlpt.unit`,
+    screen: '4',
+    count: 200,
+    image: <Card.Image source={Assets.banners.school} style={styles.smallBannerImage} />,
+  },
+  {
+    textKey: 'difficulties.grade.level5.title',
+    subtitle: `difficulties.jlpt.unit`,
+    screen: '5',
+    count: 185,
+    image: <Card.Image source={Assets.banners.school} style={styles.smallBannerImage} />,
+  },
+  {
+    textKey: 'difficulties.grade.level6.title',
+    subtitle: `difficulties.jlpt.unit`,
+    screen: '6',
+    count: 181,
+    image: <Card.Image source={Assets.banners.school} style={styles.smallBannerImage} />,
+  },
+  {
+    textKey: 'difficulties.grade.juniorHigh.title',
+    subtitle: `difficulties.jlpt.unit`,
+    screen: '8',
+    count: 1130,
+    image: <Card.Image source={Assets.banners.school} style={styles.smallBannerImage} />,
+  },
+];
+
 export const jlptDifficulties = [
   {
     textKey: 'difficulties.jlpt.level5.title',

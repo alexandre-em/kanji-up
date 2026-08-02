@@ -86,8 +86,15 @@
   "difficulties.jlpt.level1.title": "JLPT N1",
   "difficulties.jlpt.unit": "characters",
 
-  "difficulties.school.title": "School grades",
-  "difficulties.school.subtitle": "School grade order helps you level up naturally, but you can grab any kanji and start your adventure!",
+  "difficulties.grade.title": "School grades",
+  "difficulties.grade.subtitle": "School grade order helps you level up naturally, but you can grab any kanji and start your adventure!",
+  "difficulties.grade.level1.title": "Grade 1",
+  "difficulties.grade.level2.title": "Grade 2",
+  "difficulties.grade.level3.title": "Grade 3",
+  "difficulties.grade.level4.title": "Grade 4",
+  "difficulties.grade.level5.title": "Grade 5",
+  "difficulties.grade.level6.title": "Grade 6",
+  "difficulties.grade.juniorHigh.title": "Junior High",
 
   "kanjiList.title": "Kanji List",
   "kanjiList.subtitle": "Tap a kanji to select or unselect it, then press Save to confirm. Long-press any kanji to view its details",
