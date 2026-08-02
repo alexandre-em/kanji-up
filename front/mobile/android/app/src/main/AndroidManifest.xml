@@ -1,4 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -10,9 +10,13 @@
       android:allowBackup="false"
       android:theme="@style/AppTheme"
       android:supportsRtl="true">
+      <!-- react-native-google-mobile-ads' own AndroidManifest.xml declares this same meta-data,
+           resolved from app.json's android_app_id (unset, so it resolves empty) — this project
+           configures it via .env/build.gradle instead, so this value must win the merge -->
       <meta-data
         android:name="com.google.android.gms.ads.APPLICATION_ID"
-        android:value="${admobAppId}" />
+        android:value="${admobAppId}"
+        tools:replace="android:value" />
       <activity
         android:name=".MainActivity"
         android:label="@string/app_name"
