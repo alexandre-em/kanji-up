@@ -79,7 +79,7 @@ const KanjiCardElement = ({ kanji, onPress, isLocked }: KanjiCardElementProps) =
   }, [kanji.kanji_id, entities, toAdd, toRemove]);
 
   return (
-    <Card style={styles.cardContainer} width={CARD_SIZE} height={CARD_SIZE} onPress={onPress}>
+    <Card style={[styles.cardContainer, isLocked && styles.cardLocked]} width={CARD_SIZE} height={CARD_SIZE} onPress={onPress}>
       {isBadgeVisible && !isLocked && (
         <Badge
           icon={label}
@@ -310,6 +310,9 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.$backgroundNeutralMedium,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  cardLocked: {
+    opacity: 0.5,
   },
   loader: {
     display: 'flex',
