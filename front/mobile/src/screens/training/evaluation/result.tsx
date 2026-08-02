@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Assets, Button, Colors, Icon, Text, View } from 'react-native-ui-lib';
 
 import { screenNames } from '../../../constants/screens';
+import { useEvaluationInterstitialAd } from '../../../hooks/useEvaluationInterstitialAd';
 import { useAppDispatch, useAppSelector } from '../../../hooks/useStore';
 import { useToaster } from '../../../providers/toaster';
 import {
@@ -113,6 +114,7 @@ export default function EvaluationResult() {
   const items = useAppSelector(selectEvaluationItems);
   const correctCount = useAppSelector(selectCorrectCount);
   const pendingReviewCount = useAppSelector(selectPendingReviewCount);
+  const showInterstitialAd = useEvaluationInterstitialAd();
 
   // Index into `items` of the answer currently shown in the review modal, null when closed
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
@@ -161,11 +163,14 @@ export default function EvaluationResult() {
       dispatch(resetEvaluation());
       navigation.navigate(screenNames.HOME);
       toast?.show({ message: t('evaluationResult.toast.success'), type: 'success' });
+      // Natural break point: the session is over and results are saved, so an interstitial here
+      // (a no-op for premium/adsDeactivated users) doesn't interrupt anything mid-task
+      showInterstitialAd();
     } else {
       // Left on this screen with the button re-enabled: nothing is lost, they can just retry
       toast?.show({ message: t('evaluationResult.toast.error'), type: 'failure' });
     }
-  }, [items, dispatch, navigation, toast, t]);
+  }, [items, dispatch, navigation, toast, t, showInterstitialAd]);
 
   const buttonLabel = useMemo(
     () =>
