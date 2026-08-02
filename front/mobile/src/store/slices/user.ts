@@ -70,6 +70,7 @@ export const user = createSlice({
         state.providerId = action.payload.providerId;
         state.subscribedAt = action.payload.subscribedAt;
         state.subscribedUntil = action.payload.subscribedUntil;
+        state.credits = action.payload.credits;
       })
       .addCase(getUser.rejected, (state) => {
         state.getUserStatus = 'failed';
