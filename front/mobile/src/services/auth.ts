@@ -29,4 +29,10 @@ export default class AuthService {
 
     return this._instance?.patch(`/link/${payload.macAddress}`, payload, options as AxiosRequestConfig);
   }
+
+  earnCredits(macAddress: string, options?: AxiosRequestConfig) {
+    if (!this._instance) throw new Error('Auth instance not ready...');
+
+    return this._instance?.patch(`/${macAddress}/credits/earn`, undefined, options as AxiosRequestConfig);
+  }
 }

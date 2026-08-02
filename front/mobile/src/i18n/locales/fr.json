@@ -46,6 +46,8 @@
   "home.evaluation.emptySelection.message": "Choisis les kanji que tu veux pratiquer avant de commencer une évaluation.",
   "home.evaluation.emptySelection.confirm": "Choisir des kanji",
   "home.evaluation.emptySelection.cancel": "Annuler",
+  "home.menu.ad.reward.toast": "Credits gagnés, merci d'avoir regardé !",
+  "home.menu.ad.error.toast": "Pub indisponible pour le moment, réessaie plus tard",
 
   "search.segment.kanji": "Kanji",
   "search.segment.word": "Mots",

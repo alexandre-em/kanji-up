@@ -17,6 +17,8 @@ import SearchIcon from '../../components/svg/search';
 import { homeMenuButtons } from '../../constants/homeButtons';
 import { screenNames } from '../../constants/screens';
 import { GENERAL_MARGIN } from '../../constants/styles';
+import { useRewardedCreditsAd } from '../../hooks/useRewardedCreditsAd';
+import { useToaster } from '../../providers/toaster';
 import { selectSelectedKanji } from '../../store/slices/selectedKanji';
 import { selectUserName, selectUserPicture, selectUserState } from '../../store/slices/user';
 
@@ -26,12 +28,19 @@ const { Dialog } = Incubator;
 export default function Home() {
   const { t } = useTranslation();
   const navigation = useNavigation();
+  const toast = useToaster();
   const userName = useSelector(selectUserName);
   const userPicture = useSelector(selectUserPicture);
   const userState = useSelector(selectUserState);
   const selectedKanjiState = useSelector(selectSelectedKanji);
+  const rewardedAd = useRewardedCreditsAd();
 
   const [isEmptySelectionVisible, setEmptySelectionVisible] = useState(false);
+
+  const handleWatchAd = useCallback(() => {
+    if (rewardedAd.isReady) rewardedAd.show();
+    else toast?.show({ message: t('home.menu.ad.error.toast'), type: 'failure' });
+  }, [rewardedAd, toast, t]);
 
   const handleRediction = useCallback(
     (screen: string) => {
@@ -156,10 +165,10 @@ export default function Home() {
         ))}
       </View>
 
-      {userState.subscriptionPlan === 'free' && (
+      {userState.subscriptionPlan === 'free' && !userState.adsDeactivated && (
         <>
           <Spacing y={GENERAL_MARGIN} />
-          <Card height={115} width={width - GENERAL_MARGIN * 2} style={styles.card}>
+          <Card height={115} width={width - GENERAL_MARGIN * 2} style={styles.card} onPress={handleWatchAd}>
             <Icon source={Assets.icons.video} size={36} tintColor={Colors.$textPrimary} />
             <Card.Section
               flex

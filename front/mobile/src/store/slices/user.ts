@@ -47,6 +47,14 @@ export const linkUserToProvider = createAsyncThunk<void, Pick<UserType, 'email' 
   },
 );
 
+export const earnCredits = createAsyncThunk<{ creditsEarned: number }, { macAddress: string }>(
+  'user/earnCredits',
+  async ({ macAddress }) => {
+    const response = await core.authService!.earnCredits(macAddress);
+    return response!.data;
+  },
+);
+
 export const user = createSlice({
   name: 'user',
   initialState,
@@ -83,6 +91,9 @@ export const user = createSlice({
       })
       .addCase(createUser.rejected, (state) => {
         state.createUserStatus = 'failed';
+      })
+      .addCase(earnCredits.fulfilled, (state, action) => {
+        state.credits += action.payload.creditsEarned;
       });
   },
 });
