@@ -1,20 +1,21 @@
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dimensions, ScrollView, StyleSheet } from 'react-native';
 import { ActionSheet, Assets, Button, Colors, ExpandableSection, Icon, View } from 'react-native-ui-lib';
-import { useAppDispatch, useAppSelector } from '../../../../../hooks/useStore.tsx';
-import Layout from '../../../../../components/layout.tsx';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { getOne, selectEntities } from '../../../../../store/slices/kanji.ts';
-import { core } from '../../../../../services/http.ts';
-import SvgSilhouette from '../../../../../components/svgSilhouette.tsx';
-import Canvas from '../../../../../components/canvas.tsx';
-import AnimatedSvgRenderer from '../../../../../components/AnimatedSvgRenderer';
-import Spacing from '../../../../../components/spacing.tsx';
-import { save, selectedKanji, selectSaveStatus, selectSelectedKanji } from '../../../../../store/slices/selectedKanji.ts';
-import { useToaster } from '../../../../../providers/toaster.tsx';
 import Card from 'react-native-ui-lib/card';
 import Text from 'react-native-ui-lib/text';
+
+import AnimatedSvgRenderer from '../../../../../components/AnimatedSvgRenderer';
+import Canvas from '../../../../../components/canvas.tsx';
+import Layout from '../../../../../components/layout.tsx';
+import Spacing from '../../../../../components/spacing.tsx';
+import SvgSilhouette from '../../../../../components/svgSilhouette.tsx';
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from '../../../../../constants/styles.ts';
+import { useAppDispatch, useAppSelector } from '../../../../../hooks/useStore.tsx';
+import { useToaster } from '../../../../../providers/toaster.tsx';
+import { core } from '../../../../../services/http.ts';
+import { getOne, selectEntities } from '../../../../../store/slices/kanji.ts';
+import { save, selectedKanji, selectSaveStatus, selectSelectedKanji } from '../../../../../store/slices/selectedKanji.ts';
 
 type KanjiDetailsProps = RouteParamsProps<{
   character: string;
@@ -122,7 +123,7 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
   }, [entities[character]?.kanji?.character]);
 
   return (
-    <Layout screen="kanji">
+    <Layout screen="kanji" withBanner>
       <View style={styles.header}>{isDrawMode ? CanvasMode : ViewMode}</View>
       <Spacing y={20} />
       <View style={styles.buttonGroup}>

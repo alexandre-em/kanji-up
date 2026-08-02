@@ -32,7 +32,7 @@ export default function KanjiDifficulties({ route }: KanjiDifficultiesProps) {
   );
 
   return (
-    <Layout screen={`difficulties.${category}`}>
+    <Layout screen={`difficulties.${category}`} withBanner>
       <Spacing y={10} />
       {jlptDifficulties.map((button) => (
         <View key={button.textKey}>

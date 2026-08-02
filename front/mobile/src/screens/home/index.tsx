@@ -66,7 +66,7 @@ export default function Home() {
   }, [handleRediction]);
 
   return (
-    <Layout withTabBar>
+    <Layout withTabBar withBanner>
       <View style={styles.flex} marginB-15>
         <View style={styles.flex}>
           <Avatar

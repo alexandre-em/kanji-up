@@ -7,11 +7,13 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Assets, Badge, Button, Card, Colors, Text, View } from 'react-native-ui-lib';
 import { useSelector } from 'react-redux';
 
+import { BANNER_AD_HEIGHT } from '../../../../components/bannerAd';
 import { TAB_BAR_TOTAL_HEIGHT } from '../../../../components/bottomNavBar';
 import Layout from '../../../../components/layout';
 import Spacing from '../../../../components/spacing';
 import { screenNames } from '../../../../constants/screens';
 import { useAppDispatch, useAppSelector } from '../../../../hooks/useStore';
+import { useToaster } from '../../../../providers/toaster.tsx';
 import { getAll, selectGetAllStatus, selectLastGet } from '../../../../store/slices/kanji';
 import { selectGetAllResult } from '../../../../store/slices/kanji';
 import {
@@ -22,7 +24,6 @@ import {
   selectSaveStatus,
   selectSelectedKanji,
 } from '../../../../store/slices/selectedKanji';
-import { useToaster } from '../../../../providers/toaster.tsx';
 
 type KanjiListProps = RouteParamsProps<{
   difficulty: string;
@@ -198,7 +199,7 @@ export default function KanjiList(props: KanjiListProps) {
         onEndReachedThreshold={0.15}
         // FlashList scrolls itself, so Layout's own bottom clearance (built for its outer
         // ScrollView) never reaches it: the floating tab bar would sit on top of the last row
-        contentContainerStyle={{ paddingBottom: TAB_BAR_TOTAL_HEIGHT + insets.bottom }}
+        contentContainerStyle={{ paddingBottom: TAB_BAR_TOTAL_HEIGHT + BANNER_AD_HEIGHT + insets.bottom }}
         ListFooterComponent={
           kanjisStatus === 'pending' ? (
             <View style={styles.loader}>

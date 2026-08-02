@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, StyleSheet, TextInput, TouchableOpacity, View as RNView } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Assets, Colors, Icon, Text, View } from 'react-native-ui-lib';
 
+import { BANNER_AD_HEIGHT } from '../../components/bannerAd';
 import SearchIcon from '../../components/svg/search';
 import { useAppDispatch, useAppSelector } from '../../hooks/useStore';
 import { useToaster } from '../../providers/toaster';
@@ -27,6 +29,7 @@ export default function Search() {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const toast = useToaster();
+  const insets = useSafeAreaInsets();
 
   const [query, setQuery] = useState('');
   const [activeSegment, setActiveSegment] = useState(KANJI_SEGMENT);
@@ -103,7 +106,7 @@ export default function Search() {
   useEffect(() => () => clearTimeout(debounceRef.current), []);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingBottom: BANNER_AD_HEIGHT + insets.bottom }]}>
       <RNView style={styles.searchBar}>
         {/* A plain TextInput, not react-native-ui-lib's SearchInput: typing a character into
             *either* one crashes the native bridge on this RN 0.80 New Architecture emulator setup
