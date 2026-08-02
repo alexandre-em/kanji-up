@@ -136,4 +136,23 @@ export class WordService {
 
     return aggregate.sample(number);
   }
+
+  /**
+   * @description Words practicable with a given set of already-selected kanji characters: every
+   * character in the word's spelling must be one of `characters` (not just an overlap), so the
+   * drawing game never asks for a kanji the user hasn't chosen to learn yet. No cross-service
+   * lookup needed — `word` is already a plain character string, so a character-class regex
+   * ("every char in this word is in this allowed set") does the matching directly in Mongo.
+   */
+  getPracticeWords(characters: string[], number = 10) {
+    if (characters.length === 0) return Promise.resolve([]);
+
+    const allowedCharacterClass = characters.map((char) => char.replace(/[\\\]^-]/g, '\\$&')).join('');
+    const onlyAllowedCharacters = new RegExp(`^[${allowedCharacterClass}]+$`);
+
+    return this.model.aggregate([
+      { $match: { deleted_at: null, word: onlyAllowedCharacters } },
+      { $sample: { size: number } },
+    ]);
+  }
 }

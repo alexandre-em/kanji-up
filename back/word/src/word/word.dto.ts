@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { ArrayNotEmpty, ArrayUnique, IsArray, IsDefined, IsEnum, IsNotEmpty, IsUUID, ValidateNested } from 'class-validator';
+import { ArrayNotEmpty, ArrayUnique, IsArray, IsDefined, IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, IsUUID, Min, ValidateNested } from 'class-validator';
 
 import { SentenceDTO } from '../sentence/sentence.dto';
 import { withBaseResponse } from '../utils';
@@ -61,6 +61,20 @@ export class WordDTO {
 export class PaginateWordDTO extends withBaseResponse(WordShortDTO, {
   description: 'List of returned words',
 }) {}
+
+export class PracticeWordsDto {
+  @IsArray()
+  @ArrayNotEmpty()
+  @IsString({ each: true })
+  @ApiProperty({ description: 'Kanji characters the returned words must be entirely composed of' })
+  characters: string[];
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @ApiProperty({ required: false, default: 10 })
+  number?: number;
+}
 
 export class WordDefinitionDto {
   @IsArray()

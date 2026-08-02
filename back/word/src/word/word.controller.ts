@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Param, ParseIntPipe, ParseUUIDPipe, Patc
 import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiForbiddenResponse, ApiOkResponse, ApiOperation, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 
 import { WordService } from './word.service';
-import { CreateWordDto, UpdateWordUUIDDTO, UpdateWordDefinitionTypeDto, UpdateWordReadingDTO } from './word.dto';
+import { CreateWordDto, PracticeWordsDto, UpdateWordUUIDDTO, UpdateWordDefinitionTypeDto, UpdateWordReadingDTO } from './word.dto';
 import { PaginateWordDTO, WordDTO } from './word.dto';
 import PermissionGuard from '../security/permission.guard';
 import permissions from '../utils/permission.type';
@@ -34,6 +34,17 @@ export class WordController {
   @Get('/random/word')
   getRandom(@Query('number') number: number, @Query('ids') ids?: string) {
     return this.service.getNRandomWord(number, ids?.split(','));
+  }
+
+  @ApiTags('Words')
+  @ApiOperation({
+    summary: 'Get random words entirely composed of the given kanji characters',
+    description: 'POST, not GET: a large selection of kanji characters could otherwise push the request past URL length limits.',
+  })
+  @ApiOkResponse({ description: 'Practicable words', type: WordDTO, isArray: true })
+  @Post('/practice/word')
+  getPracticeWords(@Body() body: PracticeWordsDto) {
+    return this.service.getPracticeWords(body.characters, body.number);
   }
 
   @ApiTags('Words')
