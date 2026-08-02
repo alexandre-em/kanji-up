@@ -85,6 +85,11 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        // Falls back to Google's official Android test App ID so debug/CI builds without a real
+        // ADMOB_APP_ID in .env still build and serve test ads instead of failing at manifest merge
+        manifestPlaceholders = [
+            admobAppId: (project.env.get("ADMOB_APP_ID") ?: "ca-app-pub-3940256099942544~3347511713")
+        ]
     }
     signingConfigs {
         debug {
