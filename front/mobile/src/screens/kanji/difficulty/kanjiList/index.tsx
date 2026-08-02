@@ -11,7 +11,9 @@ import { BANNER_AD_HEIGHT } from '../../../../components/bannerAd';
 import { TAB_BAR_TOTAL_HEIGHT } from '../../../../components/bottomNavBar';
 import Layout from '../../../../components/layout';
 import Spacing from '../../../../components/spacing';
+import Lock from '../../../../components/svg/lock';
 import { screenNames } from '../../../../constants/screens';
+import { BULK_UNLOCK_COST, getTierKey, PER_KANJI_UNLOCK_COST } from '../../../../constants/unlockCosts';
 import { useAppDispatch, useAppSelector } from '../../../../hooks/useStore';
 import { useToaster } from '../../../../providers/toaster.tsx';
 import { getAll, selectGetAllStatus, selectLastGet } from '../../../../store/slices/kanji';
@@ -24,6 +26,8 @@ import {
   selectSaveStatus,
   selectSelectedKanji,
 } from '../../../../store/slices/selectedKanji';
+import { selectUserState, unlockContent } from '../../../../store/slices/user';
+import UnlockModal from './unlockModal';
 
 type KanjiListProps = RouteParamsProps<{
   difficulty: string;
@@ -33,11 +37,12 @@ type KanjiListProps = RouteParamsProps<{
 type KanjiCardElementProps = {
   kanji: Partial<KanjiType>;
   onPress: (kanji: Partial<KanjiType>) => void;
+  isLocked: boolean;
 };
 
 const CARD_SIZE = 50;
 
-const KanjiCardElement = ({ kanji, onPress }: KanjiCardElementProps) => {
+const KanjiCardElement = ({ kanji, onPress, isLocked }: KanjiCardElementProps) => {
   const entities = useSelector(selectSelectedKanji);
   const toAdd = useSelector(selectKanjiToAdd);
   const toRemove = useSelector(selectKanjiToDelete);
@@ -76,7 +81,7 @@ const KanjiCardElement = ({ kanji, onPress }: KanjiCardElementProps) => {
 
   return (
     <Card style={styles.cardContainer} width={CARD_SIZE} height={CARD_SIZE} onPress={onPress}>
-      {isBadgeVisible && (
+      {isBadgeVisible && !isLocked && (
         <Badge
           icon={label}
           iconStyle={{ tintColor: '#fff', width: 15, height: 15 }}
@@ -85,20 +90,29 @@ const KanjiCardElement = ({ kanji, onPress }: KanjiCardElementProps) => {
           backgroundColor={color}
         />
       )}
-
-      <Card.Section
-        content={[{ text: kanji.kanji!.character, text40BL: true, color: Colors.$textDefault }]}
-        contentStyle={styles.cardContent}
-      />
+      {isLocked ? (
+        <View style={styles.lockedContent}>
+          <Lock size={18} color={Colors.$iconNeutral} />
+        </View>
+      ) : (
+        <Card.Section
+          content={[{ text: kanji.kanji!.character, text40BL: true, color: Colors.$textDefault }]}
+          contentStyle={styles.cardContent}
+        />
+      )}
     </Card>
   );
 };
+
+type UnlockTarget = { scope: 'kanji'; kanji: Partial<KanjiType> } | { scope: 'tier' };
 
 export default function KanjiList(props: KanjiListProps) {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const insets = useSafeAreaInsets();
   const [isSelectModeOn, setIsSelectModeOn] = useState(false);
+  const [unlockTarget, setUnlockTarget] = useState<UnlockTarget | null>(null);
+  const [isUnlocking, setIsUnlocking] = useState(false);
   const navigation = useNavigation();
   const last = useAppSelector(selectLastGet);
   const kanjis = useAppSelector(selectGetAllResult);
@@ -109,6 +123,22 @@ export default function KanjiList(props: KanjiListProps) {
   const saveStatus = useSelector(selectSaveStatus);
   const { difficulty, category } = props.route.params;
   const toaster = useToaster();
+  const userState = useAppSelector(selectUserState);
+
+  const tierKey = getTierKey(category, difficulty);
+  const perKanjiCost = PER_KANJI_UNLOCK_COST[tierKey];
+  const bulkCost = BULK_UNLOCK_COST[tierKey];
+  const isPremium = userState.subscriptionPlan === 'premium';
+  const isTierUnlocked = userState.unlockedDifficulties.includes(tierKey);
+  // Only paid tiers (present in the cost table) have anything to unlock — free tiers (JLPT
+  // N5/N4, grade 1-6) never gate a single kanji, perKanjiCost stays undefined for them
+  const isTierPaid = perKanjiCost !== undefined;
+
+  const isKanjiLocked = useCallback(
+    (kanji: Partial<KanjiType>) =>
+      isTierPaid && !isPremium && !isTierUnlocked && !userState.unlockedKanji.includes(kanji.kanji_id!),
+    [isTierPaid, isPremium, isTierUnlocked, userState.unlockedKanji],
+  );
 
   const kanjiList = useMemo(() => {
     const isOnline = true;
@@ -144,10 +174,35 @@ export default function KanjiList(props: KanjiListProps) {
   const handlePress = useCallback(
     (kanji: Partial<KanjiType>) => {
       if (isSelectModeOn) handleSelect(kanji);
+      else if (isKanjiLocked(kanji)) setUnlockTarget({ scope: 'kanji', kanji });
       else handleRedirect(kanji);
     },
-    [isSelectModeOn, handleRedirect, handleSelect],
+    [isSelectModeOn, handleRedirect, handleSelect, isKanjiLocked],
   );
+
+  const handleConfirmUnlock = useCallback(async () => {
+    if (!unlockTarget) return;
+
+    setIsUnlocking(true);
+    const action = await dispatch(
+      unlockTarget.scope === 'kanji'
+        ? unlockContent({
+            macAddress: userState.macAddress,
+            scope: 'kanji',
+            tier: tierKey,
+            kanjiId: unlockTarget.kanji.kanji_id!,
+          })
+        : unlockContent({ macAddress: userState.macAddress, scope: 'tier', tier: tierKey }),
+    );
+    setIsUnlocking(false);
+
+    if (unlockContent.fulfilled.match(action)) {
+      toaster?.show({ message: t('kanjiList.unlock.toast.success'), type: 'success' });
+      setUnlockTarget(null);
+    } else {
+      toaster?.show({ message: t('kanjiList.unlock.toast.error'), type: 'failure' });
+    }
+  }, [unlockTarget, dispatch, userState.macAddress, tierKey, toaster, t]);
 
   const handleSave = useCallback(() => {
     dispatch(save());
@@ -181,20 +236,33 @@ export default function KanjiList(props: KanjiListProps) {
     // withTabBar on Layout would reserve clearance on the outer (inert) ScrollView too, creating
     // a double gap and letting that outer scroll fire the scroll-hide-bar behavior wrongly
     <Layout screen="kanjiList">
-      {!isSelectModeOn ? (
-        <Button label="Select" onPress={() => setIsSelectModeOn(!isSelectModeOn)} size="xSmall" />
-      ) : (
-        <View style={styles.buttonGroup}>
-          <Button label="Save selection" onPress={handleSave} size="xSmall" />
-          <Spacing x={10} />
-          <Button label="Cancel" onPress={handleCancel} size="xSmall" outline />
-        </View>
-      )}
+      <View style={styles.buttonGroup}>
+        {!isSelectModeOn ? (
+          <Button label="Select" onPress={() => setIsSelectModeOn(!isSelectModeOn)} size="xSmall" />
+        ) : (
+          <>
+            <Button label="Save selection" onPress={handleSave} size="xSmall" />
+            <Spacing x={10} />
+            <Button label="Cancel" onPress={handleCancel} size="xSmall" outline />
+          </>
+        )}
+        {isTierPaid && !isPremium && !isTierUnlocked && (
+          <Button
+            label={t('kanjiList.unlock.bulkButton', { cost: bulkCost })}
+            onPress={() => setUnlockTarget({ scope: 'tier' })}
+            size="xSmall"
+            outline
+            style={styles.unlockAllButton}
+          />
+        )}
+      </View>
       <Spacing y={10} />
       <FlashList
         data={kanjiList}
         keyExtractor={(item) => item.kanji_id!}
-        renderItem={({ item }) => <KanjiCardElement kanji={item} onPress={() => handlePress(item)} />}
+        renderItem={({ item }) => (
+          <KanjiCardElement kanji={item} onPress={() => handlePress(item)} isLocked={isKanjiLocked(item)} />
+        )}
         onEndReached={handleEndReached}
         onEndReachedThreshold={0.15}
         // FlashList scrolls itself, so Layout's own bottom clearance (built for its outer
@@ -210,6 +278,15 @@ export default function KanjiList(props: KanjiListProps) {
           ) : null
         }
         numColumns={5}
+      />
+      <UnlockModal
+        visible={unlockTarget !== null}
+        label={unlockTarget?.scope === 'kanji' ? t('kanjiList.unlock.single.label') : t('kanjiList.unlock.bulk.label')}
+        cost={(unlockTarget?.scope === 'kanji' ? perKanjiCost : bulkCost) ?? 0}
+        credits={userState.credits}
+        isUnlocking={isUnlocking}
+        onConfirm={handleConfirmUnlock}
+        onClose={() => setUnlockTarget(null)}
       />
     </Layout>
   );
@@ -228,6 +305,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  lockedContent: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: Colors.$backgroundNeutralMedium,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   loader: {
     display: 'flex',
     flexDirection: 'row',
@@ -239,5 +323,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignItems: 'center',
+  },
+  unlockAllButton: {
+    marginLeft: 10,
   },
 });

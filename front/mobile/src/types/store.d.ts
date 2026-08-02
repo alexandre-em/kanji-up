@@ -52,6 +52,8 @@ type UserState = {
   subscribedAt: Date | null;
   subscribedUntil: Date | null;
   credits: number;
+  unlockedDifficulties: string[];
+  unlockedKanji: string[];
 
   getUserStatus: StatusType;
   createUserStatus: StatusType;

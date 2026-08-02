@@ -97,6 +97,9 @@ type RegisteredUser = {
   credits: number;
   subscribedAt: Date | null;
   subscribedUntil: Date | null;
+  // Bulk tier unlocks ("jlpt:3", "grade:8") and individually unlocked kanji_id
+  unlockedDifficulties: string[];
+  unlockedKanji: string[];
 };
 
 type UserType = UnregisteredUser & RegisteredUser;

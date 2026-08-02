@@ -79,5 +79,17 @@
   "difficulties.grade.level4.title": "Primaire 4",
   "difficulties.grade.level5.title": "Primaire 5",
   "difficulties.grade.level6.title": "Primaire 6",
-  "difficulties.grade.juniorHigh.title": "Collège"
+  "difficulties.grade.juniorHigh.title": "Collège",
+  "kanjiList.unlock.bulkButton": "Tout débloquer ({{cost}})",
+  "kanjiList.unlock.single.label": "ce kanji",
+  "kanjiList.unlock.bulk.label": "tout ce niveau",
+  "kanjiList.unlock.title": "Débloquer {{label}}",
+  "kanjiList.unlock.cost": "{{cost}} credits",
+  "kanjiList.unlock.balance": "Tu as {{credits}} credits",
+  "kanjiList.unlock.confirm": "Débloquer",
+  "kanjiList.unlock.cancel": "Annuler",
+  "kanjiList.unlock.insufficient": "Il te manque {{missing}} credits",
+  "kanjiList.unlock.earnCredits": "Gagner des credits",
+  "kanjiList.unlock.toast.success": "Débloqué !",
+  "kanjiList.unlock.toast.error": "Échec du déblocage, réessaie"
 }

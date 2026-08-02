@@ -98,6 +98,18 @@
 
   "kanjiList.title": "Kanji List",
   "kanjiList.subtitle": "Tap a kanji to select or unselect it, then press Save to confirm. Long-press any kanji to view its details",
+  "kanjiList.unlock.bulkButton": "Unlock all ({{cost}})",
+  "kanjiList.unlock.single.label": "this kanji",
+  "kanjiList.unlock.bulk.label": "this whole level",
+  "kanjiList.unlock.title": "Unlock {{label}}",
+  "kanjiList.unlock.cost": "{{cost}} credits",
+  "kanjiList.unlock.balance": "You have {{credits}} credits",
+  "kanjiList.unlock.confirm": "Unlock",
+  "kanjiList.unlock.cancel": "Cancel",
+  "kanjiList.unlock.insufficient": "You need {{missing}} more credits",
+  "kanjiList.unlock.earnCredits": "Earn credits",
+  "kanjiList.unlock.toast.success": "Unlocked!",
+  "kanjiList.unlock.toast.error": "Couldn't unlock, try again",
 
   "kanjiDetails.viewMode.button": "Animation mode",
   "kanjiDetails.drawMode.button": "Practice mode",

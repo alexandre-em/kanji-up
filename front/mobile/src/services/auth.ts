@@ -35,4 +35,14 @@ export default class AuthService {
 
     return this._instance?.patch(`/${macAddress}/credits/earn`, undefined, options as AxiosRequestConfig);
   }
+
+  unlockContent(
+    macAddress: string,
+    payload: { scope: 'kanji' | 'tier'; tier: string; kanjiId?: string },
+    options?: AxiosRequestConfig,
+  ) {
+    if (!this._instance) throw new Error('Auth instance not ready...');
+
+    return this._instance?.patch(`/${macAddress}/unlock`, payload, options as AxiosRequestConfig);
+  }
 }

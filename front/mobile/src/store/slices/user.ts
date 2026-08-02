@@ -18,6 +18,8 @@ const initialState: UserState = {
   subscribedAt: null,
   subscribedUntil: null,
   credits: 0,
+  unlockedDifficulties: [],
+  unlockedKanji: [],
 
   getUserStatus: 'idle',
   createUserStatus: 'idle',
@@ -55,6 +57,21 @@ export const earnCredits = createAsyncThunk<{ creditsEarned: number }, { macAddr
   },
 );
 
+type UnlockContentInput = {
+  macAddress: string;
+  scope: 'kanji' | 'tier';
+  tier: string;
+  kanjiId?: string;
+};
+
+export const unlockContent = createAsyncThunk<{ creditsSpent: number }, UnlockContentInput>(
+  'user/unlockContent',
+  async ({ macAddress, scope, tier, kanjiId }) => {
+    const response = await core.authService!.unlockContent(macAddress, { scope, tier, kanjiId });
+    return response!.data;
+  },
+);
+
 export const user = createSlice({
   name: 'user',
   initialState,
@@ -79,6 +96,8 @@ export const user = createSlice({
         state.subscribedAt = action.payload.subscribedAt;
         state.subscribedUntil = action.payload.subscribedUntil;
         state.credits = action.payload.credits;
+        state.unlockedDifficulties = action.payload.unlockedDifficulties;
+        state.unlockedKanji = action.payload.unlockedKanji;
       })
       .addCase(getUser.rejected, (state) => {
         state.getUserStatus = 'failed';
@@ -94,6 +113,12 @@ export const user = createSlice({
       })
       .addCase(earnCredits.fulfilled, (state, action) => {
         state.credits += action.payload.creditsEarned;
+      })
+      .addCase(unlockContent.fulfilled, (state, action) => {
+        state.credits -= action.payload.creditsSpent;
+        const { scope, tier, kanjiId } = action.meta.arg;
+        if (scope === 'kanji') state.unlockedKanji.push(kanjiId!);
+        else state.unlockedDifficulties.push(tier);
       });
   },
 });
