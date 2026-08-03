@@ -11,6 +11,7 @@ import { useAppDispatch, useAppSelector } from '../../../hooks/useStore';
 import { useToaster } from '../../../providers/toaster';
 import { core } from '../../../services/http';
 import {
+  buildKanjiResults,
   clearLocalSession,
   confirmItem,
   EvaluationItemType,
@@ -157,9 +158,7 @@ export default function EvaluationResult() {
 
   const handleValidate = useCallback(async () => {
     // One entry per tested kanji: a kanji drawn twice in the session counts as two attempts
-    const results = items
-      .filter((item): item is typeof item & { kanji: { kanji_id: string } } => !!item.kanji.kanji_id)
-      .map((item) => ({ kanjiId: item.kanji.kanji_id, isCorrect: getEffectiveStatus(item) === 'correct' }));
+    const results = buildKanjiResults(items);
 
     setIsSaving(true);
     const action = await dispatch(recordResults(results));

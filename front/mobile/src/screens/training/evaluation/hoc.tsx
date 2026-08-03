@@ -11,14 +11,18 @@ import { useToaster } from '../../../providers/toaster';
 import { fileNames, fileServiceInstance } from '../../../services/file';
 import { core } from '../../../services/http';
 import {
+  buildKanjiResults,
   checkActiveSession,
+  clearLocalSession,
   EvaluationItemType,
+  getEffectiveStatus,
   hydrateItems,
   PendingLocalSession,
   selectEvaluationItems,
   selectEvaluationStatus,
   startFreshSession,
 } from '../../../store/slices/evaluation';
+import { recordResults } from '../../../store/slices/progression';
 import { selectSelectedKanji } from '../../../store/slices/selectedKanji';
 import EvaluationScreen from '.';
 
@@ -30,6 +34,7 @@ export default function EvaluationHoc() {
   const kanjis = useAppSelector(selectSelectedKanji);
   const evaluationItems = useAppSelector(selectEvaluationItems);
   const evaluationStatus = useAppSelector(selectEvaluationStatus);
+  const isPremium = useAppSelector((state) => state.user.subscriptionPlan === 'premium');
   const dispatch = useAppDispatch();
   const [isModelLoaded, setModelLoaded] = useState(false);
   const [isChecking, setIsChecking] = useState(true);
@@ -56,44 +61,14 @@ export default function EvaluationHoc() {
       });
   }, [toast]);
 
-  const startSession = useCallback(async () => {
-    setIsChecking(true);
-
-    // A locally suspended run always wins: it survives regardless of connectivity, and starting
-    // another one on top of it would abandon progress the server may not even know about yet
-    const localPending: PendingLocalSession | null = await fileServiceInstance.read(fileNames.PENDING_KANJI_SESSION);
-    if (localPending && localPending.items.length > 0) {
-      setPendingResume({ source: 'local', session: localPending });
-      setIsChecking(false);
-      return;
+  // Resolves a pending session (either source) into the same shape hydrateItems expects — the
+  // server one needs a kanji re-fetch by id since the session only stored kanjiId
+  const resolvePendingItems = useCallback(async (pending: PendingResume) => {
+    if (pending.source === 'local') {
+      return { items: pending.session.items, sessionId: pending.session.sessionId };
     }
 
-    const action = await dispatch(checkActiveSession());
-    const session = checkActiveSession.fulfilled.match(action) ? action.payload : null;
-
-    if (session) {
-      setPendingResume({ source: 'server', session });
-    } else {
-      void dispatch(startFreshSession({ kanjis: kanjiQueue() }));
-    }
-    setIsChecking(false);
-  }, [dispatch, kanjiQueue]);
-
-  useEffect(() => {
-    void startSession();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const handleResume = useCallback(async () => {
-    if (!pendingResume) return;
-
-    if (pendingResume.source === 'local') {
-      dispatch(hydrateItems(pendingResume.session));
-      setPendingResume(null);
-      return;
-    }
-
-    const session = pendingResume.session;
+    const session = pending.session;
     const kanjiResults = await Promise.all(
       session.questions.map((question) => core.kanjiService!.getOne({ id: (question as KanjiSessionQuestion).kanjiId })),
     );
@@ -109,9 +84,76 @@ export default function EvaluationHoc() {
         userConfirmation: question.userConfirmation,
       };
     });
-    dispatch(hydrateItems({ items, currentIndex: session.currentIndex, sessionId: session.sessionId }));
+
+    return { items, sessionId: session.sessionId };
+  }, []);
+
+  // Free plan: no continuation across interruptions. Whatever was already answered still counts
+  // (kanji progress + a closed-out session for history), the rest is simply dropped.
+  const finalizeAsIncomplete = useCallback(
+    async (pending: PendingResume) => {
+      try {
+        const { items, sessionId } = await resolvePendingItems(pending);
+        const answered = items.filter((item) => item.status !== 'idle');
+
+        if (answered.length > 0) {
+          await dispatch(recordResults(buildKanjiResults(answered)));
+
+          if (sessionId) {
+            const correctCount = answered.filter((item) => getEffectiveStatus(item) === 'correct').length;
+            core.sessionsService!.finish(sessionId, correctCount).catch(() => undefined);
+          }
+        }
+      } catch {
+        // Best-effort: even if the partial save fails, the pending run is still discarded below
+      } finally {
+        await clearLocalSession();
+      }
+    },
+    [dispatch, resolvePendingItems],
+  );
+
+  const startSession = useCallback(async () => {
+    setIsChecking(true);
+
+    // A locally suspended run always wins: it survives regardless of connectivity, and starting
+    // another one on top of it would abandon progress the server may not even know about yet
+    const localPending: PendingLocalSession | null = await fileServiceInstance.read(fileNames.PENDING_KANJI_SESSION);
+    let pending: PendingResume | null =
+      localPending && localPending.items.length > 0 ? { source: 'local', session: localPending } : null;
+
+    if (!pending) {
+      const action = await dispatch(checkActiveSession());
+      const session = checkActiveSession.fulfilled.match(action) ? action.payload : null;
+      if (session) pending = { source: 'server', session };
+    }
+
+    if (pending) {
+      if (isPremium) {
+        setPendingResume(pending);
+        setIsChecking(false);
+        return;
+      }
+
+      await finalizeAsIncomplete(pending);
+    }
+
+    void dispatch(startFreshSession({ kanjis: kanjiQueue() }));
+    setIsChecking(false);
+  }, [dispatch, kanjiQueue, isPremium, finalizeAsIncomplete]);
+
+  useEffect(() => {
+    void startSession();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleResume = useCallback(async () => {
+    if (!pendingResume) return;
+
+    const { items, sessionId } = await resolvePendingItems(pendingResume);
+    dispatch(hydrateItems({ items, currentIndex: pendingResume.session.currentIndex, sessionId }));
     setPendingResume(null);
-  }, [pendingResume, dispatch]);
+  }, [pendingResume, dispatch, resolvePendingItems]);
 
   const handleStartOver = useCallback(() => {
     const abandonSessionId = pendingResume?.session.sessionId ?? undefined;

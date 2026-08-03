@@ -45,6 +45,13 @@ export function getEffectiveStatus(item: EvaluationItemType): AnswerStatusType {
   return item.userConfirmation ? 'correct' : 'incorrect';
 }
 
+/** One entry per tested kanji, correct meaning the user's final effective verdict, model or self-confirmed */
+export function buildKanjiResults(items: EvaluationItemType[]) {
+  return items
+    .filter((item): item is EvaluationItemType & { kanji: { kanji_id: string } } => !!item.kanji.kanji_id)
+    .map((item) => ({ kanjiId: item.kanji.kanji_id, isCorrect: getEffectiveStatus(item) === 'correct' }));
+}
+
 export function toKanjiQuestion(item: EvaluationItemType): KanjiSessionQuestion {
   return {
     kanjiId: item.kanji.kanji_id ?? '',
