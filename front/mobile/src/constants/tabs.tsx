@@ -28,7 +28,7 @@ export const tabs: TabType[] = [
     icon: ({ size, color }) => <Icon source={Assets.icons.selection} size={size} tintColor={color} />,
   },
   {
-    key: screenNames.EVALUATION,
+    key: screenNames.TRAINING,
     labelKey: 'tabs.training.label',
     icon: ({ size, color }) => <Icon source={Assets.icons.draw} size={size} tintColor={color} />,
   },
@@ -39,10 +39,10 @@ export const tabs: TabType[] = [
   },
 ];
 
-/**
- * Routes displaying the floating tab bar. Kanji List is a browsing screen (scroll through a grid,
- * tap in and out), not a narrow detail view, so it keeps the bar too. Difficulties and Kanji
- * detail (drawing/practice) stay excluded — genuine full-screen detail views. Evaluation is a tab
- * entry point but hides the bar, since it is a full screen drawing session.
- */
-export const TAB_VISIBLE_ROUTES = [screenNames.HOME, screenNames.CATEGORIES, screenNames.KANJIS, screenNames.SETTINGS];
+export const TAB_VISIBLE_ROUTES = [
+  screenNames.HOME,
+  screenNames.CATEGORIES,
+  screenNames.KANJIS,
+  screenNames.SETTINGS,
+  screenNames.TRAINING,
+];

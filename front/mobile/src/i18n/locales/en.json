@@ -111,6 +111,14 @@
   "kanjiList.unlock.toast.success": "Unlocked!",
   "kanjiList.unlock.toast.error": "Couldn't unlock, try again",
 
+  "training.title": "Training",
+  "training.subtitle": "Choose how you want to practice",
+  "training.menu.kanji.title": "Kanji",
+  "training.menu.kanji.subtitle": "Draw individual kanji from memory",
+  "training.menu.word.title": "Words",
+  "training.menu.word.subtitle": "Draw the kanji that make up a word",
+  "training.comingSoon": "Coming soon",
+
   "kanjiDetails.viewMode.button": "Animation mode",
   "kanjiDetails.drawMode.button": "Practice mode",
   "kanjiDetails.select.button": "Select",

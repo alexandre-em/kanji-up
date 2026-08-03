@@ -91,5 +91,12 @@
   "kanjiList.unlock.insufficient": "Il te manque {{missing}} credits",
   "kanjiList.unlock.earnCredits": "Gagner des credits",
   "kanjiList.unlock.toast.success": "Débloqué !",
-  "kanjiList.unlock.toast.error": "Échec du déblocage, réessaie"
+  "kanjiList.unlock.toast.error": "Échec du déblocage, réessaie",
+  "training.title": "Entraînement",
+  "training.subtitle": "Choisis comment tu veux t'entraîner",
+  "training.menu.kanji.title": "Kanji",
+  "training.menu.kanji.subtitle": "Dessine des kanji individuels de mémoire",
+  "training.menu.word.title": "Mots",
+  "training.menu.word.subtitle": "Dessine les kanji qui composent un mot",
+  "training.comingSoon": "Bientôt disponible"
 }
