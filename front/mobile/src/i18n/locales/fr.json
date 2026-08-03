@@ -39,6 +39,14 @@
   "evaluationResult.review.question": "Ton tracé ressemble-t-il au modèle ?",
   "evaluationResult.review.yes": "Oui, ça correspond",
   "evaluationResult.review.no": "Non",
+  "evaluation.resume.title": "Session en cours",
+  "evaluation.resume.message": "Tu as une session d'entraînement inachevée. Reprendre où tu t'es arrêté ?",
+  "evaluation.resume.resume": "Reprendre",
+  "evaluation.resume.startOver": "Recommencer",
+  "evaluation.error.title": "Impossible de démarrer la session",
+  "evaluation.error.message": "Vérifie ta connexion et réessaie.",
+  "evaluation.error.retry": "Réessayer",
+
   "evaluationResult.toast.success": "Progression enregistrée",
   "evaluationResult.toast.error": "Impossible d'enregistrer ta progression, réessaie",
 

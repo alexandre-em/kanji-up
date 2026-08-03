@@ -149,6 +149,14 @@
   "evaluationResult.review.question": "Does your drawing look like the model?",
   "evaluationResult.review.yes": "Yes, it matches",
   "evaluationResult.review.no": "No",
+  "evaluation.resume.title": "Session in progress",
+  "evaluation.resume.message": "You have an unfinished training session. Resume where you left off?",
+  "evaluation.resume.resume": "Resume",
+  "evaluation.resume.startOver": "Start over",
+  "evaluation.error.title": "Couldn't start the session",
+  "evaluation.error.message": "Check your connection and try again.",
+  "evaluation.error.retry": "Retry",
+
   "evaluationResult.toast.success": "Progress saved",
   "evaluationResult.toast.error": "Could not save your progress, please try again",
 

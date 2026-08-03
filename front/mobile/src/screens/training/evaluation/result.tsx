@@ -9,6 +9,7 @@ import { screenNames } from '../../../constants/screens';
 import { useEvaluationInterstitialAd } from '../../../hooks/useEvaluationInterstitialAd';
 import { useAppDispatch, useAppSelector } from '../../../hooks/useStore';
 import { useToaster } from '../../../providers/toaster';
+import { core } from '../../../services/http';
 import {
   confirmItem,
   EvaluationItemType,
@@ -16,6 +17,7 @@ import {
   reset as resetEvaluation,
   selectCorrectCount,
   selectEvaluationItems,
+  selectEvaluationSessionId,
   selectPendingReviewCount,
 } from '../../../store/slices/evaluation';
 import { recordResults } from '../../../store/slices/progression';
@@ -114,6 +116,7 @@ export default function EvaluationResult() {
   const items = useAppSelector(selectEvaluationItems);
   const correctCount = useAppSelector(selectCorrectCount);
   const pendingReviewCount = useAppSelector(selectPendingReviewCount);
+  const sessionId = useAppSelector(selectEvaluationSessionId);
   const showInterstitialAd = useEvaluationInterstitialAd();
 
   // Index into `items` of the answer currently shown in the review modal, null when closed
@@ -160,6 +163,10 @@ export default function EvaluationResult() {
     setIsSaving(false);
 
     if (recordResults.fulfilled.match(action)) {
+      // Best-effort, same as the per-answer PATCH: a network hiccup here shouldn't block the
+      // user from moving on, the session just stays resumable server-side a bit longer
+      if (sessionId) core.sessionsService!.finish(sessionId, correctCount).catch(() => undefined);
+
       dispatch(resetEvaluation());
       navigation.navigate(screenNames.HOME);
       toast?.show({ message: t('evaluationResult.toast.success'), type: 'success' });
@@ -170,7 +177,7 @@ export default function EvaluationResult() {
       // Left on this screen with the button re-enabled: nothing is lost, they can just retry
       toast?.show({ message: t('evaluationResult.toast.error'), type: 'failure' });
     }
-  }, [items, dispatch, navigation, toast, t, showInterstitialAd]);
+  }, [items, dispatch, navigation, toast, t, showInterstitialAd, sessionId, correctCount]);
 
   const buttonLabel = useMemo(
     () =>

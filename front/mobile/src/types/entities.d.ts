@@ -103,3 +103,35 @@ type RegisteredUser = {
 };
 
 type UserType = UnregisteredUser & RegisteredUser;
+
+type SessionKind = 'kanji' | 'word' | 'other';
+type SessionStatusType = 'in_progress' | 'finished' | 'abandoned';
+type SessionQuestionStatus = 'idle' | 'correct' | 'incorrect' | 'review';
+
+type KanjiSessionQuestion = {
+  kanjiId: string;
+  image: string | null;
+  strokesCount: number;
+  status: SessionQuestionStatus;
+  userConfirmation: boolean | null;
+};
+
+type WordSessionQuestion = {
+  wordId: string;
+  slots: { image: string | null; predictions: PredictionType[]; strokesCount: number }[];
+  status: SessionQuestionStatus;
+  userConfirmation: boolean | null;
+};
+
+type SessionType = {
+  sessionId: string;
+  macAddress: string;
+  type: SessionKind;
+  status: SessionStatusType;
+  questions: (KanjiSessionQuestion | WordSessionQuestion | Record<string, unknown>)[];
+  currentIndex: number;
+  score: number | null;
+
+  createdAt: string;
+  updatedAt: string;
+};

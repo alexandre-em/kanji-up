@@ -1,6 +1,8 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from 'store';
 
+import { core } from '../../services/http';
+
 /** Verdict of the recognition model on a drawing */
 type AnswerStatusType = 'idle' | 'correct' | 'incorrect' | 'review';
 
@@ -22,12 +24,17 @@ type EvaluationState = {
   items: EvaluationItemType[];
   currentIndex: number;
   status: RequestStatusType;
+  /** Session persisted server-side so the run can be resumed after the app is killed */
+  sessionId: string | null;
+  checkActiveSessionStatus: RequestStatusType;
 };
 
 const initialState: EvaluationState = {
   items: [],
   currentIndex: 0,
   status: 'idle',
+  sessionId: null,
+  checkActiveSessionStatus: 'idle',
 };
 
 /** Status actually shown to the user: on a 'review' answer, their own verdict wins */
@@ -37,11 +44,41 @@ export function getEffectiveStatus(item: EvaluationItemType): AnswerStatusType {
   return item.userConfirmation ? 'correct' : 'incorrect';
 }
 
-export const init = createAsyncThunk('evaluation/init', async (payload: { kanjis: Partial<KanjiType>[] }) => {
-  console.log('init');
-  // const response = await core.get('/evaluation/init');
-  return payload.kanjis;
+export const checkActiveSession = createAsyncThunk('evaluation/checkActiveSession', async (_: void, { getState }) => {
+  const macAddress = (getState() as RootState).user.macAddress;
+  // No identity yet (e.g. getUser hasn't resolved): nothing to resume, degrade to local-only
+  if (!macAddress) return null;
+
+  const response = await core.sessionsService!.findActive(macAddress, 'kanji');
+
+  return response.data;
 });
+
+export const startFreshSession = createAsyncThunk(
+  'evaluation/startFreshSession',
+  async (payload: { kanjis: Partial<KanjiType>[]; abandonSessionId?: string }, { getState }) => {
+    const macAddress = (getState() as RootState).user.macAddress;
+    // No identity yet: run the session locally without server persistence rather than blocking
+    // the whole evaluation flow on it — every downstream PATCH/finish already no-ops without a sessionId
+    if (!macAddress) return { session: null, kanjis: payload.kanjis };
+
+    if (payload.abandonSessionId) {
+      await core.sessionsService!.abandon(payload.abandonSessionId).catch(() => undefined);
+    }
+
+    const questions: KanjiSessionQuestion[] = payload.kanjis.map((kanji) => ({
+      kanjiId: kanji.kanji_id ?? '',
+      image: null,
+      strokesCount: 0,
+      status: 'idle',
+      userConfirmation: null,
+    }));
+
+    const response = await core.sessionsService!.create({ macAddress, type: 'kanji', questions });
+
+    return { session: response.data, kanjis: payload.kanjis };
+  },
+);
 
 export const getPendingEvaluation = createAsyncThunk('evaluation/getEvaluation', async () => {
   console.log('getPendingEvaluation');
@@ -64,8 +101,10 @@ export const saveEvaluation = createAsyncThunk('evaluation/saveEvaluation', asyn
 export const updateItemScore = createAsyncThunk(
   'evaluation/updateItem',
   async (payload: { result: PredictionType[]; strokesCount: number; image: string | null }, { getState }) => {
-    const currentIndex = (getState() as RootState).evaluation.currentIndex;
-    const expected = (getState() as RootState).evaluation.items[currentIndex].kanji.kanji;
+    const state = getState() as RootState;
+    const currentIndex = state.evaluation.currentIndex;
+    const currentItem = state.evaluation.items[currentIndex];
+    const expected = currentItem.kanji.kanji;
     const prediction = payload.result.find((item) => item.label === expected?.character);
 
     // No drawing (timed out, hence no image, or an empty canvas) and a wrong stroke count are
@@ -89,8 +128,21 @@ export const updateItemScore = createAsyncThunk(
       image: payload.image,
       strokesCount: payload.strokesCount,
     };
-    console.log('updateItem with image to upload:', { ...body, image: !!body.image });
-    // const response = await core.patch(`/evaluation/${item}`, body);
+
+    // Best-effort: a network hiccup here shouldn't block scoring a drawing the user already made.
+    // Resume just replays from the last question that did make it to the server.
+    if (state.evaluation.sessionId && currentItem.kanji.kanji_id) {
+      core
+        .sessionsService!.updateQuestion(state.evaluation.sessionId, {
+          kanjiId: currentItem.kanji.kanji_id,
+          image: payload.image,
+          strokesCount: payload.strokesCount,
+          status,
+          userConfirmation: null,
+        })
+        .catch(() => undefined);
+    }
+
     return body;
   },
 );
@@ -108,74 +160,107 @@ const evaluationSlice = createSlice({
       item.userConfirmation = action.payload.isCorrect;
     },
     reset: () => initialState,
+    hydrateFromSession: (state, action: PayloadAction<{ session: SessionType; kanjis: Partial<KanjiType>[] }>) => {
+      const { session, kanjis } = action.payload;
+
+      state.items = kanjis.map((kanji, index) => {
+        const question = session.questions[index] as KanjiSessionQuestion | undefined;
+
+        return {
+          kanji,
+          score: null,
+          status: question?.status ?? 'idle',
+          image: question?.image ?? null,
+          strokesCount: question?.strokesCount ?? 0,
+          userConfirmation: question?.userConfirmation ?? null,
+        };
+      });
+      state.currentIndex = session.currentIndex;
+      state.sessionId = session.sessionId;
+      state.status = 'succeeded';
+    },
   },
   extraReducers: (builder) => {
-    builder.addCase(init.pending, (state) => {
-      state.status = 'pending';
-    });
-    builder.addCase(init.fulfilled, (state, action) => {
-      state.items = action.payload.map((kanji) => ({
-        kanji,
-        score: null,
-        status: 'idle' as AnswerStatusType,
-        image: null,
-        strokesCount: 0,
-        userConfirmation: null,
-      }));
-      state.currentIndex = 0;
-      state.status = 'succeeded';
-    });
-    builder.addCase(init.rejected, (state) => {
-      state.status = 'failed';
-      state.currentIndex = 0;
-      state.items = [];
-    });
-    builder.addCase(getPendingEvaluation.pending, (state) => {
-      state.status = 'pending';
-    });
-    builder.addCase(getPendingEvaluation.fulfilled, (state, action) => {
-      state.status = 'succeeded';
-    });
-    builder.addCase(getPendingEvaluation.rejected, (state) => {
-      state.status = 'failed';
-    });
-    builder.addCase(getHistory.pending, (state) => {
-      state.status = 'pending';
-    });
-    builder.addCase(getHistory.fulfilled, (state, action) => {
-      state.status = 'succeeded';
-    });
-    builder.addCase(getHistory.rejected, (state) => {
-      state.status = 'failed';
-    });
-    builder.addCase(saveEvaluation.pending, (state) => {
-      state.status = 'pending';
-    });
-    builder.addCase(saveEvaluation.fulfilled, (state, action) => {
-      state.status = 'succeeded';
-    });
-    builder.addCase(saveEvaluation.rejected, (state) => {
-      state.status = 'failed';
-    });
-    builder.addCase(updateItemScore.pending, (state) => {
-      state.status = 'pending';
-    });
-    builder.addCase(updateItemScore.fulfilled, (state, action) => {
-      state.status = 'succeeded';
-      state.items[state.currentIndex] = { ...state.items[state.currentIndex], ...action.payload };
-      state.currentIndex++;
-    });
-    builder.addCase(updateItemScore.rejected, (state) => {
-      state.status = 'failed';
-    });
+    builder
+      .addCase(checkActiveSession.pending, (state) => {
+        state.checkActiveSessionStatus = 'pending';
+      })
+      .addCase(checkActiveSession.fulfilled, (state) => {
+        state.checkActiveSessionStatus = 'succeeded';
+      })
+      .addCase(checkActiveSession.rejected, (state) => {
+        state.checkActiveSessionStatus = 'failed';
+      })
+      .addCase(startFreshSession.pending, (state) => {
+        state.status = 'pending';
+      })
+      .addCase(startFreshSession.fulfilled, (state, action) => {
+        state.items = action.payload.kanjis.map((kanji) => ({
+          kanji,
+          score: null,
+          status: 'idle' as AnswerStatusType,
+          image: null,
+          strokesCount: 0,
+          userConfirmation: null,
+        }));
+        state.currentIndex = 0;
+        state.sessionId = action.payload.session?.sessionId ?? null;
+        state.status = 'succeeded';
+      })
+      .addCase(startFreshSession.rejected, (state) => {
+        state.status = 'failed';
+        state.currentIndex = 0;
+        state.items = [];
+      })
+      .addCase(getPendingEvaluation.pending, (state) => {
+        state.status = 'pending';
+      })
+      .addCase(getPendingEvaluation.fulfilled, (state) => {
+        state.status = 'succeeded';
+      })
+      .addCase(getPendingEvaluation.rejected, (state) => {
+        state.status = 'failed';
+      })
+      .addCase(getHistory.pending, (state) => {
+        state.status = 'pending';
+      })
+      .addCase(getHistory.fulfilled, (state) => {
+        state.status = 'succeeded';
+      })
+      .addCase(getHistory.rejected, (state) => {
+        state.status = 'failed';
+      })
+      .addCase(saveEvaluation.pending, (state) => {
+        state.status = 'pending';
+      })
+      .addCase(saveEvaluation.fulfilled, (state) => {
+        state.status = 'succeeded';
+      })
+      .addCase(saveEvaluation.rejected, (state) => {
+        state.status = 'failed';
+      })
+      .addCase(updateItemScore.pending, (state) => {
+        state.status = 'pending';
+      })
+      .addCase(updateItemScore.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.items[state.currentIndex] = { ...state.items[state.currentIndex], ...action.payload };
+        state.currentIndex++;
+      })
+      .addCase(updateItemScore.rejected, (state) => {
+        state.status = 'failed';
+      });
   },
 });
 
-export const { confirmItem, reset } = evaluationSlice.actions;
+export const { confirmItem, reset, hydrateFromSession } = evaluationSlice.actions;
 export default evaluationSlice.reducer;
 
 export const selectEvaluationItems = (state: RootState) => state.evaluation.items;
+export const selectEvaluationStatus = (state: RootState) => state.evaluation.status;
 export const selectCurrentIndex = (state: RootState) => state.evaluation.currentIndex;
+export const selectEvaluationSessionId = (state: RootState) => state.evaluation.sessionId;
+export const selectCheckActiveSessionStatus = (state: RootState) => state.evaluation.checkActiveSessionStatus;
 /** Answers still waiting for the user to arbitrate: blocks the result validation */
 export const selectPendingReviewCount = (state: RootState) =>
   state.evaluation.items.filter((item) => item.status === 'review' && item.userConfirmation === null).length;
