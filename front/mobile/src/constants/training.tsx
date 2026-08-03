@@ -23,6 +23,5 @@ export const trainingModes: TrainingModeType[] = [
     subtitle: 'training.menu.word.subtitle',
     screen: screenNames.WORD_EVALUATION,
     icon: <Icon source={Assets.icons.draw} size={36} tintColor={Colors.$textPrimary} />,
-    comingSoon: true,
   },
 ];

@@ -21,6 +21,7 @@ import Search from './search';
 import Settings from './settings';
 import TrainingModes from './training';
 import EvaluationHoc from './training/evaluation/hoc';
+import WordEvaluationHoc from './training/wordEvaluation/hoc';
 
 const Stack = createNativeStackNavigator();
 
@@ -66,6 +67,7 @@ export default function RootNavigation() {
           <Stack.Screen name={screenNames.HOME} component={Home} />
           <Stack.Screen name={screenNames.TRAINING} component={TrainingModes} />
           <Stack.Screen name={screenNames.EVALUATION} component={EvaluationHoc} options={headerOptions} />
+          <Stack.Screen name={screenNames.WORD_EVALUATION} component={WordEvaluationHoc} options={headerOptions} />
           <Stack.Screen name={screenNames.SEARCH} component={Search} />
           <Stack.Screen name={screenNames.CATEGORIES} component={KanjiCategoriesScreen} />
           <Stack.Screen name={screenNames.DIFFICULTIES} component={KanjiDifficulties} />

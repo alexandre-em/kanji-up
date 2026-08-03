@@ -1,0 +1,280 @@
+import { useNavigation } from '@react-navigation/native';
+import { useCallback, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { ScrollView, StyleSheet, TouchableOpacity, View as RNView } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Assets, Button, Colors, Icon, Text, View } from 'react-native-ui-lib';
+
+import { screenNames } from '../../../constants/screens';
+import { useEvaluationInterstitialAd } from '../../../hooks/useEvaluationInterstitialAd';
+import { useAppDispatch, useAppSelector } from '../../../hooks/useStore';
+import { useToaster } from '../../../providers/toaster';
+import { recordResults } from '../../../store/slices/progression';
+import { selectSelectedKanji } from '../../../store/slices/selectedKanji';
+import {
+  confirmItem,
+  getEffectiveStatus,
+  getKanjiCharacters,
+  reset as resetWordEvaluation,
+  selectWordCorrectCount,
+  selectWordEvaluationItems,
+  selectWordPendingReviewCount,
+  WordEvaluationItemType,
+} from '../../../store/slices/wordEvaluation';
+import WordReviewModal from './reviewModal';
+
+function useItemMessage(item: WordEvaluationItemType) {
+  const { t } = useTranslation();
+  const expectedLength = getKanjiCharacters(item.word.word?.[0] ?? '').length;
+
+  if (item.status === 'correct') return t('wordEvaluationResult.status.correct');
+
+  if (item.status === 'incorrect') {
+    if (item.slots.length !== expectedLength) {
+      return t('wordEvaluationResult.status.wrongLength', { expected: expectedLength, actual: item.slots.length });
+    }
+    return t('wordEvaluationResult.status.empty');
+  }
+
+  if (item.userConfirmation === true) return t('wordEvaluationResult.status.confirmedCorrect');
+  if (item.userConfirmation === false) return t('wordEvaluationResult.status.confirmedIncorrect');
+  return t('wordEvaluationResult.status.review');
+}
+
+function StatusIcon({ item }: { item: WordEvaluationItemType }) {
+  const effectiveStatus = getEffectiveStatus(item);
+
+  if (effectiveStatus === 'correct') {
+    return (
+      <RNView style={[styles.statusIcon, { backgroundColor: Colors.$backgroundSuccessLight }]}>
+        <Icon source={Assets.icons.check} size={16} tintColor={Colors.$iconSuccess} />
+      </RNView>
+    );
+  }
+
+  if (effectiveStatus === 'incorrect') {
+    return (
+      <RNView style={[styles.statusIcon, { backgroundColor: Colors.$backgroundPrimaryLight }]}>
+        <Icon source={Assets.icons.cross} size={16} tintColor={Colors.$iconPrimary} />
+      </RNView>
+    );
+  }
+
+  return (
+    <RNView style={[styles.statusIcon, { backgroundColor: Colors.$backgroundWarningLight }]}>
+      <Text text80BO $textWarning>
+        ?
+      </Text>
+    </RNView>
+  );
+}
+
+type ResultItemRowProps = {
+  item: WordEvaluationItemType;
+  onPress?: () => void;
+};
+
+function ResultItemRow({ item, onPress }: ResultItemRowProps) {
+  const message = useItemMessage(item);
+  const wordText = item.word.word?.[0] ?? '';
+  const meaning = item.word.definition?.[0]?.meaning?.join(', ');
+
+  const content = (
+    <>
+      <RNView style={styles.wordBox}>
+        <Text text40BL>{wordText}</Text>
+      </RNView>
+      <RNView style={styles.rowContent}>
+        <RNView style={styles.rowHeader}>
+          <Text text80M $textDefault numberOfLines={1} style={styles.meaning}>
+            {meaning}
+          </Text>
+          <StatusIcon item={item} />
+        </RNView>
+        <Text text90M $textDefault numberOfLines={2}>
+          {message}
+        </Text>
+      </RNView>
+    </>
+  );
+
+  if (!onPress) return <RNView style={styles.row}>{content}</RNView>;
+
+  return (
+    <TouchableOpacity style={styles.row} onPress={onPress} accessibilityRole="button" accessibilityLabel={message}>
+      {content}
+    </TouchableOpacity>
+  );
+}
+
+export default function WordEvaluationResult() {
+  const { t } = useTranslation();
+  const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
+  const dispatch = useAppDispatch();
+  const toast = useToaster();
+  const items = useAppSelector(selectWordEvaluationItems);
+  const correctCount = useAppSelector(selectWordCorrectCount);
+  const pendingReviewCount = useAppSelector(selectWordPendingReviewCount);
+  const selectedKanjiState = useAppSelector(selectSelectedKanji);
+  const showInterstitialAd = useEvaluationInterstitialAd();
+
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const reviewItems = useMemo(() => items.filter((item) => item.status === 'review'), [items]);
+  const activeItem = activeIndex !== null ? items[activeIndex] : undefined;
+  const activePosition = activeItem ? reviewItems.indexOf(activeItem) + 1 : 0;
+
+  const openFirstPending = useCallback(() => {
+    const firstPendingIndex = items.findIndex((item) => item.status === 'review' && item.userConfirmation === null);
+    if (firstPendingIndex !== -1) setActiveIndex(firstPendingIndex);
+  }, [items]);
+
+  const closeReview = useCallback(() => setActiveIndex(null), []);
+
+  const handleChoose = useCallback(
+    (isCorrect: boolean) => {
+      if (activeIndex === null) return;
+
+      dispatch(confirmItem({ index: activeIndex, isCorrect }));
+
+      const nextPendingIndex = items.findIndex(
+        (item, index) => index !== activeIndex && item.status === 'review' && item.userConfirmation === null,
+      );
+      setActiveIndex(nextPendingIndex === -1 ? null : nextPendingIndex);
+    },
+    [activeIndex, dispatch, items],
+  );
+
+  const handleValidate = useCallback(async () => {
+    const kanjiIdByCharacter = new Map(
+      Object.values(selectedKanjiState).map((kanji) => [kanji.kanji?.character, kanji.kanji_id]),
+    );
+
+    const results = items
+      .filter((item) => item.status !== 'idle')
+      .flatMap((item) => {
+        const isCorrect = getEffectiveStatus(item) === 'correct';
+        return getKanjiCharacters(item.word.word?.[0] ?? '')
+          .map((character) => kanjiIdByCharacter.get(character))
+          .filter((kanjiId): kanjiId is string => !!kanjiId)
+          .map((kanjiId) => ({ kanjiId, isCorrect }));
+      });
+
+    setIsSaving(true);
+    const action = await dispatch(recordResults(results));
+    setIsSaving(false);
+
+    if (recordResults.fulfilled.match(action)) {
+      dispatch(resetWordEvaluation());
+      navigation.navigate(screenNames.HOME);
+      toast?.show({ message: t('wordEvaluationResult.toast.success'), type: 'success' });
+      showInterstitialAd();
+    } else {
+      toast?.show({ message: t('wordEvaluationResult.toast.error'), type: 'failure' });
+    }
+  }, [items, selectedKanjiState, dispatch, navigation, toast, t, showInterstitialAd]);
+
+  const buttonLabel = useMemo(
+    () =>
+      pendingReviewCount > 0
+        ? t('wordEvaluationResult.button.review', { count: pendingReviewCount })
+        : t('wordEvaluationResult.button.validate'),
+    [pendingReviewCount, t],
+  );
+
+  return (
+    <View style={styles.container}>
+      <RNView style={styles.summary}>
+        <Text text60BL>{t('wordEvaluationResult.summary.score', { correct: correctCount, total: items.length })}</Text>
+        {pendingReviewCount > 0 && (
+          <Text text90M $textWarning>
+            {t('wordEvaluationResult.summary.pending', { count: pendingReviewCount })}
+          </Text>
+        )}
+      </RNView>
+      <ScrollView style={styles.list} contentContainerStyle={styles.listContent}>
+        {items.map((item, index) => (
+          <ResultItemRow
+            key={`${item.word.word?.[0]}-${index}`}
+            item={item}
+            onPress={item.status === 'review' ? () => setActiveIndex(index) : undefined}
+          />
+        ))}
+      </ScrollView>
+      <RNView style={[styles.stickyBar, { paddingBottom: insets.bottom + 16 }]}>
+        <Button label={buttonLabel} disabled={isSaving} onPress={pendingReviewCount > 0 ? openFirstPending : handleValidate} />
+      </RNView>
+      <WordReviewModal
+        item={activeItem}
+        position={activePosition}
+        total={reviewItems.length}
+        onChoose={handleChoose}
+        onClose={closeReview}
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: Colors.$backgroundDefault,
+  },
+  summary: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 10,
+    gap: 4,
+  },
+  list: {
+    flex: 1,
+  },
+  listContent: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingVertical: 12,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: Colors.$outlineNeutral,
+  },
+  wordBox: {
+    width: 56,
+    height: 56,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.$backgroundNeutralLight,
+  },
+  rowContent: {
+    flex: 1,
+    gap: 2,
+  },
+  rowHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 8,
+  },
+  meaning: {
+    flex: 1,
+  },
+  statusIcon: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  stickyBar: {
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: Colors.$outlineNeutral,
+  },
+});

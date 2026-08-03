@@ -7,7 +7,7 @@ type AnswerStatusType = 'idle' | 'correct' | 'incorrect' | 'review';
 
 export type WordSlotType = {
   image: string | null;
-  predictedCharacter: string | null;
+  predictions: PredictionType[];
   strokesCount: number;
 };
 
@@ -36,6 +36,12 @@ export function getEffectiveStatus(item: WordEvaluationItemType): AnswerStatusTy
   return item.userConfirmation ? 'correct' : 'incorrect';
 }
 
+const KANJI_REGEX = /[一-鿿㐀-䶿]/;
+
+export function getKanjiCharacters(word: string): string[] {
+  return Array.from(word).filter((character) => KANJI_REGEX.test(character));
+}
+
 export const init = createAsyncThunk('wordEvaluation/init', async (payload: { number?: number } | undefined, { getState }) => {
   const selectedKanji = (getState() as RootState).selectedKanji.selectedKanji;
   const characters = Object.values(selectedKanji)
@@ -51,14 +57,16 @@ export const updateItemSlots = createAsyncThunk(
   async (payload: { slots: WordSlotType[] }, { getState }) => {
     const currentIndex = (getState() as RootState).wordEvaluation.currentIndex;
     const expected = (getState() as RootState).wordEvaluation.items[currentIndex].word.word?.[0] ?? '';
-    const expectedCharacters = Array.from(expected);
+    const expectedCharacters = getKanjiCharacters(expected);
 
     let status: AnswerStatusType = 'review';
     const hasEmptySlot = payload.slots.some((slot) => !slot.image || slot.strokesCount === 0);
 
     if (payload.slots.length !== expectedCharacters.length || hasEmptySlot) {
       status = 'incorrect';
-    } else if (payload.slots.every((slot, index) => slot.predictedCharacter === expectedCharacters[index])) {
+    } else if (
+      payload.slots.every((slot, index) => slot.predictions.some((prediction) => prediction.label === expectedCharacters[index]))
+    ) {
       status = 'correct';
     }
 
