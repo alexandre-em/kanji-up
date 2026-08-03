@@ -8,10 +8,13 @@ import Layout from '../../../components/layout';
 import Spacing from '../../../components/spacing';
 import { useAppDispatch, useAppSelector } from '../../../hooks/useStore';
 import { useToaster } from '../../../providers/toaster';
+import { fileNames, fileServiceInstance } from '../../../services/file';
 import { core } from '../../../services/http';
 import {
   checkActiveSession,
-  hydrateFromSession,
+  EvaluationItemType,
+  hydrateItems,
+  PendingLocalSession,
   selectEvaluationItems,
   selectEvaluationStatus,
   startFreshSession,
@@ -21,6 +24,8 @@ import EvaluationScreen from '.';
 
 const numberKanji = 20;
 
+type PendingResume = { source: 'local'; session: PendingLocalSession } | { source: 'server'; session: SessionType };
+
 export default function EvaluationHoc() {
   const kanjis = useAppSelector(selectSelectedKanji);
   const evaluationItems = useAppSelector(selectEvaluationItems);
@@ -28,7 +33,7 @@ export default function EvaluationHoc() {
   const dispatch = useAppDispatch();
   const [isModelLoaded, setModelLoaded] = useState(false);
   const [isChecking, setIsChecking] = useState(true);
-  const [pendingResume, setPendingResume] = useState<SessionType | null>(null);
+  const [pendingResume, setPendingResume] = useState<PendingResume | null>(null);
   const toast = useToaster();
   const { t } = useTranslation();
 
@@ -51,38 +56,66 @@ export default function EvaluationHoc() {
       });
   }, [toast]);
 
-  const startSession = useCallback(() => {
+  const startSession = useCallback(async () => {
     setIsChecking(true);
-    dispatch(checkActiveSession()).then((action) => {
-      const session = checkActiveSession.fulfilled.match(action) ? action.payload : null;
 
-      if (session) {
-        setPendingResume(session);
-      } else {
-        void dispatch(startFreshSession({ kanjis: kanjiQueue() }));
-      }
+    // A locally suspended run always wins: it survives regardless of connectivity, and starting
+    // another one on top of it would abandon progress the server may not even know about yet
+    const localPending: PendingLocalSession | null = await fileServiceInstance.read(fileNames.PENDING_KANJI_SESSION);
+    if (localPending && localPending.items.length > 0) {
+      setPendingResume({ source: 'local', session: localPending });
       setIsChecking(false);
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+      return;
+    }
+
+    const action = await dispatch(checkActiveSession());
+    const session = checkActiveSession.fulfilled.match(action) ? action.payload : null;
+
+    if (session) {
+      setPendingResume({ source: 'server', session });
+    } else {
+      void dispatch(startFreshSession({ kanjis: kanjiQueue() }));
+    }
+    setIsChecking(false);
+  }, [dispatch, kanjiQueue]);
 
   useEffect(() => {
-    startSession();
+    void startSession();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleResume = useCallback(async () => {
     if (!pendingResume) return;
 
+    if (pendingResume.source === 'local') {
+      dispatch(hydrateItems(pendingResume.session));
+      setPendingResume(null);
+      return;
+    }
+
+    const session = pendingResume.session;
     const kanjiResults = await Promise.all(
-      pendingResume.questions.map((question) => core.kanjiService!.getOne({ id: (question as KanjiSessionQuestion).kanjiId })),
+      session.questions.map((question) => core.kanjiService!.getOne({ id: (question as KanjiSessionQuestion).kanjiId })),
     );
-    dispatch(hydrateFromSession({ session: pendingResume, kanjis: kanjiResults.map((result) => result.data) }));
+    const items: EvaluationItemType[] = kanjiResults.map((result, index) => {
+      const question = session.questions[index] as KanjiSessionQuestion;
+
+      return {
+        kanji: result.data,
+        score: null,
+        status: question.status,
+        image: question.image,
+        strokesCount: question.strokesCount,
+        userConfirmation: question.userConfirmation,
+      };
+    });
+    dispatch(hydrateItems({ items, currentIndex: session.currentIndex, sessionId: session.sessionId }));
     setPendingResume(null);
   }, [pendingResume, dispatch]);
 
   const handleStartOver = useCallback(() => {
-    void dispatch(startFreshSession({ kanjis: kanjiQueue(), abandonSessionId: pendingResume?.sessionId }));
+    const abandonSessionId = pendingResume?.session.sessionId ?? undefined;
+    void dispatch(startFreshSession({ kanjis: kanjiQueue(), abandonSessionId }));
     setPendingResume(null);
   }, [dispatch, kanjiQueue, pendingResume]);
 

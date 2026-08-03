@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from 'store';
 
+import { fileNames, fileServiceInstance } from '../../services/file';
 import { core } from '../../services/http';
 
 /** Verdict of the recognition model on a drawing */
@@ -44,6 +45,29 @@ export function getEffectiveStatus(item: EvaluationItemType): AnswerStatusType {
   return item.userConfirmation ? 'correct' : 'incorrect';
 }
 
+export function toKanjiQuestion(item: EvaluationItemType): KanjiSessionQuestion {
+  return {
+    kanjiId: item.kanji.kanji_id ?? '',
+    image: item.image,
+    strokesCount: item.strokesCount,
+    status: item.status,
+    userConfirmation: item.userConfirmation,
+  };
+}
+
+/** Local mirror of the run in progress: the only thing that lets a kanji session resume
+ * without any network access, and what a run started offline is made of until it can sync */
+export type PendingLocalSession = {
+  items: EvaluationItemType[];
+  currentIndex: number;
+  sessionId: string | null;
+};
+
+export const persistLocalSession = (session: PendingLocalSession) =>
+  fileServiceInstance.write(fileNames.PENDING_KANJI_SESSION, session).catch(() => undefined);
+
+export const clearLocalSession = () => fileServiceInstance.remove(fileNames.PENDING_KANJI_SESSION).catch(() => undefined);
+
 export const checkActiveSession = createAsyncThunk('evaluation/checkActiveSession', async (_: void, { getState }) => {
   const macAddress = (getState() as RootState).user.macAddress;
   // No identity yet (e.g. getUser hasn't resolved): nothing to resume, degrade to local-only
@@ -58,25 +82,39 @@ export const startFreshSession = createAsyncThunk(
   'evaluation/startFreshSession',
   async (payload: { kanjis: Partial<KanjiType>[]; abandonSessionId?: string }, { getState }) => {
     const macAddress = (getState() as RootState).user.macAddress;
-    // No identity yet: run the session locally without server persistence rather than blocking
-    // the whole evaluation flow on it — every downstream PATCH/finish already no-ops without a sessionId
-    if (!macAddress) return { session: null, kanjis: payload.kanjis };
+    let sessionId: string | null = null;
 
-    if (payload.abandonSessionId) {
-      await core.sessionsService!.abandon(payload.abandonSessionId).catch(() => undefined);
-    }
-
-    const questions: KanjiSessionQuestion[] = payload.kanjis.map((kanji) => ({
-      kanjiId: kanji.kanji_id ?? '',
+    const items: EvaluationItemType[] = payload.kanjis.map((kanji) => ({
+      kanji,
+      score: null,
+      status: 'idle' as AnswerStatusType,
       image: null,
       strokesCount: 0,
-      status: 'idle',
       userConfirmation: null,
     }));
 
-    const response = await core.sessionsService!.create({ macAddress, type: 'kanji', questions });
+    // Offline, unreachable server, or no identity yet: the run still starts, just local-only —
+    // it becomes a real session later, at finish time, if a connection is available by then
+    if (macAddress) {
+      try {
+        if (payload.abandonSessionId) {
+          await core.sessionsService!.abandon(payload.abandonSessionId).catch(() => undefined);
+        }
 
-    return { session: response.data, kanjis: payload.kanjis };
+        const response = await core.sessionsService!.create({
+          macAddress,
+          type: 'kanji',
+          questions: items.map(toKanjiQuestion),
+        });
+        sessionId = response.data.sessionId;
+      } catch {
+        sessionId = null;
+      }
+    }
+
+    await persistLocalSession({ items, currentIndex: 0, sessionId });
+
+    return { items, sessionId };
   },
 );
 
@@ -130,7 +168,7 @@ export const updateItemScore = createAsyncThunk(
     };
 
     // Best-effort: a network hiccup here shouldn't block scoring a drawing the user already made.
-    // Resume just replays from the last question that did make it to the server.
+    // The local mirror below is what actually guarantees resume, not this.
     if (state.evaluation.sessionId && currentItem.kanji.kanji_id) {
       core
         .sessionsService!.updateQuestion(state.evaluation.sessionId, {
@@ -142,6 +180,10 @@ export const updateItemScore = createAsyncThunk(
         })
         .catch(() => undefined);
     }
+
+    const nextItems = [...state.evaluation.items];
+    nextItems[currentIndex] = { ...currentItem, ...body };
+    await persistLocalSession({ items: nextItems, currentIndex: currentIndex + 1, sessionId: state.evaluation.sessionId });
 
     return body;
   },
@@ -160,23 +202,13 @@ const evaluationSlice = createSlice({
       item.userConfirmation = action.payload.isCorrect;
     },
     reset: () => initialState,
-    hydrateFromSession: (state, action: PayloadAction<{ session: SessionType; kanjis: Partial<KanjiType>[] }>) => {
-      const { session, kanjis } = action.payload;
-
-      state.items = kanjis.map((kanji, index) => {
-        const question = session.questions[index] as KanjiSessionQuestion | undefined;
-
-        return {
-          kanji,
-          score: null,
-          status: question?.status ?? 'idle',
-          image: question?.image ?? null,
-          strokesCount: question?.strokesCount ?? 0,
-          userConfirmation: question?.userConfirmation ?? null,
-        };
-      });
-      state.currentIndex = session.currentIndex;
-      state.sessionId = session.sessionId;
+    hydrateItems: (
+      state,
+      action: PayloadAction<{ items: EvaluationItemType[]; currentIndex: number; sessionId: string | null }>,
+    ) => {
+      state.items = action.payload.items;
+      state.currentIndex = action.payload.currentIndex;
+      state.sessionId = action.payload.sessionId;
       state.status = 'succeeded';
     },
   },
@@ -195,16 +227,9 @@ const evaluationSlice = createSlice({
         state.status = 'pending';
       })
       .addCase(startFreshSession.fulfilled, (state, action) => {
-        state.items = action.payload.kanjis.map((kanji) => ({
-          kanji,
-          score: null,
-          status: 'idle' as AnswerStatusType,
-          image: null,
-          strokesCount: 0,
-          userConfirmation: null,
-        }));
+        state.items = action.payload.items;
         state.currentIndex = 0;
-        state.sessionId = action.payload.session?.sessionId ?? null;
+        state.sessionId = action.payload.sessionId;
         state.status = 'succeeded';
       })
       .addCase(startFreshSession.rejected, (state) => {
@@ -253,7 +278,7 @@ const evaluationSlice = createSlice({
   },
 });
 
-export const { confirmItem, reset, hydrateFromSession } = evaluationSlice.actions;
+export const { confirmItem, reset, hydrateItems } = evaluationSlice.actions;
 export default evaluationSlice.reducer;
 
 export const selectEvaluationItems = (state: RootState) => state.evaluation.items;

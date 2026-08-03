@@ -4,6 +4,7 @@ export const fileNames = {
   SELECTED_KANJI: 'selectedKanji',
   SELECTED_WORD: 'selectedWord',
   USER_SCORES: 'userScores',
+  PENDING_KANJI_SESSION: 'pendingKanjiSession',
 };
 
 class fileService {
@@ -17,6 +18,10 @@ class fileService {
 
   async write(path: string, content: any) {
     return await AsyncStorage.setItem(path, JSON.stringify(content));
+  }
+
+  async remove(path: string) {
+    return await AsyncStorage.removeItem(path);
   }
 }
 

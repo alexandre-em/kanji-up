@@ -11,6 +11,7 @@ import { useAppDispatch, useAppSelector } from '../../../hooks/useStore';
 import { useToaster } from '../../../providers/toaster';
 import { core } from '../../../services/http';
 import {
+  clearLocalSession,
   confirmItem,
   EvaluationItemType,
   getEffectiveStatus,
@@ -19,6 +20,7 @@ import {
   selectEvaluationItems,
   selectEvaluationSessionId,
   selectPendingReviewCount,
+  toKanjiQuestion,
 } from '../../../store/slices/evaluation';
 import { recordResults } from '../../../store/slices/progression';
 import ReviewModal from './reviewModal';
@@ -117,6 +119,7 @@ export default function EvaluationResult() {
   const correctCount = useAppSelector(selectCorrectCount);
   const pendingReviewCount = useAppSelector(selectPendingReviewCount);
   const sessionId = useAppSelector(selectEvaluationSessionId);
+  const macAddress = useAppSelector((state) => state.user.macAddress);
   const showInterstitialAd = useEvaluationInterstitialAd();
 
   // Index into `items` of the answer currently shown in the review modal, null when closed
@@ -163,9 +166,20 @@ export default function EvaluationResult() {
     setIsSaving(false);
 
     if (recordResults.fulfilled.match(action)) {
+      await clearLocalSession();
+
       // Best-effort, same as the per-answer PATCH: a network hiccup here shouldn't block the
-      // user from moving on, the session just stays resumable server-side a bit longer
-      if (sessionId) core.sessionsService!.finish(sessionId, correctCount).catch(() => undefined);
+      // user from moving on
+      if (sessionId) {
+        core.sessionsService!.finish(sessionId, correctCount).catch(() => undefined);
+      } else if (macAddress) {
+        // Ran entirely offline: push a finished record now for history, if a connection happens
+        // to be back by the time the run is done — kanji progress itself is already saved either way
+        core
+          .sessionsService!.create({ macAddress, type: 'kanji', questions: items.map(toKanjiQuestion) })
+          .then((response) => core.sessionsService!.finish(response.data.sessionId, correctCount))
+          .catch(() => undefined);
+      }
 
       dispatch(resetEvaluation());
       navigation.navigate(screenNames.HOME);
@@ -177,7 +191,7 @@ export default function EvaluationResult() {
       // Left on this screen with the button re-enabled: nothing is lost, they can just retry
       toast?.show({ message: t('evaluationResult.toast.error'), type: 'failure' });
     }
-  }, [items, dispatch, navigation, toast, t, showInterstitialAd, sessionId, correctCount]);
+  }, [items, dispatch, navigation, toast, t, showInterstitialAd, sessionId, correctCount, macAddress]);
 
   const buttonLabel = useMemo(
     () =>
