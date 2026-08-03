@@ -157,7 +157,8 @@
   "premium.plans.lifetime.price": "79,99 € une fois",
   "premium.plans.lifetime.badge": "Offre limitée",
   "premium.plans.select": "Choisir",
-  "premium.comingSoon.toast": "Les paiements arrivent bientôt",
+  "premium.purchase.success": "Bienvenue dans Premium !",
+  "premium.purchase.error": "L'achat a échoué, réessaie",
   "premium.active.title": "Tu es déjà Premium",
   "premium.active.message": "Merci de soutenir KanjiUp ! Toutes les fonctionnalités premium sont débloquées sur ton compte.",
   "premium.active.cancel": "Annuler l'abonnement"

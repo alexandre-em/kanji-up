@@ -85,6 +85,9 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        // react-native-iap ships separate Play Store / Amazon Appstore build flavors; this app
+        // only ever distributes through Play, so pin Gradle to that flavor for the dependency
+        missingDimensionStrategy 'store', 'play'
         // Falls back to Google's official Android test App ID so debug/CI builds without a real
         // ADMOB_APP_ID in .env still build and serve test ads instead of failing at manifest merge
         manifestPlaceholders = [
