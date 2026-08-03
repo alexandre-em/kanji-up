@@ -2,6 +2,7 @@ import { Config } from 'react-native-config';
 
 import AuthService from './auth';
 import KanjiService from './kanji';
+import PurchasesService from './purchases';
 import SessionsService from './sessions';
 import WordService from './word';
 
@@ -22,14 +23,17 @@ export class AxiosInstance {
   wordService: WordService | null = null;
   authService: AuthService | null = null;
   sessionsService: SessionsService | null = null;
+  purchasesService: PurchasesService | null = null;
 
   constructor() {
     if (!defaultEndpoints.auth || !defaultEndpoints.kanji || !defaultEndpoints.word) throw new Error('Endpoints not ready');
     this.authService = new AuthService(defaultEndpoints.auth);
     this.kanjiService = new KanjiService(defaultEndpoints.kanji);
     this.wordService = new WordService(defaultEndpoints.word);
-    // Sessions live in the same backend as auth (kanji-up-auth), just a different route namespace
+    // Sessions and billing verification live in the same backend as auth (kanji-up-auth), just
+    // different route namespaces
     this.sessionsService = new SessionsService(defaultEndpoints.auth);
+    this.purchasesService = new PurchasesService(defaultEndpoints.auth);
   }
 }
 

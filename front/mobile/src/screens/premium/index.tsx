@@ -21,6 +21,7 @@ import {
   purchaseSubscription,
   restorePurchases,
 } from '../../services/billing';
+import { core } from '../../services/http';
 import { selectUserState, user } from '../../store/slices/user';
 
 const { width } = Dimensions.get('window');
@@ -46,26 +47,29 @@ export default function Premium() {
   });
   const [purchasingPlan, setPurchasingPlan] = useState<PremiumPlanKey | null>(null);
 
-  // TEMPORARY: grants premium from the purchase alone, trusting the client. Phase C (server-side
-  // receipt verification against the Google Play Developer API) must replace this before launch —
-  // right now nothing stops a crafted local state change from faking premium. The dates below are
-  // a local estimate for display only, not the real renewal date Play tracks.
-  const grantPremiumLocally = useCallback(
-    (plan: PremiumPlanKey) => {
-      const now = new Date();
-      let subscribedUntil: Date | null = null;
-      if (plan === 'monthly') subscribedUntil = new Date(now.setMonth(now.getMonth() + 1));
-      if (plan === 'annual') subscribedUntil = new Date(now.setFullYear(now.getFullYear() + 1));
+  // Server is the source of truth: the purchase token is only proof a checkout happened, it's the
+  // /billing/verify-purchase check against the Google Play Developer API that actually grants
+  // premium, so a crafted local state change can't fake it.
+  const applyServerVerification = useCallback(
+    async (plan: PremiumPlanKey, purchase: Purchase) => {
+      if (!purchase.purchaseToken) throw new Error('Missing purchase token');
+
+      const response = await core.purchasesService!.verifyPurchase({
+        macAddress: userState.macAddress,
+        productId: purchase.productId,
+        purchaseToken: purchase.purchaseToken,
+        planType: plan,
+      });
 
       dispatch(
         user.actions.update({
-          subscriptionPlan: 'premium',
+          subscriptionPlan: response.data.subscriptionPlan,
           subscribedAt: new Date(),
-          subscribedUntil,
+          subscribedUntil: response.data.subscribedUntil ? new Date(response.data.subscribedUntil) : null,
         }),
       );
     },
-    [dispatch],
+    [dispatch, userState.macAddress],
   );
 
   const handlePurchaseUpdate = useCallback(
@@ -74,7 +78,7 @@ export default function Premium() {
 
       try {
         await acknowledgePurchase(purchase);
-        if (plan) grantPremiumLocally(plan);
+        if (plan) await applyServerVerification(plan, purchase);
         toast?.show({ message: t('premium.purchase.success'), type: 'success' });
       } catch {
         toast?.show({ message: t('premium.purchase.error'), type: 'failure' });
@@ -82,7 +86,7 @@ export default function Premium() {
         setPurchasingPlan(null);
       }
     },
-    [grantPremiumLocally, toast, t],
+    [applyServerVerification, toast, t],
   );
 
   const handlePurchaseError = useCallback(
@@ -107,10 +111,11 @@ export default function Premium() {
       .then(([premiumOffers, pastPurchases]) => {
         setOffers(premiumOffers);
 
-        const restoredPlan = pastPurchases
-          .map((purchase) => planFromProductId(purchase.productId))
-          .find((plan): plan is PremiumPlanKey => plan !== null);
-        if (restoredPlan && userState.subscriptionPlan === 'free') grantPremiumLocally(restoredPlan);
+        const restoredPurchase = pastPurchases.find((purchase) => planFromProductId(purchase.productId) !== null);
+        if (restoredPurchase && userState.subscriptionPlan === 'free') {
+          const plan = planFromProductId(restoredPurchase.productId)!;
+          applyServerVerification(plan, restoredPurchase).catch(() => undefined);
+        }
       })
       .catch(() => {
         // Billing unavailable (no Play Services here, or products not yet configured in Play
