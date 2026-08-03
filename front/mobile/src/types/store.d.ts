@@ -54,6 +54,9 @@ type UserState = {
   credits: number;
   unlockedDifficulties: string[];
   unlockedKanji: string[];
+  totalScore: number;
+  dailyScores: Record<string, number>;
+  progression: Record<string, number>;
 
   getUserStatus: StatusType;
   createUserStatus: StatusType;

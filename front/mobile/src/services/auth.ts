@@ -45,4 +45,10 @@ export default class AuthService {
 
     return this._instance?.patch(`/${macAddress}/unlock`, payload, options as AxiosRequestConfig);
   }
+
+  updateKanjiProgression(macAddress: string, payload: KanjiProgressionType, options?: AxiosRequestConfig) {
+    if (!this._instance) throw new Error('Auth instance not ready...');
+
+    return this._instance?.patch(`/${macAddress}/kanji-progression`, payload, options as AxiosRequestConfig);
+  }
 }

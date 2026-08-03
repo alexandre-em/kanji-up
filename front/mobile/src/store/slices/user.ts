@@ -1,11 +1,14 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from 'store';
 
+import { KANJI_PROGRESSION_MAX } from '../../constants/progression';
 import { core } from '../../services/http';
 
 type GetUserInput = {
   macAddress: string;
 };
+
+const SCORE_HISTORY_DAYS = 30;
 
 const initialState: UserState = {
   name: '',
@@ -20,10 +23,18 @@ const initialState: UserState = {
   credits: 0,
   unlockedDifficulties: [],
   unlockedKanji: [],
+  totalScore: 0,
+  dailyScores: {},
+  progression: {},
 
   getUserStatus: 'idle',
   createUserStatus: 'idle',
 };
+
+function todayLocal(): string {
+  const date = new Date();
+  return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+}
 
 export const getUser = createAsyncThunk<UserType, GetUserInput>('user/get', async ({ macAddress }) => {
   try {
@@ -72,12 +83,39 @@ export const unlockContent = createAsyncThunk<{ creditsSpent: number }, UnlockCo
   },
 );
 
+// Best-effort, fire-and-forget: a network hiccup here shouldn't block or surface an error to the
+// user, the local state (already incremented live per answer) is what actually matters
+export const syncKanjiProgression = createAsyncThunk('user/syncKanjiProgression', async (_: void, { getState }) => {
+  const { macAddress, totalScore, dailyScores, progression } = (getState() as RootState).user;
+  if (!macAddress) return;
+
+  await core.authService!.updateKanjiProgression(macAddress, { totalScore, dailyScores, progression }).catch(() => undefined);
+});
+
 export const user = createSlice({
   name: 'user',
   initialState,
   reducers: {
     reset: () => initialState,
     update: (state, action: PayloadAction<Partial<UserType>>) => ({ ...state, ...action.payload }),
+    updateProgression: (state, action: PayloadAction<{ id: string; inc: number }>) => {
+      const { id, inc } = action.payload;
+      const current = state.progression[id] ?? 0;
+
+      state.progression[id] = Math.min(Math.max(current + inc, 0), KANJI_PROGRESSION_MAX);
+    },
+    addScore: (state, action: PayloadAction<number>) => {
+      const today = todayLocal();
+
+      state.dailyScores[today] = (state.dailyScores[today] ?? 0) + action.payload;
+      state.totalScore += action.payload;
+
+      const cutoff = new Date();
+      cutoff.setDate(cutoff.getDate() - SCORE_HISTORY_DAYS);
+      Object.keys(state.dailyScores).forEach((date) => {
+        if (new Date(date) < cutoff) delete state.dailyScores[date];
+      });
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -98,6 +136,9 @@ export const user = createSlice({
         state.credits = action.payload.credits;
         state.unlockedDifficulties = action.payload.unlockedDifficulties;
         state.unlockedKanji = action.payload.unlockedKanji;
+        state.totalScore = action.payload.totalScore;
+        state.dailyScores = action.payload.dailyScores;
+        state.progression = action.payload.progression;
       })
       .addCase(getUser.rejected, (state) => {
         state.getUserStatus = 'failed';

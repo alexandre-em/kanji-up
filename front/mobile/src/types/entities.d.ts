@@ -102,7 +102,15 @@ type RegisteredUser = {
   unlockedKanji: string[];
 };
 
-type UserType = UnregisteredUser & RegisteredUser;
+// Per-kanji mastery (0-20), shared between kanji and word training modes — see
+// src/constants/progression.ts for the tuning constants
+type KanjiProgressionType = {
+  totalScore: number;
+  dailyScores: Record<string, number>;
+  progression: Record<string, number>;
+};
+
+type UserType = UnregisteredUser & RegisteredUser & KanjiProgressionType;
 
 type SessionKind = 'kanji' | 'word' | 'other';
 type SessionStatusType = 'in_progress' | 'finished' | 'abandoned';
