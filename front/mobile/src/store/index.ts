@@ -7,6 +7,7 @@ import selectedKanji from './slices/selectedKanji';
 import selectedWord from './slices/selectedWord';
 import user from './slices/user';
 import word from './slices/word';
+import wordEvaluation from './slices/wordEvaluation';
 
 const store = configureStore({
   reducer: {
@@ -17,6 +18,7 @@ const store = configureStore({
     word,
     user,
     evaluation,
+    wordEvaluation,
   },
 });
 

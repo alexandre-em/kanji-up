@@ -32,4 +32,10 @@ export default class WordService {
 
     return this._instance.get<Pagination<WordType>>(`/search/word?query=${query}&page=${page}&limit=${limit}`, options);
   }
+
+  getPracticeWords(characters: string[], number = 10, options?: AxiosRequestConfig) {
+    if (!this._instance) throw new Error('Word instance not ready');
+
+    return this._instance.post<WordType[]>('/practice/word', { characters, number }, options);
+  }
 }
