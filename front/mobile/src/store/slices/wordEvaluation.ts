@@ -55,14 +55,28 @@ export const init = createAsyncThunk('wordEvaluation/init', async (payload: { nu
 export const updateItemSlots = createAsyncThunk(
   'wordEvaluation/updateItemSlots',
   async (payload: { slots: WordSlotType[] }, { getState }) => {
-    const currentIndex = (getState() as RootState).wordEvaluation.currentIndex;
-    const expected = (getState() as RootState).wordEvaluation.items[currentIndex].word.word?.[0] ?? '';
+    const state = getState() as RootState;
+    const currentIndex = state.wordEvaluation.currentIndex;
+    const expected = state.wordEvaluation.items[currentIndex].word.word?.[0] ?? '';
     const expectedCharacters = getKanjiCharacters(expected);
+
+    // Kanji progression is shared with the kanji-only evaluation flow, which rejects a wrong
+    // stroke count outright — without this, drawing badly here would be the easy way to inflate
+    // the same shared score
+    const strokesByCharacter: Record<string, number> = {};
+    Object.values(state.selectedKanji.selectedKanji).forEach((kanji) => {
+      if (kanji.kanji?.character && kanji.kanji.strokes !== undefined)
+        strokesByCharacter[kanji.kanji.character] = kanji.kanji.strokes;
+    });
 
     let status: AnswerStatusType = 'review';
     const hasEmptySlot = payload.slots.some((slot) => !slot.image || slot.strokesCount === 0);
+    const hasWrongStrokeCount = payload.slots.some((slot, index) => {
+      const expectedStrokes = strokesByCharacter[expectedCharacters[index]];
+      return expectedStrokes !== undefined && slot.strokesCount !== expectedStrokes;
+    });
 
-    if (payload.slots.length !== expectedCharacters.length || hasEmptySlot) {
+    if (payload.slots.length !== expectedCharacters.length || hasEmptySlot || hasWrongStrokeCount) {
       status = 'incorrect';
     } else if (
       payload.slots.every((slot, index) => slot.predictions.some((prediction) => prediction.label === expectedCharacters[index]))
