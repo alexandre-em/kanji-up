@@ -17,6 +17,7 @@ import KanjiDifficulties from './kanji/difficulty';
 import KanjiList from './kanji/difficulty/kanjiList';
 import KanjiDetail from './kanji/difficulty/kanjiList/kanji';
 import Onboarding from './onboarding';
+import Premium from './premium';
 import Search from './search';
 import Settings from './settings';
 import TrainingModes from './training';
@@ -74,6 +75,7 @@ export default function RootNavigation() {
           <Stack.Screen name={screenNames.KANJIS} component={KanjiList} />
           <Stack.Screen name={screenNames.KANJI} component={KanjiDetail} options={headerOptions} />
           <Stack.Screen name={screenNames.SETTINGS} component={Settings} />
+          <Stack.Screen name={screenNames.PREMIUM} component={Premium} options={headerOptions} />
         </Stack.Navigator>
         {activeRoute && TAB_VISIBLE_ROUTES.includes(activeRoute) && (
           <BottomNavBar activeRoute={activeRoute} onTabPress={handleTabPress} />

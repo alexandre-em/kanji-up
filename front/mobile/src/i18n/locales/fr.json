@@ -138,5 +138,27 @@
   "training.menu.kanji.subtitle": "Dessine des kanji individuels de mémoire",
   "training.menu.word.title": "Mots",
   "training.menu.word.subtitle": "Dessine les kanji qui composent un mot",
-  "training.comingSoon": "Bientôt disponible"
+  "training.comingSoon": "Bientôt disponible",
+
+  "premium.feature.badge": "premium",
+  "premium.title": "Passe Premium",
+  "premium.subtitle": "Débloque toute l'expérience KanjiUp",
+  "premium.benefits.title": "Ce que tu obtiens",
+  "premium.benefits.noAds": "Plus aucune publicité",
+  "premium.benefits.advancedKanji": "Débloque instantanément les niveaux de kanji avancés, sans credits",
+  "premium.benefits.scan": "Scanne et traduis du texte réel",
+  "premium.benefits.resume": "Reprends les sessions d'entraînement inachevées",
+  "premium.plans.monthly.title": "Mensuel",
+  "premium.plans.monthly.price": "4,99 € / mois",
+  "premium.plans.annual.title": "Annuel",
+  "premium.plans.annual.price": "39,99 € / an",
+  "premium.plans.annual.badge": "Économise 33%",
+  "premium.plans.lifetime.title": "Membre fondateur",
+  "premium.plans.lifetime.price": "79,99 € une fois",
+  "premium.plans.lifetime.badge": "Offre limitée",
+  "premium.plans.select": "Choisir",
+  "premium.comingSoon.toast": "Les paiements arrivent bientôt",
+  "premium.active.title": "Tu es déjà Premium",
+  "premium.active.message": "Merci de soutenir KanjiUp ! Toutes les fonctionnalités premium sont débloquées sur ton compte.",
+  "premium.active.cancel": "Annuler l'abonnement"
 }

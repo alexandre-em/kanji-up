@@ -193,6 +193,26 @@
   "wordEvaluationResult.toast.error": "Could not save your progress, please try again",
 
   "premium.feature.badge": "premium",
+  "premium.title": "Go Premium",
+  "premium.subtitle": "Unlock the full KanjiUp experience",
+  "premium.benefits.title": "What you get",
+  "premium.benefits.noAds": "No ads, ever",
+  "premium.benefits.advancedKanji": "Unlock advanced kanji tiers instantly, no credits needed",
+  "premium.benefits.scan": "Scan and translate real-world text",
+  "premium.benefits.resume": "Resume training sessions you didn't finish",
+  "premium.plans.monthly.title": "Monthly",
+  "premium.plans.monthly.price": "$4.99 / month",
+  "premium.plans.annual.title": "Annual",
+  "premium.plans.annual.price": "$39.99 / year",
+  "premium.plans.annual.badge": "Save 33%",
+  "premium.plans.lifetime.title": "Founding member",
+  "premium.plans.lifetime.price": "$79.99 once",
+  "premium.plans.lifetime.badge": "Limited time",
+  "premium.plans.select": "Choose",
+  "premium.comingSoon.toast": "Payments are coming soon",
+  "premium.active.title": "You're already Premium",
+  "premium.active.message": "Thanks for supporting KanjiUp! All premium features are unlocked on your account.",
+  "premium.active.cancel": "Cancel subscription",
 
   "loading.title": "Loading..."
 }

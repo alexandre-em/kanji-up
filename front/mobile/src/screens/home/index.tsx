@@ -127,9 +127,10 @@ export default function Home() {
             <Card
               height={140}
               width={(width - GENERAL_MARGIN * 2 - 20) / 2}
-              style={styles.card}
-              disabled={button.premium && userState.subscriptionPlan === 'free'}
-              onPress={() => handleRediction(button.screen)}>
+              style={[styles.card, button.premium && userState.subscriptionPlan === 'free' && styles.cardLocked]}
+              onPress={() =>
+                handleRediction(button.premium && userState.subscriptionPlan === 'free' ? screenNames.PREMIUM : button.screen)
+              }>
               {button.icon}
               <Card.Section
                 flex
@@ -161,7 +162,11 @@ export default function Home() {
             />
           </Card>
           <Spacing y={GENERAL_MARGIN} />
-          <Card height={115} width={width - GENERAL_MARGIN * 2} style={styles.card}>
+          <Card
+            height={115}
+            width={width - GENERAL_MARGIN * 2}
+            style={styles.card}
+            onPress={() => handleRediction(screenNames.PREMIUM)}>
             <Icon source={Assets.icons.premium} size={36} tintColor="#fff" />
             <Card.Section
               flex
@@ -208,6 +213,9 @@ const styles = StyleSheet.create({
   },
   card: {
     padding: 15,
+  },
+  cardLocked: {
+    opacity: 0.5,
   },
   cardContent: {
     marginTop: GENERAL_MARGIN / 2,
