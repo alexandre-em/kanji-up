@@ -152,3 +152,16 @@ type DailyMissionType = {
   tasks: Record<MissionTaskKey, boolean>;
   rewardClaimed: boolean;
 };
+
+type ScanTokenType = {
+  text: string;
+  // null when this stretch of text isn't a known word (kana, punctuation, unrecognized)
+  wordId: string | null;
+};
+
+type ScanResultType = {
+  scanId: string;
+  imageUrl: string;
+  recognizedText: string;
+  tokens: ScanTokenType[];
+};

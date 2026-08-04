@@ -4,6 +4,7 @@ import AuthService from './auth';
 import KanjiService from './kanji';
 import MissionsService from './missions';
 import PurchasesService from './purchases';
+import ScanService from './scan';
 import SessionsService from './sessions';
 import WordService from './word';
 
@@ -26,17 +27,19 @@ export class AxiosInstance {
   sessionsService: SessionsService | null = null;
   purchasesService: PurchasesService | null = null;
   missionsService: MissionsService | null = null;
+  scanService: ScanService | null = null;
 
   constructor() {
     if (!defaultEndpoints.auth || !defaultEndpoints.kanji || !defaultEndpoints.word) throw new Error('Endpoints not ready');
     this.authService = new AuthService(defaultEndpoints.auth);
     this.kanjiService = new KanjiService(defaultEndpoints.kanji);
     this.wordService = new WordService(defaultEndpoints.word);
-    // Sessions, billing verification, and missions live in the same backend as auth
+    // Sessions, billing verification, missions, and scans live in the same backend as auth
     // (kanji-up-auth), just different route namespaces
     this.sessionsService = new SessionsService(defaultEndpoints.auth);
     this.purchasesService = new PurchasesService(defaultEndpoints.auth);
     this.missionsService = new MissionsService(defaultEndpoints.auth);
+    this.scanService = new ScanService(defaultEndpoints.auth);
   }
 }
 
