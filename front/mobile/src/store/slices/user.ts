@@ -3,6 +3,7 @@ import { RootState } from 'store';
 
 import { KANJI_PROGRESSION_MAX } from '../../constants/progression';
 import { core } from '../../services/http';
+import { completeMissionTask } from './missions';
 
 type GetUserInput = {
   macAddress: string;
@@ -160,6 +161,9 @@ export const user = createSlice({
         const { scope, tier, kanjiId } = action.meta.arg;
         if (scope === 'kanji') state.unlockedKanji.push(kanjiId!);
         else state.unlockedDifficulties.push(tier);
+      })
+      .addCase(completeMissionTask.fulfilled, (state, action) => {
+        state.credits += action.payload.creditsGranted;
       });
   },
 });

@@ -143,3 +143,12 @@ type SessionType = {
   createdAt: string;
   updatedAt: string;
 };
+
+type MissionTaskKey = 'kanjiSession' | 'wordSession' | 'kanjiMastery';
+
+type DailyMissionType = {
+  macAddress: string;
+  date: string;
+  tasks: Record<MissionTaskKey, boolean>;
+  rewardClaimed: boolean;
+};

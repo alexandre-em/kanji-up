@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 
 import evaluation from './slices/evaluation';
 import kanji from './slices/kanji';
+import missions from './slices/missions';
 import selectedKanji from './slices/selectedKanji';
 import selectedWord from './slices/selectedWord';
 import user from './slices/user';
@@ -17,6 +18,7 @@ const store = configureStore({
     user,
     evaluation,
     wordEvaluation,
+    missions,
   },
 });
 
