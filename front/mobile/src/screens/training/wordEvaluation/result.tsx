@@ -5,10 +5,12 @@ import { ScrollView, StyleSheet, TouchableOpacity, View as RNView } from 'react-
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Assets, Button, Colors, Icon, Text, View } from 'react-native-ui-lib';
 
+import { hasNewlyMasteredKanji } from '../../../constants/progression';
 import { screenNames } from '../../../constants/screens';
 import { useEvaluationInterstitialAd } from '../../../hooks/useEvaluationInterstitialAd';
 import { useAppDispatch, useAppSelector } from '../../../hooks/useStore';
 import { useToaster } from '../../../providers/toaster';
+import { completeMissionTask } from '../../../store/slices/missions';
 import { selectSelectedKanji } from '../../../store/slices/selectedKanji';
 import { syncKanjiProgression, user } from '../../../store/slices/user';
 import {
@@ -118,6 +120,8 @@ export default function WordEvaluationResult() {
   const correctCount = useAppSelector(selectWordCorrectCount);
   const pendingReviewCount = useAppSelector(selectWordPendingReviewCount);
   const selectedKanjiState = useAppSelector(selectSelectedKanji);
+  const macAddress = useAppSelector((state) => state.user.macAddress);
+  const progressionState = useAppSelector((state) => state.user.progression);
   const showInterstitialAd = useEvaluationInterstitialAd();
 
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
@@ -150,6 +154,7 @@ export default function WordEvaluationResult() {
 
   const handleValidate = useCallback(async () => {
     const deltas = computeProgressionDeltas(items, selectedKanjiState);
+    const justMasteredAKanji = hasNewlyMasteredKanji(deltas, progressionState);
     deltas.forEach((delta) => dispatch(user.actions.updateProgression(delta)));
     const points = deltas.filter((delta) => delta.inc > 0).length;
     if (points > 0) dispatch(user.actions.addScore(points));
@@ -159,6 +164,12 @@ export default function WordEvaluationResult() {
     setIsSaving(false);
 
     if (syncKanjiProgression.fulfilled.match(action)) {
+      // Best-effort: missing a daily mission tick isn't worth blocking or erroring the user over
+      if (macAddress) {
+        dispatch(completeMissionTask({ macAddress, task: 'wordSession' }));
+        if (justMasteredAKanji) dispatch(completeMissionTask({ macAddress, task: 'kanjiMastery' }));
+      }
+
       dispatch(resetWordEvaluation());
       navigation.navigate(screenNames.HOME);
       toast?.show({ message: t('wordEvaluationResult.toast.success'), type: 'success' });
@@ -166,7 +177,7 @@ export default function WordEvaluationResult() {
     } else {
       toast?.show({ message: t('wordEvaluationResult.toast.error'), type: 'failure' });
     }
-  }, [items, selectedKanjiState, dispatch, navigation, toast, t, showInterstitialAd]);
+  }, [items, selectedKanjiState, dispatch, navigation, toast, t, showInterstitialAd, macAddress, progressionState]);
 
   const buttonLabel = useMemo(
     () =>

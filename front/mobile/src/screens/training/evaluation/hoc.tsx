@@ -6,6 +6,7 @@ import { Button, Colors, Text, View } from 'react-native-ui-lib';
 
 import Layout from '../../../components/layout';
 import Spacing from '../../../components/spacing';
+import { hasNewlyMasteredKanji } from '../../../constants/progression';
 import { useAppDispatch, useAppSelector } from '../../../hooks/useStore';
 import { useToaster } from '../../../providers/toaster';
 import { fileNames, fileServiceInstance } from '../../../services/file';
@@ -22,6 +23,7 @@ import {
   selectEvaluationStatus,
   startFreshSession,
 } from '../../../store/slices/evaluation';
+import { completeMissionTask } from '../../../store/slices/missions';
 import { selectSelectedKanji } from '../../../store/slices/selectedKanji';
 import { syncKanjiProgression, user } from '../../../store/slices/user';
 import EvaluationScreen from '.';
@@ -35,6 +37,8 @@ export default function EvaluationHoc() {
   const evaluationItems = useAppSelector(selectEvaluationItems);
   const evaluationStatus = useAppSelector(selectEvaluationStatus);
   const isPremium = useAppSelector((state) => state.user.subscriptionPlan === 'premium');
+  const macAddress = useAppSelector((state) => state.user.macAddress);
+  const progressionState = useAppSelector((state) => state.user.progression);
   const dispatch = useAppDispatch();
   const [isModelLoaded, setModelLoaded] = useState(false);
   const [isChecking, setIsChecking] = useState(true);
@@ -98,10 +102,17 @@ export default function EvaluationHoc() {
 
         if (answered.length > 0) {
           const deltas = computeProgressionDeltas(answered);
+          // Mastery is a per-kanji event, independent of whether the session itself was
+          // completed — unlike the "finished a session" mission tasks, not granted here
+          const justMasteredAKanji = hasNewlyMasteredKanji(deltas, progressionState);
           deltas.forEach((delta) => dispatch(user.actions.updateProgression(delta)));
           const points = deltas.filter((delta) => delta.inc > 0).length;
           if (points > 0) dispatch(user.actions.addScore(points));
           await dispatch(syncKanjiProgression());
+
+          if (macAddress && justMasteredAKanji) {
+            dispatch(completeMissionTask({ macAddress, task: 'kanjiMastery' }));
+          }
 
           if (sessionId) {
             const correctCount = answered.filter((item) => getEffectiveStatus(item) === 'correct').length;
@@ -114,7 +125,7 @@ export default function EvaluationHoc() {
         await clearLocalSession();
       }
     },
-    [dispatch, resolvePendingItems],
+    [dispatch, resolvePendingItems, macAddress, progressionState],
   );
 
   const startSession = useCallback(async () => {

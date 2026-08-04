@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from 'store';
 
-import { KANJI_PROGRESSION_MAX } from '../../constants/progression';
+import { clampProgression } from '../../constants/progression';
 import { core } from '../../services/http';
 import { completeMissionTask } from './missions';
 
@@ -101,9 +101,8 @@ export const user = createSlice({
     update: (state, action: PayloadAction<Partial<UserType>>) => ({ ...state, ...action.payload }),
     updateProgression: (state, action: PayloadAction<{ id: string; inc: number }>) => {
       const { id, inc } = action.payload;
-      const current = state.progression[id] ?? 0;
 
-      state.progression[id] = Math.min(Math.max(current + inc, 0), KANJI_PROGRESSION_MAX);
+      state.progression[id] = clampProgression(state.progression[id] ?? 0, inc);
     },
     addScore: (state, action: PayloadAction<number>) => {
       const today = todayLocal();

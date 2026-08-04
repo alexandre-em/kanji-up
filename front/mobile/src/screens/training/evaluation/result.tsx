@@ -5,6 +5,7 @@ import { Image, ScrollView, StyleSheet, TouchableOpacity, View as RNView } from 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Assets, Button, Colors, Icon, Text, View } from 'react-native-ui-lib';
 
+import { hasNewlyMasteredKanji } from '../../../constants/progression';
 import { screenNames } from '../../../constants/screens';
 import { useEvaluationInterstitialAd } from '../../../hooks/useEvaluationInterstitialAd';
 import { useAppDispatch, useAppSelector } from '../../../hooks/useStore';
@@ -23,6 +24,7 @@ import {
   selectPendingReviewCount,
   toKanjiQuestion,
 } from '../../../store/slices/evaluation';
+import { completeMissionTask } from '../../../store/slices/missions';
 import { syncKanjiProgression, user } from '../../../store/slices/user';
 import ReviewModal from './reviewModal';
 
@@ -121,6 +123,7 @@ export default function EvaluationResult() {
   const pendingReviewCount = useAppSelector(selectPendingReviewCount);
   const sessionId = useAppSelector(selectEvaluationSessionId);
   const macAddress = useAppSelector((state) => state.user.macAddress);
+  const progressionState = useAppSelector((state) => state.user.progression);
   const showInterstitialAd = useEvaluationInterstitialAd();
 
   // Index into `items` of the answer currently shown in the review modal, null when closed
@@ -158,6 +161,7 @@ export default function EvaluationResult() {
 
   const handleValidate = useCallback(async () => {
     const deltas = computeProgressionDeltas(items);
+    const justMasteredAKanji = hasNewlyMasteredKanji(deltas, progressionState);
     deltas.forEach((delta) => dispatch(user.actions.updateProgression(delta)));
     const points = deltas.filter((delta) => delta.inc > 0).length;
     if (points > 0) dispatch(user.actions.addScore(points));
@@ -168,6 +172,12 @@ export default function EvaluationResult() {
 
     if (syncKanjiProgression.fulfilled.match(action)) {
       await clearLocalSession();
+
+      // Best-effort: missing a daily mission tick isn't worth blocking or erroring the user over
+      if (macAddress) {
+        dispatch(completeMissionTask({ macAddress, task: 'kanjiSession' }));
+        if (justMasteredAKanji) dispatch(completeMissionTask({ macAddress, task: 'kanjiMastery' }));
+      }
 
       // Best-effort, same as the per-answer PATCH: a network hiccup here shouldn't block the
       // user from moving on
@@ -192,7 +202,7 @@ export default function EvaluationResult() {
       // Left on this screen with the button re-enabled: nothing is lost, they can just retry
       toast?.show({ message: t('evaluationResult.toast.error'), type: 'failure' });
     }
-  }, [items, dispatch, navigation, toast, t, showInterstitialAd, sessionId, correctCount, macAddress]);
+  }, [items, dispatch, navigation, toast, t, showInterstitialAd, sessionId, correctCount, macAddress, progressionState]);
 
   const buttonLabel = useMemo(
     () =>
