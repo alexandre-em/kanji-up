@@ -5,7 +5,6 @@ import { Dimensions, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { Assets, Badge, Button, Colors, Icon, ProgressBar } from 'react-native-ui-lib';
 import Avatar from 'react-native-ui-lib/avatar';
 import Card from 'react-native-ui-lib/card';
-import Chip from 'react-native-ui-lib/chip';
 import Text from 'react-native-ui-lib/text';
 import View from 'react-native-ui-lib/view';
 import { useSelector } from 'react-redux';
@@ -78,14 +77,11 @@ export default function Home() {
             </Text>
           </View>
         </View>
-        <View width={90} height={30}>
-          <Chip
-            label={`${userState.credits}`}
-            size={35}
-            iconSource={Assets.icons.coin}
-            iconProps={{ size: { width: 20, height: 20 } }}
-            useSizeAsMinimum
-          />
+        <View style={styles.creditsBadge}>
+          <Icon source={Assets.icons.coin} size={18} tintColor={Colors.$iconPrimary} />
+          <Text text80BO $textPrimary>
+            {userState.credits}
+          </Text>
         </View>
       </View>
       {/* A styled button, not a real text field: no TextInput here means no keyboard/focus
@@ -97,9 +93,23 @@ export default function Home() {
         accessibilityRole="button"
         accessibilityLabel={t('home.search.placeholder')}>
         <SearchIcon size={18} color={Colors.$iconNeutral} />
-        <Text text80M $textGeneral>
-          {t('home.search.placeholder')}
-        </Text>
+        <Text style={styles.searchPlaceholder}>{t('home.search.placeholder')}</Text>
+      </TouchableOpacity>
+      <Spacing y={GENERAL_MARGIN} />
+      <TouchableOpacity
+        onPress={() => setMissionsVisible(true)}
+        style={styles.missionsCard}
+        accessibilityRole="button"
+        accessibilityLabel={t('missions.title')}>
+        <Icon source={Assets.icons.check} size={32} tintColor={Colors.$iconPrimary} />
+        <View style={styles.missionsContent}>
+          <Text text80BL $textDefault>
+            {t('missions.title')}
+          </Text>
+          <Text text90M $textGeneral>
+            {t('missions.progress', { done: missionsDoneCount, total: MISSION_TASK_COUNT })}
+          </Text>
+        </View>
       </TouchableOpacity>
       {/* Selection counter + mastered kanji counter */}
       <Spacing y={GENERAL_MARGIN} />
@@ -124,22 +134,6 @@ export default function Home() {
         text80BL
         onPress={() => handleRediction(screenNames.TRAINING)}
       />
-      <Spacing y={GENERAL_MARGIN} />
-      <TouchableOpacity
-        onPress={() => setMissionsVisible(true)}
-        style={styles.missionsCard}
-        accessibilityRole="button"
-        accessibilityLabel={t('missions.title')}>
-        <Icon source={Assets.icons.check} size={32} tintColor={Colors.$iconPrimary} />
-        <View style={styles.missionsContent}>
-          <Text text80BL $textDefault>
-            {t('missions.title')}
-          </Text>
-          <Text text90M $textGeneral>
-            {t('missions.progress', { done: missionsDoneCount, total: MISSION_TASK_COUNT })}
-          </Text>
-        </View>
-      </TouchableOpacity>
       {/* Menu */}
       <Spacing y={GENERAL_MARGIN} />
       <View style={styles.flex}>
@@ -253,6 +247,15 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   transparent: { backgroundColor: '#00000000' },
+  creditsBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: Colors.$backgroundPrimaryLight,
+  },
   missionsCard: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -277,6 +280,12 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     borderColor: Colors.$outlineNeutral,
     borderRadius: 25,
+  },
+  // Matches Search's real TextInput placeholder exactly (fontSize/color), so this decorative
+  // button reads as the same field, not a lookalike
+  searchPlaceholder: {
+    fontSize: 16,
+    color: Colors.$textNeutral,
   },
   badge: { position: 'absolute', right: 10, top: 10, zIndex: 10 },
 });
