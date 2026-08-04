@@ -24,6 +24,7 @@ import Settings from './settings';
 import TrainingModes from './training';
 import EvaluationHoc from './training/evaluation/hoc';
 import WordEvaluationHoc from './training/wordEvaluation/hoc';
+import WordDetail from './word';
 
 const Stack = createNativeStackNavigator();
 
@@ -78,6 +79,7 @@ export default function RootNavigation() {
           <Stack.Screen name={screenNames.SETTINGS} component={Settings} />
           <Stack.Screen name={screenNames.PREMIUM} component={Premium} options={headerOptions} />
           <Stack.Screen name={screenNames.PROFILE} component={Profile} />
+          <Stack.Screen name={screenNames.WORD} component={WordDetail} options={headerOptions} />
         </Stack.Navigator>
         {activeRoute && TAB_VISIBLE_ROUTES.includes(activeRoute) && (
           <BottomNavBar activeRoute={activeRoute} onTabPress={handleTabPress} />

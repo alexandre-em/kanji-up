@@ -13,4 +13,5 @@ export const screenNames = {
   SEARCH: 'Search',
   SETTINGS: 'Settings',
   PROFILE: 'Profile',
+  WORD: 'Word',
 };

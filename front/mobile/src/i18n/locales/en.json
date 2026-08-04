@@ -240,5 +240,14 @@
   "profile.unlocked.difficulties": "{{count}} levels",
   "profile.activity.title": "Recent activity",
 
+  "wordDetails.error": "Couldn't load this word, try again",
+  "wordDetails.spellings": "Spellings",
+  "wordDetails.readings": "Readings",
+  "wordDetails.kanji.title": "Kanji in this word",
+  "wordDetails.kanji.subtitle": "Tap a kanji you don't know yet to add it to your selection",
+  "wordDetails.kanji.added": "Added to your selection",
+  "wordDetails.kanji.removed": "Removed from your selection",
+  "wordDetails.definitions": "Meaning",
+
   "loading.title": "Loading..."
 }
