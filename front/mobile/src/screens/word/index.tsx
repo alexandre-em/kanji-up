@@ -143,6 +143,16 @@ export default function WordDetail(props: WordDetailProps) {
           <Text text80M $textDefault>
             {definition.meaning.join(', ')}
           </Text>
+          {definition.example?.map((example, exampleIndex) => (
+            <RNView key={example.sentence_id ?? exampleIndex} style={styles.exampleRow}>
+              <Text text90M $textDefault>
+                {example.sentence}
+              </Text>
+              <Text text90M $textNeutral>
+                {example.translation}
+              </Text>
+            </RNView>
+          ))}
         </RNView>
       ))}
     </Layout>
@@ -187,5 +197,12 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: Colors.$outlineNeutral,
+  },
+  exampleRow: {
+    marginTop: 6,
+    paddingLeft: 12,
+    borderLeftWidth: 2,
+    borderLeftColor: Colors.$outlineNeutral,
+    gap: 2,
   },
 });
