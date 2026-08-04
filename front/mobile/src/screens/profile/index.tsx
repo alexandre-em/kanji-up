@@ -42,7 +42,7 @@ export default function Profile() {
   const maxScore = Math.max(...recentDays.map((day) => day.score), 1);
 
   return (
-    <Layout screen="profile">
+    <Layout screen="profile" withTabBar>
       <AccountSummary />
       <Spacing y={28} />
 

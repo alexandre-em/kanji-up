@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, StyleSheet, TextInput, TouchableOpacity, View as RNView } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Assets, Colors, Icon, Text, View } from 'react-native-ui-lib';
 
 import AppBannerAd from '../../components/bannerAd';
+import { TAB_BAR_TOTAL_HEIGHT } from '../../components/bottomNavBar';
 import SearchIcon from '../../components/svg/search';
 import { useAppDispatch, useAppSelector } from '../../hooks/useStore';
 import { useToaster } from '../../providers/toaster';
@@ -28,6 +30,10 @@ export default function Search() {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const toast = useToaster();
+  const insets = useSafeAreaInsets();
+  // Now a tab screen: the floating tab bar overlays the bottom of the list, so the last results
+  // need clearance the same way Layout reserves it for its own screens
+  const listBottomPadding = TAB_BAR_TOTAL_HEIGHT + insets.bottom;
 
   const [query, setQuery] = useState('');
   const [activeSegment, setActiveSegment] = useState(KANJI_SEGMENT);
@@ -174,7 +180,7 @@ export default function Search() {
         </RNView>
       ) : activeSegment === KANJI_SEGMENT ? (
         <RNView style={styles.listContainer}>
-          <KanjiResults query={trimmedQuery} />
+          <KanjiResults query={trimmedQuery} bottomPadding={listBottomPadding} />
         </RNView>
       ) : (
         // Word results land in a follow-up: kanji comes first

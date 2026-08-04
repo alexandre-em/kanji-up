@@ -12,9 +12,11 @@ import KanjiResultCard from './kanjiResultCard';
 
 type KanjiResultsProps = {
   query: string;
+  /** Extra clearance below the last row — the floating tab bar overlays this list on top */
+  bottomPadding?: number;
 };
 
-export default function KanjiResults({ query }: KanjiResultsProps) {
+export default function KanjiResults({ query, bottomPadding = 0 }: KanjiResultsProps) {
   const { t } = useTranslation();
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
@@ -44,7 +46,7 @@ export default function KanjiResults({ query }: KanjiResultsProps) {
       renderItem={({ item }) => <KanjiResultCard kanji={item} onPress={() => handlePress(item)} />}
       onEndReached={handleEndReached}
       onEndReachedThreshold={0.3}
-      contentContainerStyle={styles.listContent}
+      contentContainerStyle={[styles.listContent, { paddingBottom: 20 + bottomPadding }]}
       ListFooterComponent={
         status === 'pending' && cache.current > 0 ? (
           <RNView style={styles.footer}>

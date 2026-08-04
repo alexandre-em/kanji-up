@@ -77,7 +77,7 @@ export default function RootNavigation() {
           <Stack.Screen name={screenNames.KANJI} component={KanjiDetail} options={headerOptions} />
           <Stack.Screen name={screenNames.SETTINGS} component={Settings} />
           <Stack.Screen name={screenNames.PREMIUM} component={Premium} options={headerOptions} />
-          <Stack.Screen name={screenNames.PROFILE} component={Profile} options={headerOptions} />
+          <Stack.Screen name={screenNames.PROFILE} component={Profile} />
         </Stack.Navigator>
         {activeRoute && TAB_VISIBLE_ROUTES.includes(activeRoute) && (
           <BottomNavBar activeRoute={activeRoute} onTabPress={handleTabPress} />

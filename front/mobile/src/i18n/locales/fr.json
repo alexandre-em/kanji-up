@@ -20,6 +20,8 @@
   "tabs.home.label": "Accueil",
   "tabs.selection.label": "Sélection",
   "tabs.training.label": "Entraînement",
+  "tabs.search.label": "Recherche",
+  "tabs.profile.label": "Profil",
   "tabs.settings.label": "Réglages",
 
   "evaluationResult.summary.score": "{{correct}} / {{total}} réussis",
