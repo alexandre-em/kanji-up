@@ -249,5 +249,20 @@
   "wordDetails.kanji.removed": "Removed from your selection",
   "wordDetails.definitions": "Meaning",
 
+  "ocr.title": "Scan",
+  "ocr.subtitle": "Scan real text and find the words in it",
+  "ocr.empty.message": "Take a photo of a sign, menu, or anything written in Japanese",
+  "ocr.scan.button": "Scan",
+  "ocr.uploading": "Reading the text...",
+  "ocr.error": "Couldn't read this photo, try again",
+  "ocr.retry": "Try again",
+  "ocr.rescan": "Scan another photo",
+  "ocr.result.title": "Recognized text",
+  "ocr.result.empty": "No text found in this photo",
+  "ocr.picker.title": "Scan a photo",
+  "ocr.picker.camera": "Take a photo",
+  "ocr.picker.gallery": "Choose from gallery",
+  "ocr.picker.cancel": "Cancel",
+
   "loading.title": "Loading..."
 }

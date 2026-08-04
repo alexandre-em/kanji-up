@@ -16,6 +16,7 @@ import KanjiCategoriesScreen from './kanji';
 import KanjiDifficulties from './kanji/difficulty';
 import KanjiList from './kanji/difficulty/kanjiList';
 import KanjiDetail from './kanji/difficulty/kanjiList/kanji';
+import Ocr from './ocr';
 import Onboarding from './onboarding';
 import Premium from './premium';
 import Profile from './profile';
@@ -76,6 +77,7 @@ export default function RootNavigation() {
           <Stack.Screen name={screenNames.DIFFICULTIES} component={KanjiDifficulties} />
           <Stack.Screen name={screenNames.KANJIS} component={KanjiList} />
           <Stack.Screen name={screenNames.KANJI} component={KanjiDetail} options={headerOptions} />
+          <Stack.Screen name={screenNames.OCR} component={Ocr} options={headerOptions} />
           <Stack.Screen name={screenNames.SETTINGS} component={Settings} />
           <Stack.Screen name={screenNames.PREMIUM} component={Premium} options={headerOptions} />
           <Stack.Screen name={screenNames.PROFILE} component={Profile} />

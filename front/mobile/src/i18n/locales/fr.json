@@ -195,5 +195,20 @@
   "wordDetails.kanji.subtitle": "Touche un kanji que tu ne connais pas encore pour l'ajouter à ta sélection",
   "wordDetails.kanji.added": "Ajouté à ta sélection",
   "wordDetails.kanji.removed": "Retiré de ta sélection",
-  "wordDetails.definitions": "Signification"
+  "wordDetails.definitions": "Signification",
+
+  "ocr.title": "Scan",
+  "ocr.subtitle": "Scanne du texte réel et retrouve les mots",
+  "ocr.empty.message": "Prends en photo une enseigne, un menu, ou tout texte écrit en japonais",
+  "ocr.scan.button": "Scanner",
+  "ocr.uploading": "Lecture du texte...",
+  "ocr.error": "Impossible de lire cette photo, réessaie",
+  "ocr.retry": "Réessayer",
+  "ocr.rescan": "Scanner une autre photo",
+  "ocr.result.title": "Texte reconnu",
+  "ocr.result.empty": "Aucun texte trouvé sur cette photo",
+  "ocr.picker.title": "Scanner une photo",
+  "ocr.picker.camera": "Prendre une photo",
+  "ocr.picker.gallery": "Choisir dans la galerie",
+  "ocr.picker.cancel": "Annuler"
 }
