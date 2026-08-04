@@ -1,6 +1,6 @@
 import { predict } from '@kanjiup/recognition';
 import { useNavigation } from '@react-navigation/native';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Image, ScrollView, StyleSheet, TouchableOpacity, View as RNView } from 'react-native';
 import { Assets, Button, Colors, Icon, ProgressBar, Text, View } from 'react-native-ui-lib';
@@ -18,6 +18,7 @@ import {
   WordSlotType,
 } from '../../../store/slices/wordEvaluation';
 import DrawSlotModal from './drawSlotModal';
+import { findMaskedExampleHint } from './exampleHint';
 import WordEvaluationResult from './result';
 
 const SLOT_SIZE = 160;
@@ -45,6 +46,9 @@ export default function WordEvaluationScreen() {
   const currentItem = items[currentIndex];
   const isSessionOver = currentIndex >= items.length;
   const canAddSlot = slots[slots.length - 1]?.image != null;
+  // No example sentence contains any of this word's spellings verbatim: falls back to the plain
+  // meaning hint below rather than leaving the player with nothing to go on
+  const exampleHint = useMemo(() => (currentItem ? findMaskedExampleHint(currentItem.word) : null), [currentItem]);
 
   useEffect(() => {
     setSlots([{ id: 0, image: null, strokesCount: 0 }]);
@@ -148,7 +152,22 @@ export default function WordEvaluationScreen() {
       </RNView>
       <ProgressBar progress={((currentIndex + 1) / items.length) * 100} fullWidth style={styles.progressBar} />
       <Spacing y={20} />
-      <Text h1>{currentItem?.word.definition?.[0]?.meaning?.join(', ')}</Text>
+      {exampleHint ? (
+        <RNView style={styles.hintSentence}>
+          <Text text60M>{exampleHint.prefix}</Text>
+          <RNView style={styles.hintBlank}>
+            {exampleHint.reading && (
+              <Text style={styles.hintReading} numberOfLines={1}>
+                {exampleHint.reading}
+              </Text>
+            )}
+            <RNView style={[styles.hintChip, { width: Math.max(40, exampleHint.spelling.length * 22) }]} />
+          </RNView>
+          <Text text60M>{exampleHint.suffix}</Text>
+        </RNView>
+      ) : (
+        <Text h1>{currentItem?.word.definition?.[0]?.meaning?.join(', ')}</Text>
+      )}
       <Spacing y={20} />
       <ScrollView
         horizontal
@@ -191,6 +210,28 @@ export default function WordEvaluationScreen() {
 }
 
 const styles = StyleSheet.create({
+  hintSentence: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'flex-end',
+    rowGap: 8,
+  },
+  hintBlank: {
+    alignItems: 'center',
+    marginHorizontal: 4,
+  },
+  hintReading: {
+    fontSize: 11,
+    color: Colors.$textNeutral,
+    marginBottom: 2,
+  },
+  hintChip: {
+    height: 28,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: Colors.$outlineNeutral,
+    backgroundColor: Colors.$backgroundNeutralLight,
+  },
   progressHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
