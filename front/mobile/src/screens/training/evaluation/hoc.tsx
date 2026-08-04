@@ -37,7 +37,7 @@ export default function EvaluationHoc() {
   const evaluationItems = useAppSelector(selectEvaluationItems);
   const evaluationStatus = useAppSelector(selectEvaluationStatus);
   const isPremium = useAppSelector((state) => state.user.subscriptionPlan === 'premium');
-  const macAddress = useAppSelector((state) => state.user.macAddress);
+  const userId = useAppSelector((state) => state.user.userId);
   const progressionState = useAppSelector((state) => state.user.progression);
   const dispatch = useAppDispatch();
   const [isModelLoaded, setModelLoaded] = useState(false);
@@ -110,8 +110,8 @@ export default function EvaluationHoc() {
           if (points > 0) dispatch(user.actions.addScore(points));
           await dispatch(syncKanjiProgression());
 
-          if (macAddress && justMasteredAKanji) {
-            dispatch(completeMissionTask({ macAddress, task: 'kanjiMastery' }));
+          if (userId && justMasteredAKanji) {
+            dispatch(completeMissionTask({ userId, task: 'kanjiMastery' }));
           }
 
           if (sessionId) {
@@ -125,7 +125,7 @@ export default function EvaluationHoc() {
         await clearLocalSession();
       }
     },
-    [dispatch, resolvePendingItems, macAddress, progressionState],
+    [dispatch, resolvePendingItems, userId, progressionState],
   );
 
   const startSession = useCallback(async () => {

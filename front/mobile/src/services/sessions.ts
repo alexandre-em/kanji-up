@@ -12,16 +12,16 @@ export default class SessionsService {
     }
   }
 
-  create(payload: { macAddress: string; type: SessionKind; questions: SessionType['questions'] }, options?: AxiosRequestConfig) {
+  create(payload: { userId: string; type: SessionKind; questions: SessionType['questions'] }, options?: AxiosRequestConfig) {
     if (!this._instance) throw new Error('Sessions instance not ready...');
 
     return this._instance.post<SessionType>('/', payload, options);
   }
 
-  findActive(macAddress: string, type: SessionKind, options?: AxiosRequestConfig) {
+  findActive(userId: string, type: SessionKind, options?: AxiosRequestConfig) {
     if (!this._instance) throw new Error('Sessions instance not ready...');
 
-    return this._instance.get<SessionType | null>('/active', { ...options, params: { macAddress, type } });
+    return this._instance.get<SessionType | null>('/active', { ...options, params: { userId, type } });
   }
 
   updateQuestion(sessionId: string, question: SessionType['questions'][number], options?: AxiosRequestConfig) {

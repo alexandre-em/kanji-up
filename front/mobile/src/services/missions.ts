@@ -18,15 +18,15 @@ export default class MissionsService {
     }
   }
 
-  getToday(macAddress: string, options?: AxiosRequestConfig) {
+  getToday(userId: string, options?: AxiosRequestConfig) {
     if (!this._instance) throw new Error('Missions instance not ready...');
 
-    return this._instance.get<DailyMissionType>('/today', { ...options, params: { macAddress } });
+    return this._instance.get<DailyMissionType>('/today', { ...options, params: { userId } });
   }
 
-  complete(macAddress: string, task: MissionTaskKey, options?: AxiosRequestConfig) {
+  complete(userId: string, task: MissionTaskKey, options?: AxiosRequestConfig) {
     if (!this._instance) throw new Error('Missions instance not ready...');
 
-    return this._instance.patch<CompleteMissionTaskResponse>('/complete', { macAddress, task }, options);
+    return this._instance.patch<CompleteMissionTaskResponse>('/complete', { userId, task }, options);
   }
 }

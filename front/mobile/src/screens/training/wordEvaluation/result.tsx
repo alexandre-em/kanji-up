@@ -120,7 +120,7 @@ export default function WordEvaluationResult() {
   const correctCount = useAppSelector(selectWordCorrectCount);
   const pendingReviewCount = useAppSelector(selectWordPendingReviewCount);
   const selectedKanjiState = useAppSelector(selectSelectedKanji);
-  const macAddress = useAppSelector((state) => state.user.macAddress);
+  const userId = useAppSelector((state) => state.user.userId);
   const progressionState = useAppSelector((state) => state.user.progression);
   const showInterstitialAd = useEvaluationInterstitialAd();
 
@@ -165,9 +165,9 @@ export default function WordEvaluationResult() {
 
     if (syncKanjiProgression.fulfilled.match(action)) {
       // Best-effort: missing a daily mission tick isn't worth blocking or erroring the user over
-      if (macAddress) {
-        dispatch(completeMissionTask({ macAddress, task: 'wordSession' }));
-        if (justMasteredAKanji) dispatch(completeMissionTask({ macAddress, task: 'kanjiMastery' }));
+      if (userId) {
+        dispatch(completeMissionTask({ userId, task: 'wordSession' }));
+        if (justMasteredAKanji) dispatch(completeMissionTask({ userId, task: 'kanjiMastery' }));
       }
 
       dispatch(resetWordEvaluation());
@@ -177,7 +177,7 @@ export default function WordEvaluationResult() {
     } else {
       toast?.show({ message: t('wordEvaluationResult.toast.error'), type: 'failure' });
     }
-  }, [items, selectedKanjiState, dispatch, navigation, toast, t, showInterstitialAd, macAddress, progressionState]);
+  }, [items, selectedKanjiState, dispatch, navigation, toast, t, showInterstitialAd, userId, progressionState]);
 
   const buttonLabel = useMemo(
     () =>

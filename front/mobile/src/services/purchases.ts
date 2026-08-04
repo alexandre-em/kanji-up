@@ -3,7 +3,7 @@ import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import { PremiumPlanKey } from '../constants/billing';
 
 export type VerifyPurchasePayload = {
-  macAddress: string;
+  userId: string;
   productId: string;
   purchaseToken: string;
   planType: PremiumPlanKey;

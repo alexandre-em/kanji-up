@@ -11,7 +11,7 @@ export function useRewardedCreditsAd() {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const toast = useToaster();
-  const { macAddress } = useAppSelector(selectUserState);
+  const { userId } = useAppSelector(selectUserState);
   const { isLoaded, isClosed, isEarnedReward, load, show } = useRewardedAd(REWARDED_AD_UNIT_ID);
   // `load()` resets isClosed synchronously, so this only guards against React re-running the
   // effect for the same closure before that reset lands
@@ -32,12 +32,12 @@ export function useRewardedCreditsAd() {
     hasHandledClose.current = true;
 
     if (isEarnedReward) {
-      dispatch(earnCredits({ macAddress })).then(() => {
+      dispatch(earnCredits({ userId })).then(() => {
         toast?.show({ message: t('home.menu.ad.reward.toast'), type: 'success' });
       });
     }
     load();
-  }, [isClosed, isEarnedReward, dispatch, macAddress, toast, t, load]);
+  }, [isClosed, isEarnedReward, dispatch, userId, toast, t, load]);
 
   const showAd = useCallback(() => {
     if (isLoaded) show();

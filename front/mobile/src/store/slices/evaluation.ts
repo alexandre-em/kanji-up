@@ -94,11 +94,11 @@ export const persistLocalSession = (session: PendingLocalSession) =>
 export const clearLocalSession = () => fileServiceInstance.remove(fileNames.PENDING_KANJI_SESSION).catch(() => undefined);
 
 export const checkActiveSession = createAsyncThunk('evaluation/checkActiveSession', async (_: void, { getState }) => {
-  const macAddress = (getState() as RootState).user.macAddress;
+  const userId = (getState() as RootState).user.userId;
   // No identity yet (e.g. getUser hasn't resolved): nothing to resume, degrade to local-only
-  if (!macAddress) return null;
+  if (!userId) return null;
 
-  const response = await core.sessionsService!.findActive(macAddress, 'kanji');
+  const response = await core.sessionsService!.findActive(userId, 'kanji');
 
   return response.data;
 });
@@ -106,7 +106,7 @@ export const checkActiveSession = createAsyncThunk('evaluation/checkActiveSessio
 export const startFreshSession = createAsyncThunk(
   'evaluation/startFreshSession',
   async (payload: { kanjis: Partial<KanjiType>[]; abandonSessionId?: string }, { getState }) => {
-    const macAddress = (getState() as RootState).user.macAddress;
+    const userId = (getState() as RootState).user.userId;
     let sessionId: string | null = null;
 
     const items: EvaluationItemType[] = payload.kanjis.map((kanji) => ({
@@ -120,14 +120,14 @@ export const startFreshSession = createAsyncThunk(
 
     // Offline, unreachable server, or no identity yet: the run still starts, just local-only —
     // it becomes a real session later, at finish time, if a connection is available by then
-    if (macAddress) {
+    if (userId) {
       try {
         if (payload.abandonSessionId) {
           await core.sessionsService!.abandon(payload.abandonSessionId).catch(() => undefined);
         }
 
         const response = await core.sessionsService!.create({
-          macAddress,
+          userId,
           type: 'kanji',
           questions: items.map(toKanjiQuestion),
         });

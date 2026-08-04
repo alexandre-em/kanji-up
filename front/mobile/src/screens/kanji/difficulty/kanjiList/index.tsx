@@ -186,12 +186,12 @@ export default function KanjiList(props: KanjiListProps) {
     const action = await dispatch(
       unlockTarget.scope === 'kanji'
         ? unlockContent({
-            macAddress: userState.macAddress,
+            userId: userState.userId,
             scope: 'kanji',
             tier: tierKey,
             kanjiId: unlockTarget.kanji.kanji_id!,
           })
-        : unlockContent({ macAddress: userState.macAddress, scope: 'tier', tier: tierKey }),
+        : unlockContent({ userId: userState.userId, scope: 'tier', tier: tierKey }),
     );
     setIsUnlocking(false);
 
@@ -201,7 +201,7 @@ export default function KanjiList(props: KanjiListProps) {
     } else {
       toaster?.show({ message: t('kanjiList.unlock.toast.error'), type: 'failure' });
     }
-  }, [unlockTarget, dispatch, userState.macAddress, tierKey, toaster, t]);
+  }, [unlockTarget, dispatch, userState.userId, tierKey, toaster, t]);
 
   const handleSave = useCallback(() => {
     dispatch(save());

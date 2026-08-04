@@ -33,7 +33,7 @@ export default function GoogleSignInButton() {
         return;
       }
 
-      const action = await dispatch(recoverAccount({ macAddress: userState.macAddress, idToken: response.data.idToken }));
+      const action = await dispatch(recoverAccount({ userId: userState.userId, idToken: response.data.idToken }));
 
       if (recoverAccount.fulfilled.match(action)) {
         toast?.show({
@@ -48,7 +48,7 @@ export default function GoogleSignInButton() {
     } finally {
       setIsSigningIn(false);
     }
-  }, [dispatch, userState.macAddress, toast, t]);
+  }, [dispatch, userState.userId, toast, t]);
 
   if (userState.providerId) {
     return (

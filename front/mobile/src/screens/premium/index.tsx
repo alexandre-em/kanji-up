@@ -55,7 +55,7 @@ export default function Premium() {
       if (!purchase.purchaseToken) throw new Error('Missing purchase token');
 
       const response = await core.purchasesService!.verifyPurchase({
-        macAddress: userState.macAddress,
+        userId: userState.userId,
         productId: purchase.productId,
         purchaseToken: purchase.purchaseToken,
         planType: plan,
@@ -69,7 +69,7 @@ export default function Premium() {
         }),
       );
     },
-    [dispatch, userState.macAddress],
+    [dispatch, userState.userId],
   );
 
   const handlePurchaseUpdate = useCallback(

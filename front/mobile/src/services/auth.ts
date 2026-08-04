@@ -12,10 +12,17 @@ export default class AuthService {
     }
   }
 
-  get(macAddress: string, options?: AxiosRequestConfig) {
+  // Bootstrap only: the one lookup a client without a stored userId yet can make
+  getByMacAddress(macAddress: string, options?: AxiosRequestConfig) {
     if (!this._instance) throw new Error('Auth instance not ready...');
 
     return this._instance.get<UserType>(`/mac-address/${macAddress}`, options);
+  }
+
+  get(userId: string, options?: AxiosRequestConfig) {
+    if (!this._instance) throw new Error('Auth instance not ready...');
+
+    return this._instance.get<UserType>(`/${userId}`, options);
   }
 
   create(payload: Pick<UserType, 'name' | 'macAddress'>, options?: AxiosRequestConfig) {
@@ -24,31 +31,31 @@ export default class AuthService {
     return this._instance?.post('/', payload, options as AxiosRequestConfig);
   }
 
-  recoverAccount(macAddress: string, idToken: string, options?: AxiosRequestConfig) {
+  recoverAccount(userId: string, idToken: string, options?: AxiosRequestConfig) {
     if (!this._instance) throw new Error('Auth instance not ready...');
 
-    return this._instance.patch<{ migrated: boolean }>(`/${macAddress}/recover`, { idToken }, options);
+    return this._instance.patch<{ userId: string; migrated: boolean }>(`/${userId}/recover`, { idToken }, options);
   }
 
-  earnCredits(macAddress: string, options?: AxiosRequestConfig) {
+  earnCredits(userId: string, options?: AxiosRequestConfig) {
     if (!this._instance) throw new Error('Auth instance not ready...');
 
-    return this._instance?.patch(`/${macAddress}/credits/earn`, undefined, options as AxiosRequestConfig);
+    return this._instance?.patch(`/${userId}/credits/earn`, undefined, options as AxiosRequestConfig);
   }
 
   unlockContent(
-    macAddress: string,
+    userId: string,
     payload: { scope: 'kanji' | 'tier'; tier: string; kanjiId?: string },
     options?: AxiosRequestConfig,
   ) {
     if (!this._instance) throw new Error('Auth instance not ready...');
 
-    return this._instance?.patch(`/${macAddress}/unlock`, payload, options as AxiosRequestConfig);
+    return this._instance?.patch(`/${userId}/unlock`, payload, options as AxiosRequestConfig);
   }
 
-  updateKanjiProgression(macAddress: string, payload: KanjiProgressionType, options?: AxiosRequestConfig) {
+  updateKanjiProgression(userId: string, payload: KanjiProgressionType, options?: AxiosRequestConfig) {
     if (!this._instance) throw new Error('Auth instance not ready...');
 
-    return this._instance?.patch(`/${macAddress}/kanji-progression`, payload, options as AxiosRequestConfig);
+    return this._instance?.patch(`/${userId}/kanji-progression`, payload, options as AxiosRequestConfig);
   }
 }

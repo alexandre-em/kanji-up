@@ -42,6 +42,7 @@ type EvaluationState = {
 };
 
 type UserState = {
+  userId: string;
   name: string;
   macAddress: string;
   isAnonymous: boolean;

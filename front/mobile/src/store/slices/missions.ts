@@ -13,16 +13,16 @@ const initialState: MissionsState = {
   status: 'idle',
 };
 
-export const fetchTodayMissions = createAsyncThunk('missions/fetchToday', async (macAddress: string) => {
-  const response = await core.missionsService!.getToday(macAddress);
+export const fetchTodayMissions = createAsyncThunk('missions/fetchToday', async (userId: string) => {
+  const response = await core.missionsService!.getToday(userId);
 
   return response.data;
 });
 
 export const completeMissionTask = createAsyncThunk(
   'missions/completeTask',
-  async (payload: { macAddress: string; task: MissionTaskKey }) => {
-    const response = await core.missionsService!.complete(payload.macAddress, payload.task);
+  async (payload: { userId: string; task: MissionTaskKey }) => {
+    const response = await core.missionsService!.complete(payload.userId, payload.task);
 
     return response.data;
   },

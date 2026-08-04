@@ -122,7 +122,7 @@ export default function EvaluationResult() {
   const correctCount = useAppSelector(selectCorrectCount);
   const pendingReviewCount = useAppSelector(selectPendingReviewCount);
   const sessionId = useAppSelector(selectEvaluationSessionId);
-  const macAddress = useAppSelector((state) => state.user.macAddress);
+  const userId = useAppSelector((state) => state.user.userId);
   const progressionState = useAppSelector((state) => state.user.progression);
   const showInterstitialAd = useEvaluationInterstitialAd();
 
@@ -174,20 +174,20 @@ export default function EvaluationResult() {
       await clearLocalSession();
 
       // Best-effort: missing a daily mission tick isn't worth blocking or erroring the user over
-      if (macAddress) {
-        dispatch(completeMissionTask({ macAddress, task: 'kanjiSession' }));
-        if (justMasteredAKanji) dispatch(completeMissionTask({ macAddress, task: 'kanjiMastery' }));
+      if (userId) {
+        dispatch(completeMissionTask({ userId, task: 'kanjiSession' }));
+        if (justMasteredAKanji) dispatch(completeMissionTask({ userId, task: 'kanjiMastery' }));
       }
 
       // Best-effort, same as the per-answer PATCH: a network hiccup here shouldn't block the
       // user from moving on
       if (sessionId) {
         core.sessionsService!.finish(sessionId, correctCount).catch(() => undefined);
-      } else if (macAddress) {
+      } else if (userId) {
         // Ran entirely offline: push a finished record now for history, if a connection happens
         // to be back by the time the run is done — kanji progress itself is already saved either way
         core
-          .sessionsService!.create({ macAddress, type: 'kanji', questions: items.map(toKanjiQuestion) })
+          .sessionsService!.create({ userId, type: 'kanji', questions: items.map(toKanjiQuestion) })
           .then((response) => core.sessionsService!.finish(response.data.sessionId, correctCount))
           .catch(() => undefined);
       }
@@ -202,7 +202,7 @@ export default function EvaluationResult() {
       // Left on this screen with the button re-enabled: nothing is lost, they can just retry
       toast?.show({ message: t('evaluationResult.toast.error'), type: 'failure' });
     }
-  }, [items, dispatch, navigation, toast, t, showInterstitialAd, sessionId, correctCount, macAddress, progressionState]);
+  }, [items, dispatch, navigation, toast, t, showInterstitialAd, sessionId, correctCount, userId, progressionState]);
 
   const buttonLabel = useMemo(
     () =>

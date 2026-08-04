@@ -5,13 +5,14 @@ import { clampProgression } from '../../constants/progression';
 import { core } from '../../services/http';
 import { completeMissionTask } from './missions';
 
-type GetUserInput = {
-  macAddress: string;
-};
+// Bootstrap (first launch, no stored userId yet) resolves by device macAddress; every other
+// refresh (e.g. after account recovery) resolves by the stable userId
+type GetUserInput = { macAddress: string } | { userId: string };
 
 const SCORE_HISTORY_DAYS = 30;
 
 const initialState: UserState = {
+  userId: '',
   name: '',
   macAddress: '',
   isAnonymous: true,
@@ -41,9 +42,10 @@ function todayLocal(): string {
   return localDateKey(new Date());
 }
 
-export const getUser = createAsyncThunk<UserType, GetUserInput>('user/get', async ({ macAddress }) => {
+export const getUser = createAsyncThunk<UserType, GetUserInput>('user/get', async (input) => {
   try {
-    const response = await core.authService!.get(macAddress);
+    const response =
+      'userId' in input ? await core.authService!.get(input.userId) : await core.authService!.getByMacAddress(input.macAddress);
 
     return response.data;
   } catch (error) {
@@ -58,27 +60,29 @@ export const createUser = createAsyncThunk<void, Pick<UserType, 'name' | 'macAdd
 });
 
 // Refetches the full profile afterward: on a migrated (recovered) account, name/credits/progression/
-// everything just changed under this device's macAddress, a manual field merge isn't worth it
-export const recoverAccount = createAsyncThunk<{ migrated: boolean }, { macAddress: string; idToken: string }>(
+// everything just changed to a different userId, a manual field merge isn't worth it. The returned
+// userId is authoritative — if migrated, it's a different (older, recovered) account than the one
+// passed in, and getUser refetches using it.
+export const recoverAccount = createAsyncThunk<{ userId: string; migrated: boolean }, { userId: string; idToken: string }>(
   'user/recoverAccount',
-  async ({ macAddress, idToken }, { dispatch }) => {
-    const response = await core.authService!.recoverAccount(macAddress, idToken);
-    await dispatch(getUser({ macAddress }));
+  async ({ userId, idToken }, { dispatch }) => {
+    const response = await core.authService!.recoverAccount(userId, idToken);
+    await dispatch(getUser({ userId: response.data.userId }));
 
     return response.data;
   },
 );
 
-export const earnCredits = createAsyncThunk<{ creditsEarned: number }, { macAddress: string }>(
+export const earnCredits = createAsyncThunk<{ creditsEarned: number }, { userId: string }>(
   'user/earnCredits',
-  async ({ macAddress }) => {
-    const response = await core.authService!.earnCredits(macAddress);
+  async ({ userId }) => {
+    const response = await core.authService!.earnCredits(userId);
     return response!.data;
   },
 );
 
 type UnlockContentInput = {
-  macAddress: string;
+  userId: string;
   scope: 'kanji' | 'tier';
   tier: string;
   kanjiId?: string;
@@ -86,8 +90,8 @@ type UnlockContentInput = {
 
 export const unlockContent = createAsyncThunk<{ creditsSpent: number }, UnlockContentInput>(
   'user/unlockContent',
-  async ({ macAddress, scope, tier, kanjiId }) => {
-    const response = await core.authService!.unlockContent(macAddress, { scope, tier, kanjiId });
+  async ({ userId, scope, tier, kanjiId }) => {
+    const response = await core.authService!.unlockContent(userId, { scope, tier, kanjiId });
     return response!.data;
   },
 );
@@ -95,10 +99,10 @@ export const unlockContent = createAsyncThunk<{ creditsSpent: number }, UnlockCo
 // Best-effort, fire-and-forget: a network hiccup here shouldn't block or surface an error to the
 // user, the local state (already incremented live per answer) is what actually matters
 export const syncKanjiProgression = createAsyncThunk('user/syncKanjiProgression', async (_: void, { getState }) => {
-  const { macAddress, totalScore, dailyScores, progression } = (getState() as RootState).user;
-  if (!macAddress) return;
+  const { userId, totalScore, dailyScores, progression } = (getState() as RootState).user;
+  if (!userId) return;
 
-  await core.authService!.updateKanjiProgression(macAddress, { totalScore, dailyScores, progression }).catch(() => undefined);
+  await core.authService!.updateKanjiProgression(userId, { totalScore, dailyScores, progression }).catch(() => undefined);
 });
 
 export const user = createSlice({
@@ -132,6 +136,7 @@ export const user = createSlice({
       })
       .addCase(getUser.fulfilled, (state, action) => {
         state.getUserStatus = 'succeeded';
+        state.userId = action.payload.userId;
         state.name = action.payload.name;
         state.macAddress = action.payload.macAddress;
         state.isAnonymous = action.payload.isAnonymous;

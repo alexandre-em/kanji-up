@@ -18,11 +18,11 @@ export default class ScanService {
     }
   }
 
-  create(macAddress: string, image: ScanImageInput, options?: AxiosRequestConfig) {
+  create(userId: string, image: ScanImageInput, options?: AxiosRequestConfig) {
     if (!this._instance) throw new Error('Scan instance not ready...');
 
     const formData = new FormData();
-    formData.append('macAddress', macAddress);
+    formData.append('userId', userId);
     // React Native's FormData accepts this {uri, type, name} shape for a file part, not a real Blob
     formData.append('image', image as unknown as Blob);
 
@@ -32,9 +32,9 @@ export default class ScanService {
     });
   }
 
-  list(macAddress: string, page: number, limit: number, options?: AxiosRequestConfig) {
+  list(userId: string, page: number, limit: number, options?: AxiosRequestConfig) {
     if (!this._instance) throw new Error('Scan instance not ready...');
 
-    return this._instance.get<PaginatedScansType>('/', { ...options, params: { macAddress, page, limit } });
+    return this._instance.get<PaginatedScansType>('/', { ...options, params: { userId, page, limit } });
   }
 }

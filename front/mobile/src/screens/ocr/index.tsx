@@ -35,11 +35,11 @@ export default function Ocr() {
 
   const loadHistory = useCallback(
     async (page: number) => {
-      if (!userState.macAddress) return;
+      if (!userState.userId) return;
 
       setHistoryStatus('pending');
       try {
-        const response = await core.scanService!.list(userState.macAddress, page, HISTORY_LIMIT);
+        const response = await core.scanService!.list(userState.userId, page, HISTORY_LIMIT);
         setHistoryItems((prev) => (page === 1 ? response.data.docs : [...prev, ...response.data.docs]));
         setHistoryTotal(response.data.totalDocs);
         setHistoryPage(page);
@@ -48,7 +48,7 @@ export default function Ocr() {
         setHistoryStatus('failed');
       }
     },
-    [userState.macAddress],
+    [userState.userId],
   );
 
   useEffect(() => {
@@ -63,7 +63,7 @@ export default function Ocr() {
       setResult(null);
 
       try {
-        const response = await core.scanService!.create(userState.macAddress, {
+        const response = await core.scanService!.create(userState.userId, {
           uri: asset.uri,
           type: asset.type ?? 'image/jpeg',
           name: asset.fileName ?? 'scan.jpg',
@@ -84,7 +84,7 @@ export default function Ocr() {
         setStatus('error');
       }
     },
-    [userState.macAddress],
+    [userState.userId],
   );
 
   const handleCamera = useCallback(async () => {

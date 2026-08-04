@@ -42,8 +42,8 @@ export default function Home() {
   const missionsDoneCount = todayMissions ? Object.values(todayMissions.tasks).filter(Boolean).length : 0;
 
   useEffect(() => {
-    if (userState.macAddress) dispatch(fetchTodayMissions(userState.macAddress));
-  }, [dispatch, userState.macAddress]);
+    if (userState.userId) dispatch(fetchTodayMissions(userState.userId));
+  }, [dispatch, userState.userId]);
 
   const handleWatchAd = useCallback(() => {
     if (rewardedAd.isReady) rewardedAd.show();

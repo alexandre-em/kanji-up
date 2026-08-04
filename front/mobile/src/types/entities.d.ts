@@ -79,6 +79,7 @@ type WordType = {
 };
 
 type UnregisteredUser = {
+  userId: string;
   name: string;
   macAddress: string;
   isAnonymous: boolean;
@@ -133,7 +134,7 @@ type WordSessionQuestion = {
 
 type SessionType = {
   sessionId: string;
-  macAddress: string;
+  userId: string;
   type: SessionKind;
   status: SessionStatusType;
   questions: (KanjiSessionQuestion | WordSessionQuestion | Record<string, unknown>)[];
@@ -147,7 +148,7 @@ type SessionType = {
 type MissionTaskKey = 'kanjiSession' | 'wordSession' | 'kanjiMastery';
 
 type DailyMissionType = {
-  macAddress: string;
+  userId: string;
   date: string;
   tasks: Record<MissionTaskKey, boolean>;
   rewardClaimed: boolean;
