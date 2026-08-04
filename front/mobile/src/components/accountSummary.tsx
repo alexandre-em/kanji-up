@@ -4,7 +4,7 @@ import { Colors, Text } from 'react-native-ui-lib';
 import Avatar from 'react-native-ui-lib/avatar';
 import { useSelector } from 'react-redux';
 
-import { selectUserName, selectUserPicture, selectUserState } from '../../store/slices/user';
+import { selectUserName, selectUserPicture, selectUserState } from '../store/slices/user';
 
 export default function AccountSummary() {
   const { t, i18n } = useTranslation();

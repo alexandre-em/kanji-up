@@ -12,4 +12,5 @@ export const screenNames = {
   PREMIUM: 'Premium',
   SEARCH: 'Search',
   SETTINGS: 'Settings',
+  PROFILE: 'Profile',
 };

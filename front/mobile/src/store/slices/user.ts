@@ -32,9 +32,12 @@ const initialState: UserState = {
   createUserStatus: 'idle',
 };
 
-function todayLocal(): string {
-  const date = new Date();
+export function localDateKey(date: Date): string {
   return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+}
+
+function todayLocal(): string {
+  return localDateKey(new Date());
 }
 
 export const getUser = createAsyncThunk<UserType, GetUserInput>('user/get', async ({ macAddress }) => {

@@ -49,6 +49,7 @@
   "settings.subscription.free": "Free plan",
   "settings.subscription.premium": "Premium",
   "settings.subscription.expiresOn": "Renews on {{date}}",
+  "settings.viewProfile": "View profile",
   "home.selection.unit": "kanji selected",
   "home.progression.title": "Kanji mastered so far",
   "home.evaluation.button": "Level up today!",
@@ -224,6 +225,18 @@
   "missions.empty": "Nothing done yet today — start a training session to begin",
   "missions.reward": "Finish all 3 missions to earn credits",
   "missions.allDone": "All done! Come back tomorrow for new missions",
+
+  "profile.title": "Profile",
+  "profile.subtitle": "Your progress at a glance",
+  "profile.empty.title": "Nothing to show yet",
+  "profile.empty.message": "Start a training session to see your stats here",
+  "profile.stats.totalScore": "Total score",
+  "profile.stats.mastered": "Kanji mastered",
+  "profile.stats.credits": "Credits",
+  "profile.unlocked.title": "Unlocked content",
+  "profile.unlocked.kanji": "{{count}} kanji",
+  "profile.unlocked.difficulties": "{{count}} levels",
+  "profile.activity.title": "Recent activity",
 
   "loading.title": "Loading..."
 }

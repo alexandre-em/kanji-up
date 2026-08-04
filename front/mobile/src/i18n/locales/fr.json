@@ -111,6 +111,7 @@
   "settings.subscription.free": "Offre gratuite",
   "settings.subscription.premium": "Premium",
   "settings.subscription.expiresOn": "Renouvellement le {{date}}",
+  "settings.viewProfile": "Voir le profil",
   "difficulties.grade.title": "Niveaux scolaires",
   "difficulties.grade.subtitle": "L'ordre scolaire t'aide à progresser naturellement, mais tu peux choisir n'importe quel kanji et commencer ton aventure !",
   "difficulties.grade.level1.title": "Primaire 1",
@@ -171,5 +172,17 @@
   "missions.task.kanjiMastery": "Fais atteindre la pleine maîtrise à un kanji",
   "missions.empty": "Rien de fait aujourd'hui — lance une session d'entraînement pour commencer",
   "missions.reward": "Termine les 3 missions pour gagner des credits",
-  "missions.allDone": "Bravo, tout est fait ! Reviens demain pour de nouvelles missions"
+  "missions.allDone": "Bravo, tout est fait ! Reviens demain pour de nouvelles missions",
+
+  "profile.title": "Profil",
+  "profile.subtitle": "Ta progression en un coup d'œil",
+  "profile.empty.title": "Rien à afficher pour l'instant",
+  "profile.empty.message": "Lance une session d'entraînement pour voir tes stats ici",
+  "profile.stats.totalScore": "Score total",
+  "profile.stats.mastered": "Kanji maîtrisés",
+  "profile.stats.credits": "Credits",
+  "profile.unlocked.title": "Contenu débloqué",
+  "profile.unlocked.kanji": "{{count}} kanji",
+  "profile.unlocked.difficulties": "{{count}} niveaux",
+  "profile.activity.title": "Activité récente"
 }

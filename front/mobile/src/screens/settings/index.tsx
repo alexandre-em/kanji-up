@@ -1,18 +1,26 @@
+import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, View as RNView } from 'react-native';
+import { StyleSheet, TouchableOpacity, View as RNView } from 'react-native';
 import { Colors, Text } from 'react-native-ui-lib';
 
+import AccountSummary from '../../components/accountSummary';
 import Layout from '../../components/layout';
 import Spacing from '../../components/spacing';
-import AccountSummary from './accountSummary';
+import { screenNames } from '../../constants/screens';
 import LanguageSelector from './languageSelector';
 
 export default function Settings() {
   const { t } = useTranslation();
+  const navigation = useNavigation();
 
   return (
     <Layout screen="settings" withTabBar>
-      <AccountSummary />
+      <TouchableOpacity
+        onPress={() => navigation.navigate(screenNames.PROFILE)}
+        accessibilityRole="button"
+        accessibilityLabel={t('settings.viewProfile')}>
+        <AccountSummary />
+      </TouchableOpacity>
       <Spacing y={28} />
       <Text text70BO>{t('settings.section.preferences')}</Text>
       <Spacing y={12} />
