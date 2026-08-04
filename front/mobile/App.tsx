@@ -2,7 +2,7 @@ import './src/services/http';
 import './src/config/rnui';
 
 import { useEffect } from 'react';
-import { Dimensions, StatusBar, StyleSheet, useColorScheme, View as RNView } from 'react-native';
+import { StatusBar, StyleSheet, useColorScheme, View as RNView } from 'react-native';
 import mobileAds from 'react-native-google-mobile-ads';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Colors, View } from 'react-native-ui-lib';
@@ -51,14 +51,9 @@ function App() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    height: Dimensions.get('window').height - (StatusBar.currentHeight || 0),
-    width: Dimensions.get('window').width,
   },
   container: {
     flex: 1,
-    paddingTop: StatusBar.currentHeight || 0, // take in account the status bar
-    height: '100%',
-    width: '100%',
   },
 });
 
