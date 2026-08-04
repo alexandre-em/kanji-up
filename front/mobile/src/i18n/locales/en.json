@@ -263,6 +263,8 @@
   "ocr.picker.camera": "Take a photo",
   "ocr.picker.gallery": "Choose from gallery",
   "ocr.picker.cancel": "Cancel",
+  "ocr.history.title": "Your scans",
+  "ocr.history.empty": "Your past scans will show up here",
 
   "loading.title": "Loading..."
 }

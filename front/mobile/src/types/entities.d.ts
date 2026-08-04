@@ -165,3 +165,15 @@ type ScanResultType = {
   recognizedText: string;
   tokens: ScanTokenType[];
 };
+
+type ScanSummaryType = {
+  scanId: string;
+  imageUrl: string;
+  recognizedText: string;
+  createdAt: string;
+};
+
+type PaginatedScansType = {
+  docs: ScanSummaryType[];
+  totalDocs: number;
+};

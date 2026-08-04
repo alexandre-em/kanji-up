@@ -210,5 +210,7 @@
   "ocr.picker.title": "Scanner une photo",
   "ocr.picker.camera": "Prendre une photo",
   "ocr.picker.gallery": "Choisir dans la galerie",
-  "ocr.picker.cancel": "Annuler"
+  "ocr.picker.cancel": "Annuler",
+  "ocr.history.title": "Tes scans",
+  "ocr.history.empty": "Tes scans précédents apparaîtront ici"
 }

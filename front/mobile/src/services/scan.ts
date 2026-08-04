@@ -31,4 +31,10 @@ export default class ScanService {
       headers: { ...options?.headers, 'Content-Type': 'multipart/form-data' },
     });
   }
+
+  list(macAddress: string, page: number, limit: number, options?: AxiosRequestConfig) {
+    if (!this._instance) throw new Error('Scan instance not ready...');
+
+    return this._instance.get<PaginatedScansType>('/', { ...options, params: { macAddress, page, limit } });
+  }
 }
