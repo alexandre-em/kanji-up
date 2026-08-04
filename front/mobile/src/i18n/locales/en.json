@@ -215,5 +215,15 @@
   "premium.active.message": "Thanks for supporting KanjiUp! All premium features are unlocked on your account.",
   "premium.active.cancel": "Cancel subscription",
 
+  "missions.title": "Daily missions",
+  "missions.subtitle": "Same 3 missions every day — finish them all to earn credits",
+  "missions.progress": "{{done}} / {{total}} done",
+  "missions.task.kanjiSession": "Finish a kanji training session",
+  "missions.task.wordSession": "Finish a word training session",
+  "missions.task.kanjiMastery": "Get a kanji to full mastery",
+  "missions.empty": "Nothing done yet today — start a training session to begin",
+  "missions.reward": "Finish all 3 missions to earn credits",
+  "missions.allDone": "All done! Come back tomorrow for new missions",
+
   "loading.title": "Loading..."
 }

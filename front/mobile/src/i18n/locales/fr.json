@@ -161,5 +161,15 @@
   "premium.purchase.error": "L'achat a échoué, réessaie",
   "premium.active.title": "Tu es déjà Premium",
   "premium.active.message": "Merci de soutenir KanjiUp ! Toutes les fonctionnalités premium sont débloquées sur ton compte.",
-  "premium.active.cancel": "Annuler l'abonnement"
+  "premium.active.cancel": "Annuler l'abonnement",
+
+  "missions.title": "Missions du jour",
+  "missions.subtitle": "Toujours les 3 mêmes missions — termine-les toutes pour gagner des credits",
+  "missions.progress": "{{done}} / {{total}} accomplies",
+  "missions.task.kanjiSession": "Termine une session d'entraînement kanji",
+  "missions.task.wordSession": "Termine une session d'entraînement mots",
+  "missions.task.kanjiMastery": "Fais atteindre la pleine maîtrise à un kanji",
+  "missions.empty": "Rien de fait aujourd'hui — lance une session d'entraînement pour commencer",
+  "missions.reward": "Termine les 3 missions pour gagner des credits",
+  "missions.allDone": "Bravo, tout est fait ! Reviens demain pour de nouvelles missions"
 }

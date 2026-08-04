@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dimensions, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { Assets, Badge, Button, Colors, Icon, ProgressBar } from 'react-native-ui-lib';
@@ -17,21 +17,34 @@ import { homeMenuButtons } from '../../constants/homeButtons';
 import { screenNames } from '../../constants/screens';
 import { GENERAL_MARGIN } from '../../constants/styles';
 import { useRewardedCreditsAd } from '../../hooks/useRewardedCreditsAd';
+import { useAppDispatch } from '../../hooks/useStore';
 import { useToaster } from '../../providers/toaster';
+import { fetchTodayMissions, selectTodayMissions } from '../../store/slices/missions';
 import { selectSelectedKanji } from '../../store/slices/selectedKanji';
 import { selectUserName, selectUserPicture, selectUserState } from '../../store/slices/user';
+import MissionsModal from './missionsModal';
 
 const { width } = Dimensions.get('window');
+const MISSION_TASK_COUNT = 3;
 
 export default function Home() {
   const { t } = useTranslation();
   const navigation = useNavigation();
+  const dispatch = useAppDispatch();
   const toast = useToaster();
   const userName = useSelector(selectUserName);
   const userPicture = useSelector(selectUserPicture);
   const userState = useSelector(selectUserState);
   const selectedKanjiState = useSelector(selectSelectedKanji);
+  const todayMissions = useSelector(selectTodayMissions);
   const rewardedAd = useRewardedCreditsAd();
+  const [missionsVisible, setMissionsVisible] = useState(false);
+
+  const missionsDoneCount = todayMissions ? Object.values(todayMissions.tasks).filter(Boolean).length : 0;
+
+  useEffect(() => {
+    if (userState.macAddress) dispatch(fetchTodayMissions(userState.macAddress));
+  }, [dispatch, userState.macAddress]);
 
   const handleWatchAd = useCallback(() => {
     if (rewardedAd.isReady) rewardedAd.show();
@@ -110,6 +123,22 @@ export default function Home() {
         text80BL
         onPress={() => handleRediction(screenNames.TRAINING)}
       />
+      <Spacing y={GENERAL_MARGIN} />
+      <TouchableOpacity
+        onPress={() => setMissionsVisible(true)}
+        style={styles.missionsCard}
+        accessibilityRole="button"
+        accessibilityLabel={t('missions.title')}>
+        <Icon source={Assets.icons.check} size={32} tintColor={Colors.$iconPrimary} />
+        <View style={styles.missionsContent}>
+          <Text text80BL $textDefault>
+            {t('missions.title')}
+          </Text>
+          <Text text90M $textGeneral>
+            {t('missions.progress', { done: missionsDoneCount, total: MISSION_TASK_COUNT })}
+          </Text>
+        </View>
+      </TouchableOpacity>
       {/* Menu */}
       <Spacing y={GENERAL_MARGIN} />
       <View style={styles.flex}>
@@ -195,6 +224,7 @@ export default function Home() {
           style={styles.transparent}
         />
       </Card>
+      <MissionsModal visible={missionsVisible} missions={todayMissions} onClose={() => setMissionsVisible(false)} />
     </Layout>
   );
 }
@@ -222,6 +252,20 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   transparent: { backgroundColor: '#00000000' },
+  missionsCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    minHeight: 56,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderWidth: 0.5,
+    borderColor: Colors.$outlineNeutral,
+    borderRadius: 16,
+  },
+  missionsContent: {
+    flex: 1,
+  },
   bannerImage: { position: 'absolute', left: 0, zIndex: -10, width: width - GENERAL_MARGIN * 2, height: 115, borderRadius: 10 },
   search: {
     flexDirection: 'row',
