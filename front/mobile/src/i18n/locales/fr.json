@@ -95,7 +95,6 @@
   "search.segment.word": "Mots",
   "search.empty.message": "Cherche un kanji ou un mot",
   "search.noResults": "Aucun résultat pour « {{query}} »",
-  "search.resultCount": "{{count}} résultats",
   "search.error": "La recherche a échoué, réessaie",
   "search.clear": "Effacer la recherche",
   "search.tag.elementary": "Primaire {{grade}}",
@@ -194,7 +193,6 @@
   "profile.activity.title": "Activité récente",
 
   "wordDetails.error": "Impossible de charger ce mot, réessaie",
-  "wordDetails.spellings": "Orthographes",
   "wordDetails.readings": "Lectures",
   "wordDetails.kanji.title": "Kanji de ce mot",
   "wordDetails.kanji.subtitle": "Touche un kanji que tu ne connais pas encore pour l'ajouter à ta sélection",

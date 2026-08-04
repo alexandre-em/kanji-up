@@ -20,6 +20,7 @@ import {
   selectSearchStatus as selectWordSearchStatus,
 } from '../../store/slices/word';
 import KanjiResults from './kanjiResults';
+import WordResults from './wordResults';
 
 // Waits for a pause in typing before hitting the API, so every keystroke doesn't fire a request
 const DEBOUNCE_MS = 350;
@@ -183,9 +184,8 @@ export default function Search() {
           <KanjiResults query={trimmedQuery} bottomPadding={listBottomPadding} />
         </RNView>
       ) : (
-        // Word results land in a follow-up: kanji comes first
-        <RNView style={styles.body}>
-          <Text text70M>{t('search.resultCount', { count: activeResultCount })}</Text>
+        <RNView style={styles.listContainer}>
+          <WordResults query={trimmedQuery} bottomPadding={listBottomPadding} />
         </RNView>
       )}
     </View>

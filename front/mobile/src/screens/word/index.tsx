@@ -79,15 +79,11 @@ export default function WordDetail(props: WordDetailProps) {
 
   return (
     <Layout screen="wordDetails">
-      <Text text70BO>{t('wordDetails.spellings')}</Text>
-      <Spacing y={8} />
       <RNView style={styles.chipRow}>
         {word.word.map((spelling) => (
-          <RNView key={spelling} style={styles.chip}>
-            <Text text70BL $textPrimary>
-              {spelling}
-            </Text>
-          </RNView>
+          <Text key={spelling} text50BL $textPrimary>
+            {spelling}
+          </Text>
         ))}
       </RNView>
 
@@ -96,8 +92,8 @@ export default function WordDetail(props: WordDetailProps) {
       <Spacing y={8} />
       <RNView style={styles.chipRow}>
         {word.reading.map((reading) => (
-          <RNView key={reading} style={styles.chipNeutral}>
-            <Text text80M $textDefault>
+          <RNView key={reading} style={styles.chip}>
+            <Text text80M $textPrimary>
               {reading}
             </Text>
           </RNView>
@@ -109,7 +105,7 @@ export default function WordDetail(props: WordDetailProps) {
           <Spacing y={20} />
           <Text text70BO>{t('wordDetails.kanji.title')}</Text>
           <Spacing y={4} />
-          <Text text90M $textGeneral>
+          <Text text90M $textNeutral>
             {t('wordDetails.kanji.subtitle')}
           </Text>
           <Spacing y={12} />
@@ -168,12 +164,6 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 16,
     backgroundColor: Colors.$backgroundPrimaryLight,
-  },
-  chipNeutral: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-    backgroundColor: Colors.$backgroundNeutralLight,
   },
   kanjiTile: {
     width: 56,
