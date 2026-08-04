@@ -17,6 +17,7 @@ const initialState: UserState = {
   isAnonymous: true,
   adsDeactivated: false,
   subscriptionPlan: 'free',
+  email: null,
   picture: null,
   providerId: null,
   subscribedAt: null,
@@ -56,11 +57,15 @@ export const createUser = createAsyncThunk<void, Pick<UserType, 'name' | 'macAdd
   return;
 });
 
-export const linkUserToProvider = createAsyncThunk<void, Pick<UserType, 'email' | 'picture' | 'providerId' | 'macAddress'>>(
-  'user/link',
-  async (payload) => {
-    await core.authService!.link(payload);
-    return;
+// Refetches the full profile afterward: on a migrated (recovered) account, name/credits/progression/
+// everything just changed under this device's macAddress, a manual field merge isn't worth it
+export const recoverAccount = createAsyncThunk<{ migrated: boolean }, { macAddress: string; idToken: string }>(
+  'user/recoverAccount',
+  async ({ macAddress, idToken }, { dispatch }) => {
+    const response = await core.authService!.recoverAccount(macAddress, idToken);
+    await dispatch(getUser({ macAddress }));
+
+    return response.data;
   },
 );
 
@@ -132,6 +137,7 @@ export const user = createSlice({
         state.isAnonymous = action.payload.isAnonymous;
         state.adsDeactivated = action.payload.adsDeactivated;
         state.subscriptionPlan = action.payload.subscriptionPlan;
+        state.email = action.payload.email;
         state.picture = action.payload.picture;
         state.providerId = action.payload.providerId;
         state.subscribedAt = action.payload.subscribedAt;

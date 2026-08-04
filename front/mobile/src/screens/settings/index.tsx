@@ -7,6 +7,7 @@ import AccountSummary from '../../components/accountSummary';
 import Layout from '../../components/layout';
 import Spacing from '../../components/spacing';
 import { screenNames } from '../../constants/screens';
+import GoogleSignInButton from './googleSignIn';
 import LanguageSelector from './languageSelector';
 
 export default function Settings() {
@@ -21,6 +22,8 @@ export default function Settings() {
         accessibilityLabel={t('settings.viewProfile')}>
         <AccountSummary />
       </TouchableOpacity>
+      <Spacing y={20} />
+      <GoogleSignInButton />
       <Spacing y={28} />
       <Text text70BO>{t('settings.section.preferences')}</Text>
       <Spacing y={12} />

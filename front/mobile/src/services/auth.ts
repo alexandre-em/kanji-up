@@ -24,10 +24,10 @@ export default class AuthService {
     return this._instance?.post('/', payload, options as AxiosRequestConfig);
   }
 
-  link(payload: Pick<UserType, 'email' | 'picture' | 'providerId' | 'macAddress'>, options?: AxiosRequestConfig) {
+  recoverAccount(macAddress: string, idToken: string, options?: AxiosRequestConfig) {
     if (!this._instance) throw new Error('Auth instance not ready...');
 
-    return this._instance?.patch(`/link/${payload.macAddress}`, payload, options as AxiosRequestConfig);
+    return this._instance.patch<{ migrated: boolean }>(`/${macAddress}/recover`, { idToken }, options);
   }
 
   earnCredits(macAddress: string, options?: AxiosRequestConfig) {

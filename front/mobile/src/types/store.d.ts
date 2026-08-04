@@ -47,6 +47,7 @@ type UserState = {
   isAnonymous: boolean;
   adsDeactivated: boolean;
   subscriptionPlan: SubscriptionPlan;
+  email: string | null;
   picture: string | null;
   providerId: string | null;
   subscribedAt: Date | null;
