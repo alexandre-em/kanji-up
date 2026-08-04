@@ -69,6 +69,7 @@ export default function Home() {
             badgeProps={{ label: userState.subscriptionPlan.slice(0, 4), size: 15 }}
             badgePosition={'BOTTOM_RIGHT'}
             useAutoColors
+            onPress={() => navigation.navigate(screenNames.PROFILE)}
           />
           <View style={styles.minContent} marginL-10>
             <Text text70BO>{t('home.welcome.title')},</Text>
