@@ -71,13 +71,15 @@ export default function Home() {
             onPress={() => navigation.navigate(screenNames.PROFILE)}
           />
           <View style={styles.minContent} marginL-10>
-            <Text text70BO>{t('home.welcome.title')},</Text>
-            <Text text60BL highlightString={[userName]} highlightStyle={{ color: Colors.$textPrimary }}>
+            <Text text70BO $textDefault>
+              {t('home.welcome.title')},
+            </Text>
+            <Text text60BL $textDefault highlightString={[userName]} highlightStyle={{ color: Colors.$textPrimary }}>
               {userName}
             </Text>
           </View>
         </View>
-        <View style={styles.creditsBadge}>
+        <View style={[styles.creditsBadge, { backgroundColor: Colors.$backgroundPrimaryLight }]}>
           <Icon source={Assets.icons.coin} size={18} tintColor={Colors.$iconPrimary} />
           <Text text80BO $textPrimary>
             {userState.credits}
@@ -89,16 +91,18 @@ export default function Home() {
           crashed the bridge on tap. The real, editable field lives on the Search screen. */}
       <TouchableOpacity
         onPress={() => handleRediction(screenNames.SEARCH)}
-        style={styles.search}
+        style={[styles.search, { borderColor: Colors.$outlineNeutral }]}
         accessibilityRole="button"
         accessibilityLabel={t('home.search.placeholder')}>
         <SearchIcon size={18} color={Colors.$iconNeutral} />
-        <Text style={styles.searchPlaceholder}>{t('home.search.placeholder')}</Text>
+        <Text $textNeutral style={styles.searchPlaceholder}>
+          {t('home.search.placeholder')}
+        </Text>
       </TouchableOpacity>
       <Spacing y={GENERAL_MARGIN} />
       <TouchableOpacity
         onPress={() => setMissionsVisible(true)}
-        style={styles.missionsCard}
+        style={[styles.missionsCard, { borderColor: Colors.$outlineNeutral }]}
         accessibilityRole="button"
         accessibilityLabel={t('missions.title')}>
         <Icon source={Assets.icons.check} size={32} tintColor={Colors.$iconPrimary} />
@@ -114,17 +118,23 @@ export default function Home() {
       {/* Selection counter + mastered kanji counter */}
       <Spacing y={GENERAL_MARGIN} />
       <View>
-        <Text text40BL>{selectedKanjiState ? Object.keys(selectedKanjiState).length : 0}</Text>
-        <Text>{t('home.selection.unit')}</Text>
+        <Text text40BL $textDefault>
+          {selectedKanjiState ? Object.keys(selectedKanjiState).length : 0}
+        </Text>
+        <Text $textNeutral>{t('home.selection.unit')}</Text>
       </View>
 
       {/* Progress bar on mastered kanji / total kanji */}
       <Spacing y={GENERAL_MARGIN} />
       <View>
-        <Text text90BO>{t('home.progression.title')}</Text>
+        <Text text90BO $textDefault>
+          {t('home.progression.title')}
+        </Text>
         <Spacing y={5} />
         <ProgressBar progress={5} />
-        <Text text100L>5%</Text>
+        <Text text100L $textNeutral>
+          5%
+        </Text>
       </View>
       <Spacing y={GENERAL_MARGIN} />
       <Button
@@ -161,7 +171,7 @@ export default function Home() {
                 style={styles.transparent}
                 content={[
                   { text: t(button.textKey), text80BL: true, $textDefault: true },
-                  { text: t(button.subtitle!), text90M: true },
+                  { text: t(button.subtitle!), text90M: true, $textNeutral: true },
                 ]}
                 contentStyle={styles.cardContent}
               />
@@ -179,7 +189,7 @@ export default function Home() {
               flex
               content={[
                 { text: t('home.menu.ad.title'), text80BL: true, $textDefault: true },
-                { text: t('home.menu.ad.subtitle'), text90M: true },
+                { text: t('home.menu.ad.subtitle'), text90M: true, $textNeutral: true },
               ]}
               contentStyle={styles.cardContent}
               style={styles.transparent}
@@ -214,7 +224,7 @@ export default function Home() {
         <Icon source={Assets.icons.setting} size={36} tintColor={Colors.$textPrimary} />
         <Card.Section
           flex
-          content={[{ text: t('home.menu.setting.title'), text80BL: true }]}
+          content={[{ text: t('home.menu.setting.title'), text80BL: true, $textDefault: true }]}
           contentStyle={styles.cardContent}
           style={styles.transparent}
         />
@@ -254,7 +264,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: Colors.$backgroundPrimaryLight,
   },
   missionsCard: {
     flexDirection: 'row',
@@ -264,7 +273,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderWidth: 0.5,
-    borderColor: Colors.$outlineNeutral,
     borderRadius: 16,
   },
   missionsContent: {
@@ -278,14 +286,14 @@ const styles = StyleSheet.create({
     height: 44,
     paddingHorizontal: 16,
     borderWidth: 0.5,
-    borderColor: Colors.$outlineNeutral,
     borderRadius: 25,
   },
-  // Matches Search's real TextInput placeholder exactly (fontSize/color), so this decorative
-  // button reads as the same field, not a lookalike
+  // Matches Search's real TextInput placeholder exactly (fontSize + $textNeutral color via
+  // prop, not baked in here — StyleSheet.create runs once at import time, so a Colors.$xxx
+  // value frozen here would never follow a later theme switch), so this decorative button
+  // reads as the same field, not a lookalike
   searchPlaceholder: {
     fontSize: 16,
-    color: Colors.$textNeutral,
   },
   badge: { position: 'absolute', right: 10, top: 10, zIndex: 10 },
 });

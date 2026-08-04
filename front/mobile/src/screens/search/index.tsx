@@ -116,14 +116,14 @@ export default function Search() {
         {/* A plain TextInput, not react-native-ui-lib's SearchInput: typing a character into
             *either* one crashes the native bridge on this RN 0.80 New Architecture emulator setup
             (see CLAUDE.md §4) — an environment issue, not something specific to this component */}
-        <RNView style={styles.searchInputContainer}>
+        <RNView style={[styles.searchInputContainer, { borderColor: Colors.$outlineNeutral }]}>
           <SearchIcon size={18} color={Colors.$iconNeutral} />
           <TextInput
             value={query}
             onChangeText={handleChangeText}
             placeholder={t('home.search.placeholder')}
             placeholderTextColor={Colors.$textNeutral}
-            style={styles.searchInput}
+            style={[styles.searchInput, { color: Colors.$textDefault }]}
           />
           {activeStatus === 'pending' ? (
             <ActivityIndicator color={Colors.$textPrimary} size="small" />
@@ -136,18 +136,18 @@ export default function Search() {
           )}
         </RNView>
       </RNView>
-      <RNView style={styles.segmentedControl}>
+      <RNView style={[styles.segmentedControl, { backgroundColor: Colors.$backgroundNeutralMedium }]}>
         {segments.map((segment) => {
           const isActive = segment.key === activeSegment;
 
           return (
             <TouchableOpacity
               key={segment.key}
-              style={[styles.segment, isActive && styles.segmentActive]}
+              style={[styles.segment, isActive && { backgroundColor: Colors.$backgroundPrimaryHeavy }]}
               onPress={() => handleSegmentChange(segment.key)}
               accessibilityRole="button"
               accessibilityState={{ selected: isActive }}>
-              <Text style={[styles.segmentLabel, isActive && styles.segmentLabelActive]}>{segment.label}</Text>
+              <Text style={[styles.segmentLabel, { color: isActive ? '#fff' : Colors.$textNeutral }]}>{segment.label}</Text>
             </TouchableOpacity>
           );
         })}
@@ -195,7 +195,6 @@ export default function Search() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.$backgroundDefault,
   },
   searchBar: {
     paddingHorizontal: 20,
@@ -208,13 +207,11 @@ const styles = StyleSheet.create({
     height: 44,
     paddingHorizontal: 16,
     borderWidth: 0.5,
-    borderColor: Colors.$outlineNeutral,
     borderRadius: 25,
   },
   searchInput: {
     flex: 1,
     fontSize: 16,
-    color: Colors.$textDefault,
     padding: 0,
   },
   segmentedControl: {
@@ -223,7 +220,6 @@ const styles = StyleSheet.create({
     marginTop: 16,
     padding: 4,
     gap: 4,
-    backgroundColor: Colors.$backgroundNeutralMedium,
     borderRadius: 25,
   },
   banner: {
@@ -237,16 +233,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  segmentActive: {
-    backgroundColor: Colors.$backgroundPrimaryHeavy,
-  },
   segmentLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: Colors.$textNeutral,
-  },
-  segmentLabelActive: {
-    color: '#fff',
   },
   body: {
     flex: 1,

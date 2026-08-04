@@ -2,7 +2,7 @@ import './src/services/http';
 import './src/config/rnui';
 
 import { useEffect } from 'react';
-import { StatusBar, StyleSheet, useColorScheme, View as RNView } from 'react-native';
+import { StatusBar, StyleSheet, useColorScheme } from 'react-native';
 import mobileAds from 'react-native-google-mobile-ads';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Colors, View } from 'react-native-ui-lib';
@@ -16,9 +16,10 @@ import { gatherAdsConsent } from './src/services/ads/consent';
 import store from './src/store';
 
 function App() {
-  const theme = useColorScheme();
+  const systemTheme = useColorScheme();
+  const isDark = systemTheme === 'dark';
 
-  Colors.setScheme('light');
+  Colors.setScheme(isDark ? 'dark' : 'light');
 
   useEffect(() => {
     // Ads must never be requested before consent is gathered (Play Store policy, UMP/GDPR) —
@@ -34,12 +35,13 @@ function App() {
         <UserProvider>
           <ToasterProvider>
             <TabBarProvider>
-              <RNView style={styles.screen}>
-                <View style={styles.container}>
-                  <StatusBar barStyle={theme === 'dark' ? 'light-content' : 'dark-content'} />
-                  <RootNavigation />
-                </View>
-              </RNView>
+              {/* A single reactive View (not a plain RN View, which paints no background of its
+                  own) so the whole window — including the strip behind the status/nav bars — picks
+                  up the theme's background instead of leaking the native white window background */}
+              <View style={styles.screen}>
+                <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={Colors.$backgroundDefault} />
+                <RootNavigation />
+              </View>
             </TabBarProvider>
           </ToasterProvider>
         </UserProvider>
@@ -50,9 +52,6 @@ function App() {
 
 const styles = StyleSheet.create({
   screen: {
-    flex: 1,
-  },
-  container: {
     flex: 1,
   },
 });

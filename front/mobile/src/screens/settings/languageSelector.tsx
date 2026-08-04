@@ -27,15 +27,22 @@ export default function LanguageSelector() {
 
   return (
     <>
-      <TouchableOpacity style={styles.row} onPress={() => setPickerVisible(true)} accessibilityRole="button">
-        <Text text80M>{t('settings.language.title')}</Text>
+      <TouchableOpacity
+        style={[styles.row, { borderColor: Colors.$outlineNeutral }]}
+        onPress={() => setPickerVisible(true)}
+        accessibilityRole="button">
+        <Text text80M $textDefault>
+          {t('settings.language.title')}
+        </Text>
         <Text text80M $textNeutral>
           {t(`settings.language.${i18n.language}`)}
         </Text>
       </TouchableOpacity>
       <Dialog visible={isPickerVisible} onDismiss={() => setPickerVisible(false)} bottom useSafeArea width="100%">
-        <RNView style={styles.sheet}>
-          <Text text70BO>{t('settings.language.choose')}</Text>
+        <RNView style={[styles.sheet, { backgroundColor: Colors.$backgroundDefault }]}>
+          <Text text70BO $textDefault>
+            {t('settings.language.choose')}
+          </Text>
           <Spacing y={12} />
           <ScrollView style={styles.list} showsVerticalScrollIndicator={false}>
             {SUPPORTED_LANGUAGES.map((code) => {
@@ -44,11 +51,11 @@ export default function LanguageSelector() {
               return (
                 <TouchableOpacity
                   key={code}
-                  style={styles.option}
+                  style={[styles.option, { borderBottomColor: Colors.$outlineNeutral }]}
                   onPress={() => handleSelect(code)}
                   accessibilityRole="button"
                   accessibilityState={{ selected: isActive }}>
-                  <Text text80M style={isActive ? { color: Colors.$textPrimary } : undefined}>
+                  <Text text80M style={{ color: isActive ? Colors.$textPrimary : Colors.$textDefault }}>
                     {t(`settings.language.${code}`)}
                   </Text>
                   {isActive && <Icon source={Assets.icons.check} size={18} tintColor={Colors.$iconPrimary} />}
@@ -71,10 +78,8 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 12,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: Colors.$outlineNeutral,
   },
   sheet: {
-    backgroundColor: Colors.$backgroundDefault,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 20,
@@ -88,6 +93,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 14,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: Colors.$outlineNeutral,
   },
 });

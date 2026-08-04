@@ -4,6 +4,10 @@
     <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="android:editTextBackground">@drawable/rn_edit_text_material</item>
+        <!-- Matches $backgroundDefault (light) in src/config/rnui.ts — without this the native
+             window background (default white) shows through at the very edges before the RN
+             surface paints over it, and during the fade between screens/activity transitions -->
+        <item name="android:windowBackground">#f9fafb</item>
     </style>
 
 </resources>

@@ -16,8 +16,10 @@ const CHART_HEIGHT = 100;
 
 function StatCard({ value, label }: { value: number; label: string }) {
   return (
-    <RNView style={styles.statCard}>
-      <Text text50BL>{value}</Text>
+    <RNView style={[styles.statCard, { borderColor: Colors.$outlineNeutral }]}>
+      <Text text50BL $textDefault>
+        {value}
+      </Text>
       <Text text90M $textGeneral>
         {label}
       </Text>
@@ -48,7 +50,7 @@ export default function Profile() {
 
       {!hasAnyActivity ? (
         <RNView style={styles.empty}>
-          <Text text70BO center>
+          <Text text70BO $textDefault center>
             {t('profile.empty.title')}
           </Text>
           <Spacing y={8} />
@@ -65,7 +67,9 @@ export default function Profile() {
           </RNView>
 
           <Spacing y={28} />
-          <Text text70BO>{t('profile.unlocked.title')}</Text>
+          <Text text70BO $textDefault>
+            {t('profile.unlocked.title')}
+          </Text>
           <Spacing y={12} />
           <RNView style={styles.unlockedRow}>
             <Text text80M $textDefault>
@@ -77,7 +81,9 @@ export default function Profile() {
           </RNView>
 
           <Spacing y={28} />
-          <Text text70BO>{t('profile.activity.title')}</Text>
+          <Text text70BO $textDefault>
+            {t('profile.activity.title')}
+          </Text>
           <Spacing y={16} />
           <RNView style={styles.chart}>
             {recentDays.map((day) => (
@@ -88,7 +94,13 @@ export default function Profile() {
                 <Spacing y={4} />
                 <RNView style={styles.chartTrack}>
                   <RNView
-                    style={[styles.chartBar, { height: Math.max((day.score / maxScore) * CHART_HEIGHT, day.score > 0 ? 4 : 0) }]}
+                    style={[
+                      styles.chartBar,
+                      {
+                        height: Math.max((day.score / maxScore) * CHART_HEIGHT, day.score > 0 ? 4 : 0),
+                        backgroundColor: Colors.$backgroundPrimaryHeavy,
+                      },
+                    ]}
                   />
                 </RNView>
                 <Spacing y={6} />
@@ -118,7 +130,6 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderRadius: 12,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: Colors.$outlineNeutral,
   },
   unlockedRow: {
     flexDirection: 'row',
@@ -141,6 +152,5 @@ const styles = StyleSheet.create({
   chartBar: {
     width: 18,
     borderRadius: 6,
-    backgroundColor: Colors.$backgroundPrimaryHeavy,
   },
 });

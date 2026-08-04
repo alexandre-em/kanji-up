@@ -25,12 +25,16 @@ export default function Settings() {
       <Spacing y={20} />
       <GoogleSignInButton />
       <Spacing y={28} />
-      <Text text70BO>{t('settings.section.preferences')}</Text>
+      <Text text70BO $textDefault>
+        {t('settings.section.preferences')}
+      </Text>
       <Spacing y={12} />
       <LanguageSelector />
       <Spacing y={16} />
-      <RNView style={styles.themeRow}>
-        <Text text80M>{t('settings.theme.title')}</Text>
+      <RNView style={[styles.themeRow, { borderColor: Colors.$outlineNeutral }]}>
+        <Text text80M $textDefault>
+          {t('settings.theme.title')}
+        </Text>
         <Text text90M $textNeutral>
           {t('settings.theme.comingSoon')}
         </Text>
@@ -48,7 +52,6 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 12,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: Colors.$outlineNeutral,
     opacity: 0.5,
   },
 });

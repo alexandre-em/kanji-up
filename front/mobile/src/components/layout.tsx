@@ -64,15 +64,23 @@ export default function Layout({ screen, withTabBar, hideBanner, children }: Lay
 
   return (
     <Animated.ScrollView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: Colors.$backgroundDefault }]}
       contentContainerStyle={{ paddingBottom: bottomClearance + GENERAL_MARGIN }}
       onScroll={handleScroll}
       scrollEventThrottle={16}>
       <View style={{ minHeight: height - headerHeight - bottomClearance }}>
         <Spacing y={20} />
-        {title !== `${screen}.title` && <Text h1>{title}</Text>}
+        {title !== `${screen}.title` && (
+          <Text h1 $textDefault>
+            {title}
+          </Text>
+        )}
         {title !== `${screen}.title` && subtitle !== `${screen}.subtitle` && <Spacing y={5} />}
-        {subtitle !== `${screen}.subtitle` && <Text text80L>{t(`${screen}.subtitle`)}</Text>}
+        {subtitle !== `${screen}.subtitle` && (
+          <Text text80L $textNeutral>
+            {t(`${screen}.subtitle`)}
+          </Text>
+        )}
         {title !== `${screen}.title` && subtitle !== `${screen}.subtitle` && <Spacing y={10} />}
         {!hideBanner && (
           <>
@@ -89,7 +97,6 @@ export default function Layout({ screen, withTabBar, hideBanner, children }: Lay
 const styles = StyleSheet.create({
   container: {
     height: '100%',
-    backgroundColor: Colors.$backgroundDefault,
     paddingLeft: 20,
     paddingRight: 20,
   },

@@ -21,12 +21,16 @@ export default function AccountSummary() {
     <RNView style={styles.row}>
       <Avatar name={userName} source={userPicture ? { uri: userPicture } : undefined} useAutoColors size={56} />
       <RNView style={styles.info}>
-        <Text text70BO numberOfLines={1}>
+        <Text text70BO $textDefault numberOfLines={1}>
           {userName}
         </Text>
         <RNView style={styles.subscriptionRow}>
-          <RNView style={[styles.badge, isPremium && styles.badgePremium]}>
-            <Text text100M style={isPremium ? { color: Colors.$textPrimary } : { color: Colors.$textNeutral }}>
+          <RNView
+            style={[
+              styles.badge,
+              { backgroundColor: isPremium ? Colors.$backgroundPrimaryLight : Colors.$backgroundNeutralLight },
+            ]}>
+            <Text text100M style={{ color: isPremium ? Colors.$textPrimary : Colors.$textNeutral }}>
               {subscriptionLabel}
             </Text>
           </RNView>
@@ -61,9 +65,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 8,
-    backgroundColor: Colors.$backgroundNeutralLight,
-  },
-  badgePremium: {
-    backgroundColor: Colors.$backgroundPrimaryLight,
   },
 });
