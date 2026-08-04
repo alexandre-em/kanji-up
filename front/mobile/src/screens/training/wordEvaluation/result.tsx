@@ -9,9 +9,10 @@ import { screenNames } from '../../../constants/screens';
 import { useEvaluationInterstitialAd } from '../../../hooks/useEvaluationInterstitialAd';
 import { useAppDispatch, useAppSelector } from '../../../hooks/useStore';
 import { useToaster } from '../../../providers/toaster';
-import { recordResults } from '../../../store/slices/progression';
 import { selectSelectedKanji } from '../../../store/slices/selectedKanji';
+import { syncKanjiProgression, user } from '../../../store/slices/user';
 import {
+  computeProgressionDeltas,
   confirmItem,
   getEffectiveStatus,
   getKanjiCharacters,
@@ -148,25 +149,16 @@ export default function WordEvaluationResult() {
   );
 
   const handleValidate = useCallback(async () => {
-    const kanjiIdByCharacter = new Map(
-      Object.values(selectedKanjiState).map((kanji) => [kanji.kanji?.character, kanji.kanji_id]),
-    );
-
-    const results = items
-      .filter((item) => item.status !== 'idle')
-      .flatMap((item) => {
-        const isCorrect = getEffectiveStatus(item) === 'correct';
-        return getKanjiCharacters(item.word.word?.[0] ?? '')
-          .map((character) => kanjiIdByCharacter.get(character))
-          .filter((kanjiId): kanjiId is string => !!kanjiId)
-          .map((kanjiId) => ({ kanjiId, isCorrect }));
-      });
+    const deltas = computeProgressionDeltas(items, selectedKanjiState);
+    deltas.forEach((delta) => dispatch(user.actions.updateProgression(delta)));
+    const points = deltas.filter((delta) => delta.inc > 0).length;
+    if (points > 0) dispatch(user.actions.addScore(points));
 
     setIsSaving(true);
-    const action = await dispatch(recordResults(results));
+    const action = await dispatch(syncKanjiProgression());
     setIsSaving(false);
 
-    if (recordResults.fulfilled.match(action)) {
+    if (syncKanjiProgression.fulfilled.match(action)) {
       dispatch(resetWordEvaluation());
       navigation.navigate(screenNames.HOME);
       toast?.show({ message: t('wordEvaluationResult.toast.success'), type: 'success' });

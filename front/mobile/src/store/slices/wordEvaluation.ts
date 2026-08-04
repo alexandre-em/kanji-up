@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from 'store';
 
+import { KANJI_PROGRESSION_INC, KANJI_PROGRESSION_INC_LOW } from '../../constants/progression';
 import { core } from '../../services/http';
 
 type AnswerStatusType = 'idle' | 'correct' | 'incorrect' | 'review';
@@ -40,6 +41,53 @@ const KANJI_REGEX = /[一-鿿㐀-䶿]/;
 
 export function getKanjiCharacters(word: string): string[] {
   return Array.from(word).filter((character) => KANJI_REGEX.test(character));
+}
+
+/** Same resilience reasoning as computeProgressionDeltas in evaluation.ts: recomputed from items
+ * at session-end, not dispatched live, so it survives an app kill mid-session. A word's kanji are
+ * looked up by character against the user's selected kanji, same as the stroke-count check above */
+export function computeProgressionDeltas(
+  items: WordEvaluationItemType[],
+  selectedKanji: Record<string, Partial<KanjiType>>,
+): { id: string; inc: number }[] {
+  const kanjiByCharacter: Record<string, { kanjiId: string; strokes?: number }> = {};
+  Object.values(selectedKanji).forEach((kanji) => {
+    if (kanji.kanji?.character && kanji.kanji_id) {
+      kanjiByCharacter[kanji.kanji.character] = { kanjiId: kanji.kanji_id, strokes: kanji.kanji.strokes };
+    }
+  });
+
+  const deltas: { id: string; inc: number }[] = [];
+
+  items.forEach((item) => {
+    const expectedCharacters = getKanjiCharacters(item.word.word?.[0] ?? '');
+    // A structural mismatch (wrong slot count) can't be reliably mapped back to which character
+    // each slot was meant to be — skip rather than guessing
+    if (item.slots.length !== expectedCharacters.length) return;
+
+    if (item.status === 'correct') {
+      expectedCharacters.forEach((character) => {
+        const kanjiId = kanjiByCharacter[character]?.kanjiId;
+        if (kanjiId) deltas.push({ id: kanjiId, inc: KANJI_PROGRESSION_INC });
+      });
+    } else if (item.status === 'incorrect') {
+      item.slots.forEach((slot, index) => {
+        const ref = kanjiByCharacter[expectedCharacters[index]];
+        const isSkip = !slot.image || slot.strokesCount === 0;
+        const isWrongStrokes = !isSkip && ref?.strokes !== undefined && slot.strokesCount !== ref.strokes;
+
+        if (isWrongStrokes && ref) deltas.push({ id: ref.kanjiId, inc: -KANJI_PROGRESSION_INC });
+      });
+    } else if (item.status === 'review' && item.userConfirmation !== null) {
+      expectedCharacters.forEach((character) => {
+        const kanjiId = kanjiByCharacter[character]?.kanjiId;
+        if (kanjiId)
+          deltas.push({ id: kanjiId, inc: item.userConfirmation ? KANJI_PROGRESSION_INC_LOW : -KANJI_PROGRESSION_INC });
+      });
+    }
+  });
+
+  return deltas;
 }
 
 export const init = createAsyncThunk('wordEvaluation/init', async (payload: { number?: number } | undefined, { getState }) => {

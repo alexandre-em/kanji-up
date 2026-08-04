@@ -11,8 +11,8 @@ import { useAppDispatch, useAppSelector } from '../../../hooks/useStore';
 import { useToaster } from '../../../providers/toaster';
 import { core } from '../../../services/http';
 import {
-  buildKanjiResults,
   clearLocalSession,
+  computeProgressionDeltas,
   confirmItem,
   EvaluationItemType,
   getEffectiveStatus,
@@ -23,7 +23,7 @@ import {
   selectPendingReviewCount,
   toKanjiQuestion,
 } from '../../../store/slices/evaluation';
-import { recordResults } from '../../../store/slices/progression';
+import { syncKanjiProgression, user } from '../../../store/slices/user';
 import ReviewModal from './reviewModal';
 
 function useItemMessage(item: EvaluationItemType) {
@@ -157,14 +157,16 @@ export default function EvaluationResult() {
   );
 
   const handleValidate = useCallback(async () => {
-    // One entry per tested kanji: a kanji drawn twice in the session counts as two attempts
-    const results = buildKanjiResults(items);
+    const deltas = computeProgressionDeltas(items);
+    deltas.forEach((delta) => dispatch(user.actions.updateProgression(delta)));
+    const points = deltas.filter((delta) => delta.inc > 0).length;
+    if (points > 0) dispatch(user.actions.addScore(points));
 
     setIsSaving(true);
-    const action = await dispatch(recordResults(results));
+    const action = await dispatch(syncKanjiProgression());
     setIsSaving(false);
 
-    if (recordResults.fulfilled.match(action)) {
+    if (syncKanjiProgression.fulfilled.match(action)) {
       await clearLocalSession();
 
       // Best-effort, same as the per-answer PATCH: a network hiccup here shouldn't block the

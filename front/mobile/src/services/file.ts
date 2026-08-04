@@ -3,7 +3,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export const fileNames = {
   SELECTED_KANJI: 'selectedKanji',
   SELECTED_WORD: 'selectedWord',
-  USER_SCORES: 'userScores',
   PENDING_KANJI_SESSION: 'pendingKanjiSession',
 };
 

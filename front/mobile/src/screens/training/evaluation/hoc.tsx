@@ -11,9 +11,9 @@ import { useToaster } from '../../../providers/toaster';
 import { fileNames, fileServiceInstance } from '../../../services/file';
 import { core } from '../../../services/http';
 import {
-  buildKanjiResults,
   checkActiveSession,
   clearLocalSession,
+  computeProgressionDeltas,
   EvaluationItemType,
   getEffectiveStatus,
   hydrateItems,
@@ -22,8 +22,8 @@ import {
   selectEvaluationStatus,
   startFreshSession,
 } from '../../../store/slices/evaluation';
-import { recordResults } from '../../../store/slices/progression';
 import { selectSelectedKanji } from '../../../store/slices/selectedKanji';
+import { syncKanjiProgression, user } from '../../../store/slices/user';
 import EvaluationScreen from '.';
 
 const numberKanji = 20;
@@ -97,7 +97,11 @@ export default function EvaluationHoc() {
         const answered = items.filter((item) => item.status !== 'idle');
 
         if (answered.length > 0) {
-          await dispatch(recordResults(buildKanjiResults(answered)));
+          const deltas = computeProgressionDeltas(answered);
+          deltas.forEach((delta) => dispatch(user.actions.updateProgression(delta)));
+          const points = deltas.filter((delta) => delta.inc > 0).length;
+          if (points > 0) dispatch(user.actions.addScore(points));
+          await dispatch(syncKanjiProgression());
 
           if (sessionId) {
             const correctCount = answered.filter((item) => getEffectiveStatus(item) === 'correct').length;

@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from 'store';
 
+import { KANJI_PROGRESSION_INC, KANJI_PROGRESSION_INC_LOW } from '../../constants/progression';
 import { fileNames, fileServiceInstance } from '../../services/file';
 import { core } from '../../services/http';
 
@@ -45,11 +46,28 @@ export function getEffectiveStatus(item: EvaluationItemType): AnswerStatusType {
   return item.userConfirmation ? 'correct' : 'incorrect';
 }
 
-/** One entry per tested kanji, correct meaning the user's final effective verdict, model or self-confirmed */
-export function buildKanjiResults(items: EvaluationItemType[]) {
-  return items
-    .filter((item): item is EvaluationItemType & { kanji: { kanji_id: string } } => !!item.kanji.kanji_id)
-    .map((item) => ({ kanjiId: item.kanji.kanji_id, isCorrect: getEffectiveStatus(item) === 'correct' }));
+/** Progression deltas for a finished (or abandoned) run, recomputed from the items themselves
+ * rather than dispatched live per-answer — items are what survives an app kill, in-memory Redux
+ * state isn't, so this is what makes progression resilient to a resumed session */
+export function computeProgressionDeltas(items: EvaluationItemType[]): { id: string; inc: number }[] {
+  const deltas: { id: string; inc: number }[] = [];
+
+  items.forEach((item) => {
+    const kanjiId = item.kanji.kanji_id;
+    if (!kanjiId) return;
+
+    if (item.status === 'correct') {
+      deltas.push({ id: kanjiId, inc: KANJI_PROGRESSION_INC });
+    } else if (item.status === 'incorrect') {
+      // A skip (no drawing at all) carries no penalty, unlike a wrong stroke count
+      const isSkip = !item.image || item.strokesCount === 0;
+      if (!isSkip) deltas.push({ id: kanjiId, inc: -KANJI_PROGRESSION_INC });
+    } else if (item.status === 'review' && item.userConfirmation !== null) {
+      deltas.push({ id: kanjiId, inc: item.userConfirmation ? KANJI_PROGRESSION_INC_LOW : -KANJI_PROGRESSION_INC });
+    }
+  });
+
+  return deltas;
 }
 
 export function toKanjiQuestion(item: EvaluationItemType): KanjiSessionQuestion {
