@@ -1,6 +1,7 @@
 import { predict } from '@kanjiup/recognition';
 import { useNavigation } from '@react-navigation/native';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { StyleSheet, View as RNView } from 'react-native';
 import { Assets, Button, Chip, Colors, Icon, ProgressBar, Text, View } from 'react-native-ui-lib';
 import ViewShot from 'react-native-view-shot';
@@ -10,6 +11,7 @@ import Layout from '../../../components/layout.tsx';
 import Spacing from '../../../components/spacing.tsx';
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from '../../../constants/styles.ts';
 import { useAppDispatch, useAppSelector } from '../../../hooks/useStore';
+import { useIsOffline } from '../../../providers/network';
 import { useToaster } from '../../../providers/toaster';
 import { selectCurrentIndex, selectEvaluationItems, updateItemScore } from '../../../store/slices/evaluation';
 import EvaluationResult from './result.tsx';
@@ -17,8 +19,10 @@ import EvaluationResult from './result.tsx';
 const TIMER_DURATION = 60;
 
 export default function EvaluationScreen() {
+  const { t } = useTranslation();
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
+  const isOffline = useIsOffline();
   const currentIndex = useAppSelector(selectCurrentIndex);
   const evaluationItems = useAppSelector(selectEvaluationItems);
   const viewShotRef = useRef(null);
@@ -126,6 +130,14 @@ export default function EvaluationScreen() {
             </RNView>
             <ProgressBar progress={((currentIndex + 1) / evaluationItems.length) * 100} fullWidth style={styles.progressBar} />
           </View>
+          {isOffline && (
+            <>
+              <Spacing y={10} />
+              <Text text90M $textWarning center>
+                {t('evaluation.offline.notice')}
+              </Text>
+            </>
+          )}
           <Spacing y={20} />
           <RNView style={styles.timer}>
             <Icon source={Assets.icons.timer} size={20} tintColor={Colors.$textPrimary} />

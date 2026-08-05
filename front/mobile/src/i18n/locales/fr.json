@@ -1,6 +1,7 @@
 {
   "offline.banner": "Hors ligne — certaines fonctionnalités sont indisponibles",
   "offline.badge": "Hors ligne",
+  "evaluation.offline.notice": "Hors ligne — tes résultats seront envoyés une fois reconnecté",
   "onboarding.welcome.title": "Welcome to KanjiUp",
   "onboarding.welcome.subtitle": "Level up your kanji knowledge with KanjiUp!",
   "onboarding.welcome.subtitle.highlight": "Level up",
