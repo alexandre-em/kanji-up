@@ -10,6 +10,8 @@ type HomeButtonsType = {
   screen: string;
   premium: boolean;
   hide?: boolean;
+  /** Needs a live network call to be useful — greyed out with an offline badge when offline */
+  requiresNetwork?: boolean;
 };
 
 export const homeMenuButtons: HomeButtonsType[] = [
@@ -19,6 +21,7 @@ export const homeMenuButtons: HomeButtonsType[] = [
     icon: <Icon source={Assets.icons.selection} size={36} tintColor={Colors.$textPrimary} />,
     screen: screenNames.CATEGORIES,
     premium: false,
+    requiresNetwork: true,
   },
   {
     textKey: 'home.menu.ocr.title',
@@ -26,6 +29,7 @@ export const homeMenuButtons: HomeButtonsType[] = [
     icon: <Icon source={Assets.icons.recognition} size={36} tintColor={Colors.$textPrimary} />,
     screen: screenNames.OCR,
     premium: true,
+    requiresNetwork: true,
   },
 ];
 

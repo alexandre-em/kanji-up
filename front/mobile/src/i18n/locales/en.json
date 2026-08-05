@@ -1,5 +1,6 @@
 {
   "offline.banner": "You're offline — some features are unavailable",
+  "offline.badge": "Offline",
   "onboarding.welcome.title": "Welcome to KanjiUp",
   "onboarding.welcome.subtitle": "Level up your kanji knowledge with KanjiUp!",
   "onboarding.welcome.subtitle.highlight": "Level up",
