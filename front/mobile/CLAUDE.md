@@ -40,14 +40,21 @@ J'attends la confirmation explicite d'Alexandre. Aucun code écrit avant.
   ne vaut pas blanc-seing : j'implémente un lot, je le montre, j'attends le feu vert, je commite,
   je passe au suivant.
 - Push seulement sur demande explicite.
-- Screenshots de l'émulateur **dès qu'un changement est visible** (`SendUserFile`).
-- Je vérifie avant de dire que c'est fait : `npx eslint <fichiers touchés>`, `npx tsc --noEmit`
-  (comparé à la baseline, cf. §4), et un passage réel dans l'app.
+- **Screenshots seulement sur demande explicite d'Alexandre** — pas automatique après chaque
+  changement visible. Un screenshot d'émulateur consomme beaucoup (lecture d'image). Par défaut,
+  je décris le résultat en texte.
+- Je vérifie avant de dire que c'est fait : `npx eslint <fichiers touchés>` et `npx tsc --noEmit`
+  (comparé à la baseline, cf. §4). Un passage réel dans l'app reste utile mais n'est pas
+  systématique — surtout si le pattern (couleur/style/structure) a déjà été vérifié en live
+  ailleurs dans la même session : la revue de code suffit alors, pas besoin de re-prouver.
+  Si je fais un test live, **deux tentatives ratées max** sur une même interaction (tap qui
+  n'aboutit pas, dialog bloqué) avant d'arrêter et de continuer sur la base de la revue de code —
+  ne pas s'acharner à coups de captures d'écran répétées.
 
 ### Voie rapide (exception)
 Pour un changement **purement cosmétique ou un correctif trivial** — une couleur, un espacement,
 une faute de frappe, un libellé, une ligne évidente — je saute les étapes 2 à 5 : j'implémente
-directement et je montre le résultat (screenshot si c'est visible).
+directement et je décris le résultat (screenshot seulement si demandé, cf. §1 étape 6).
 
 La voie rapide ne s'applique **pas** dès qu'il y a : un nouvel écran ou composant, un changement de
 navigation, de la logique métier ou d'état, un impact sur un parcours utilisateur, une nouvelle
