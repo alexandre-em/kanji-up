@@ -43,7 +43,7 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
 
   const ViewMode = useMemo(
     () => (
-      <View style={styles.canvas}>
+      <View style={[styles.canvas, { backgroundColor: Colors.$backgroundNeutralLight, borderColor: Colors.$outlineNeutral }]}>
         {svg && (
           <AnimatedSvgRenderer
             width={CANVAS_WIDTH}
@@ -60,7 +60,7 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
 
   const CanvasMode = useMemo(
     () => (
-      <View style={styles.canvas}>
+      <View style={[styles.canvas, { backgroundColor: Colors.$backgroundNeutralLight, borderColor: Colors.$outlineNeutral }]}>
         <View style={[styles.canvasContainer, styles.character]}>
           <Canvas width={CANVAS_WIDTH} height={CANVAS_HEIGHT} hideBackground />
         </View>
@@ -145,7 +145,7 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
       <Spacing y={20} />
       <ScrollView>
         <View row centerH>
-          <Card style={styles.cardYomi}>
+          <Card style={[styles.cardYomi, { backgroundColor: Colors.$backgroundGeneralLight, borderColor: Colors.$textPrimary }]}>
             <Card.Section
               content={[
                 {
@@ -157,13 +157,14 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
                 {
                   text: entities[character]?.kanji?.onyomi?.join(', ') ?? '',
                   text70M: true,
+                  color: Colors.$textDefault,
                   style: { backgroundColor: Colors.$backgroundGeneralLight },
                 },
               ]}
             />
           </Card>
           <Spacing x={15} />
-          <Card style={styles.cardYomi}>
+          <Card style={[styles.cardYomi, { backgroundColor: Colors.$backgroundGeneralLight, borderColor: Colors.$textPrimary }]}>
             <Card.Section
               content={[
                 {
@@ -175,6 +176,7 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
                 {
                   text: entities[character]?.kanji?.kunyomi?.join(', ') ?? '',
                   text70M: true,
+                  color: Colors.$textDefault,
                   style: { backgroundColor: Colors.$backgroundGeneralLight },
                 },
               ]}
@@ -184,17 +186,19 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
         {entities[character]?.kanji?.meaning && (
           <>
             <Spacing y={15} />
-            <Card style={[styles.card]}>
+            <Card style={[styles.card, { backgroundColor: Colors.$backgroundNeutralLight }]}>
               <Card.Section
                 content={[
                   {
                     text: t('kanjiDetails.meanings'),
                     text70BL: true,
+                    color: Colors.$textDefault,
                     style: { backgroundColor: Colors.$backgroundNeutralLight },
                   },
                   ...(entities[character]?.kanji?.meaning?.map((meaning) => ({
                     text: meaning,
                     style: { backgroundColor: Colors.$backgroundNeutralLight },
+                    color: Colors.$textDefault,
                     text80L: true,
                   })) ?? []),
                 ]}
@@ -207,24 +211,24 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
           <Card enableShadow={false}>
             <Card.Section
               content={[
-                { text: t('kanjiDetails.grade.school'), text70BL: true, center: true },
-                { text: kanji?.reference?.grade ?? '-', text70: true, center: true },
+                { text: t('kanjiDetails.grade.school'), text70BL: true, center: true, color: Colors.$textDefault },
+                { text: kanji?.reference?.grade ?? '-', text70: true, center: true, color: Colors.$textNeutral },
               ]}
             />
           </Card>
           <Card enableShadow={false}>
             <Card.Section
               content={[
-                { text: t('kanjiDetails.grade.jlpt'), text70BL: true, center: true },
-                { text: kanji?.kanji?.jlpt ?? '-', text70: true, center: true },
+                { text: t('kanjiDetails.grade.jlpt'), text70BL: true, center: true, color: Colors.$textDefault },
+                { text: kanji?.kanji?.jlpt ?? '-', text70: true, center: true, color: Colors.$textNeutral },
               ]}
             />
           </Card>
           <Card enableShadow={false}>
             <Card.Section
               content={[
-                { text: t('kanjiDetails.strokes'), text70BL: true, center: true },
-                { text: kanji?.kanji?.strokes, text70: true, center: true },
+                { text: t('kanjiDetails.strokes'), text70BL: true, center: true, color: Colors.$textDefault },
+                { text: kanji?.kanji?.strokes, text70: true, center: true, color: Colors.$textNeutral },
               ]}
             />
           </Card>
@@ -240,7 +244,7 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
             }}
             sectionHeader={
               <View row centerV style={{ justifyContent: 'space-between' }}>
-                <Text grey10 text60>
+                <Text text60 $textDefault>
                   {t('kanjiDetails.section.radical.title')}
                 </Text>
                 <Icon source={showRadical ? Assets.icons.down : Assets.icons.up} size={25} />
@@ -248,19 +252,27 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
             }>
             <View>
               <Spacing y={10} />
-              <Card style={styles.card}>
+              <Card style={[styles.card, { backgroundColor: Colors.$backgroundNeutralLight }]}>
                 <View row style={{ justifyContent: 'space-around', backgroundColor: Colors.$backgroundNeutralLight }}>
                   <Text text40BO $textPrimary>
                     {kanji.radical.character}
                   </Text>
                   <View style={{ backgroundColor: Colors.$backgroundNeutralLight }}>
-                    <Text text70BL>{kanji.radical.name?.hiragana ?? ''}</Text>
-                    <Text text80>{kanji.radical.name?.romaji ?? ''}</Text>
+                    <Text text70BL $textDefault>
+                      {kanji.radical.name?.hiragana ?? ''}
+                    </Text>
+                    <Text text80 $textNeutral>
+                      {kanji.radical.name?.romaji ?? ''}
+                    </Text>
                   </View>
                 </View>
                 <Spacing y={10} />
-                <Text text80BL>{t('kanjiDetails.meanings')}</Text>
-                <Text text70>{kanji.radical.meaning?.join(',')}</Text>
+                <Text text80BL $textDefault>
+                  {t('kanjiDetails.meanings')}
+                </Text>
+                <Text text70 $textNeutral>
+                  {kanji.radical.meaning?.join(',')}
+                </Text>
               </Card>
             </View>
           </ExpandableSection>
@@ -276,7 +288,7 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
             }}
             sectionHeader={
               <View row centerV style={{ justifyContent: 'space-between' }}>
-                <Text grey10 text60>
+                <Text text60 $textDefault>
                   {t('kanjiDetails.section.example.title')}
                 </Text>
                 <Icon source={showRadical ? Assets.icons.down : Assets.icons.up} size={25} />
@@ -287,9 +299,13 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
               {kanji.examples.map((example, i) => (
                 <View key={example.japanese + example.meaning}>
                   {i !== 0 && <Spacing y={10} />}
-                  <Card centerV style={styles.card} enableShadow={false}>
-                    <Text text70BL>{example.japanese}</Text>
-                    <Text text80>{example.meaning}</Text>
+                  <Card centerV style={[styles.card, { backgroundColor: Colors.$backgroundNeutralLight }]} enableShadow={false}>
+                    <Text text70BL $textDefault>
+                      {example.japanese}
+                    </Text>
+                    <Text text80 $textNeutral>
+                      {example.meaning}
+                    </Text>
                   </Card>
                 </View>
               ))}
@@ -324,10 +340,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
-    backgroundColor: Colors.$backgroundNeutralLight,
     borderRadius: 10,
     borderWidth: 0.5,
-    borderColor: Colors.$outlineNeutral,
   },
   character: {
     width: CANVAS_WIDTH,
@@ -351,13 +365,10 @@ const styles = StyleSheet.create({
   cardYomi: {
     width: width / 2 - 30,
     padding: 10,
-    backgroundColor: Colors.$backgroundGeneralLight,
-    borderColor: Colors.$textPrimary,
     borderWidth: 0.25,
   },
   card: {
     width: '100%',
     padding: 10,
-    backgroundColor: Colors.$backgroundNeutralLight,
   },
 });

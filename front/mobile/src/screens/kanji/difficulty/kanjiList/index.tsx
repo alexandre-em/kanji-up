@@ -90,13 +90,13 @@ const KanjiCardElement = ({ kanji, onPress, isLocked }: KanjiCardElementProps) =
         />
       )}
       {isLocked ? (
-        <View style={styles.lockedContent}>
+        <View style={[styles.lockedContent, { backgroundColor: Colors.$backgroundNeutralMedium }]}>
           <Lock size={18} color={Colors.$iconNeutral} />
         </View>
       ) : (
         <Card.Section
           content={[{ text: kanji.kanji!.character, text40BL: true, color: Colors.$textDefault }]}
-          contentStyle={styles.cardContent}
+          contentStyle={[styles.cardContent, { backgroundColor: Colors.$backgroundNeutralLight }]}
         />
       )}
     </Card>
@@ -272,7 +272,7 @@ export default function KanjiList(props: KanjiListProps) {
             <View style={styles.loader}>
               <ActivityIndicator style={{ marginVertical: 16 }} color={Colors.$backgroundPrimaryHeavy} size="large" />
               <Spacing x={10} />
-              <Text>{t('loading.title')}</Text>
+              <Text $textDefault>{t('loading.title')}</Text>
             </View>
           ) : null
         }
@@ -300,14 +300,12 @@ const styles = StyleSheet.create({
   cardContent: {
     width: '100%',
     height: '100%',
-    backgroundColor: Colors.$backgroundNeutralLight,
     justifyContent: 'center',
     alignItems: 'center',
   },
   lockedContent: {
     width: '100%',
     height: '100%',
-    backgroundColor: Colors.$backgroundNeutralMedium,
     justifyContent: 'center',
     alignItems: 'center',
   },

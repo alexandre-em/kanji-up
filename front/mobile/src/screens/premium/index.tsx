@@ -157,7 +157,7 @@ export default function Premium() {
         <View center flex>
           <Icon source={Assets.icons.premium} size={48} tintColor={Colors.$textPrimary} />
           <Spacing y={20} />
-          <Text text70BO center>
+          <Text text70BO $textDefault center>
             {t('premium.active.title')}
           </Text>
           <Spacing y={8} />
@@ -179,11 +179,13 @@ export default function Premium() {
         <Icon source={Assets.icons.premium} size={48} tintColor={Colors.$textPrimary} />
       </RNView>
       <Spacing y={20} />
-      <Text text60BL>{t('premium.benefits.title')}</Text>
+      <Text text60BL $textDefault>
+        {t('premium.benefits.title')}
+      </Text>
       <Spacing y={12} />
       {BENEFIT_KEYS.map((key) => (
         <RNView key={key} style={styles.benefitRow}>
-          <RNView style={styles.benefitIcon}>
+          <RNView style={[styles.benefitIcon, { backgroundColor: Colors.$backgroundSuccessLight }]}>
             <Icon source={Assets.icons.check} size={16} tintColor={Colors.$iconSuccess} />
           </RNView>
           <Text text80M $textDefault style={styles.benefitText}>
@@ -196,9 +198,11 @@ export default function Premium() {
         <RNView key={plan}>
           <Card width={width - GENERAL_MARGIN * 2} style={styles.planCard} onPress={() => handleSelectPlan(plan)}>
             <RNView style={styles.planHeader}>
-              <Text text70BL>{t(`premium.plans.${plan}.title`)}</Text>
+              <Text text70BL $textDefault>
+                {t(`premium.plans.${plan}.title`)}
+              </Text>
               {plan !== 'monthly' && (
-                <RNView style={styles.planBadge}>
+                <RNView style={[styles.planBadge, { backgroundColor: Colors.$backgroundPrimaryLight }]}>
                   <Text text90BO $textPrimary>
                     {t(`premium.plans.${plan}.badge`)}
                   </Text>
@@ -237,7 +241,6 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: Colors.$backgroundSuccessLight,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -254,7 +257,6 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   planBadge: {
-    backgroundColor: Colors.$backgroundPrimaryLight,
     borderRadius: 8,
     paddingHorizontal: 8,
     paddingVertical: 2,

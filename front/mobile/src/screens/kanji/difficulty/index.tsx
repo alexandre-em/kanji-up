@@ -59,16 +59,17 @@ export default function KanjiDifficulties({ route }: KanjiDifficultiesProps) {
               spread
               style={isLocked ? styles.cardLocked : undefined}>
               {button.image}
-              <View style={styles.cardContainer}>
+              <View style={[styles.cardContainer, { backgroundColor: Colors.$backgroundNeutralLight }]}>
                 <Card.Section
                   flex
                   content={[
-                    { text: t(button.textKey), text60BL: true },
+                    { text: t(button.textKey), text60BL: true, $textDefault: true },
                     {
                       text: `${button.count} ${t(button.subtitle)}`,
                       highlightString: `${button.count}`,
                       highlightStyle: { color: Colors.$backgroundPrimaryHeavy, fontWeight: '700' },
                       text80M: true,
+                      $textNeutral: true,
                     },
                   ]}
                   contentStyle={styles.transparent}
@@ -90,7 +91,6 @@ export default function KanjiDifficulties({ route }: KanjiDifficultiesProps) {
 
 const styles = StyleSheet.create({
   cardContainer: {
-    backgroundColor: Colors.$backgroundNeutralLight,
     display: 'flex',
     justifyContent: 'center',
     width: '100%',
