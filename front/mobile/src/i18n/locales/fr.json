@@ -1,6 +1,8 @@
 {
   "offline.banner": "Hors ligne — certaines fonctionnalités sont indisponibles",
   "offline.badge": "Hors ligne",
+  "kanjiDetails.locked.message": "Ce kanji fait partie d'un palier payant — débloque-le avec des crédits ou passe en Premium pour accéder à tous les paliers instantanément.",
+  "kanjiDetails.locked.unlockButton": "Débloquer ({{cost}})",
   "evaluation.offline.notice": "Hors ligne — tes résultats seront envoyés une fois reconnecté",
   "onboarding.welcome.title": "Welcome to KanjiUp",
   "onboarding.welcome.subtitle": "Level up your kanji knowledge with KanjiUp!",

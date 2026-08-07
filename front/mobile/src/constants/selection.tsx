@@ -140,7 +140,7 @@ export const jlptDifficulties = [
     textKey: 'difficulties.jlpt.level1.title',
     subtitle: `difficulties.jlpt.unit`,
     screen: '1',
-    count: 1136,
+    count: 1232,
     image: <Card.Image source={Assets.banners.jlpt} style={styles.smallBannerImage} />,
   },
 ];

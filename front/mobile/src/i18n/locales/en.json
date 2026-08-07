@@ -139,6 +139,8 @@
   "kanjiDetails.grade.jlpt": "JLPT",
   "kanjiDetails.section.radical.title": "Radical",
   "kanjiDetails.section.example.title": "Example",
+  "kanjiDetails.locked.message": "This kanji is part of a paid tier — unlock it with credits or go Premium to access every tier instantly.",
+  "kanjiDetails.locked.unlockButton": "Unlock ({{cost}})",
   "kanji.select.toast.success": "Characters added to selection",
   "kanji.unselect.toast.success": "Updates saved with unselected characters",
 

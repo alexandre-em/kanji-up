@@ -9,13 +9,18 @@ import AnimatedSvgRenderer from '../../../../../components/AnimatedSvgRenderer';
 import Canvas from '../../../../../components/canvas.tsx';
 import Layout from '../../../../../components/layout.tsx';
 import Spacing from '../../../../../components/spacing.tsx';
+import Lock from '../../../../../components/svg/lock';
 import SvgSilhouette from '../../../../../components/svgSilhouette.tsx';
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from '../../../../../constants/styles.ts';
+import { PER_KANJI_UNLOCK_COST } from '../../../../../constants/unlockCosts.ts';
 import { useAppDispatch, useAppSelector } from '../../../../../hooks/useStore.tsx';
 import { useToaster } from '../../../../../providers/toaster.tsx';
 import { core } from '../../../../../services/http.ts';
 import { getOne, selectEntities } from '../../../../../store/slices/kanji.ts';
 import { save, selectedKanji, selectSaveStatus, selectSelectedKanji } from '../../../../../store/slices/selectedKanji.ts';
+import { selectUserState, unlockContent } from '../../../../../store/slices/user.ts';
+import { getCheapestLockedTier, isKanjiLocked } from '../../../../../utils/kanjiLock.ts';
+import UnlockModal from '../unlockModal.tsx';
 
 type KanjiDetailsProps = RouteParamsProps<{
   character: string;
@@ -35,11 +40,36 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
   const [showModal, setShowModal] = useState(false);
   const [showRadical, setShowRadical] = useState(false);
   const [showExample, setShowExample] = useState(false);
+  const [isUnlockVisible, setIsUnlockVisible] = useState(false);
+  const [isUnlocking, setIsUnlocking] = useState(false);
   const toaster = useToaster();
+  const userState = useAppSelector(selectUserState);
 
   console.log({ selectedKanjiState });
 
   const kanji = useMemo(() => entities[character], [entities[character]]);
+  // A kanji can belong to both a JLPT tier and a school grade tier — locked here only means
+  // every classification it has is a paid, not-yet-unlocked one (see utils/kanjiLock)
+  const locked = useMemo(() => (kanji ? isKanjiLocked(kanji, userState) : false), [kanji, userState]);
+  const unlockTierKey = useMemo(() => (kanji ? getCheapestLockedTier(kanji, userState) : null), [kanji, userState]);
+  const unlockCost = unlockTierKey ? PER_KANJI_UNLOCK_COST[unlockTierKey] : 0;
+
+  const handleConfirmUnlock = useCallback(async () => {
+    if (!unlockTierKey) return;
+
+    setIsUnlocking(true);
+    const action = await dispatch(
+      unlockContent({ userId: userState.userId, scope: 'kanji', tier: unlockTierKey, kanjiId: character }),
+    );
+    setIsUnlocking(false);
+
+    if (unlockContent.fulfilled.match(action)) {
+      toaster?.show({ message: t('kanjiList.unlock.toast.success'), type: 'success' });
+      setIsUnlockVisible(false);
+    } else {
+      toaster?.show({ message: t('kanjiList.unlock.toast.error'), type: 'failure' });
+    }
+  }, [unlockTierKey, dispatch, userState.userId, character, toaster, t]);
 
   const ViewMode = useMemo(
     () => (
@@ -121,6 +151,35 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
       core.kanjiService?.getOneImage({ kanji: entities[character].kanji.character }).then((res) => setSvg(res.data));
     }
   }, [entities[character]?.kanji?.character]);
+
+  if (locked) {
+    return (
+      <Layout screen="kanji">
+        <View style={styles.lockedContainer}>
+          <Lock size={48} color={Colors.$iconNeutral} />
+          <Spacing y={16} />
+          <Text text50BL $textDefault center>
+            {kanji?.kanji?.character}
+          </Text>
+          <Spacing y={8} />
+          <Text text80M $textNeutral center>
+            {t('kanjiDetails.locked.message')}
+          </Text>
+          <Spacing y={20} />
+          <Button label={t('kanjiDetails.locked.unlockButton', { cost: unlockCost })} onPress={() => setIsUnlockVisible(true)} />
+        </View>
+        <UnlockModal
+          visible={isUnlockVisible}
+          label={t('kanjiList.unlock.single.label')}
+          cost={unlockCost}
+          credits={userState.credits}
+          isUnlocking={isUnlocking}
+          onConfirm={handleConfirmUnlock}
+          onClose={() => setIsUnlockVisible(false)}
+        />
+      </Layout>
+    );
+  }
 
   return (
     <Layout screen="kanji">
@@ -332,6 +391,13 @@ const styles = StyleSheet.create({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  lockedContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 80,
+    paddingHorizontal: 20,
   },
   canvas: {
     width: CANVAS_WIDTH,

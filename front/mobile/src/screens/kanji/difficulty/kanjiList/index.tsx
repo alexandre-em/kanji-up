@@ -26,6 +26,7 @@ import {
   selectSelectedKanji,
 } from '../../../../store/slices/selectedKanji';
 import { selectUserState, unlockContent } from '../../../../store/slices/user';
+import { isKanjiLocked } from '../../../../utils/kanjiLock';
 import UnlockModal from './unlockModal';
 
 type KanjiListProps = RouteParamsProps<{
@@ -103,14 +104,12 @@ const KanjiCardElement = ({ kanji, onPress, isLocked }: KanjiCardElementProps) =
   );
 };
 
-type UnlockTarget = { scope: 'kanji'; kanji: Partial<KanjiType> } | { scope: 'tier' };
-
 export default function KanjiList(props: KanjiListProps) {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const insets = useSafeAreaInsets();
   const [isSelectModeOn, setIsSelectModeOn] = useState(false);
-  const [unlockTarget, setUnlockTarget] = useState<UnlockTarget | null>(null);
+  const [isBulkUnlockVisible, setIsBulkUnlockVisible] = useState(false);
   const [isUnlocking, setIsUnlocking] = useState(false);
   const navigation = useNavigation();
   const last = useAppSelector(selectLastGet);
@@ -132,12 +131,6 @@ export default function KanjiList(props: KanjiListProps) {
   // Only paid tiers (present in the cost table) have anything to unlock — free tiers (JLPT
   // N5/N4, grade 1-6) never gate a single kanji, perKanjiCost stays undefined for them
   const isTierPaid = perKanjiCost !== undefined;
-
-  const isKanjiLocked = useCallback(
-    (kanji: Partial<KanjiType>) =>
-      isTierPaid && !isPremium && !isTierUnlocked && !userState.unlockedKanji.includes(kanji.kanji_id!),
-    [isTierPaid, isPremium, isTierUnlocked, userState.unlockedKanji],
-  );
 
   const kanjiList = useMemo(() => {
     const isOnline = true;
@@ -170,38 +163,29 @@ export default function KanjiList(props: KanjiListProps) {
     [dispatch, toAdd, toRemove, entities],
   );
 
+  // Locked kanji navigate through too now — the detail screen is the single place that gates
+  // access (it can tell whether a kanji is genuinely locked across all its tiers, not just this
+  // one), showing an unlock prompt there instead of blocking the tap here
   const handlePress = useCallback(
     (kanji: Partial<KanjiType>) => {
       if (isSelectModeOn) handleSelect(kanji);
-      else if (isKanjiLocked(kanji)) setUnlockTarget({ scope: 'kanji', kanji });
       else handleRedirect(kanji);
     },
-    [isSelectModeOn, handleRedirect, handleSelect, isKanjiLocked],
+    [isSelectModeOn, handleRedirect, handleSelect],
   );
 
   const handleConfirmUnlock = useCallback(async () => {
-    if (!unlockTarget) return;
-
     setIsUnlocking(true);
-    const action = await dispatch(
-      unlockTarget.scope === 'kanji'
-        ? unlockContent({
-            userId: userState.userId,
-            scope: 'kanji',
-            tier: tierKey,
-            kanjiId: unlockTarget.kanji.kanji_id!,
-          })
-        : unlockContent({ userId: userState.userId, scope: 'tier', tier: tierKey }),
-    );
+    const action = await dispatch(unlockContent({ userId: userState.userId, scope: 'tier', tier: tierKey }));
     setIsUnlocking(false);
 
     if (unlockContent.fulfilled.match(action)) {
       toaster?.show({ message: t('kanjiList.unlock.toast.success'), type: 'success' });
-      setUnlockTarget(null);
+      setIsBulkUnlockVisible(false);
     } else {
       toaster?.show({ message: t('kanjiList.unlock.toast.error'), type: 'failure' });
     }
-  }, [unlockTarget, dispatch, userState.userId, tierKey, toaster, t]);
+  }, [dispatch, userState.userId, tierKey, toaster, t]);
 
   const handleSave = useCallback(() => {
     dispatch(save());
@@ -248,7 +232,7 @@ export default function KanjiList(props: KanjiListProps) {
         {isTierPaid && !isPremium && !isTierUnlocked && (
           <Button
             label={t('kanjiList.unlock.bulkButton', { cost: bulkCost })}
-            onPress={() => setUnlockTarget({ scope: 'tier' })}
+            onPress={() => setIsBulkUnlockVisible(true)}
             size="xSmall"
             outline
             style={styles.unlockAllButton}
@@ -260,7 +244,7 @@ export default function KanjiList(props: KanjiListProps) {
         data={kanjiList}
         keyExtractor={(item) => item.kanji_id!}
         renderItem={({ item }) => (
-          <KanjiCardElement kanji={item} onPress={() => handlePress(item)} isLocked={isKanjiLocked(item)} />
+          <KanjiCardElement kanji={item} onPress={() => handlePress(item)} isLocked={isKanjiLocked(item, userState)} />
         )}
         onEndReached={handleEndReached}
         onEndReachedThreshold={0.15}
@@ -279,13 +263,13 @@ export default function KanjiList(props: KanjiListProps) {
         numColumns={5}
       />
       <UnlockModal
-        visible={unlockTarget !== null}
-        label={unlockTarget?.scope === 'kanji' ? t('kanjiList.unlock.single.label') : t('kanjiList.unlock.bulk.label')}
-        cost={(unlockTarget?.scope === 'kanji' ? perKanjiCost : bulkCost) ?? 0}
+        visible={isBulkUnlockVisible}
+        label={t('kanjiList.unlock.bulk.label')}
+        cost={bulkCost ?? 0}
         credits={userState.credits}
         isUnlocking={isUnlocking}
         onConfirm={handleConfirmUnlock}
-        onClose={() => setUnlockTarget(null)}
+        onClose={() => setIsBulkUnlockVisible(false)}
       />
     </Layout>
   );
