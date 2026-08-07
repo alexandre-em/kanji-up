@@ -43,15 +43,10 @@ function todayLocal(): string {
 }
 
 export const getUser = createAsyncThunk<UserType, GetUserInput>('user/get', async (input) => {
-  try {
-    const response =
-      'userId' in input ? await core.authService!.get(input.userId) : await core.authService!.getByMacAddress(input.macAddress);
+  const response =
+    'userId' in input ? await core.authService!.get(input.userId) : await core.authService!.getByMacAddress(input.macAddress);
 
-    return response.data;
-  } catch (error) {
-    console.error('Error getting user', error);
-    return null;
-  }
+  return response.data;
 });
 
 export const createUser = createAsyncThunk<void, Pick<UserType, 'name' | 'macAddress'>>('user/create', async (payload) => {
