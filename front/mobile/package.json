@@ -1,6 +1,7 @@
 {
   "name": "kanji-up",
   "version": "0.0.1",
+  "description": "Learn and memorize Japanese kanji with flashcards, drawing quizzes, and OCR word lookup.",
   "private": true,
   "scripts": {
     "android": "react-native run-android",

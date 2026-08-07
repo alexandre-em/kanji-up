@@ -1,0 +1,10 @@
+Kanji Up helps you learn and remember Japanese kanji through hands-on practice, not just flashcards.
+
+- Build your own kanji list, organized by JLPT level (N5 to N1) or Japanese school grade (1 to 12)
+- Practice by drawing each kanji from memory — get instant feedback on your strokes
+- Train with real words: guess the reading, review your answers, and track your progress
+- Scan real-world Japanese text and look up unfamiliar words on the spot
+- Complete daily missions to earn credits and unlock more kanji tiers
+- Track your progress on your profile: mastery score, unlocked content, and recent activity
+
+Whether you're studying for the JLPT or just starting your kanji journey, Kanji Up keeps practice focused and consistent.

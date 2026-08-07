@@ -1,0 +1,6 @@
+<resources>
+
+    <!-- Brand red, matches the web app's splash background (front/apps/kanji-up/app.json) -->
+    <color name="splashBackground">#851a1b</color>
+
+</resources>
