@@ -1,4 +1,5 @@
 import React, { useCallback } from 'react';
+import { Colors } from 'react-native-ui-lib';
 import Incubator from 'react-native-ui-lib/incubator';
 
 const { Toast } = Incubator;
@@ -47,6 +48,8 @@ export function ToasterProvider({ children }: { children: React.ReactNode }) {
         swipeable
         preset={!type || type === 'loading' ? 'general' : type}
         onDismiss={handleDismiss}
+        backgroundColor={Colors.$backgroundNeutralLight}
+        messageStyle={{ color: Colors.$textDefault }}
       />
       {children}
     </ToasterContext.Provider>
