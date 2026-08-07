@@ -41,15 +41,21 @@ J'attends la confirmation explicite d'Alexandre. Aucun code écrit avant.
   je passe au suivant.
 - Push seulement sur demande explicite.
 - **Screenshots seulement sur demande explicite d'Alexandre** — pas automatique après chaque
-  changement visible. Un screenshot d'émulateur consomme beaucoup (lecture d'image). Par défaut,
-  je décris le résultat en texte.
+  changement visible, que ce soit pour lui envoyer (`SendUserFile`) **ou pour ma propre
+  vérification**. Chaque capture lue (même juste par moi, sans l'envoyer) consomme autant qu'un
+  envoi — ce n'est pas le `SendUserFile` qui coûte, c'est la lecture d'image elle-même. Par
+  défaut, je décris le résultat en texte à partir de ce que je peux vérifier sans image : lint,
+  types, logs, code review.
 - Je vérifie avant de dire que c'est fait : `npx eslint <fichiers touchés>` et `npx tsc --noEmit`
-  (comparé à la baseline, cf. §4). Un passage réel dans l'app reste utile mais n'est pas
-  systématique — surtout si le pattern (couleur/style/structure) a déjà été vérifié en live
-  ailleurs dans la même session : la revue de code suffit alors, pas besoin de re-prouver.
-  Si je fais un test live, **deux tentatives ratées max** sur une même interaction (tap qui
-  n'aboutit pas, dialog bloqué) avant d'arrêter et de continuer sur la base de la revue de code —
-  ne pas s'acharner à coups de captures d'écran répétées.
+  (comparé à la baseline, cf. §4). Un passage réel dans l'app avec capture d'écran est réservé aux
+  cas où c'est le seul moyen de vérifier (nouveau pattern jamais prouvé en live, rendu visuel
+  ambigu) — et même là, **une seule capture** pour se faire une idée, pas une série pour
+  "attraper le bon moment" (ex. un splash screen transitoire) : si la première capture ne suffit
+  pas à conclure, je le dis et je passe à autre chose plutôt que de réessayer en boucle.
+  Si le pattern (couleur/style/structure) a déjà été vérifié en live ailleurs dans la même
+  session, la revue de code suffit, pas besoin de re-capturer.
+  Pour une interaction qui échoue (tap qui n'aboutit pas, dialog bloqué) : **deux tentatives max**
+  avant d'arrêter et de continuer sur la base de la revue de code.
 
 ### Voie rapide (exception)
 Pour un changement **purement cosmétique ou un correctif trivial** — une couleur, un espacement,
