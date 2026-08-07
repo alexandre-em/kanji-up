@@ -12,9 +12,12 @@ export default function WordResultCard({ word, onPress }: WordResultCardProps) {
   const meaning = word.definition[0]?.meaning.join(', ');
 
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress} accessibilityRole="button">
+    <TouchableOpacity
+      style={[styles.card, { borderBottomColor: Colors.$outlineNeutral }]}
+      onPress={onPress}
+      accessibilityRole="button">
       <RNView style={styles.cardInfo}>
-        <Text text80BL numberOfLines={1}>
+        <Text text80BL $textDefault numberOfLines={1}>
           {spelling}
         </Text>
         <Text text90M $textNeutral numberOfLines={1}>
@@ -35,7 +38,6 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingVertical: 12,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: Colors.$outlineNeutral,
   },
   cardInfo: {
     gap: 2,

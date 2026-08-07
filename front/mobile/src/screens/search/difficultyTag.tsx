@@ -10,12 +10,18 @@ export type Tag = {
 };
 
 // Reuses the same three-tier semantic colors as the evaluation result screen (success/warning/
-// primary for correct/doubtful/invalid), so "difficulty" reads with the same vocabulary app-wide
-const TIER_COLORS: Record<DifficultyTier, { background: string; text: string }> = {
-  easy: { background: Colors.$backgroundSuccessLight, text: Colors.$textSuccess },
-  medium: { background: Colors.$backgroundWarningLight, text: Colors.$textWarning },
-  hard: { background: Colors.$backgroundPrimaryLight, text: Colors.$textPrimary },
-};
+// primary for correct/doubtful/invalid), so "difficulty" reads with the same vocabulary app-wide.
+// Built inside the component (not at module scope) so it re-reads Colors.$xxx after the app's
+// theme is set, instead of freezing whatever scheme was active at import time.
+function getTierColors(tier: DifficultyTier): { background: string; text: string } {
+  const TIER_COLORS: Record<DifficultyTier, { background: string; text: string }> = {
+    easy: { background: Colors.$backgroundSuccessLight, text: Colors.$textSuccess },
+    medium: { background: Colors.$backgroundWarningLight, text: Colors.$textWarning },
+    hard: { background: Colors.$backgroundPrimaryLight, text: Colors.$textPrimary },
+  };
+
+  return TIER_COLORS[tier];
+}
 
 // Grade follows the KANJIDIC convention: 1-6 = elementary school year, 8-10 = junior high /
 // name kanji, all folded into a single "junior high" tag since the app doesn't distinguish them
@@ -39,7 +45,7 @@ export function getJlptTag(jlpt: number | undefined, t: TFunction): Tag | undefi
 }
 
 export default function DifficultyTag({ tag }: { tag: Tag }) {
-  const colors = TIER_COLORS[tag.tier];
+  const colors = getTierColors(tag.tier);
 
   return (
     <RNView style={[styles.tag, { backgroundColor: colors.background }]}>

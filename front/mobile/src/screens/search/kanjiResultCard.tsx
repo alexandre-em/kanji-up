@@ -18,12 +18,15 @@ export default function KanjiResultCard({ kanji, onPress }: KanjiResultCardProps
   // sub-document (see CLAUDE.md §4), so it would always be empty against the real API
 
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress} accessibilityRole="button">
-      <RNView style={styles.characterBox}>
-        <Text style={styles.characterText}>{kanji.kanji?.character}</Text>
+    <TouchableOpacity
+      style={[styles.card, { borderBottomColor: Colors.$outlineNeutral }]}
+      onPress={onPress}
+      accessibilityRole="button">
+      <RNView style={[styles.characterBox, { backgroundColor: Colors.$backgroundNeutralLight }]}>
+        <Text style={[styles.characterText, { color: Colors.$textDefault }]}>{kanji.kanji?.character}</Text>
       </RNView>
       <RNView style={styles.cardInfo}>
-        <Text text80BL numberOfLines={1}>
+        <Text text80BL $textDefault numberOfLines={1}>
           {readings}
         </Text>
         <Text text90M $textNeutral numberOfLines={2}>
@@ -49,13 +52,11 @@ const styles = StyleSheet.create({
     gap: 14,
     paddingVertical: 12,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: Colors.$outlineNeutral,
   },
   characterBox: {
     width: CHARACTER_BOX_SIZE,
     height: CHARACTER_BOX_SIZE,
     borderRadius: 12,
-    backgroundColor: Colors.$backgroundNeutralLight,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -63,7 +64,6 @@ const styles = StyleSheet.create({
     fontSize: 30,
     lineHeight: 34,
     textAlign: 'center',
-    color: Colors.$textDefault,
   },
   cardInfo: {
     flex: 1,
