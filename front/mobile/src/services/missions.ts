@@ -1,5 +1,7 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 
+import { API_TIMEOUT_MS } from '../constants/network';
+
 export type CompleteMissionTaskResponse = {
   mission: DailyMissionType;
   rewardGranted: boolean;
@@ -14,6 +16,7 @@ export default class MissionsService {
       this._instance = axios.create({
         baseURL: `${baseUrl}/missions`,
         headers: { 'Access-Control-Allow-Origin': '*' },
+        timeout: API_TIMEOUT_MS,
       });
     }
   }

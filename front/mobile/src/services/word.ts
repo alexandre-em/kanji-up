@@ -1,5 +1,7 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 
+import { API_TIMEOUT_MS } from '../constants/network';
+
 export default class WordService {
   private _instance: AxiosInstance | null = null;
 
@@ -7,6 +9,7 @@ export default class WordService {
     this._instance = axios.create({
       baseURL: `${baseUrl}/words`,
       headers: { 'Access-Control-Allow-Origin': '*' },
+      timeout: API_TIMEOUT_MS,
     });
   }
 

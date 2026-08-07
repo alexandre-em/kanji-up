@@ -1,5 +1,7 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 
+import { API_TIMEOUT_MS } from '../constants/network';
+
 export type ScanImageInput = {
   uri: string;
   type: string;
@@ -14,6 +16,7 @@ export default class ScanService {
       this._instance = axios.create({
         baseURL: `${baseUrl}/scans`,
         headers: { 'Access-Control-Allow-Origin': '*' },
+        timeout: API_TIMEOUT_MS,
       });
     }
   }

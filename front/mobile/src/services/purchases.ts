@@ -1,6 +1,7 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 
 import { PremiumPlanKey } from '../constants/billing';
+import { API_TIMEOUT_MS } from '../constants/network';
 
 export type VerifyPurchasePayload = {
   userId: string;
@@ -22,6 +23,7 @@ export default class PurchasesService {
       this._instance = axios.create({
         baseURL: `${baseUrl}/billing`,
         headers: { 'Access-Control-Allow-Origin': '*' },
+        timeout: API_TIMEOUT_MS,
       });
     }
   }

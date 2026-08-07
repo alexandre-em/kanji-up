@@ -1,5 +1,7 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 
+import { API_TIMEOUT_MS } from '../constants/network';
+
 type GetAllParams = {
   page?: number;
   limit?: number;
@@ -14,6 +16,7 @@ export default class KanjiService {
     this._instance = axios.create({
       baseURL: `${baseUrl}/kanjis`,
       // headers: { 'Access-Control-Allow-Origin': '*' },
+      timeout: API_TIMEOUT_MS,
     });
   }
 

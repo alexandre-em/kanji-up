@@ -1,5 +1,7 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 
+import { API_TIMEOUT_MS } from '../constants/network';
+
 export default class AuthService {
   private _instance: AxiosInstance | null = null;
 
@@ -8,6 +10,7 @@ export default class AuthService {
       this._instance = axios.create({
         baseURL: `${baseUrl}/users`,
         headers: { 'Access-Control-Allow-Origin': '*' },
+        timeout: API_TIMEOUT_MS,
       });
     }
   }
