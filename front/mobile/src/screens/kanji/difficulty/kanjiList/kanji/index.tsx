@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dimensions, ScrollView, StyleSheet } from 'react-native';
@@ -11,6 +12,7 @@ import Layout from '../../../../../components/layout.tsx';
 import Spacing from '../../../../../components/spacing.tsx';
 import Lock from '../../../../../components/svg/lock';
 import SvgSilhouette from '../../../../../components/svgSilhouette.tsx';
+import { screenNames } from '../../../../../constants/screens.ts';
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from '../../../../../constants/styles.ts';
 import { PER_KANJI_UNLOCK_COST } from '../../../../../constants/unlockCosts.ts';
 import { useAppDispatch, useAppSelector } from '../../../../../hooks/useStore.tsx';
@@ -30,6 +32,7 @@ const { width } = Dimensions.get('window');
 
 export default function KanjiDetail(props: KanjiDetailsProps) {
   const { t } = useTranslation();
+  const navigation = useNavigation();
   const dispatch = useAppDispatch();
   const entities = useAppSelector(selectEntities);
   const selectedKanjiState = useAppSelector(selectSelectedKanji);
@@ -153,6 +156,10 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
   }, [entities[character]?.kanji?.character]);
 
   if (locked) {
+    // No applicable tier ("custom" kanji, no JLPT/grade classification) means there's nothing to
+    // buy per-kanji — Premium is the only way in, not a credits unlock
+    const isPremiumOnly = !unlockTierKey;
+
     return (
       <Layout screen="kanji">
         <View style={styles.lockedContainer}>
@@ -163,20 +170,32 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
           </Text>
           <Spacing y={8} />
           <Text text80M $textNeutral center>
-            {t('kanjiDetails.locked.message')}
+            {t(isPremiumOnly ? 'kanjiDetails.locked.premiumOnlyMessage' : 'kanjiDetails.locked.message')}
           </Text>
           <Spacing y={20} />
-          <Button label={t('kanjiDetails.locked.unlockButton', { cost: unlockCost })} onPress={() => setIsUnlockVisible(true)} />
+          {isPremiumOnly ? (
+            <Button
+              label={t('kanjiDetails.locked.premiumButton')}
+              onPress={() => navigation.navigate(screenNames.PREMIUM as never)}
+            />
+          ) : (
+            <Button
+              label={t('kanjiDetails.locked.unlockButton', { cost: unlockCost })}
+              onPress={() => setIsUnlockVisible(true)}
+            />
+          )}
         </View>
-        <UnlockModal
-          visible={isUnlockVisible}
-          label={t('kanjiList.unlock.single.label')}
-          cost={unlockCost}
-          credits={userState.credits}
-          isUnlocking={isUnlocking}
-          onConfirm={handleConfirmUnlock}
-          onClose={() => setIsUnlockVisible(false)}
-        />
+        {!isPremiumOnly && (
+          <UnlockModal
+            visible={isUnlockVisible}
+            label={t('kanjiList.unlock.single.label')}
+            cost={unlockCost}
+            credits={userState.credits}
+            isUnlocking={isUnlocking}
+            onConfirm={handleConfirmUnlock}
+            onClose={() => setIsUnlockVisible(false)}
+          />
+        )}
       </Layout>
     );
   }

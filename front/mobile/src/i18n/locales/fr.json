@@ -3,6 +3,8 @@
   "offline.badge": "Hors ligne",
   "kanjiDetails.locked.message": "Ce kanji fait partie d'un palier payant — débloque-le avec des crédits ou passe en Premium pour accéder à tous les paliers instantanément.",
   "kanjiDetails.locked.unlockButton": "Débloquer ({{cost}})",
+  "kanjiDetails.locked.premiumOnlyMessage": "Ce kanji ne fait partie d'aucun palier gratuit ou à crédits — il est réservé au Premium.",
+  "kanjiDetails.locked.premiumButton": "Passer en Premium",
   "evaluation.offline.notice": "Hors ligne — tes résultats seront envoyés une fois reconnecté",
   "onboarding.welcome.title": "Welcome to KanjiUp",
   "onboarding.welcome.subtitle": "Level up your kanji knowledge with KanjiUp!",
