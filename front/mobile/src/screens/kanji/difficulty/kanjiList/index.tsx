@@ -90,15 +90,16 @@ const KanjiCardElement = ({ kanji, onPress, isLocked }: KanjiCardElementProps) =
           backgroundColor={color}
         />
       )}
-      {isLocked ? (
-        <View style={[styles.lockedContent, { backgroundColor: Colors.$backgroundNeutralMedium }]}>
-          <Lock size={18} color={Colors.$iconNeutral} />
+      {/* Locked kanji stay visible — browsable, just not free — with a small lock badge instead
+          of hiding the character behind an opaque block */}
+      <Card.Section
+        content={[{ text: kanji.kanji!.character, text40BL: true, color: Colors.$textDefault }]}
+        contentStyle={[styles.cardContent, { backgroundColor: Colors.$backgroundNeutralLight }]}
+      />
+      {isLocked && (
+        <View style={[styles.lockBadge, { backgroundColor: Colors.$backgroundNeutralHeavy }]}>
+          <Lock size={11} color="#fff" />
         </View>
-      ) : (
-        <Card.Section
-          content={[{ text: kanji.kanji!.character, text40BL: true, color: Colors.$textDefault }]}
-          contentStyle={[styles.cardContent, { backgroundColor: Colors.$backgroundNeutralLight }]}
-        />
       )}
     </Card>
   );
@@ -287,14 +288,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  lockedContent: {
-    width: '100%',
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   cardLocked: {
     opacity: 0.5,
+  },
+  lockBadge: {
+    position: 'absolute',
+    right: 2,
+    bottom: 2,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 100,
   },
   loader: {
     display: 'flex',
