@@ -30,43 +30,48 @@ export default function KanjiCategoriesScreen() {
 
   return (
     <Layout screen="selection" withTabBar>
-      {selectionMenuButtons.map((button) => (
-        <View key={button.textKey}>
-          <Spacing y={15} />
-          <Card
-            height={105}
-            width={width - GENERAL_MARGIN * 2}
-            style={styles.card}
-            disabled={user.subscriptionPlan === 'free' && button.premium}
-            onPress={() => handleRedirect(button.screen)}>
-            {button.premium && user.subscriptionPlan === 'free' && (
-              <Badge
-                label={t('premium.feature.badge')}
-                size={20}
-                backgroundColor={Colors.$backgroundGeneralMedium}
-                style={styles.badge}
-              />
-            )}
-            <Card.Section
-              flex
-              content={[{ text: t(button.textKey), text60BL: true, white: true }]}
-              contentStyle={styles.transparent}
-              style={styles.transparent}
-              center
-            />
-            {button.subtitle && (
+      {selectionMenuButtons.map((button) => {
+        const isLockedForUser = user.subscriptionPlan === 'free' && button.premium;
+
+        return (
+          <View key={button.textKey}>
+            <Spacing y={15} />
+            <Card
+              height={105}
+              width={width - GENERAL_MARGIN * 2}
+              style={[styles.card, isLockedForUser && styles.cardDisabled]}
+              disabled={isLockedForUser}
+              onPress={() => handleRedirect(button.screen)}>
+              {isLockedForUser && (
+                <Badge
+                  label={t('premium.feature.badge')}
+                  size={20}
+                  backgroundColor={Colors.$backgroundGeneralHeavy}
+                  labelStyle={styles.badgeLabel}
+                  style={styles.badge}
+                />
+              )}
               <Card.Section
                 flex
-                content={[{ text: t(button.subtitle), text80M: true, white: true }]}
+                content={[{ text: t(button.textKey), text60BL: true, white: true }]}
                 contentStyle={styles.transparent}
                 style={styles.transparent}
                 center
               />
-            )}
-            {user.subscriptionPlan === 'free' && button.premium ? button.disabledImage : button.image}
-          </Card>
-        </View>
-      ))}
+              {button.subtitle && (
+                <Card.Section
+                  flex
+                  content={[{ text: t(button.subtitle), text80M: true, white: true }]}
+                  contentStyle={styles.transparent}
+                  style={styles.transparent}
+                  center
+                />
+              )}
+              {isLockedForUser ? button.disabledImage : button.image}
+            </Card>
+          </View>
+        );
+      })}
     </Layout>
   );
 }
@@ -75,6 +80,10 @@ const styles = StyleSheet.create({
   card: {
     padding: 15,
   },
+  cardDisabled: {
+    opacity: 0.5,
+  },
   transparent: { backgroundColor: '#00000000' },
   badge: { position: 'absolute', right: 10, top: 10 },
+  badgeLabel: { color: '#fff' },
 });
