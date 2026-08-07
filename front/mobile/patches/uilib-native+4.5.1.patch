@@ -1,0 +1,19 @@
+diff --git a/node_modules/uilib-native/android/src/main/java/com/wix/reactnativeuilib/keyboardinput/utils/RuntimeUtils.java b/node_modules/uilib-native/android/src/main/java/com/wix/reactnativeuilib/keyboardinput/utils/RuntimeUtils.java
+index 95c5e8e..0468709 100644
+--- a/node_modules/uilib-native/android/src/main/java/com/wix/reactnativeuilib/keyboardinput/utils/RuntimeUtils.java
++++ b/node_modules/uilib-native/android/src/main/java/com/wix/reactnativeuilib/keyboardinput/utils/RuntimeUtils.java
+@@ -9,7 +9,13 @@ public class RuntimeUtils {
+     private static final Runnable sUIUpdateClosure = new Runnable() {
+         @Override
+         public void run() {
+-            ReactContextHolder.getContext().getNativeModule(UIManagerModule.class).onBatchComplete();
++            if (ReactContextHolder.getContext() == null) {
++                return;
++            }
++            UIManagerModule uiManagerModule = ReactContextHolder.getContext().getNativeModule(UIManagerModule.class);
++            if (uiManagerModule != null) {
++                uiManagerModule.onBatchComplete();
++            }
+         }
+     };
+ 
