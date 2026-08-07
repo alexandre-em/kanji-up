@@ -144,7 +144,7 @@ export default function KanjiList(props: KanjiListProps) {
   }, [kanjis, difficulty, entities]);
 
   const handleEndReached = useCallback(() => {
-    if (difficulty === last?.difficulty && category === last?.type && last.page > 0 && last.page <= last.totalPage) {
+    if (difficulty === last?.difficulty && category === last?.type && last.page > 0 && last.page < last.totalPage) {
       dispatch(getAll({ type: category, difficulty, page: last.page + 1 }));
     }
   }, [dispatch, last?.difficulty, last?.type, last?.page, last?.totalPage, category, difficulty]);
