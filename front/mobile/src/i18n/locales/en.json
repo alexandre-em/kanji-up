@@ -120,6 +120,8 @@
   "kanjiList.unlock.earnCredits": "Earn credits",
   "kanjiList.unlock.toast.success": "Unlocked!",
   "kanjiList.unlock.toast.error": "Couldn't unlock, try again",
+  "kanjiList.selectionLimit.toast": "Free plan limit reached — you can select up to {{max}} kanji at once. Go Premium for unlimited selection.",
+  "kanjiList.selectionLimit.counter": "{{count}}/{{max}} selected",
 
   "training.title": "Training",
   "training.subtitle": "Choose how you want to practice",

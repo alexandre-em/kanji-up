@@ -12,6 +12,7 @@ import Layout from '../../../../components/layout';
 import Spacing from '../../../../components/spacing';
 import Lock from '../../../../components/svg/lock';
 import { screenNames } from '../../../../constants/screens';
+import { MAX_FREE_SELECTED_KANJI } from '../../../../constants/selectionLimit';
 import { BULK_UNLOCK_COST, getTierKey, PER_KANJI_UNLOCK_COST } from '../../../../constants/unlockCosts';
 import { useAppDispatch, useAppSelector } from '../../../../hooks/useStore';
 import { useToaster } from '../../../../providers/toaster.tsx';
@@ -24,6 +25,7 @@ import {
   selectKanjiToDelete,
   selectSaveStatus,
   selectSelectedKanji,
+  selectSelectedKanjiCount,
 } from '../../../../store/slices/selectedKanji';
 import { selectUserState, unlockContent } from '../../../../store/slices/user';
 import { isKanjiLocked } from '../../../../utils/kanjiLock';
@@ -120,6 +122,7 @@ export default function KanjiList(props: KanjiListProps) {
   const toAdd = useSelector(selectKanjiToAdd);
   const toRemove = useSelector(selectKanjiToDelete);
   const saveStatus = useSelector(selectSaveStatus);
+  const selectedCount = useAppSelector(selectSelectedKanjiCount);
   const { difficulty, category } = props.route.params;
   const toaster = useToaster();
   const userState = useAppSelector(selectUserState);
@@ -157,11 +160,17 @@ export default function KanjiList(props: KanjiListProps) {
     (kanji: Partial<KanjiType>) => {
       if (toAdd[kanji.kanji_id!] || (entities[kanji.kanji_id!] && !toRemove[kanji.kanji_id!])) {
         dispatch(selectedKanji.actions.unSelectKanji(kanji));
-      } else {
-        dispatch(selectedKanji.actions.selectKanji(kanji));
+        return;
       }
+
+      if (!isPremium && selectedCount >= MAX_FREE_SELECTED_KANJI) {
+        toaster?.show({ message: t('kanjiList.selectionLimit.toast', { max: MAX_FREE_SELECTED_KANJI }), type: 'failure' });
+        return;
+      }
+
+      dispatch(selectedKanji.actions.selectKanji(kanji));
     },
-    [dispatch, toAdd, toRemove, entities],
+    [dispatch, toAdd, toRemove, entities, isPremium, selectedCount, toaster, t],
   );
 
   // Locked kanji navigate through too now — the detail screen is the single place that gates
@@ -240,6 +249,11 @@ export default function KanjiList(props: KanjiListProps) {
           />
         )}
       </View>
+      {isSelectModeOn && !isPremium && (
+        <Text $textNeutral text90M style={styles.selectionCounter}>
+          {t('kanjiList.selectionLimit.counter', { count: selectedCount, max: MAX_FREE_SELECTED_KANJI })}
+        </Text>
+      )}
       <Spacing y={10} />
       <FlashList
         data={kanjiList}
@@ -316,5 +330,9 @@ const styles = StyleSheet.create({
   },
   unlockAllButton: {
     marginLeft: 10,
+  },
+  selectionCounter: {
+    textAlign: 'right',
+    marginTop: 4,
   },
 });

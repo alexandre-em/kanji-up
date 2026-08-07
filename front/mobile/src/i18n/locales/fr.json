@@ -144,6 +144,8 @@
   "kanjiList.unlock.earnCredits": "Gagner des credits",
   "kanjiList.unlock.toast.success": "Débloqué !",
   "kanjiList.unlock.toast.error": "Échec du déblocage, réessaie",
+  "kanjiList.selectionLimit.toast": "Limite du plan gratuit atteinte — tu peux sélectionner jusqu'à {{max}} kanji à la fois. Passe en Premium pour une sélection illimitée.",
+  "kanjiList.selectionLimit.counter": "{{count}}/{{max}} sélectionnés",
   "training.title": "Entraînement",
   "training.subtitle": "Choisis comment tu veux t'entraîner",
   "training.menu.kanji.title": "Kanji",

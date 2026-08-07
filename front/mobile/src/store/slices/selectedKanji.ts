@@ -121,3 +121,13 @@ export const selectKanjiToAdd = (state: RootState) => state.selectedKanji.toAdd;
 export const selectKanjiToDelete = (state: RootState) => state.selectedKanji.toRemove;
 export const selectSelectedKanjiInitStatus = (state: RootState) => state.selectedKanji.initStatus;
 export const selectSaveStatus = (state: RootState) => state.selectedKanji.saveStatus;
+
+// What the selection count WOULD be if saved right now — committed kanji minus pending removals,
+// plus pending additions — so the free-tier cap reads correctly mid-edit, before Save is pressed
+export const selectSelectedKanjiCount = (state: RootState) => {
+  const { selectedKanji: committed, toAdd, toRemove } = state.selectedKanji;
+
+  const committedCount = Object.keys(committed).filter((id) => !toRemove[id]).length;
+
+  return committedCount + Object.keys(toAdd).length;
+};
