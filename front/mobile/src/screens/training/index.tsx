@@ -53,27 +53,39 @@ export default function TrainingModes() {
             width={width - GENERAL_MARGIN * 2}
             onPress={() => handlePress(mode)}
             disabled={mode.comingSoon}
-            row
-            centerV
             style={[styles.card, mode.comingSoon && styles.cardDisabled]}>
-            <View style={styles.iconContainer}>{mode.icon}</View>
-            <View style={styles.textContainer}>
-              <Text text60BL>{t(mode.textKey)}</Text>
-              <Text text80M $textNeutral>
-                {t(mode.subtitle)}
-              </Text>
-              {mode.comingSoon && (
-                <Text text90M $textPrimary>
-                  {t('training.comingSoon')}
-                </Text>
-              )}
-            </View>
+            <Card.Section
+              flex
+              content={[{ text: t(mode.textKey), text60BL: true, white: true }]}
+              contentStyle={styles.transparent}
+              style={styles.transparent}
+              center
+            />
+            <Card.Section
+              flex
+              content={[{ text: t(mode.subtitle), text80M: true, white: true }]}
+              contentStyle={styles.transparent}
+              style={styles.transparent}
+              center
+            />
+            {mode.comingSoon && (
+              <Card.Section
+                flex
+                content={[{ text: t('training.comingSoon'), text90M: true, white: true }]}
+                contentStyle={styles.transparent}
+                style={styles.transparent}
+                center
+              />
+            )}
+            {mode.image}
           </Card>
         </View>
       ))}
       <Dialog visible={isEmptySelectionVisible} onDismiss={() => setEmptySelectionVisible(false)} bottom useSafeArea width="100%">
-        <RNView style={styles.emptySelectionModal}>
-          <Text text70BO>{t('home.evaluation.emptySelection.title')}</Text>
+        <RNView style={[styles.emptySelectionModal, { backgroundColor: Colors.$backgroundDefault }]}>
+          <Text text70BO $textDefault>
+            {t('home.evaluation.emptySelection.title')}
+          </Text>
           <Spacing y={8} />
           <Text text80M $textGeneral>
             {t('home.evaluation.emptySelection.message')}
@@ -101,26 +113,13 @@ export default function TrainingModes() {
 const styles = StyleSheet.create({
   card: {
     padding: 15,
-    gap: 15,
   },
   cardDisabled: {
     opacity: 0.5,
   },
-  iconContainer: {
-    width: 56,
-    height: 56,
-    borderRadius: 12,
-    backgroundColor: Colors.$backgroundNeutralLight,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  textContainer: {
-    flex: 1,
-    gap: 2,
-  },
+  transparent: { backgroundColor: '#00000000' },
   emptySelectionModal: {
     padding: 20,
-    backgroundColor: Colors.$backgroundDefault,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
   },

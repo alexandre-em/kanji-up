@@ -1,4 +1,4 @@
-import { Dimensions, StyleSheet } from 'react-native';
+import { Dimensions, StyleSheet, View } from 'react-native';
 import { Assets, Card, Image } from 'react-native-ui-lib';
 
 import { GENERAL_MARGIN } from './styles';
@@ -23,6 +23,17 @@ const styles = StyleSheet.create({
     height: 105,
     borderRadius: 10,
   },
+  // Sits between the photo (zIndex -10) and the text (default stacking) — a photo can be light
+  // enough to wash out white overlay text otherwise, this guarantees contrast regardless
+  bannerScrim: {
+    position: 'absolute',
+    left: 0,
+    zIndex: -5,
+    width: width - GENERAL_MARGIN * 2,
+    height: 105,
+    borderRadius: 10,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+  },
   smallBannerImage: {
     width: 105,
     height: 105,
@@ -30,26 +41,48 @@ const styles = StyleSheet.create({
   },
 });
 
+const BannerScrim = () => <View style={styles.bannerScrim} />;
+
 export const selectionMenuButtons: SelectionButtonsType[] = [
   {
     textKey: 'selection.menu.jlpt.title',
     subtitle: 'selection.menu.jlpt.subtitle',
-    image: <Image source={Assets.banners.jlpt} style={styles.bannerImage} />,
+    image: (
+      <>
+        <Image source={Assets.banners.jlpt} style={styles.bannerImage} />
+        <BannerScrim />
+      </>
+    ),
     screen: 'jlpt',
     premium: false,
   },
   {
     textKey: 'selection.menu.school.title',
     subtitle: 'selection.menu.school.subtitle',
-    image: <Image source={Assets.banners.school} style={styles.bannerImage} />,
+    image: (
+      <>
+        <Image source={Assets.banners.school} style={styles.bannerImage} />
+        <BannerScrim />
+      </>
+    ),
     screen: 'grade',
     premium: false,
   },
   {
     textKey: 'selection.menu.advanced.title',
     subtitle: 'selection.menu.advanced.subtitle',
-    image: <Image source={Assets.banners.advanced} style={styles.bannerImage} />,
-    disabledImage: <Image source={Assets.banners.advancedDisabled} style={styles.bannerImage} />,
+    image: (
+      <>
+        <Image source={Assets.banners.advanced} style={styles.bannerImage} />
+        <BannerScrim />
+      </>
+    ),
+    disabledImage: (
+      <>
+        <Image source={Assets.banners.advancedDisabled} style={styles.bannerImage} />
+        <BannerScrim />
+      </>
+    ),
     screen: 'advanced',
     premium: true,
   },

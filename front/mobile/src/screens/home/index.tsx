@@ -197,6 +197,7 @@ export default function Home() {
                 height={140}
                 width={(width - GENERAL_MARGIN * 2 - 20) / 2}
                 disabled={isCardOffline}
+                backgroundColor={Colors.$backgroundNeutralLight}
                 style={[styles.card, (isCardLocked || isCardOffline) && styles.cardLocked]}
                 onPress={() => handleRediction(isCardLocked ? screenNames.PREMIUM : button.screen)}>
                 {button.icon}
@@ -222,6 +223,7 @@ export default function Home() {
             height={115}
             width={width - GENERAL_MARGIN * 2}
             disabled={isOffline}
+            backgroundColor={Colors.$backgroundNeutralLight}
             style={[styles.card, isOffline && styles.cardLocked]}
             onPress={handleWatchAd}>
             <Icon source={Assets.icons.video} size={36} tintColor={Colors.$textPrimary} />
@@ -268,6 +270,7 @@ export default function Home() {
       <Card
         height={110}
         width={width - GENERAL_MARGIN * 2}
+        backgroundColor={Colors.$backgroundNeutralLight}
         style={styles.card}
         onPress={() => handleRediction(screenNames.SETTINGS)}>
         <Icon source={Assets.icons.setting} size={36} tintColor={Colors.$textPrimary} />

@@ -19,6 +19,8 @@ import TimerIcon from '../assets/icons/timer.png';
 import UpIcon from '../assets/icons/up.png';
 import VideoIcon from '../assets/icons/video.png';
 import YenIcon from '../assets/icons/yen.png';
+import WordTestBanner from '../assets/images/david-emrich-oQvcurCjD58-unsplash.jpg';
+import KanjiTestBanner from '../assets/images/felirbe-y6VMoH6921w-unsplash.jpg';
 import SchoolBanner from '../assets/images/hiroyoshi-urushima-school.jpg';
 import SchoolBannerDisabled from '../assets/images/hiroyoshi-urushima-school-disabled.jpg';
 import AdvancedBanner from '../assets/images/marco-zuppone-advanced.jpg';
@@ -55,6 +57,8 @@ Assets.loadAssetsGroup('banners', {
   school: SchoolBanner,
   schoolDisabled: SchoolBannerDisabled,
   jlpt: JlptBanner,
+  kanjiTest: KanjiTestBanner,
+  wordTest: WordTestBanner,
 });
 
 Colors.loadSchemes({

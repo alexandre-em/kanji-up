@@ -93,8 +93,13 @@ const styles = StyleSheet.create({
   cardContainer: {
     display: 'flex',
     justifyContent: 'center',
-    width: '100%',
+    flex: 1,
     padding: 15,
+    // Card itself doesn't clip children (overflow: visible), so the right side needs its own
+    // rounding to match the thumbnail's — otherwise square corners here read as the card not
+    // stopping cleanly, uneven against the rounded left edge
+    borderTopRightRadius: 10,
+    borderBottomRightRadius: 10,
   },
   transparent: { backgroundColor: '#00000000' },
   cardLocked: {

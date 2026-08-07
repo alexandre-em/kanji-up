@@ -1,27 +1,65 @@
 import { ReactNode } from 'react';
-import { Assets, Colors, Icon } from 'react-native-ui-lib';
+import { Dimensions, StyleSheet, View } from 'react-native';
+import { Assets, Image } from 'react-native-ui-lib';
 
 import { screenNames } from './screens';
+import { GENERAL_MARGIN } from './styles';
 
 export type TrainingModeType = {
   textKey: string;
   subtitle: string;
   screen: string;
-  icon: ReactNode;
+  image: ReactNode;
   comingSoon?: boolean;
 };
+
+const { width } = Dimensions.get('window');
+
+const styles = StyleSheet.create({
+  bannerImage: {
+    position: 'absolute',
+    left: 0,
+    zIndex: -10,
+    width: width - GENERAL_MARGIN * 2,
+    height: 105,
+    borderRadius: 10,
+  },
+  // Sits between the photo (zIndex -10) and the text (default stacking) — a photo can be light
+  // enough to wash out white overlay text otherwise, this guarantees contrast regardless
+  bannerScrim: {
+    position: 'absolute',
+    left: 0,
+    zIndex: -5,
+    width: width - GENERAL_MARGIN * 2,
+    height: 105,
+    borderRadius: 10,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+  },
+});
+
+const BannerScrim = () => <View style={styles.bannerScrim} />;
 
 export const trainingModes: TrainingModeType[] = [
   {
     textKey: 'training.menu.kanji.title',
     subtitle: 'training.menu.kanji.subtitle',
     screen: screenNames.EVALUATION,
-    icon: <Icon source={Assets.icons.draw} size={36} tintColor={Colors.$textPrimary} />,
+    image: (
+      <>
+        <Image source={Assets.banners.kanjiTest} style={styles.bannerImage} />
+        <BannerScrim />
+      </>
+    ),
   },
   {
     textKey: 'training.menu.word.title',
     subtitle: 'training.menu.word.subtitle',
     screen: screenNames.WORD_EVALUATION,
-    icon: <Icon source={Assets.icons.draw} size={36} tintColor={Colors.$textPrimary} />,
+    image: (
+      <>
+        <Image source={Assets.banners.wordTest} style={styles.bannerImage} />
+        <BannerScrim />
+      </>
+    ),
   },
 ];
