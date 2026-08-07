@@ -10,12 +10,13 @@ export default function Step1({ step }: StepProps) {
 
   return (
     <View height="90%" center>
-      <Text h1 highlightString="KanjiUp" highlightStyle={{ color: Colors.$textPrimary }} marginB-20>
+      <Text h1 $textDefault highlightString="KanjiUp" highlightStyle={{ color: Colors.$textPrimary }} marginB-20>
         {t('onboarding.welcome.title')}
       </Text>
       <Welcome width={300} height={300} />
       <Text
         h4
+        $textNeutral
         center
         highlightString={t('onboarding.welcome.subtitle.highlight')}
         highlightStyle={{ color: Colors.$textPrimary }}>

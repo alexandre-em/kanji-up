@@ -76,6 +76,7 @@ export default function Step2({ step }: StepProps) {
       </Frame>
       <Text
         h3
+        $textDefault
         center
         marginT-50
         highlightString={[t('onboarding.learn.title.highlight.kanji'), t('onboarding.learn.title.highlight.write')]}
@@ -84,6 +85,7 @@ export default function Step2({ step }: StepProps) {
       </Text>
       <Text
         p1
+        $textNeutral
         center
         marginT-20
         highlightString={t('onboarding.learn.subtitle1.highlight.movement')}
@@ -92,6 +94,7 @@ export default function Step2({ step }: StepProps) {
       </Text>
       <Text
         p1
+        $textNeutral
         center
         marginT-2
         highlightString={[t('onboarding.learn.subtitle2.highlight.order'), t('onboarding.learn.subtitle2.highlight.direction')]}

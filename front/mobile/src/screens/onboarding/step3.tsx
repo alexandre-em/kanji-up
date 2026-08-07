@@ -23,10 +23,10 @@ export default function Step3({ step }: StepProps) {
 
   return (
     <View height="90%" paddingT-50 centerH>
-      <Text h1 highlightString="こんにちは" highlightStyle={{ color: Colors.$textMajor }} marginB-10>
+      <Text h1 $textDefault highlightString="こんにちは" highlightStyle={{ color: Colors.$textMajor }} marginB-10>
         こんにちは 👋
       </Text>
-      <Text h3 marginB-20>
+      <Text h3 $textNeutral marginB-20>
         {t('onboarding.register.subtitle')}
       </Text>
       <View width="100%">
