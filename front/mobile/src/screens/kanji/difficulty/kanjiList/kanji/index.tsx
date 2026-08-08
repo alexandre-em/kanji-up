@@ -78,7 +78,7 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
   const ViewMode = useMemo(
     () => (
       <View style={[styles.canvas, { backgroundColor: Colors.$backgroundNeutralLight, borderColor: Colors.$outlineNeutral }]}>
-        {svg && (
+        {svg ? (
           <AnimatedSvgRenderer
             width={CANVAS_WIDTH}
             height={CANVAS_HEIGHT}
@@ -86,10 +86,14 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
             strokeColor={Colors.$textPrimary}
             loop
           />
+        ) : (
+          // Some advanced kanji have no animCJK stroke-order data — these are high-level enough
+          // that the player is expected to already know stroke order, they just need the character
+          <Text style={[styles.characterFallback, { color: Colors.$textPrimary }]}>{kanji?.kanji?.character}</Text>
         )}
       </View>
     ),
-    [svg],
+    [svg, kanji?.kanji?.character],
   );
 
   const CanvasMode = useMemo(
@@ -99,11 +103,15 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
           <Canvas width={CANVAS_WIDTH} height={CANVAS_HEIGHT} hideBackground />
         </View>
         <View style={[styles.svg, styles.character]}>
-          {svg && <SvgSilhouette svgString={svg} width={CANVAS_WIDTH} height={CANVAS_HEIGHT} />}
+          {svg ? (
+            <SvgSilhouette svgString={svg} width={CANVAS_WIDTH} height={CANVAS_HEIGHT} />
+          ) : (
+            <Text style={styles.characterFallback}>{kanji?.kanji?.character}</Text>
+          )}
         </View>
       </View>
     ),
-    [svg],
+    [svg, kanji?.kanji?.character],
   );
 
   const handleModeSelect = useCallback(() => {
@@ -461,6 +469,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'transparent',
+  },
+  // Stand-in for the missing animCJK stroke data — sized to roughly fill the canvas like the SVG
+  // would. Color defaults to #ccc to match SvgSilhouette's own guide fill; ViewMode overrides it
+  // to the brand color since there it's the whole reference, not a trace-over guide
+  characterFallback: {
+    fontSize: 260,
+    lineHeight: 300,
+    color: '#ccc',
   },
   canvasContainer: {
     zIndex: 100,
