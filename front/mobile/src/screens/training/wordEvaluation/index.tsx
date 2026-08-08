@@ -7,9 +7,11 @@ import { Assets, Button, Colors, Icon, ProgressBar, Text, View } from 'react-nat
 
 import Layout from '../../../components/layout';
 import Spacing from '../../../components/spacing';
+import { RECOGNITION_MODEL_LABELS } from '../../../constants/recognitionLabels';
 import { useAppDispatch, useAppSelector } from '../../../hooks/useStore';
 import { useToaster } from '../../../providers/toaster';
 import {
+  getKanjiCharacters,
   init,
   selectWordCurrentIndex,
   selectWordEvaluationItems,
@@ -77,11 +79,20 @@ export default function WordEvaluationScreen() {
 
   const handleValidate = useCallback(async () => {
     setIsSubmitting(true);
+    const expectedCharacters = getKanjiCharacters(currentItem?.word.word?.[0] ?? '');
 
     try {
       const resolvedSlots: WordSlotType[] = await Promise.all(
-        slots.map(async (slot) => {
+        slots.map(async (slot, index) => {
           if (!slot.image) return { image: null, predictions: [], strokesCount: 0 };
+
+          // The model only classifies into the fixed set it was trained on — calling predict()
+          // for a character outside that set can only ever misclassify. No predictions routes
+          // this slot's word to 'review' (updateItemSlots), for the user to arbitrate themselves.
+          const expectedCharacter = expectedCharacters[index];
+          if (expectedCharacter && !RECOGNITION_MODEL_LABELS.has(expectedCharacter)) {
+            return { image: slot.image, predictions: [], strokesCount: slot.strokesCount };
+          }
 
           const predictions: PredictionType[] = await predict(slot.image);
           return { image: slot.image, predictions, strokesCount: slot.strokesCount };
@@ -94,7 +105,7 @@ export default function WordEvaluationScreen() {
     } finally {
       setIsSubmitting(false);
     }
-  }, [slots, dispatch, toast, t]);
+  }, [slots, dispatch, toast, t, currentItem]);
 
   if (items.length === 0 && (status === 'idle' || status === 'pending')) {
     return (

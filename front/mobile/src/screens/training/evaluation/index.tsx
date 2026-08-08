@@ -9,6 +9,7 @@ import ViewShot from 'react-native-view-shot';
 import Canvas from '../../../components/canvas.tsx';
 import Layout from '../../../components/layout.tsx';
 import Spacing from '../../../components/spacing.tsx';
+import { RECOGNITION_MODEL_LABELS } from '../../../constants/recognitionLabels.ts';
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from '../../../constants/styles.ts';
 import { useAppDispatch, useAppSelector } from '../../../hooks/useStore';
 import { useIsOffline } from '../../../providers/network';
@@ -46,6 +47,19 @@ export default function EvaluationScreen() {
   const onPredict = useCallback(
     (uri: string) => {
       if (uri) {
+        const character = currentKanji?.kanji?.kanji?.character;
+
+        // The model only classifies into the fixed set it was trained on — calling predict() for
+        // a character outside that set can only ever misclassify. Passing no predictions routes
+        // this to the existing 'review' status (updateItemScore), same as a doubtful answer the
+        // model failed to recognize: the user arbitrates it themselves on the result screen.
+        if (character && !RECOGNITION_MODEL_LABELS.has(character)) {
+          dispatch(updateItemScore({ result: [], strokesCount, image: uri }));
+          toast?.show({ message: 'Answer saved', type: 'success' });
+          setTimer(TIMER_DURATION);
+          return;
+        }
+
         predict(uri)
           .then((res: PredictionType[]) => {
             console.log('predicted', res);
@@ -62,7 +76,7 @@ export default function EvaluationScreen() {
           });
       }
     },
-    [dispatch, toast, strokesCount],
+    [dispatch, toast, strokesCount, currentKanji],
   );
 
   const timerInMinutes = useMemo(() => {
