@@ -18,7 +18,7 @@ import { PER_KANJI_UNLOCK_COST } from '../../../../../constants/unlockCosts.ts';
 import { useAppDispatch, useAppSelector } from '../../../../../hooks/useStore.tsx';
 import { useToaster } from '../../../../../providers/toaster.tsx';
 import { core } from '../../../../../services/http.ts';
-import { getOne, selectEntities } from '../../../../../store/slices/kanji.ts';
+import { getOne, selectEntities, selectGetOneStatus } from '../../../../../store/slices/kanji.ts';
 import { save, selectedKanji, selectSaveStatus, selectSelectedKanji } from '../../../../../store/slices/selectedKanji.ts';
 import { selectUserState, unlockContent } from '../../../../../store/slices/user.ts';
 import { getCheapestLockedTier, isKanjiLocked } from '../../../../../utils/kanjiLock.ts';
@@ -35,6 +35,7 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
   const entities = useAppSelector(selectEntities);
+  const getOneStatus = useAppSelector(selectGetOneStatus);
   const selectedKanjiState = useAppSelector(selectSelectedKanji);
   const selectedSaveStatus = useAppSelector(selectSaveStatus);
   const { character } = props.route.params;
@@ -154,6 +155,25 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
       core.kanjiService?.getOneImage({ kanji: entities[character].kanji.character }).then((res) => setSvg(res.data));
     }
   }, [entities[character]?.kanji?.character]);
+
+  // Gate on the data itself, not just getOneStatus === 'pending' — status is a single flag shared
+  // across every kanji fetch, so navigating straight from one detail page to another can read a
+  // stale 'succeeded' from the previous character for a frame before the new fetch's 'pending' lands
+  if (!kanji && getOneStatus === 'failed') {
+    return (
+      <Layout screen="kanji">
+        <View style={styles.loadingContainer}>
+          <Text text80M $textNeutral center>
+            {t('kanjiDetails.loadError')}
+          </Text>
+        </View>
+      </Layout>
+    );
+  }
+
+  if (!kanji) {
+    return <Layout screen="kanji" isLoading />;
+  }
 
   if (locked) {
     // No applicable tier ("custom" kanji, no JLPT/grade classification) means there's nothing to
@@ -416,6 +436,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingTop: 80,
+    paddingHorizontal: 20,
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
     paddingHorizontal: 20,
   },
   canvas: {

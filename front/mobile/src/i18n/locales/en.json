@@ -145,6 +145,7 @@
   "kanjiDetails.locked.unlockButton": "Unlock ({{cost}})",
   "kanjiDetails.locked.premiumOnlyMessage": "This kanji isn't part of any free or credits tier — it's Premium only.",
   "kanjiDetails.locked.premiumButton": "Go Premium",
+  "kanjiDetails.loadError": "Couldn't load this kanji, try again",
   "kanji.select.toast.success": "Characters added to selection",
   "kanji.unselect.toast.success": "Updates saved with unselected characters",
 

@@ -1,7 +1,7 @@
 import { useHeaderHeight } from '@react-navigation/elements';
 import { PropsWithChildren, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Dimensions, StyleSheet } from 'react-native';
+import { ActivityIndicator, Dimensions, StyleSheet } from 'react-native';
 import Animated, { useAnimatedScrollHandler, useSharedValue, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors, Text, View } from 'react-native-ui-lib';
@@ -19,13 +19,16 @@ type LayoutProps = {
   /** Set on the rare screens that must stay ad-free (e.g. the full-screen evaluation session) —
    * every other screen gets the banner by default, right below its title/subtitle */
   hideBanner?: boolean;
+  /** Shows a centered spinner in place of children — for screens whose content depends on an
+   * async fetch (e.g. a detail page keyed by a route param) that hasn't resolved yet */
+  isLoading?: boolean;
 };
 
 const { height } = Dimensions.get('window');
 /** Scroll distance ignored before hiding/showing the tab bar, to avoid flickering on small moves */
 const SCROLL_THRESHOLD = 8;
 
-export default function Layout({ screen, withTabBar, hideBanner, children }: LayoutProps & PropsWithChildren) {
+export default function Layout({ screen, withTabBar, hideBanner, isLoading, children }: LayoutProps & PropsWithChildren) {
   const { t } = useTranslation();
 
   const headerHeight = useHeaderHeight();
@@ -88,7 +91,15 @@ export default function Layout({ screen, withTabBar, hideBanner, children }: Lay
             <Spacing y={10} />
           </>
         )}
-        {children}
+        {isLoading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator color={Colors.$backgroundPrimaryHeavy} size="large" />
+            <Spacing y={12} />
+            <Text $textDefault>{t('loading.title')}</Text>
+          </View>
+        ) : (
+          children
+        )}
       </View>
     </Animated.ScrollView>
   );
@@ -102,5 +113,11 @@ const styles = StyleSheet.create({
   },
   banner: {
     alignItems: 'center',
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 20,
   },
 });
