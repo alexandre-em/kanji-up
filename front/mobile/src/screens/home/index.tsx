@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dimensions, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { Assets, Badge, Button, Colors, Icon, ProgressBar } from 'react-native-ui-lib';
@@ -13,6 +13,7 @@ import Layout from '../../components/layout';
 import Spacing from '../../components/spacing';
 import SearchIcon from '../../components/svg/search';
 import { homeMenuButtons } from '../../constants/homeButtons';
+import { KANJI_PROGRESSION_MAX } from '../../constants/progression';
 import { screenNames } from '../../constants/screens';
 import { GENERAL_MARGIN } from '../../constants/styles';
 import { useRewardedCreditsAd } from '../../hooks/useRewardedCreditsAd';
@@ -42,6 +43,18 @@ export default function Home() {
   const [missionsVisible, setMissionsVisible] = useState(false);
 
   const missionsDoneCount = todayMissions ? Object.values(todayMissions.tasks).filter(Boolean).length : 0;
+
+  // "Mastered" mirrors the same threshold the evaluation flow itself uses to clamp progression —
+  // out of the kanji currently selected, not the whole joyo corpus, so this tracks what the user
+  // actually set out to learn rather than showing a near-zero, demotivating global percentage
+  const masteryPercent = useMemo(() => {
+    const selectedCount = selectedKanjiState ? Object.keys(selectedKanjiState).length : 0;
+    if (selectedCount === 0) return 0;
+
+    const masteredCount = Object.values(userState.progression ?? {}).filter((score) => score >= KANJI_PROGRESSION_MAX).length;
+
+    return Math.min(100, Math.round((masteredCount / selectedCount) * 100));
+  }, [userState.progression, selectedKanjiState]);
 
   useEffect(() => {
     if (userState.userId) dispatch(fetchTodayMissions(userState.userId));
@@ -152,9 +165,12 @@ export default function Home() {
           {t('home.progression.title')}
         </Text>
         <Spacing y={5} />
-        <ProgressBar progress={5} />
+        {/* RNUI's own container style bakes Colors.$backgroundNeutralMedium into a module-level
+            StyleSheet.create — frozen at import time to whatever the OS scheme was at cold boot,
+            never reactive to Colors.setScheme(). Overriding it here reads the token live instead. */}
+        <ProgressBar progress={masteryPercent} style={{ backgroundColor: Colors.$backgroundNeutralMedium }} />
         <Text text100L $textNeutral>
-          5%
+          {masteryPercent}%
         </Text>
       </View>
       <Spacing y={GENERAL_MARGIN} />
