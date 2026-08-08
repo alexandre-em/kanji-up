@@ -2,7 +2,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dimensions, ScrollView, StyleSheet } from 'react-native';
-import { ActionSheet, Assets, Button, Colors, ExpandableSection, Icon, View } from 'react-native-ui-lib';
+import { ActionSheet, Assets, Button, Colors, ExpandableSection, Icon, ProgressBar, View } from 'react-native-ui-lib';
 import Card from 'react-native-ui-lib/card';
 import Text from 'react-native-ui-lib/text';
 
@@ -12,6 +12,7 @@ import Layout from '../../../../../components/layout.tsx';
 import Spacing from '../../../../../components/spacing.tsx';
 import Lock from '../../../../../components/svg/lock';
 import SvgSilhouette from '../../../../../components/svgSilhouette.tsx';
+import { KANJI_PROGRESSION_MAX } from '../../../../../constants/progression.ts';
 import { screenNames } from '../../../../../constants/screens.ts';
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from '../../../../../constants/styles.ts';
 import { PER_KANJI_UNLOCK_COST } from '../../../../../constants/unlockCosts.ts';
@@ -52,6 +53,10 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
   console.log({ selectedKanjiState });
 
   const kanji = useMemo(() => entities[character], [entities[character]]);
+  // undefined = never practiced yet, distinct from a real 0 — no bar shown in that case
+  const progressionScore = userState.progression[character];
+  const progressPercent =
+    progressionScore !== undefined ? Math.min(100, Math.round((progressionScore / KANJI_PROGRESSION_MAX) * 100)) : null;
   // A kanji can belong to both a JLPT tier and a school grade tier — locked here only means
   // every classification it has is a paid, not-yet-unlocked one (see utils/kanjiLock)
   const locked = useMemo(() => (kanji ? isKanjiLocked(kanji, userState) : false), [kanji, userState]);
@@ -231,6 +236,25 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
   return (
     <Layout screen="kanji">
       <View style={styles.header}>{isDrawMode ? CanvasMode : ViewMode}</View>
+      {progressPercent !== null && (
+        <>
+          <Spacing y={16} />
+          <View row spread centerV>
+            <Text text90M $textNeutral>
+              {t('kanjiDetails.mastery.title')}
+            </Text>
+            <Text text90BO style={{ color: progressPercent >= 100 ? Colors.$textSuccess : Colors.$textPrimary }}>
+              {progressPercent}%
+            </Text>
+          </View>
+          <Spacing y={4} />
+          <ProgressBar
+            progress={progressPercent}
+            style={{ backgroundColor: Colors.$backgroundNeutralMedium }}
+            progressColor={progressPercent >= 100 ? Colors.$backgroundSuccessHeavy : Colors.$backgroundPrimaryHeavy}
+          />
+        </>
+      )}
       <Spacing y={20} />
       <View style={styles.buttonGroup}>
         <Button

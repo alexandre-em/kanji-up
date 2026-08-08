@@ -11,6 +11,7 @@ import { TAB_BAR_TOTAL_HEIGHT } from '../../../../components/bottomNavBar';
 import Layout from '../../../../components/layout';
 import Spacing from '../../../../components/spacing';
 import Lock from '../../../../components/svg/lock';
+import { KANJI_PROGRESSION_MAX } from '../../../../constants/progression';
 import { screenNames } from '../../../../constants/screens';
 import { MAX_FREE_SELECTED_KANJI } from '../../../../constants/selectionLimit';
 import { BULK_UNLOCK_COST, getTierKey, PER_KANJI_UNLOCK_COST } from '../../../../constants/unlockCosts';
@@ -40,14 +41,19 @@ type KanjiCardElementProps = {
   kanji: Partial<KanjiType>;
   onPress: (kanji: Partial<KanjiType>) => void;
   isLocked: boolean;
+  /** undefined for a kanji never practiced yet — no bar shown, distinct from a real 0 */
+  progressionScore: number | undefined;
 };
 
 const CARD_SIZE = 50;
 
-const KanjiCardElement = ({ kanji, onPress, isLocked }: KanjiCardElementProps) => {
+const KanjiCardElement = ({ kanji, onPress, isLocked, progressionScore }: KanjiCardElementProps) => {
   const entities = useSelector(selectSelectedKanji);
   const toAdd = useSelector(selectKanjiToAdd);
   const toRemove = useSelector(selectKanjiToDelete);
+
+  const progressPercent =
+    progressionScore !== undefined ? Math.min(100, Math.round((progressionScore / KANJI_PROGRESSION_MAX) * 100)) : null;
 
   const color = useMemo(() => {
     if (toRemove[kanji.kanji_id!]) {
@@ -101,6 +107,19 @@ const KanjiCardElement = ({ kanji, onPress, isLocked }: KanjiCardElementProps) =
       {isLocked && (
         <View style={[styles.lockBadge, { backgroundColor: Colors.$backgroundNeutralHeavy }]}>
           <Lock size={11} color="#fff" />
+        </View>
+      )}
+      {progressPercent !== null && (
+        <View style={[styles.progressTrack, { backgroundColor: Colors.$backgroundNeutralHeavy }]}>
+          <View
+            style={[
+              styles.progressFill,
+              {
+                width: `${progressPercent}%`,
+                backgroundColor: progressPercent >= 100 ? Colors.$backgroundSuccessHeavy : Colors.$backgroundPrimaryHeavy,
+              },
+            ]}
+          />
         </View>
       )}
     </Card>
@@ -259,7 +278,12 @@ export default function KanjiList(props: KanjiListProps) {
         data={kanjiList}
         keyExtractor={(item) => item.kanji_id!}
         renderItem={({ item }) => (
-          <KanjiCardElement kanji={item} onPress={() => handlePress(item)} isLocked={isKanjiLocked(item, userState)} />
+          <KanjiCardElement
+            kanji={item}
+            onPress={() => handlePress(item)}
+            isLocked={isKanjiLocked(item, userState)}
+            progressionScore={userState.progression[item.kanji_id!]}
+          />
         )}
         onEndReached={handleEndReached}
         onEndReachedThreshold={0.15}
@@ -315,6 +339,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 100,
+  },
+  progressTrack: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 3,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
   },
   loader: {
     display: 'flex',
