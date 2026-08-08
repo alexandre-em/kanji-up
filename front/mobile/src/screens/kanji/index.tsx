@@ -23,6 +23,13 @@ export default function KanjiCategoriesScreen() {
 
   const handleRedirect = useCallback(
     (category: string) => {
+      // Advanced has no sub-levels to pick between (unlike JLPT/grade) — a tier-picker screen
+      // showing a single "all of it" tile would just be an extra tap for nothing
+      if (category === 'advanced') {
+        navigation.navigate(screenNames.KANJIS as never, { category, difficulty: 'all' } as never);
+        return;
+      }
+
       navigation.navigate(screenNames.DIFFICULTIES, { category });
     },
     [navigation],

@@ -7,6 +7,7 @@ type GetAllParams = {
   limit?: number;
   grade?: string;
   jlpt?: string;
+  advanced?: boolean;
 };
 
 export default class KanjiService {
@@ -20,10 +21,13 @@ export default class KanjiService {
     });
   }
 
-  getAll({ page = 0, limit = 10, grade = undefined, jlpt = undefined }: GetAllParams, options?: AxiosRequestConfig) {
+  getAll(
+    { page = 0, limit = 10, grade = undefined, jlpt = undefined, advanced = undefined }: GetAllParams,
+    options?: AxiosRequestConfig,
+  ) {
     if (!this._instance) throw new Error('Kanji instance not ready...');
 
-    return this._instance.get<Pagination<KanjiType>>(``, { ...options, params: { page, limit, grade, jlpt } });
+    return this._instance.get<Pagination<KanjiType>>(``, { ...options, params: { page, limit, grade, jlpt, advanced } });
   }
 
   getOne({ id = '' }, options?: AxiosRequestConfig) {

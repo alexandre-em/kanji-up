@@ -34,7 +34,7 @@ import UnlockModal from './unlockModal';
 
 type KanjiListProps = RouteParamsProps<{
   difficulty: string;
-  category: 'jlpt' | 'grade';
+  category: 'jlpt' | 'grade' | 'advanced';
 }>;
 
 type KanjiCardElementProps = {

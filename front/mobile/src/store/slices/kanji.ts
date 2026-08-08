@@ -8,7 +8,7 @@ interface KanjiState {
   kanjis: KanjiType[];
   last: {
     page: number;
-    type: 'grade' | 'jlpt';
+    type: 'grade' | 'jlpt' | 'advanced';
     difficulty: string;
     totalPage: number;
   } | null;
@@ -21,9 +21,11 @@ interface KanjiState {
 }
 
 type GetAllInput = {
+  // 'advanced' has no sub-levels — difficulty is an unused placeholder (kept as a required string
+  // so the same cache/pagination fields work uniformly across all three types)
   difficulty: string;
   page?: number;
-  type: 'grade' | 'jlpt';
+  type: 'grade' | 'jlpt' | 'advanced';
 };
 
 interface SearchKanjiInput {
@@ -52,7 +54,7 @@ export const getOne = createAsyncThunk<KanjiType, string>('kanjis/getById', asyn
 });
 
 export const getAll = createAsyncThunk<
-  (Pagination<KanjiType> & { difficulty: string; type: 'grade' | 'jlpt' }) | null,
+  (Pagination<KanjiType> & { difficulty: string; type: 'grade' | 'jlpt' | 'advanced' }) | null,
   GetAllInput
 >('kanjis/getAll', async ({ page = 1, ...params }, { getState }) => {
   const { kanji } = getState() as RootState;
@@ -60,7 +62,8 @@ export const getAll = createAsyncThunk<
     return null;
   }
 
-  const response = await core.kanjiService!.getAll({ page, [params.type]: params.difficulty, limit: 50 });
+  const typeParams = params.type === 'advanced' ? { advanced: true } : { [params.type]: params.difficulty };
+  const response = await core.kanjiService!.getAll({ page, ...typeParams, limit: 50 });
 
   if (params.difficulty !== kanji.last?.difficulty) {
     return { ...response.data, difficulty: params.difficulty, type: params.type };
