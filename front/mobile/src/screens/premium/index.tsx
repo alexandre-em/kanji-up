@@ -131,6 +131,15 @@ export default function Premium() {
 
   const handleSelectPlan = useCallback(
     async (plan: PremiumPlanKey) => {
+      // Dev shortcut: skips real Play Billing (unavailable on the emulator/no Play Services)
+      // entirely and grants premium locally, so the paywalled UI can be tested without a real
+      // purchase. __DEV__ is false in release builds, so this never ships.
+      if (__DEV__) {
+        dispatch(user.actions.update({ subscriptionPlan: 'premium', subscribedAt: new Date(), subscribedUntil: null }));
+        toast?.show({ message: t('premium.purchase.success'), type: 'success' });
+        return;
+      }
+
       setPurchasingPlan(plan);
 
       try {
@@ -148,7 +157,7 @@ export default function Premium() {
         toast?.show({ message: t('premium.purchase.error'), type: 'failure' });
       }
     },
-    [offers, toast, t],
+    [offers, toast, t, dispatch],
   );
 
   if (userState.subscriptionPlan === 'premium') {
