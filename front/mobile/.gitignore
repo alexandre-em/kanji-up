@@ -41,6 +41,10 @@ local.properties
 !debug.keystore
 keystore.properties
 
+# Play Store upload key certificates + service account JSON — real credential material, never
+# committed
+android/certificates/
+
 # node.js
 #
 node_modules/
