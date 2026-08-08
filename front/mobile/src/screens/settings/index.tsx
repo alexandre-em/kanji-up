@@ -1,7 +1,7 @@
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, TouchableOpacity, View as RNView } from 'react-native';
-import { Colors, Text } from 'react-native-ui-lib';
+import { TouchableOpacity } from 'react-native';
+import { Text } from 'react-native-ui-lib';
 
 import AccountSummary from '../../components/accountSummary';
 import Layout from '../../components/layout';
@@ -9,6 +9,7 @@ import Spacing from '../../components/spacing';
 import { screenNames } from '../../constants/screens';
 import GoogleSignInButton from './googleSignIn';
 import LanguageSelector from './languageSelector';
+import ThemeSelector from './themeSelector';
 
 export default function Settings() {
   const { t } = useTranslation();
@@ -31,27 +32,7 @@ export default function Settings() {
       <Spacing y={12} />
       <LanguageSelector />
       <Spacing y={16} />
-      <RNView style={[styles.themeRow, { borderColor: Colors.$outlineNeutral }]}>
-        <Text text80M $textDefault>
-          {t('settings.theme.title')}
-        </Text>
-        <Text text90M $textNeutral>
-          {t('settings.theme.comingSoon')}
-        </Text>
-      </RNView>
+      <ThemeSelector />
     </Layout>
   );
 }
-
-const styles = StyleSheet.create({
-  themeRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderRadius: 12,
-    borderWidth: StyleSheet.hairlineWidth,
-    opacity: 0.5,
-  },
-});
