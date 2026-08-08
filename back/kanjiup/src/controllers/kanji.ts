@@ -10,9 +10,10 @@ export function getAll(req: Request, res: Response) {
   const limit = req.query.limit ? parseInt(req.query.limit as string) : PAGINATION_LIMIT.LITTLE;
   const grade = (req.query.grade as string) || undefined;
   const jlpt = (req.query.jlpt as string) || undefined;
+  const advanced = req.query.advanced === 'true';
 
   kanjiService
-    .getAll(page, limit, grade, jlpt)
+    .getAll(page, limit, grade, jlpt, advanced)
     .then((kanjis) => {
       res.status(200).send(kanjis);
     })

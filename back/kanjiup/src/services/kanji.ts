@@ -17,7 +17,7 @@ export const getOneImage = (encodedKanji: string) => {
   return path.join(process.cwd(), 'data', 'svg', `${kanji.charCodeAt(0)}.svg`);
 };
 
-export const getAll = async (page: number, limit: number, grade?: string, jlpt?: string) => {
+export const getAll = async (page: number, limit: number, grade?: string, jlpt?: string, advanced?: boolean) => {
   const query: Partial<{ deleted_at: string | null; kanji: { $in: string[] } | null; reference: { $in: string[] } | null }> = { deleted_at: null };
   if (grade)
     query['reference'] = {
@@ -31,6 +31,18 @@ export const getAll = async (page: number, limit: number, grade?: string, jlpt?:
           .exec()
       ).map((char) => char._id),
     };
+  else if (advanced) {
+    // "Advanced" kanji: no grade reference linked at all (the field is optional on Kanji) and no
+    // JLPT level on the character — everything the tier grid (school grades + JLPT) never covers
+    query['reference'] = null;
+    query['kanji'] = {
+      $in: (
+        await CharacterModel.find({ jlpt: null })
+          .select('id')
+          .exec()
+      ).map((char) => char._id),
+    };
+  }
 
   console.log({ query });
 
