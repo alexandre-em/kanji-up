@@ -20,6 +20,14 @@ const store = configureStore({
     wordEvaluation,
     missions,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        // subscribedAt/subscribedUntil are intentionally Date objects (see UserState) — Redux's
+        // default check flags that as non-serializable, but it's deliberate, not a mistake to fix
+        ignoredPaths: ['user.subscribedAt', 'user.subscribedUntil'],
+      },
+    }),
 });
 
 export type RootState = ReturnType<typeof store.getState>;
