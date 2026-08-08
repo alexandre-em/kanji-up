@@ -23,6 +23,7 @@ import { getOne, selectEntities, selectGetOneStatus } from '../../../../../store
 import { save, selectedKanji, selectSaveStatus, selectSelectedKanji } from '../../../../../store/slices/selectedKanji.ts';
 import { selectUserState, unlockContent } from '../../../../../store/slices/user.ts';
 import { getCheapestLockedTier, isKanjiLocked } from '../../../../../utils/kanjiLock.ts';
+import DifficultyTag, { getGradeTag, getJlptTag } from '../../../../search/difficultyTag.tsx';
 import UnlockModal from '../unlockModal.tsx';
 
 type KanjiDetailsProps = RouteParamsProps<{
@@ -53,6 +54,8 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
   console.log({ selectedKanjiState });
 
   const kanji = useMemo(() => entities[character], [entities[character]]);
+  const gradeTag = getGradeTag(kanji?.reference?.grade, t);
+  const jlptTag = getJlptTag(kanji?.kanji?.jlpt, t);
   // undefined = never practiced yet, distinct from a real 0 — no bar shown in that case
   const progressionScore = userState.progression[character];
   const progressPercent =
@@ -236,6 +239,15 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
   return (
     <Layout screen="kanji">
       <View style={styles.header}>{isDrawMode ? CanvasMode : ViewMode}</View>
+      {(jlptTag || gradeTag) && (
+        <>
+          <Spacing y={12} />
+          <View row centerH style={styles.tagRow}>
+            {jlptTag && <DifficultyTag tag={jlptTag} />}
+            {gradeTag && <DifficultyTag tag={gradeTag} />}
+          </View>
+        </>
+      )}
       {progressPercent !== null && (
         <>
           <Spacing y={16} />
@@ -462,6 +474,9 @@ const styles = StyleSheet.create({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  tagRow: {
+    gap: 6,
   },
   lockedContainer: {
     flex: 1,
