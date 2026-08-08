@@ -32,9 +32,12 @@ export const getAll = async (page: number, limit: number, grade?: string, jlpt?:
       ).map((char) => char._id),
     };
   else if (advanced) {
-    // "Advanced" kanji: no grade reference linked at all (the field is optional on Kanji) and no
-    // JLPT level on the character — everything the tier grid (school grades + JLPT) never covers
-    query['reference'] = null;
+    // "Advanced" kanji: reference grade is the literal sentinel "custom" (not null/absent — every
+    // kanji has a reference doc, this is how "no real school grade" is actually represented) and
+    // no JLPT level on the character — everything the tier grid (school grades + JLPT) never covers
+    query['reference'] = {
+      $in: await ReferenceModel.find({ grade: 'custom' }).select('id').exec(),
+    };
     query['kanji'] = {
       $in: (
         await CharacterModel.find({ jlpt: null })
