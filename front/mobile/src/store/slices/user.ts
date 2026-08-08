@@ -143,11 +143,15 @@ export const user = createSlice({
         state.subscribedAt = action.payload.subscribedAt;
         state.subscribedUntil = action.payload.subscribedUntil;
         state.credits = action.payload.credits;
-        state.unlockedDifficulties = action.payload.unlockedDifficulties;
-        state.unlockedKanji = action.payload.unlockedKanji;
-        state.totalScore = action.payload.totalScore;
-        state.dailyScores = action.payload.dailyScores;
-        state.progression = action.payload.progression;
+        // Server response can omit these (e.g. an account created before progression tracking
+        // existed) — downstream code assumes an object/array is always there (.includes(),
+        // bracket access, Object.values()), so a missing field must fall back, not propagate as
+        // undefined and crash the first screen that reads it
+        state.unlockedDifficulties = action.payload.unlockedDifficulties ?? [];
+        state.unlockedKanji = action.payload.unlockedKanji ?? [];
+        state.totalScore = action.payload.totalScore ?? 0;
+        state.dailyScores = action.payload.dailyScores ?? {};
+        state.progression = action.payload.progression ?? {};
       })
       .addCase(getUser.rejected, (state) => {
         state.getUserStatus = 'failed';
