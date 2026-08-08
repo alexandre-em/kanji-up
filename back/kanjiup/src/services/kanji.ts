@@ -61,7 +61,7 @@ export const searchCharacter = async (query: string, page = 1, limit = 10) => {
   };
 
   const populate = [
-    { path: 'kanji', select: 'character_id character meaning onyomi kunyomi -_id' } as PopulateOptions,
+    { path: 'kanji', select: 'character_id character meaning onyomi kunyomi strokes jlpt -_id' } as PopulateOptions,
     { path: 'radical', select: 'radical_id -_id' } as PopulateOptions,
     { path: 'reference', select: 'reference_id -_id grade' } as PopulateOptions,
   ];
