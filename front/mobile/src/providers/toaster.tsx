@@ -50,6 +50,10 @@ export function ToasterProvider({ children }: { children: React.ReactNode }) {
         onDismiss={handleDismiss}
         backgroundColor={Colors.$backgroundNeutralLight}
         messageStyle={{ color: Colors.$textDefault }}
+        // The failure preset's icon defaults to $iconDangerLight, a token that doesn't exist
+        // anywhere in our theme (unlike general/offline, which reuse our own $iconPrimaryLight) —
+        // falls back to some fixed RNUI color that never adapts to our scheme
+        iconColor={type === 'failure' ? Colors.$iconPrimary : undefined}
       />
       {children}
     </ToasterContext.Provider>
