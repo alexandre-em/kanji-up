@@ -41,6 +41,7 @@
   "search.tag.elementary": "Elementary {{grade}}",
   "search.tag.juniorHigh": "Junior High",
   "search.tag.jlpt": "JLPT N{{level}}",
+  "search.tag.advanced": "Advanced",
   "settings.title": "Settings",
   "settings.section.preferences": "Preferences",
   "settings.language.title": "Display language",

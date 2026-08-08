@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { StyleSheet, TouchableOpacity, View as RNView } from 'react-native';
 import { Colors, Text } from 'react-native-ui-lib';
 
-import DifficultyTag, { getGradeTag, getJlptTag } from './difficultyTag';
+import DifficultyTag, { getAdvancedTag, getGradeTag, getJlptTag } from './difficultyTag';
 
 type KanjiResultCardProps = {
   kanji: Partial<KanjiType>;
@@ -15,6 +15,7 @@ export default function KanjiResultCard({ kanji, onPress }: KanjiResultCardProps
   const meaning = kanji.kanji?.meaning?.join(', ');
   const gradeTag = getGradeTag(kanji.reference?.grade, t);
   const jlptTag = getJlptTag(kanji.kanji?.jlpt, t);
+  const advancedTag = !gradeTag && !jlptTag ? getAdvancedTag(t) : undefined;
 
   return (
     <TouchableOpacity
@@ -31,10 +32,11 @@ export default function KanjiResultCard({ kanji, onPress }: KanjiResultCardProps
         <Text text90M $textNeutral numberOfLines={2}>
           {meaning}
         </Text>
-        {(gradeTag || jlptTag) && (
+        {(gradeTag || jlptTag || advancedTag) && (
           <RNView style={styles.tagRow}>
             {jlptTag && <DifficultyTag tag={jlptTag} />}
             {gradeTag && <DifficultyTag tag={gradeTag} />}
+            {advancedTag && <DifficultyTag tag={advancedTag} />}
           </RNView>
         )}
       </RNView>

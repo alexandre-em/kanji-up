@@ -34,14 +34,19 @@ export function getGradeTag(grade: string | undefined, t: TFunction): Tag | unde
 }
 
 // JLPT runs the opposite direction: N5 is the easiest level, N1 the hardest.
-// Not called from kanjiResultCard for now — the search endpoint doesn't return `jlpt` yet
-// (backend dette, see CLAUDE.md §4) — kept here ready for when that's fixed.
 export function getJlptTag(jlpt: number | undefined, t: TFunction): Tag | undefined {
   if (!jlpt) return undefined;
   const label = t('search.tag.jlpt', { level: jlpt });
   if (jlpt >= 4) return { label, tier: 'easy' };
   if (jlpt === 3) return { label, tier: 'medium' };
   return { label, tier: 'hard' };
+}
+
+// A kanji with neither classification isn't reachable through the Selection tier grid at all —
+// Premium-only (see utils/kanjiLock's empty-tierKeys case), worth flagging before the user taps
+// into a paywalled detail page they didn't expect
+export function getAdvancedTag(t: TFunction): Tag {
+  return { label: t('search.tag.advanced'), tier: 'hard' };
 }
 
 export default function DifficultyTag({ tag }: { tag: Tag }) {

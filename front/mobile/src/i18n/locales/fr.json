@@ -109,6 +109,7 @@
   "search.tag.elementary": "Primaire {{grade}}",
   "search.tag.juniorHigh": "Collège",
   "search.tag.jlpt": "JLPT N{{level}}",
+  "search.tag.advanced": "Avancé",
   "settings.title": "Réglages",
   "settings.section.preferences": "Préférences",
   "settings.language.title": "Langue d'affichage",
