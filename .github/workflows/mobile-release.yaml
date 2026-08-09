@@ -77,21 +77,32 @@ jobs:
             -PversionCode="${GITHUB_RUN_NUMBER}" \
             -PversionName="${VERSION_NAME}"
 
-      # serviceAccountJsonPlainText hits a JWT-signing bug in this action's bundled
-      # google-auth-library ("error:1E08010C:DECODER routines::unsupported") regardless of a
-      # confirmed-valid PKCS8 key and NODE_OPTIONS=--openssl-legacy-provider — writing the key to
-      # a file and using serviceAccountJson instead takes a different code path in the action.
       - name: Write Play service account JSON
         run: |
           cat <<'EOF' > google-play-service-account.json
           ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
           EOF
 
-      - name: Upload to Play Store (internal track)
-        uses: r0adkll/upload-google-play@v1
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
         with:
-          serviceAccountJson: front/mobile/google-play-service-account.json
-          packageName: com.kanjiup
-          releaseFiles: front/mobile/android/app/build/outputs/bundle/release/app-release.aab
-          track: internal
-          status: completed
+          ruby-version: '3.3'
+
+      - name: Install Fastlane
+        run: gem install fastlane -N
+
+      # r0adkll/upload-google-play (Node-based) hits a JWT-signing bug under the Node version
+      # GitHub now forces on all actions ("error:1E08010C:DECODER routines::unsupported",
+      # reproduces with both plaintext and file-based key input — see r0adkll/upload-google-play#256,
+      # unresolved). Fastlane supply is Ruby-based and unaffected.
+      - name: Upload to Play Store (internal track)
+        run: |
+          fastlane supply \
+            --json_key google-play-service-account.json \
+            --package_name com.kanjiup \
+            --aab android/app/build/outputs/bundle/release/app-release.aab \
+            --track internal \
+            --release_status completed \
+            --skip_upload_metadata true \
+            --skip_upload_images true \
+            --skip_upload_screenshots true
