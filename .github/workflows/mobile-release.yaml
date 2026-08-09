@@ -67,12 +67,6 @@ jobs:
           keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}
           EOF
 
-      # Temporary: prints the decoded keystore's hash so it can be diffed against the local file's
-      # hash (`shasum -a 256`) to rule out corruption in the secret's base64 round-trip. Safe to
-      # log — a hash reveals nothing about the keystore itself. Remove once the mismatch is found.
-      - name: Debug keystore hash
-        run: shasum -a 256 android/app/kanjiup-release.keystore
-
       # versionName follows the release tag (v1.4.2 -> 1.4.2); versionCode is the workflow run
       # number, guaranteed to strictly increase across releases with no extra bookkeeping.
       - name: Build release bundle
@@ -85,6 +79,11 @@ jobs:
 
       - name: Upload to Play Store (internal track)
         uses: r0adkll/upload-google-play@v1
+        env:
+          # r0adkll/upload-google-play bundles an old google-auth-library that fails JWT-signing
+          # the service account key under Node 18+/OpenSSL 3 ("error:1E08010C:DECODER
+          # routines::unsupported") even with a valid PKCS8 key. Legacy provider works around it.
+          NODE_OPTIONS: --openssl-legacy-provider
         with:
           serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
           packageName: com.kanjiup
