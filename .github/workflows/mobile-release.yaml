@@ -77,15 +77,20 @@ jobs:
             -PversionCode="${GITHUB_RUN_NUMBER}" \
             -PversionName="${VERSION_NAME}"
 
+      # serviceAccountJsonPlainText hits a JWT-signing bug in this action's bundled
+      # google-auth-library ("error:1E08010C:DECODER routines::unsupported") regardless of a
+      # confirmed-valid PKCS8 key and NODE_OPTIONS=--openssl-legacy-provider — writing the key to
+      # a file and using serviceAccountJson instead takes a different code path in the action.
+      - name: Write Play service account JSON
+        run: |
+          cat <<'EOF' > google-play-service-account.json
+          ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+          EOF
+
       - name: Upload to Play Store (internal track)
         uses: r0adkll/upload-google-play@v1
-        env:
-          # r0adkll/upload-google-play bundles an old google-auth-library that fails JWT-signing
-          # the service account key under Node 18+/OpenSSL 3 ("error:1E08010C:DECODER
-          # routines::unsupported") even with a valid PKCS8 key. Legacy provider works around it.
-          NODE_OPTIONS: --openssl-legacy-provider
         with:
-          serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+          serviceAccountJson: front/mobile/google-play-service-account.json
           packageName: com.kanjiup
           releaseFiles: front/mobile/android/app/build/outputs/bundle/release/app-release.aab
           track: internal
