@@ -45,6 +45,12 @@ export default function TrainingModes() {
   return (
     <Layout screen="training" withTabBar>
       <Spacing y={10} />
+      <Button
+        label={t('training.viewStats')}
+        outline
+        size={Button.sizes.small}
+        onPress={() => navigation.navigate(screenNames.PROFILE as never)}
+      />
       {trainingModes.map((mode) => (
         <View key={mode.textKey}>
           <Spacing y={15} />
