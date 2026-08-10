@@ -85,6 +85,27 @@ jobs:
         run: |
           echo "${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_BASE64 }}" | base64 -d > google-play-service-account.json
 
+      # Temporary: structural check only, never prints the key itself. Remove once the
+      # "Neither PUB key nor PRIV key" mismatch is diagnosed.
+      - name: Debug service account JSON structure
+        run: |
+          wc -c google-play-service-account.json
+          python3 -c "
+          import json, sys
+          try:
+              with open('google-play-service-account.json') as f:
+                  d = json.load(f)
+              print('valid JSON:', True)
+              print('type:', d.get('type'))
+              pk = d.get('private_key', '')
+              print('starts with BEGIN marker:', pk.startswith('-----BEGIN PRIVATE KEY-----'))
+              print('ends with END marker:', pk.rstrip().endswith('-----END PRIVATE KEY-----'))
+              print('newline count in key:', pk.count(chr(10)))
+          except Exception as e:
+              print('JSON PARSE FAILED:', e)
+              sys.exit(1)
+          "
+
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
