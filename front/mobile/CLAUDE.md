@@ -138,7 +138,13 @@ npx react-native run-android --no-packager                        # build (~20 m
   `services/index.ts`) + des warnings.
 - `fr.json` ne contient que les clés d'onboarding, avec des valeurs **en anglais** ; le reste
   retombe sur `en` via `fallbackLng`.
-- Routes déclarées sans écran : `Ocr`, `Premium`, et la carte « SETTING » de Home ne navigue pas.
+- La carte « SETTING » de Home ne navigue pas.
+- ~~`Ocr`/`Premium` étaient documentées ici comme routes sans écran~~ — **faux, corrigé le
+  2026-08-10** : les deux sont pleinement implémentées et branchées dans `router.tsx`. `Premium`
+  (`src/screens/premium/index.tsx`) a un vrai flow d'achat via `react-native-iap` (abonnements
+  mensuel/annuel + lifetime), vérifié côté serveur (`/billing/verify-purchase`). `Ocr`
+  (`src/screens/ocr/index.tsx`) utilise réellement la caméra/galerie (`react-native-image-picker`)
+  et upload l'image au backend (`scanService.create`, `/scans`).
 - Le mode sombre est désactivé en dur (`Colors.setScheme('light')` dans `App.tsx`) : la palette
   `dark` de `rnui.ts` est du code mort. Aperçu réel fait le 2026-07-31 (bascule temporaire de
   `setScheme`) : les tokens de `rnui.ts` s'appliquent correctement, mais plusieurs écrans ont des
