@@ -52,17 +52,17 @@ export default function Onboarding() {
   useEffect(() => {
     if (isSubmitted && userName.length > 0 && (createUserStatus === 'idle' || createUserStatus === 'failed')) {
       getUniqueId().then((deviceId) => {
-        fileServiceInstance.write(ONBOARDING_FINISHED_KEY, true).then(() => {
-          dispatch(createUser({ name: userName, macAddress: deviceId }));
-        });
+        dispatch(createUser({ name: userName, macAddress: deviceId }));
       });
     }
   }, [dispatch, userName, isSubmitted, createUserStatus]);
 
   useEffect(() => {
     if (createUserStatus === 'succeeded') {
-      navigation.navigate('Home');
-      toast?.show({ message: t('onboarding.toast.success'), type: 'success' });
+      fileServiceInstance.write(ONBOARDING_FINISHED_KEY, true).then(() => {
+        navigation.navigate('Home');
+        toast?.show({ message: t('onboarding.toast.success'), type: 'success' });
+      });
     } else if (createUserStatus === 'failed') {
       toast?.show({ message: t('onboarding.toast.error'), type: 'failure' });
     }
