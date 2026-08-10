@@ -77,11 +77,13 @@ jobs:
             -PversionCode="${GITHUB_RUN_NUMBER}" \
             -PversionName="${VERSION_NAME}"
 
+      # Base64, not raw JSON: a multi-line secret with embedded quotes/backslashes/escaped
+      # newlines is fragile to paste into the GitHub secret UI (a corrupted paste here caused
+      # "Neither PUB key nor PRIV key" from Ruby's OpenSSL, mirroring the earlier Node decoder
+      # error) — base64 is a single clean line, same proven pattern as ANDROID_KEYSTORE_BASE64.
       - name: Write Play service account JSON
         run: |
-          cat <<'EOF' > google-play-service-account.json
-          ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
-          EOF
+          echo "${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_BASE64 }}" | base64 -d > google-play-service-account.json
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
