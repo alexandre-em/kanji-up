@@ -2,7 +2,6 @@ import React, { ReactNode } from 'react';
 import { Assets, Icon } from 'react-native-ui-lib';
 
 import HomeIcon from '../components/svg/home';
-import ProfileIcon from '../components/svg/profile';
 import SearchIcon from '../components/svg/search';
 import { screenNames } from './screens';
 
@@ -37,12 +36,7 @@ export const tabs: TabType[] = [
   {
     key: screenNames.TRAINING,
     labelKey: 'tabs.training.label',
-    icon: ({ size, color }) => <Icon source={Assets.icons.draw} size={size} tintColor={color} />,
-  },
-  {
-    key: screenNames.PROFILE,
-    labelKey: 'tabs.profile.label',
-    icon: ({ size, color }) => <ProfileIcon size={size} color={color} />,
+    icon: ({ size, color }) => <Icon source={Assets.icons.game} size={size} tintColor={color} />,
   },
   {
     key: screenNames.SETTINGS,

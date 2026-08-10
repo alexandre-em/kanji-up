@@ -10,6 +10,7 @@ import CrossIcon from '../assets/icons/cross.png';
 import CoinIcon from '../assets/icons/diamond.png';
 import DownIcon from '../assets/icons/down.png';
 import DrawIcon from '../assets/icons/draw.png';
+import GameIcon from '../assets/icons/game.png';
 import GoogleIcon from '../assets/icons/google.png';
 import PremiumIcon from '../assets/icons/premium.png';
 import RecognitionIcon from '../assets/icons/recognition.png';
@@ -41,6 +42,7 @@ Assets.loadAssetsGroup('icons', {
   recognition: RecognitionIcon,
   selection: SelectionIcon,
   draw: DrawIcon,
+  game: GameIcon,
   remove: RemoveIcon,
   yen: YenIcon,
   video: VideoIcon,

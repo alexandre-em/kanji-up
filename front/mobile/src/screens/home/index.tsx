@@ -176,7 +176,7 @@ export default function Home() {
       <Spacing y={GENERAL_MARGIN} />
       <Button
         label={t('home.evaluation.button')}
-        iconSource={Assets.icons.draw}
+        iconSource={Assets.icons.game}
         iconProps={{ size: 20 }}
         text80BL
         onPress={() => handleRediction(screenNames.TRAINING)}
