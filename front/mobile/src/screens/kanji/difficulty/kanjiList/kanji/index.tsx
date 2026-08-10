@@ -391,7 +391,7 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
                 <Text text60 $textDefault>
                   {t('kanjiDetails.section.radical.title')}
                 </Text>
-                <Icon source={showRadical ? Assets.icons.down : Assets.icons.up} size={25} />
+                <Icon source={showRadical ? Assets.icons.down : Assets.icons.up} size={25} tintColor={Colors.$iconNeutral} />
               </View>
             }>
             <View>
@@ -435,7 +435,7 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
                 <Text text60 $textDefault>
                   {t('kanjiDetails.section.example.title')}
                 </Text>
-                <Icon source={showRadical ? Assets.icons.down : Assets.icons.up} size={25} />
+                <Icon source={showExample ? Assets.icons.down : Assets.icons.up} size={25} tintColor={Colors.$iconNeutral} />
               </View>
             }>
             <View>
