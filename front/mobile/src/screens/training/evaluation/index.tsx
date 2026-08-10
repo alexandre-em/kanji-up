@@ -62,13 +62,11 @@ export default function EvaluationScreen() {
 
         predict(uri)
           .then((res: PredictionType[]) => {
-            console.log('predicted', res);
             // The drawing is kept: the user needs to see it again to arbitrate a doubtful answer
             dispatch(updateItemScore({ result: res, strokesCount, image: uri }));
             toast?.show({ message: 'Answer saved', type: 'success' });
           })
-          .catch((err) => {
-            console.error('Catched error', err);
+          .catch(() => {
             toast?.show({ message: 'An error occurred when saving the answer', type: 'failure' });
           })
           .finally(() => {

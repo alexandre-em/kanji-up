@@ -51,8 +51,6 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
   const toaster = useToaster();
   const userState = useAppSelector(selectUserState);
 
-  console.log({ selectedKanjiState });
-
   const kanji = useMemo(() => entities[character], [entities[character]]);
   const gradeTag = getGradeTag(kanji?.reference?.grade, t);
   const jlptTag = getJlptTag(kanji?.kanji?.jlpt, t);
@@ -150,7 +148,6 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
   }, []);
 
   useEffect(() => {
-    console.log(selectedSaveStatus);
     if (toaster) {
       if (selectedSaveStatus === 'succeeded') {
         toaster.show({ message: t('kanji.select.toast.success'), type: 'success' });

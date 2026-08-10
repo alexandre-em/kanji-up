@@ -60,11 +60,9 @@ const KanjiCardElement = ({ kanji, onPress, isLocked, progressionScore }: KanjiC
       return Colors.$backgroundPrimaryHeavy;
     }
     if (toAdd[kanji.kanji_id!]) {
-      console.log('Added !', kanji.kanji_id);
       return Colors.$backgroundSuccessHeavy;
     }
     if (entities[kanji.kanji_id!]) {
-      console.log('Removed !', kanji.kanji_id);
       return Colors.$backgroundNeutralHeavy;
     }
     return Colors.$backgroundNeutralLight;

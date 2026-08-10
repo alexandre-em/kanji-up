@@ -144,19 +144,16 @@ export const startFreshSession = createAsyncThunk(
 );
 
 export const getPendingEvaluation = createAsyncThunk('evaluation/getEvaluation', async () => {
-  console.log('getPendingEvaluation');
   // const response = await core.get('/evaluation/pending');
   // return response.data;
 });
 
 export const getHistory = createAsyncThunk('evaluation/getHistory', async () => {
-  console.log('getHistory');
   // const response = await core.get('/evaluation/history');
   // return response.data;
 });
 
 export const saveEvaluation = createAsyncThunk('evaluation/saveEvaluation', async (evaluation) => {
-  console.log('saveEvaluation');
   // const response = await core.post('/evaluation', evaluation);
   // return response.data;
 });
