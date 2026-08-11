@@ -1,9 +1,10 @@
 import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, TouchableOpacity, View as RNView } from 'react-native';
-import { Assets, Button, Colors, Icon, Text } from 'react-native-ui-lib';
+import { Button, Colors, Text } from 'react-native-ui-lib';
 import Incubator from 'react-native-ui-lib/incubator';
 
+import Close from '../../../components/svg/close';
 import { CANVAS_WIDTH } from '../../../constants/styles';
 import { useThemedStyles } from '../../../hooks/useThemedStyles';
 import WordSlotCanvas, { WordSlotCanvasHandle } from './wordSlotCanvas';
@@ -66,8 +67,12 @@ export default function DrawSlotModal({ visible, onClose, onDone }: DrawSlotModa
           <Text text70BO $textDefault>
             {t('wordEvaluation.drawModal.title')}
           </Text>
-          <TouchableOpacity onPress={onClose} accessibilityRole="button" accessibilityLabel={t('wordEvaluation.drawModal.close')}>
-            <Icon source={Assets.icons.cross} size={18} tintColor={Colors.$iconNeutral} />
+          <TouchableOpacity
+            onPress={onClose}
+            hitSlop={{ top: 16, bottom: 16, left: 16, right: 16 }}
+            accessibilityRole="button"
+            accessibilityLabel={t('wordEvaluation.drawModal.close')}>
+            <Close size={26} color={Colors.$iconNeutral} />
           </TouchableOpacity>
         </RNView>
         <RNView style={styles.canvasWrapper}>{visible && <WordSlotCanvas ref={canvasRef} size={CANVAS_WIDTH} />}</RNView>
