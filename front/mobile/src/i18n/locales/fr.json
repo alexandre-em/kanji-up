@@ -62,6 +62,7 @@
   "evaluationResult.toast.error": "Impossible d'enregistrer ta progression, réessaie",
 
   "wordEvaluation.progress": "Progression de la session",
+  "wordEvaluation.drawings.title": "Tes dessins",
   "wordEvaluation.validate": "Valider",
   "wordEvaluation.error": "Une erreur est survenue en enregistrant la réponse",
   "wordEvaluation.empty.title": "Aucun mot disponible pour l'instant",
@@ -85,6 +86,8 @@
   "wordEvaluationResult.button.review": "Vérifier {{count}} réponses",
   "wordEvaluationResult.button.validate": "Valider le résultat",
   "wordEvaluationResult.review.title": "Vérifie tes réponses",
+  "wordEvaluationResult.review.viewTitle": "Ta réponse",
+  "wordEvaluationResult.review.close": "Fermer",
   "wordEvaluationResult.review.yourDrawing": "Ton tracé",
   "wordEvaluationResult.review.expected": "Attendu",
   "wordEvaluationResult.review.question": "Ton tracé ressemble-t-il au modèle ?",

@@ -185,6 +185,7 @@
   "evaluationResult.toast.error": "Could not save your progress, please try again",
 
   "wordEvaluation.progress": "Session progress",
+  "wordEvaluation.drawings.title": "Your drawings",
   "wordEvaluation.validate": "Validate",
   "wordEvaluation.error": "An error occurred when saving the answer",
   "wordEvaluation.empty.title": "No word available yet",
@@ -208,6 +209,8 @@
   "wordEvaluationResult.button.review": "Check {{count}} answers",
   "wordEvaluationResult.button.validate": "Validate result",
   "wordEvaluationResult.review.title": "Check your answers",
+  "wordEvaluationResult.review.viewTitle": "Your answer",
+  "wordEvaluationResult.review.close": "Close",
   "wordEvaluationResult.review.yourDrawing": "Your drawing",
   "wordEvaluationResult.review.expected": "Expected",
   "wordEvaluationResult.review.question": "Does your drawing look like the model?",

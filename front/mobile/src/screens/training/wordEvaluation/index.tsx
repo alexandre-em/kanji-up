@@ -24,6 +24,7 @@ import { findMaskedExampleHint } from './exampleHint';
 import WordEvaluationResult from './result';
 
 const SLOT_SIZE = 160;
+const SLOT_SIZE_COMPACT = 110;
 
 type LocalSlot = {
   id: number;
@@ -40,33 +41,42 @@ export default function WordEvaluationScreen() {
   const toast = useToaster();
   const { t } = useTranslation();
 
-  const [slots, setSlots] = useState<LocalSlot[]>([{ id: 0, image: null, strokesCount: 0 }]);
+  // Cards only ever show a completed drawing — an empty slot exists in state only while its
+  // modal is open (see handleAddSlot/handleModalClose), never rendered as a placeholder card
+  const [slots, setSlots] = useState<LocalSlot[]>([]);
   const [activeSlotId, setActiveSlotId] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const nextSlotId = useRef(1);
+  const nextSlotId = useRef(0);
 
   const currentItem = items[currentIndex];
   const isSessionOver = currentIndex >= items.length;
-  const canAddSlot = slots[slots.length - 1]?.image != null;
+  const filledSlots = useMemo(() => slots.filter((slot): slot is LocalSlot & { image: string } => slot.image !== null), [slots]);
+  // A single-kanji word gets the full-size slot; a multi-kanji word shrinks each one so more of
+  // the word fits on screen at once instead of scrolling through full-size tiles
+  const slotSize = filledSlots.length > 1 ? SLOT_SIZE_COMPACT : SLOT_SIZE;
   // No example sentence contains any of this word's spellings verbatim: falls back to the plain
   // meaning hint below rather than leaving the player with nothing to go on
   const exampleHint = useMemo(() => (currentItem ? findMaskedExampleHint(currentItem.word) : null), [currentItem]);
 
   useEffect(() => {
-    setSlots([{ id: 0, image: null, strokesCount: 0 }]);
-    nextSlotId.current = 1;
+    setSlots([]);
+    nextSlotId.current = 0;
   }, [currentIndex]);
 
   useEffect(() => {
     if (isSessionOver) navigation.setOptions({ headerShown: false });
   }, [isSessionOver, navigation]);
 
+  // The "+" input is the only way to add a drawing: it creates the slot and opens its modal in
+  // the same action, so no empty card is ever visible in between
   const handleAddSlot = useCallback(() => {
-    setSlots((prev) => [...prev, { id: nextSlotId.current++, image: null, strokesCount: 0 }]);
+    const id = nextSlotId.current++;
+    setSlots((prev) => [...prev, { id, image: null, strokesCount: 0 }]);
+    setActiveSlotId(id);
   }, []);
 
   const handleRemoveSlot = useCallback((id: number) => {
-    setSlots((prev) => (prev.length > 1 ? prev.filter((slot) => slot.id !== id) : prev));
+    setSlots((prev) => prev.filter((slot) => slot.id !== id));
   }, []);
 
   const handleModalDone = useCallback(
@@ -77,15 +87,20 @@ export default function WordEvaluationScreen() {
     [activeSlotId],
   );
 
+  // Cancelling a slot that was just added (never drawn) removes it rather than leaving an empty
+  // one behind; cancelling an edit on an already-drawn slot just closes the modal, unchanged
+  const handleModalClose = useCallback(() => {
+    setSlots((prev) => prev.filter((slot) => slot.id !== activeSlotId || slot.image !== null));
+    setActiveSlotId(null);
+  }, [activeSlotId]);
+
   const handleValidate = useCallback(async () => {
     setIsSubmitting(true);
     const expectedCharacters = getKanjiCharacters(currentItem?.word.word?.[0] ?? '');
 
     try {
       const resolvedSlots: WordSlotType[] = await Promise.all(
-        slots.map(async (slot, index) => {
-          if (!slot.image) return { image: null, predictions: [], strokesCount: 0 };
-
+        filledSlots.map(async (slot, index) => {
           // The model only classifies into the fixed set it was trained on — calling predict()
           // for a character outside that set can only ever misclassify. No predictions routes
           // this slot's word to 'review' (updateItemSlots), for the user to arbitrate themselves.
@@ -105,7 +120,7 @@ export default function WordEvaluationScreen() {
     } finally {
       setIsSubmitting(false);
     }
-  }, [slots, dispatch, toast, t, currentItem]);
+  }, [filledSlots, dispatch, toast, t, currentItem]);
 
   if (items.length === 0 && (status === 'idle' || status === 'pending')) {
     return (
@@ -121,7 +136,7 @@ export default function WordEvaluationScreen() {
     return (
       <Layout screen="wordEvaluation" hideBanner>
         <View center flex>
-          <Text text70BO center>
+          <Text text70BO $textDefault center>
             {t('wordEvaluation.error.title')}
           </Text>
           <Spacing y={8} />
@@ -139,7 +154,7 @@ export default function WordEvaluationScreen() {
     return (
       <Layout screen="wordEvaluation" hideBanner>
         <View center flex>
-          <Text text70BO center>
+          <Text text70BO $textDefault center>
             {t('wordEvaluation.empty.title')}
           </Text>
           <Spacing y={8} />
@@ -156,71 +171,93 @@ export default function WordEvaluationScreen() {
   return (
     <Layout screen="wordEvaluation" hideBanner>
       <RNView style={styles.progressHeader}>
-        <Text text70BL>{t('wordEvaluation.progress')}</Text>
-        <Text text80BL $textPrimary>
-          {currentIndex + 1} / {items.length}
+        <Text text80M $textNeutral>
+          {t('wordEvaluation.progress')}
         </Text>
-      </RNView>
-      <ProgressBar progress={((currentIndex + 1) / items.length) * 100} fullWidth style={styles.progressBar} />
-      <Spacing y={20} />
-      {exampleHint ? (
-        <RNView style={styles.hintSentence}>
-          <Text text60M>{exampleHint.prefix}</Text>
-          <RNView style={styles.hintBlank}>
-            {exampleHint.reading && (
-              <Text style={styles.hintReading} numberOfLines={1}>
-                {exampleHint.reading}
-              </Text>
-            )}
-            <RNView style={[styles.hintChip, { width: Math.max(40, exampleHint.spelling.length * 22) }]} />
-          </RNView>
-          <Text text60M>{exampleHint.suffix}</Text>
+        <RNView style={styles.progressBadge}>
+          <Text text90BO $textPrimary>
+            {currentIndex + 1} / {items.length}
+          </Text>
         </RNView>
-      ) : (
-        <Text h1>{currentItem?.word.definition?.[0]?.meaning?.join(', ')}</Text>
-      )}
+      </RNView>
+      <ProgressBar
+        progress={((currentIndex + 1) / items.length) * 100}
+        fullWidth
+        style={styles.progressBar}
+        progressColor={Colors.$backgroundPrimaryHeavy}
+      />
       <Spacing y={20} />
+      <RNView style={styles.hintCard}>
+        {exampleHint ? (
+          <RNView style={styles.hintSentence}>
+            <Text text60M $textDefault>
+              {exampleHint.prefix}
+            </Text>
+            <RNView style={styles.hintBlank}>
+              {exampleHint.reading && (
+                <Text style={styles.hintReading} numberOfLines={1}>
+                  {exampleHint.reading}
+                </Text>
+              )}
+              <RNView style={[styles.hintChip, { width: Math.max(40, exampleHint.spelling.length * 22) }]} />
+            </RNView>
+            <Text text60M $textDefault>
+              {exampleHint.suffix}
+            </Text>
+          </RNView>
+        ) : (
+          <Text h1 $textDefault>
+            {currentItem?.word.definition?.[0]?.meaning?.join(', ')}
+          </Text>
+        )}
+      </RNView>
+      <Spacing y={24} />
+      <Text text80BO $textNeutral>
+        {t('wordEvaluation.drawings.title')}
+      </Text>
+      <Spacing y={10} />
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        style={styles.slotsScroll}
+        style={[styles.slotsScroll, { height: slotSize + 16 }]}
         contentContainerStyle={styles.slots}>
-        {slots.map((slot) => (
+        {filledSlots.map((slot) => (
           <RNView key={slot.id} style={styles.slotWrapper}>
             <TouchableOpacity
-              style={styles.slot}
+              style={[styles.slot, { width: slotSize, height: slotSize }]}
               onPress={() => setActiveSlotId(slot.id)}
               accessibilityRole="button"
               accessibilityLabel={t('wordEvaluation.slot.accessibilityLabel')}>
-              {slot.image ? (
-                <Image source={{ uri: `data:image/png;base64,${slot.image}` }} style={styles.slotImage} />
-              ) : (
-                <Icon source={Assets.icons.draw} size={36} tintColor={Colors.$iconNeutral} />
-              )}
+              <Image
+                source={{ uri: `data:image/png;base64,${slot.image}` }}
+                style={[styles.slotImage, { width: slotSize, height: slotSize }]}
+              />
             </TouchableOpacity>
-            {slots.length > 1 && (
-              <TouchableOpacity style={styles.removeSlot} onPress={() => handleRemoveSlot(slot.id)} accessibilityRole="button">
-                <Icon source={Assets.icons.cross} size={14} tintColor="#fff" />
-              </TouchableOpacity>
-            )}
+            <TouchableOpacity style={styles.removeSlot} onPress={() => handleRemoveSlot(slot.id)} accessibilityRole="button">
+              <Icon source={Assets.icons.cross} size={14} tintColor="#fff" />
+            </TouchableOpacity>
           </RNView>
         ))}
         <TouchableOpacity
-          style={[styles.addSlot, !canAddSlot && styles.addSlotDisabled]}
+          style={[styles.addSlot, { width: slotSize, height: slotSize }]}
           onPress={handleAddSlot}
-          disabled={!canAddSlot}
           accessibilityRole="button">
-          <Icon source={Assets.icons.add} size={28} tintColor={canAddSlot ? Colors.$iconPrimary : Colors.$iconNeutral} />
+          <Icon source={Assets.icons.add} size={28} tintColor={Colors.$iconPrimary} />
         </TouchableOpacity>
       </ScrollView>
       <Spacing y={20} />
       <Button label={t('wordEvaluation.validate')} onPress={handleValidate} disabled={isSubmitting} />
-      <DrawSlotModal visible={activeSlotId !== null} onClose={() => setActiveSlotId(null)} onDone={handleModalDone} />
+      <DrawSlotModal visible={activeSlotId !== null} onClose={handleModalClose} onDone={handleModalDone} />
     </Layout>
   );
 }
 
 const styles = StyleSheet.create({
+  hintCard: {
+    backgroundColor: Colors.$backgroundNeutralLight,
+    borderRadius: 16,
+    padding: 16,
+  },
   hintSentence: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -241,18 +278,24 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     borderWidth: 1,
     borderColor: Colors.$outlineNeutral,
-    backgroundColor: Colors.$backgroundNeutralLight,
+    backgroundColor: Colors.$backgroundDefault,
   },
   progressHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  progressBadge: {
+    backgroundColor: Colors.$backgroundPrimaryLight,
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+  },
   progressBar: {
     height: 8,
+    borderRadius: 4,
   },
   slotsScroll: {
-    height: SLOT_SIZE + 16,
     flexGrow: 0,
   },
   slots: {
@@ -263,19 +306,20 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   slot: {
-    width: SLOT_SIZE,
-    height: SLOT_SIZE,
-    borderRadius: 8,
+    borderRadius: 14,
     borderWidth: 1,
     borderColor: Colors.$outlineNeutral,
-    backgroundColor: '#fff',
+    backgroundColor: Colors.$backgroundNeutralLight,
     alignItems: 'center',
     justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    elevation: 2,
   },
   slotImage: {
-    width: SLOT_SIZE,
-    height: SLOT_SIZE,
-    borderRadius: 8,
+    borderRadius: 14,
   },
   removeSlot: {
     position: 'absolute',
@@ -290,16 +334,12 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   addSlot: {
-    width: SLOT_SIZE,
-    height: SLOT_SIZE,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: Colors.$outlineNeutral,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: Colors.$outlinePrimary,
     borderStyle: 'dashed',
+    backgroundColor: Colors.$backgroundPrimaryLight,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  addSlotDisabled: {
-    opacity: 0.4,
   },
 });
