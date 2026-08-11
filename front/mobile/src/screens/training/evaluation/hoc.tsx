@@ -1,4 +1,3 @@
-import { load } from '@kanjiup/recognition';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator } from 'react-native';
@@ -7,6 +6,7 @@ import { Button, Colors, Text, View } from 'react-native-ui-lib';
 import Layout from '../../../components/layout';
 import Spacing from '../../../components/spacing';
 import { hasNewlyMasteredKanji } from '../../../constants/progression';
+import { useRecognitionModel } from '../../../hooks/useRecognitionModel';
 import { useAppDispatch, useAppSelector } from '../../../hooks/useStore';
 import { useToaster } from '../../../providers/toaster';
 import { fileNames, fileServiceInstance } from '../../../services/file';
@@ -40,7 +40,7 @@ export default function EvaluationHoc() {
   const userId = useAppSelector((state) => state.user.userId);
   const progressionState = useAppSelector((state) => state.user.progression);
   const dispatch = useAppDispatch();
-  const [isModelLoaded, setModelLoaded] = useState(false);
+  const { isLoaded: isModelLoaded, hasError: modelLoadError } = useRecognitionModel();
   const [isChecking, setIsChecking] = useState(true);
   const [pendingResume, setPendingResume] = useState<PendingResume | null>(null);
   const toast = useToaster();
@@ -56,14 +56,8 @@ export default function EvaluationHoc() {
   }, [kanjis]);
 
   useEffect(() => {
-    load()
-      .then(() => {
-        setModelLoaded(true);
-      })
-      .catch(() => {
-        toast?.show({ message: 'An error occurred when loading the recognition model', type: 'failure' });
-      });
-  }, [toast]);
+    if (modelLoadError) toast?.show({ message: 'An error occurred when loading the recognition model', type: 'failure' });
+  }, [modelLoadError, toast]);
 
   // Resolves a pending session (either source) into the same shape hydrateItems expects — the
   // server one needs a kanji re-fetch by id since the session only stored kanjiId
