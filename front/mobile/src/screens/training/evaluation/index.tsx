@@ -190,6 +190,7 @@ export default function EvaluationScreen() {
               hideGuides={isCapturing}
               hideBorder={isCapturing}
               hideClearButton={isCapturing}
+              forceCaptureColors={isCapturing}
               onStrokeUpdate={setStrokesCount}
             />
           </ViewShot>

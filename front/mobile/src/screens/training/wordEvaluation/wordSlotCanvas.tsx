@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useRef } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import ViewShot from 'react-native-view-shot';
 
 import Canvas from '../../../components/canvas';
@@ -15,15 +15,38 @@ type WordSlotCanvasProps = {
 const WordSlotCanvas = forwardRef<WordSlotCanvasHandle, WordSlotCanvasProps>(({ size }, ref) => {
   const viewShotRef = useRef<ViewShot>(null);
   const strokesCountRef = useRef(0);
+  // Forcing the canvas to its white/black capture colors is a state change, so it needs a render
+  // to actually commit before the snapshot is taken — see the effect below
+  const [isCapturing, setIsCapturing] = useState(false);
+  const captureResolveRef = useRef<((uri: string) => void) | null>(null);
+
+  useEffect(() => {
+    if (!isCapturing) return;
+
+    (viewShotRef.current as unknown as { capture: () => Promise<string> })
+      .capture()
+      .then((uri) => captureResolveRef.current?.(uri))
+      .finally(() => setIsCapturing(false));
+  }, [isCapturing]);
 
   useImperativeHandle(ref, () => ({
-    capture: () => (viewShotRef.current as unknown as { capture: () => Promise<string> }).capture(),
+    capture: () =>
+      new Promise<string>((resolve) => {
+        captureResolveRef.current = resolve;
+        setIsCapturing(true);
+      }),
     getStrokesCount: () => strokesCountRef.current,
   }));
 
   return (
     <ViewShot ref={viewShotRef} style={{ width: size, height: size }} options={{ result: 'base64' }}>
-      <Canvas width={size} height={size} strokeWidth={6} onStrokeUpdate={(count) => (strokesCountRef.current = count)} />
+      <Canvas
+        width={size}
+        height={size}
+        strokeWidth={6}
+        forceCaptureColors={isCapturing}
+        onStrokeUpdate={(count) => (strokesCountRef.current = count)}
+      />
     </ViewShot>
   );
 });

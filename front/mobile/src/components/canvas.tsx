@@ -40,6 +40,10 @@ type CanvasProps = {
   hideGuides?: boolean;
   hideClearButton?: boolean;
   hideBorder?: boolean;
+  /** Forces a white background and black stroke for the instant the drawing is captured — the
+   * recognition model and the saved image both need this fixed pattern, regardless of the app's
+   * current theme or the `color` prop, which only apply while the user is actively drawing */
+  forceCaptureColors?: boolean;
   onStrokeUpdate?: (strokesCount: number) => void;
 };
 
@@ -49,25 +53,30 @@ const Canvas = forwardRef(
       width = 300,
       height = 300,
       strokeWidth = 10,
-      color = 'black',
+      color,
       hideBackground,
       hideClearButton,
       hideGuides,
       hideBorder,
+      forceCaptureColors,
       onStrokeUpdate,
     }: CanvasProps,
     ref,
   ) => {
     const [paths, setPaths] = useState<{ x: number; y: number }[][]>([]);
     const [currentPoints, setCurrentPoints] = useState<{ x: number; y: number }[]>([]);
+    const strokeColor = forceCaptureColors ? '#000' : (color ?? Colors.$textDefault);
     const styles = useThemedStyles(() =>
       StyleSheet.create({
         canvas: {
           position: 'relative',
         },
-        // Hardcoded regardless of theme: this is captured as the recognition model's input image,
-        // and the model was only ever trained on a white background with black strokes
         canvasBackground: {
+          backgroundColor: Colors.$backgroundNeutralLight,
+        },
+        // Only applied while forceCaptureColors is set, overriding canvasBackground above — see
+        // the prop's doc comment for why
+        canvasBackgroundForced: {
           backgroundColor: '#fff',
         },
         canvasBorder: {
@@ -150,6 +159,7 @@ const Canvas = forwardRef(
           { width, height },
           styles.canvas,
           hideBackground ? {} : styles.canvasBackground,
+          forceCaptureColors ? styles.canvasBackgroundForced : {},
           hideBorder ? {} : styles.canvasBorder,
         ]}>
         {!hideClearButton && (
@@ -167,7 +177,7 @@ const Canvas = forwardRef(
             <Path
               key={i}
               d={pointsToSvgPath(points)}
-              stroke={color}
+              stroke={strokeColor}
               strokeWidth={strokeWidth}
               fill="none"
               strokeLinecap="round"
@@ -177,7 +187,7 @@ const Canvas = forwardRef(
           {currentPoints.length > 0 && (
             <Path
               d={pointsToSvgPath(currentPoints)}
-              stroke={color}
+              stroke={strokeColor}
               strokeWidth={strokeWidth}
               fill="none"
               strokeLinecap="round"
