@@ -2,7 +2,7 @@ import '../i18n';
 
 import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 import { Colors, LoaderScreen } from 'react-native-ui-lib';
@@ -43,10 +43,18 @@ const headerOptions = {
 
 export default function RootNavigation() {
   const { t } = useTranslation();
-  const isNotRegistered = useIsNotRegistered();
+  const { isNotRegistered, accountConfirmedMissing } = useIsNotRegistered();
   // The tab bar lives outside the navigator, so it reads/drives navigation through the container ref
   const navigationRef = useNavigationContainerRef();
   const [activeRoute, setActiveRoute] = useState<string | undefined>();
+
+  // A stale "registered" cache can already have picked Home as the initial route by the time the
+  // mac-address lookup comes back 404 — initialRouteName only applies once at mount, so getting a
+  // confirmed-gone account back to Onboarding needs an explicit reset here
+  useEffect(() => {
+    if (!accountConfirmedMissing || !navigationRef.isReady()) return;
+    navigationRef.reset({ index: 0, routes: [{ name: screenNames.ONBOARDING }] });
+  }, [accountConfirmedMissing, navigationRef]);
 
   const handleRouteChange = useCallback(() => {
     setActiveRoute(navigationRef.getCurrentRoute()?.name);

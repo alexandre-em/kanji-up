@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { isAxiosError } from 'axios';
 import { RootState } from 'store';
 
 import { normalizeProgressionEntry } from '../../constants/progression';
@@ -43,12 +44,22 @@ function todayLocal(): string {
   return localDateKey(new Date());
 }
 
-export const getUser = createAsyncThunk<UserType, GetUserInput>('user/get', async (input) => {
-  const response =
-    'userId' in input ? await core.authService!.get(input.userId) : await core.authService!.getByMacAddress(input.macAddress);
+export const getUser = createAsyncThunk<UserType, GetUserInput, { rejectValue: { status?: number } }>(
+  'user/get',
+  async (input, { rejectWithValue }) => {
+    try {
+      const response =
+        'userId' in input ? await core.authService!.get(input.userId) : await core.authService!.getByMacAddress(input.macAddress);
 
-  return response.data;
-});
+      return response.data;
+    } catch (error) {
+      // Surfaced so callers can tell "account genuinely doesn't exist" (404) apart from a
+      // transient failure (network, 5xx) — createAsyncThunk's default error serialization drops
+      // the response status otherwise
+      return rejectWithValue({ status: isAxiosError(error) ? error.response?.status : undefined });
+    }
+  },
+);
 
 export const createUser = createAsyncThunk<void, Pick<UserType, 'name' | 'macAddress'>>('user/create', async (payload) => {
   await core.authService!.create(payload);
