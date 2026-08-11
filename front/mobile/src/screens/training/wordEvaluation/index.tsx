@@ -43,10 +43,16 @@ export default function WordEvaluationScreen() {
   const { t } = useTranslation();
   const styles = useThemedStyles(() =>
     StyleSheet.create({
+      screenContent: {
+        flex: 1,
+      },
+      spacer: {
+        flex: 1,
+      },
       hintCard: {
         backgroundColor: Colors.$backgroundNeutralLight,
         borderRadius: 16,
-        padding: 16,
+        padding: 20,
       },
       hintSentence: {
         flexDirection: 'row',
@@ -264,83 +270,92 @@ export default function WordEvaluationScreen() {
 
   return (
     <Layout screen="wordEvaluation">
-      <RNView style={styles.progressHeader}>
-        <Text text80M $textNeutral>
-          {t('wordEvaluation.progress')}
-        </Text>
-        <RNView style={styles.progressBadge}>
-          <Text text90BO $textPrimary>
-            {currentIndex + 1} / {items.length}
+      <RNView style={styles.screenContent}>
+        <RNView>
+          <RNView style={styles.progressHeader}>
+            <Text text80M $textNeutral>
+              {t('wordEvaluation.progress')}
+            </Text>
+            <RNView style={styles.progressBadge}>
+              <Text text90BO $textPrimary>
+                {currentIndex + 1} / {items.length}
+              </Text>
+            </RNView>
+          </RNView>
+          <ProgressBar
+            progress={((currentIndex + 1) / items.length) * 100}
+            fullWidth
+            style={styles.progressBar}
+            progressColor={Colors.$backgroundPrimaryHeavy}
+          />
+        </RNView>
+
+        <Spacing y={24} />
+        <RNView style={styles.hintCard}>
+          {exampleHint ? (
+            <RNView style={styles.hintSentence}>
+              <Text text60M $textDefault>
+                {exampleHint.prefix}
+              </Text>
+              <RNView style={styles.hintBlank}>
+                {exampleHint.reading && (
+                  <Text style={styles.hintReading} numberOfLines={1}>
+                    {exampleHint.reading}
+                  </Text>
+                )}
+                <RNView style={[styles.hintChip, { width: Math.max(40, exampleHint.spelling.length * 22) }]} />
+              </RNView>
+              <Text text60M $textDefault>
+                {exampleHint.suffix}
+              </Text>
+            </RNView>
+          ) : (
+            <Text h1 $textDefault>
+              {currentItem?.word.definition?.[0]?.meaning?.join(', ')}
+            </Text>
+          )}
+        </RNView>
+
+        <RNView style={styles.spacer} />
+
+        <RNView>
+          <Text text80BO $textNeutral>
+            {t('wordEvaluation.drawings.title')}
           </Text>
+          <Spacing y={10} />
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={[styles.slotsScroll, { height: slotSize + 16 }]}
+            contentContainerStyle={styles.slots}>
+            {filledSlots.map((slot) => (
+              <RNView key={slot.id} style={styles.slotWrapper}>
+                <TouchableOpacity
+                  style={[styles.slot, { width: slotSize, height: slotSize }]}
+                  onPress={() => setActiveSlotId(slot.id)}
+                  accessibilityRole="button"
+                  accessibilityLabel={t('wordEvaluation.slot.accessibilityLabel')}>
+                  <Image
+                    source={{ uri: `data:image/png;base64,${slot.image}` }}
+                    style={[styles.slotImage, { width: slotSize, height: slotSize }]}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.removeSlot} onPress={() => handleRemoveSlot(slot.id)} accessibilityRole="button">
+                  <Icon source={Assets.icons.cross} size={14} tintColor="#fff" />
+                </TouchableOpacity>
+              </RNView>
+            ))}
+            <TouchableOpacity
+              style={[styles.addSlot, { width: slotSize, height: slotSize }]}
+              onPress={handleAddSlot}
+              accessibilityRole="button">
+              <Icon source={Assets.icons.add} size={28} tintColor={Colors.$iconPrimary} />
+            </TouchableOpacity>
+          </ScrollView>
+          <Spacing y={20} />
+          <Button label={t('wordEvaluation.validate')} onPress={handleValidate} disabled={isSubmitting} />
         </RNView>
       </RNView>
-      <ProgressBar
-        progress={((currentIndex + 1) / items.length) * 100}
-        fullWidth
-        style={styles.progressBar}
-        progressColor={Colors.$backgroundPrimaryHeavy}
-      />
-      <Spacing y={20} />
-      <RNView style={styles.hintCard}>
-        {exampleHint ? (
-          <RNView style={styles.hintSentence}>
-            <Text text60M $textDefault>
-              {exampleHint.prefix}
-            </Text>
-            <RNView style={styles.hintBlank}>
-              {exampleHint.reading && (
-                <Text style={styles.hintReading} numberOfLines={1}>
-                  {exampleHint.reading}
-                </Text>
-              )}
-              <RNView style={[styles.hintChip, { width: Math.max(40, exampleHint.spelling.length * 22) }]} />
-            </RNView>
-            <Text text60M $textDefault>
-              {exampleHint.suffix}
-            </Text>
-          </RNView>
-        ) : (
-          <Text h1 $textDefault>
-            {currentItem?.word.definition?.[0]?.meaning?.join(', ')}
-          </Text>
-        )}
-      </RNView>
-      <Spacing y={24} />
-      <Text text80BO $textNeutral>
-        {t('wordEvaluation.drawings.title')}
-      </Text>
-      <Spacing y={10} />
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={[styles.slotsScroll, { height: slotSize + 16 }]}
-        contentContainerStyle={styles.slots}>
-        {filledSlots.map((slot) => (
-          <RNView key={slot.id} style={styles.slotWrapper}>
-            <TouchableOpacity
-              style={[styles.slot, { width: slotSize, height: slotSize }]}
-              onPress={() => setActiveSlotId(slot.id)}
-              accessibilityRole="button"
-              accessibilityLabel={t('wordEvaluation.slot.accessibilityLabel')}>
-              <Image
-                source={{ uri: `data:image/png;base64,${slot.image}` }}
-                style={[styles.slotImage, { width: slotSize, height: slotSize }]}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.removeSlot} onPress={() => handleRemoveSlot(slot.id)} accessibilityRole="button">
-              <Icon source={Assets.icons.cross} size={14} tintColor="#fff" />
-            </TouchableOpacity>
-          </RNView>
-        ))}
-        <TouchableOpacity
-          style={[styles.addSlot, { width: slotSize, height: slotSize }]}
-          onPress={handleAddSlot}
-          accessibilityRole="button">
-          <Icon source={Assets.icons.add} size={28} tintColor={Colors.$iconPrimary} />
-        </TouchableOpacity>
-      </ScrollView>
-      <Spacing y={20} />
-      <Button label={t('wordEvaluation.validate')} onPress={handleValidate} disabled={isSubmitting} />
       <DrawSlotModal visible={activeSlotId !== null} onClose={handleModalClose} onDone={handleModalDone} />
     </Layout>
   );
