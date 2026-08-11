@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   canvasBackground: {
-    backgroundColor: '#fff',
+    backgroundColor: Colors.$backgroundNeutralLight,
   },
   canvasBorder: {
     borderWidth: 0.75,
