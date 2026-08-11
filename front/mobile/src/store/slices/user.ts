@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from 'store';
 
-import { clampProgression } from '../../constants/progression';
+import { normalizeProgressionEntry } from '../../constants/progression';
 import { core } from '../../services/http';
 import { completeMissionTask } from './missions';
 
@@ -106,10 +106,11 @@ export const user = createSlice({
   reducers: {
     reset: () => initialState,
     update: (state, action: PayloadAction<Partial<UserType>>) => ({ ...state, ...action.payload }),
-    updateProgression: (state, action: PayloadAction<{ id: string; inc: number }>) => {
-      const { id, inc } = action.payload;
+    updateProgression: (state, action: PayloadAction<{ id: string; correct: boolean }>) => {
+      const { id, correct } = action.payload;
+      const current = normalizeProgressionEntry(state.progression[id]);
 
-      state.progression[id] = clampProgression(state.progression[id] ?? 0, inc);
+      state.progression[id] = { correct: current.correct + (correct ? 1 : 0), total: current.total + 1 };
     },
     addScore: (state, action: PayloadAction<number>) => {
       const today = todayLocal();

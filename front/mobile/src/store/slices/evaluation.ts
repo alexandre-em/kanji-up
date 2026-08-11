@@ -1,7 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from 'store';
 
-import { KANJI_PROGRESSION_INC, KANJI_PROGRESSION_INC_LOW } from '../../constants/progression';
 import { fileNames, fileServiceInstance } from '../../services/file';
 import { core } from '../../services/http';
 
@@ -49,21 +48,21 @@ export function getEffectiveStatus(item: EvaluationItemType): AnswerStatusType {
 /** Progression deltas for a finished (or abandoned) run, recomputed from the items themselves
  * rather than dispatched live per-answer — items are what survives an app kill, in-memory Redux
  * state isn't, so this is what makes progression resilient to a resumed session */
-export function computeProgressionDeltas(items: EvaluationItemType[]): { id: string; inc: number }[] {
-  const deltas: { id: string; inc: number }[] = [];
+export function computeProgressionDeltas(items: EvaluationItemType[]): { id: string; correct: boolean }[] {
+  const deltas: { id: string; correct: boolean }[] = [];
 
   items.forEach((item) => {
     const kanjiId = item.kanji.kanji_id;
     if (!kanjiId) return;
 
     if (item.status === 'correct') {
-      deltas.push({ id: kanjiId, inc: KANJI_PROGRESSION_INC });
+      deltas.push({ id: kanjiId, correct: true });
     } else if (item.status === 'incorrect') {
-      // A skip (no drawing at all) carries no penalty, unlike a wrong stroke count
+      // A skip (no drawing at all) doesn't count as an attempt, unlike a wrong stroke count
       const isSkip = !item.image || item.strokesCount === 0;
-      if (!isSkip) deltas.push({ id: kanjiId, inc: -KANJI_PROGRESSION_INC });
+      if (!isSkip) deltas.push({ id: kanjiId, correct: false });
     } else if (item.status === 'review' && item.userConfirmation !== null) {
-      deltas.push({ id: kanjiId, inc: item.userConfirmation ? KANJI_PROGRESSION_INC_LOW : -KANJI_PROGRESSION_INC });
+      deltas.push({ id: kanjiId, correct: item.userConfirmation });
     }
   });
 
