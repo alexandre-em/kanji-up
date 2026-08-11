@@ -18,16 +18,32 @@ type WordReviewModalProps = {
 export default function WordReviewModal({ item, position, total, onChoose, onClose }: WordReviewModalProps) {
   const { t } = useTranslation();
   const expectedCharacters = item ? getKanjiCharacters(item.word.word?.[0] ?? '') : [];
+  // An already-decided item (correct/incorrect, or a review the user already confirmed) opens
+  // in read-only comparison mode: no position in a queue, no Yes/No — there's nothing left to
+  // arbitrate, just what was drawn vs what was expected
+  const isPending = item?.status === 'review' && item.userConfirmation === null;
 
   return (
-    <Dialog visible={!!item} onDismiss={onClose} useSafeArea bottom width="100%">
+    <Dialog
+      visible={!!item}
+      onDismiss={onClose}
+      useSafeArea
+      bottom
+      width="100%"
+      // RNUI's Dialog memoizes its own background without a theme dependency, so it can freeze
+      // on whichever scheme was active at first mount — this forces it fresh on every render
+      containerStyle={{ backgroundColor: Colors.$backgroundDefault }}>
       {item && (
         <RNView style={styles.container}>
           <RNView style={styles.header}>
-            <Text text70BO>{t('wordEvaluationResult.review.title')}</Text>
-            <Text text80M $textGeneral>
-              {position} / {total}
+            <Text text70BO $textDefault>
+              {t(isPending ? 'wordEvaluationResult.review.title' : 'wordEvaluationResult.review.viewTitle')}
             </Text>
+            {isPending && (
+              <Text text80M $textGeneral>
+                {position} / {total}
+              </Text>
+            )}
           </RNView>
           <ScrollView style={styles.pairs} contentContainerStyle={styles.pairsContent}>
             {expectedCharacters.map((character, index) => {
@@ -56,18 +72,24 @@ export default function WordReviewModal({ item, position, total, onChoose, onClo
               );
             })}
           </ScrollView>
-          <Text text70M center>
-            {t('wordEvaluationResult.review.question')}
-          </Text>
-          <RNView style={styles.actions}>
-            <Button
-              label={t('wordEvaluationResult.review.no')}
-              outline
-              onPress={() => onChoose(false)}
-              style={styles.actionButton}
-            />
-            <Button label={t('wordEvaluationResult.review.yes')} onPress={() => onChoose(true)} style={styles.actionButton} />
-          </RNView>
+          {isPending ? (
+            <>
+              <Text text70M $textDefault center>
+                {t('wordEvaluationResult.review.question')}
+              </Text>
+              <RNView style={styles.actions}>
+                <Button
+                  label={t('wordEvaluationResult.review.no')}
+                  outline
+                  onPress={() => onChoose(false)}
+                  style={styles.actionButton}
+                />
+                <Button label={t('wordEvaluationResult.review.yes')} onPress={() => onChoose(true)} style={styles.actionButton} />
+              </RNView>
+            </>
+          ) : (
+            <Button label={t('wordEvaluationResult.review.close')} outline onPress={onClose} />
+          )}
         </RNView>
       )}
     </Dialog>
@@ -108,7 +130,7 @@ const styles = StyleSheet.create({
     width: CANVAS_PREVIEW_SIZE,
     height: CANVAS_PREVIEW_SIZE,
     borderRadius: 12,
-    backgroundColor: '#fff',
+    backgroundColor: Colors.$backgroundNeutralLight,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: Colors.$outlineNeutral,
   },
@@ -119,7 +141,7 @@ const styles = StyleSheet.create({
     width: CANVAS_PREVIEW_SIZE,
     height: CANVAS_PREVIEW_SIZE,
     borderRadius: 12,
-    backgroundColor: '#fff',
+    backgroundColor: Colors.$backgroundNeutralLight,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: Colors.$outlineNeutral,
     alignItems: 'center',

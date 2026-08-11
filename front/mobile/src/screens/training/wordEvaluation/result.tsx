@@ -72,7 +72,7 @@ function StatusIcon({ item }: { item: WordEvaluationItemType }) {
 
 type ResultItemRowProps = {
   item: WordEvaluationItemType;
-  onPress?: () => void;
+  onPress: () => void;
 };
 
 function ResultItemRow({ item, onPress }: ResultItemRowProps) {
@@ -80,10 +80,12 @@ function ResultItemRow({ item, onPress }: ResultItemRowProps) {
   const wordText = item.word.word?.[0] ?? '';
   const meaning = item.word.definition?.[0]?.meaning?.join(', ');
 
-  const content = (
-    <>
+  return (
+    <TouchableOpacity style={styles.row} onPress={onPress} accessibilityRole="button" accessibilityLabel={message}>
       <RNView style={styles.wordBox}>
-        <Text text40BL>{wordText}</Text>
+        <Text text40BL $textDefault>
+          {wordText}
+        </Text>
       </RNView>
       <RNView style={styles.rowContent}>
         <RNView style={styles.rowHeader}>
@@ -96,14 +98,6 @@ function ResultItemRow({ item, onPress }: ResultItemRowProps) {
           {message}
         </Text>
       </RNView>
-    </>
-  );
-
-  if (!onPress) return <RNView style={styles.row}>{content}</RNView>;
-
-  return (
-    <TouchableOpacity style={styles.row} onPress={onPress} accessibilityRole="button" accessibilityLabel={message}>
-      {content}
     </TouchableOpacity>
   );
 }
@@ -184,7 +178,9 @@ export default function WordEvaluationResult() {
   return (
     <View style={styles.container}>
       <RNView style={styles.summary}>
-        <Text text60BL>{t('wordEvaluationResult.summary.score', { correct: correctCount, total: items.length })}</Text>
+        <Text text60BL $textDefault>
+          {t('wordEvaluationResult.summary.score', { correct: correctCount, total: items.length })}
+        </Text>
         {pendingReviewCount > 0 && (
           <Text text90M $textWarning>
             {t('wordEvaluationResult.summary.pending', { count: pendingReviewCount })}
@@ -193,11 +189,7 @@ export default function WordEvaluationResult() {
       </RNView>
       <ScrollView style={styles.list} contentContainerStyle={styles.listContent}>
         {items.map((item, index) => (
-          <ResultItemRow
-            key={`${item.word.word?.[0]}-${index}`}
-            item={item}
-            onPress={item.status === 'review' ? () => setActiveIndex(index) : undefined}
-          />
+          <ResultItemRow key={`${item.word.word?.[0]}-${index}`} item={item} onPress={() => setActiveIndex(index)} />
         ))}
       </ScrollView>
       <RNView style={[styles.stickyBar, { paddingBottom: insets.bottom + 16 }]}>
