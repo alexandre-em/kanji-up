@@ -168,7 +168,6 @@ npx react-native run-android --no-packager                        # build (~20 m
   `$backgroundInverted`, `$textNeutralHeavy` — voir aussi la nouvelle famille `$*Neutral*` ajoutée
   pour remplacer ces fallbacks non contrôlés). Activer le mode sombre pour de vrai est un chantier
   à part, non demandé pour l'instant.
-- Sur l'émulateur, l'API renvoie des 500 (`Error getting user`) → toasts LogBox parasites.
 - **Backend** : `searchCharacter` (`back/kanjiup/src/services/kanji.ts:64`) ne sélectionne pas
   `jlpt` dans le `populate` du sous-document `kanji`, contrairement à `getAll` (ligne 38) qui
   l'inclut. Conséquence côté mobile : le tag JLPT des résultats de recherche kanji
