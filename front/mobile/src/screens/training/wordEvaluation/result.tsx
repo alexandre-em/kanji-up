@@ -5,16 +5,13 @@ import { ScrollView, StyleSheet, TouchableOpacity, View as RNView } from 'react-
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Assets, Button, Colors, Icon, Text, View } from 'react-native-ui-lib';
 
-import { hasNewlyMasteredKanji } from '../../../constants/progression';
 import { screenNames } from '../../../constants/screens';
 import { useEvaluationInterstitialAd } from '../../../hooks/useEvaluationInterstitialAd';
 import { useAppDispatch, useAppSelector } from '../../../hooks/useStore';
 import { useToaster } from '../../../providers/toaster';
 import { completeMissionTask } from '../../../store/slices/missions';
-import { selectSelectedKanji } from '../../../store/slices/selectedKanji';
 import { syncKanjiProgression, user } from '../../../store/slices/user';
 import {
-  computeProgressionDeltas,
   confirmItem,
   getEffectiveStatus,
   getKanjiCharacters,
@@ -119,9 +116,7 @@ export default function WordEvaluationResult() {
   const items = useAppSelector(selectWordEvaluationItems);
   const correctCount = useAppSelector(selectWordCorrectCount);
   const pendingReviewCount = useAppSelector(selectWordPendingReviewCount);
-  const selectedKanjiState = useAppSelector(selectSelectedKanji);
   const userId = useAppSelector((state) => state.user.userId);
-  const progressionState = useAppSelector((state) => state.user.progression);
   const showInterstitialAd = useEvaluationInterstitialAd();
 
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
@@ -153,11 +148,9 @@ export default function WordEvaluationResult() {
   );
 
   const handleValidate = useCallback(async () => {
-    const deltas = computeProgressionDeltas(items, selectedKanjiState);
-    const justMasteredAKanji = hasNewlyMasteredKanji(deltas, progressionState);
-    deltas.forEach((delta) => dispatch(user.actions.updateProgression(delta)));
-    const points = deltas.filter((delta) => delta.inc > 0).length;
-    if (points > 0) dispatch(user.actions.addScore(points));
+    // Word evaluation doesn't feed kanji progression (a word's own progression tracking is a
+    // separate, not-yet-built feature) — it only contributes daily/total score points.
+    if (correctCount > 0) dispatch(user.actions.addScore(correctCount));
 
     setIsSaving(true);
     const action = await dispatch(syncKanjiProgression());
@@ -167,7 +160,6 @@ export default function WordEvaluationResult() {
       // Best-effort: missing a daily mission tick isn't worth blocking or erroring the user over
       if (userId) {
         dispatch(completeMissionTask({ userId, task: 'wordSession' }));
-        if (justMasteredAKanji) dispatch(completeMissionTask({ userId, task: 'kanjiMastery' }));
       }
 
       dispatch(resetWordEvaluation());
@@ -177,7 +169,7 @@ export default function WordEvaluationResult() {
     } else {
       toast?.show({ message: t('wordEvaluationResult.toast.error'), type: 'failure' });
     }
-  }, [items, selectedKanjiState, dispatch, navigation, toast, t, showInterstitialAd, userId, progressionState]);
+  }, [correctCount, dispatch, navigation, toast, t, showInterstitialAd, userId]);
 
   const buttonLabel = useMemo(
     () =>
