@@ -110,19 +110,24 @@ export default function EvaluationScreen() {
   }, [isSessionOver, navigation]);
 
   useEffect(() => {
-    if (isCapturing) {
-      if (viewShotRef.current) {
-        viewShotRef.current
-          .capture()
-          .then((uri: string) => {
-            onPredict(uri);
-          })
-          .finally(() => {
-            setIsCapturing(false);
-            canvasRef.current?.clear();
-          });
-      }
-    }
+    if (!isCapturing || !viewShotRef.current) return;
+
+    // isCapturing switches the canvas to its forced white/black capture colors and hides the
+    // guides/clear button — React commits that instantly, but the native view needs a moment to
+    // actually repaint before a snapshot reflects it, or capture() catches a stale frame
+    const timeout = setTimeout(() => {
+      viewShotRef.current
+        .capture()
+        .then((uri: string) => {
+          onPredict(uri);
+        })
+        .finally(() => {
+          setIsCapturing(false);
+          canvasRef.current?.clear();
+        });
+    }, 200);
+
+    return () => clearTimeout(timeout);
   }, [isCapturing, onPredict]);
 
   // Same route as the quiz (see EvaluationHoc): no separate screen to navigate to, so there is

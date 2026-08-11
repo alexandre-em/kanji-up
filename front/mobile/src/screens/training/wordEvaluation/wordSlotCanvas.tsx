@@ -25,10 +25,16 @@ const WordSlotCanvas = forwardRef<WordSlotCanvasHandle, WordSlotCanvasProps>(({ 
   useEffect(() => {
     if (!isCapturing) return;
 
-    (viewShotRef.current as unknown as { capture: () => Promise<string> })
-      .capture()
-      .then((uri) => captureResolveRef.current?.(uri))
-      .finally(() => setIsCapturing(false));
+    // React commits the forced white/black capture colors instantly, but the native view needs a
+    // moment to actually repaint before a snapshot reflects it, or capture() catches a stale frame
+    const timeout = setTimeout(() => {
+      (viewShotRef.current as unknown as { capture: () => Promise<string> })
+        .capture()
+        .then((uri) => captureResolveRef.current?.(uri))
+        .finally(() => setIsCapturing(false));
+    }, 200);
+
+    return () => clearTimeout(timeout);
   }, [isCapturing]);
 
   useImperativeHandle(ref, () => ({
