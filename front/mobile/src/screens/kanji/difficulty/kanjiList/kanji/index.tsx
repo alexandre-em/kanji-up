@@ -245,29 +245,35 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
           </View>
         </>
       )}
-      {progressPercent !== null && (
-        <>
-          <Spacing y={16} />
-          <View row spread centerV>
-            <Text text90M $textNeutral>
-              {t('kanjiDetails.mastery.title')}
-            </Text>
-            <Text
-              text90BO
-              style={{ color: progressPercent > KANJI_MASTERY_THRESHOLD_PERCENT ? Colors.$textSuccess : Colors.$textPrimary }}>
-              {progressPercent}%
-            </Text>
-          </View>
-          <Spacing y={4} />
-          <ProgressBar
-            progress={progressPercent}
-            style={{ backgroundColor: Colors.$backgroundNeutralMedium }}
-            progressColor={
-              progressPercent > KANJI_MASTERY_THRESHOLD_PERCENT ? Colors.$backgroundSuccessHeavy : Colors.$backgroundPrimaryHeavy
-            }
-          />
-        </>
-      )}
+      {(() => {
+        // Below the 20-attempt minimum (including zero answers), the real percentage isn't
+        // meaningful yet — shown as an empty 0% bar rather than hiding the section entirely
+        const displayPercent = progressPercent ?? 0;
+
+        return (
+          <>
+            <Spacing y={16} />
+            <View row spread centerV>
+              <Text text90M $textNeutral>
+                {t('kanjiDetails.mastery.title')}
+              </Text>
+              <Text
+                text90BO
+                style={{ color: displayPercent > KANJI_MASTERY_THRESHOLD_PERCENT ? Colors.$textSuccess : Colors.$textPrimary }}>
+                {displayPercent}%
+              </Text>
+            </View>
+            <Spacing y={4} />
+            <ProgressBar
+              progress={displayPercent}
+              style={{ backgroundColor: Colors.$backgroundNeutralMedium }}
+              progressColor={
+                displayPercent > KANJI_MASTERY_THRESHOLD_PERCENT ? Colors.$backgroundSuccessHeavy : Colors.$backgroundPrimaryHeavy
+              }
+            />
+          </>
+        );
+      })()}
       <Spacing y={20} />
       <View style={styles.buttonGroup}>
         <Button
