@@ -12,7 +12,7 @@ import Layout from '../../../../../components/layout.tsx';
 import Spacing from '../../../../../components/spacing.tsx';
 import Lock from '../../../../../components/svg/lock';
 import SvgSilhouette from '../../../../../components/svgSilhouette.tsx';
-import { getAccuracyPercent, KANJI_MASTERY_THRESHOLD_PERCENT } from '../../../../../constants/progression.ts';
+import { getAccuracyPercent, PROGRESSION_MASTERY_THRESHOLD_PERCENT } from '../../../../../constants/progression.ts';
 import { screenNames } from '../../../../../constants/screens.ts';
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from '../../../../../constants/styles.ts';
 import { PER_KANJI_UNLOCK_COST } from '../../../../../constants/unlockCosts.ts';
@@ -259,7 +259,9 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
               </Text>
               <Text
                 text90BO
-                style={{ color: displayPercent > KANJI_MASTERY_THRESHOLD_PERCENT ? Colors.$textSuccess : Colors.$textPrimary }}>
+                style={{
+                  color: displayPercent > PROGRESSION_MASTERY_THRESHOLD_PERCENT ? Colors.$textSuccess : Colors.$textPrimary,
+                }}>
                 {displayPercent}%
               </Text>
             </View>
@@ -268,7 +270,9 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
               progress={displayPercent}
               style={{ backgroundColor: Colors.$backgroundNeutralMedium }}
               progressColor={
-                displayPercent > KANJI_MASTERY_THRESHOLD_PERCENT ? Colors.$backgroundSuccessHeavy : Colors.$backgroundPrimaryHeavy
+                displayPercent > PROGRESSION_MASTERY_THRESHOLD_PERCENT
+                  ? Colors.$backgroundSuccessHeavy
+                  : Colors.$backgroundPrimaryHeavy
               }
             />
           </>

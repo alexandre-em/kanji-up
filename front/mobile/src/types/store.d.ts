@@ -59,6 +59,7 @@ type UserState = {
   totalScore: number;
   dailyScores: Record<string, number>;
   progression: Record<string, { correct: number; total: number } | number>;
+  wordProgression: Record<string, { correct: number; total: number }>;
 
   getUserStatus: StatusType;
   createUserStatus: StatusType;

@@ -11,7 +11,7 @@ import { TAB_BAR_TOTAL_HEIGHT } from '../../../../components/bottomNavBar';
 import Layout from '../../../../components/layout';
 import Spacing from '../../../../components/spacing';
 import Lock from '../../../../components/svg/lock';
-import { getAccuracyPercent, KanjiProgressionEntry } from '../../../../constants/progression';
+import { getAccuracyPercent, ProgressionEntry } from '../../../../constants/progression';
 import { screenNames } from '../../../../constants/screens';
 import { MAX_FREE_SELECTED_KANJI } from '../../../../constants/selectionLimit';
 import { BULK_UNLOCK_COST, getTierKey, PER_KANJI_UNLOCK_COST } from '../../../../constants/unlockCosts';
@@ -42,7 +42,7 @@ type KanjiCardElementProps = {
   onPress: (kanji: Partial<KanjiType>) => void;
   isLocked: boolean;
   /** undefined for a kanji never practiced yet — no bar shown, distinct from a real 0% */
-  progressionEntry: KanjiProgressionEntry | number | undefined;
+  progressionEntry: ProgressionEntry | number | undefined;
 };
 
 const CARD_SIZE = 50;
