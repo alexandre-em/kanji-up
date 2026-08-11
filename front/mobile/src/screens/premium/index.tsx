@@ -162,7 +162,7 @@ export default function Premium() {
 
   if (userState.subscriptionPlan === 'premium') {
     return (
-      <Layout screen="premium" hideBanner>
+      <Layout screen="premium">
         <View center flex>
           <Icon source={Assets.icons.premium} size={48} tintColor={Colors.$textPrimary} />
           <Spacing y={20} />
@@ -183,7 +183,7 @@ export default function Premium() {
   }
 
   return (
-    <Layout screen="premium" hideBanner>
+    <Layout screen="premium">
       <RNView style={styles.hero}>
         <Icon source={Assets.icons.premium} size={48} tintColor={Colors.$textPrimary} />
       </RNView>

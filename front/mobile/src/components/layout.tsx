@@ -7,7 +7,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors, Text, View } from 'react-native-ui-lib';
 
 import { GENERAL_MARGIN } from '../constants/styles';
+import { useAppSelector } from '../hooks/useStore';
 import { useTabBarHidden } from '../providers/tabBar';
+import { selectUserState } from '../store/slices/user';
 import AppBannerAd from './bannerAd';
 import { TAB_BAR_TOTAL_HEIGHT } from './bottomNavBar';
 import Spacing from './spacing';
@@ -16,9 +18,6 @@ type LayoutProps = {
   screen?: string;
   /** Set on the screens displaying the floating tab bar, to keep their content above it */
   withTabBar?: boolean;
-  /** Set on the rare screens that must stay ad-free (e.g. the full-screen evaluation session) —
-   * every other screen gets the banner by default, right below its title/subtitle */
-  hideBanner?: boolean;
   /** Shows a centered spinner in place of children — for screens whose content depends on an
    * async fetch (e.g. a detail page keyed by a route param) that hasn't resolved yet */
   isLoading?: boolean;
@@ -28,11 +27,13 @@ const { height } = Dimensions.get('window');
 /** Scroll distance ignored before hiding/showing the tab bar, to avoid flickering on small moves */
 const SCROLL_THRESHOLD = 8;
 
-export default function Layout({ screen, withTabBar, hideBanner, isLoading, children }: LayoutProps & PropsWithChildren) {
+export default function Layout({ screen, withTabBar, isLoading, children }: LayoutProps & PropsWithChildren) {
   const { t } = useTranslation();
 
   const headerHeight = useHeaderHeight();
   const insets = useSafeAreaInsets();
+  const userState = useAppSelector(selectUserState);
+  const hideBanner = userState.subscriptionPlan === 'premium';
 
   const tabBarHidden = useTabBarHidden();
   const lastOffset = useSharedValue(0);

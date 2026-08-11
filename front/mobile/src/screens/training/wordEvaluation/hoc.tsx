@@ -32,7 +32,7 @@ export default function WordEvaluationHoc() {
 
   if (!isModelLoaded)
     return (
-      <Layout screen="wordEvaluation" hideBanner>
+      <Layout screen="wordEvaluation">
         <View center>
           <ActivityIndicator color={Colors.$textPrimary} size="large" />
           <Spacing y={10} />

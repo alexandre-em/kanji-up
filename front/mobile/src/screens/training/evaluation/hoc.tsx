@@ -178,7 +178,7 @@ export default function EvaluationHoc() {
 
   if (!isModelLoaded || isChecking)
     return (
-      <Layout screen="evaluation" hideBanner>
+      <Layout screen="evaluation">
         <View center>
           <ActivityIndicator color={Colors.$textPrimary} size="large" />
           <Spacing y={10} />
@@ -189,7 +189,7 @@ export default function EvaluationHoc() {
 
   if (pendingResume) {
     return (
-      <Layout screen="evaluation" hideBanner>
+      <Layout screen="evaluation">
         <View center flex>
           <Text text70BO center>
             {t('evaluation.resume.title')}
@@ -209,7 +209,7 @@ export default function EvaluationHoc() {
 
   if (evaluationStatus === 'failed') {
     return (
-      <Layout screen="evaluation" hideBanner>
+      <Layout screen="evaluation">
         <View center flex>
           <Text text70BO center>
             {t('evaluation.error.title')}
@@ -227,7 +227,7 @@ export default function EvaluationHoc() {
 
   if (evaluationItems.length === 0)
     return (
-      <Layout screen="evaluation" hideBanner>
+      <Layout screen="evaluation">
         <View center>
           <ActivityIndicator color={Colors.$textPrimary} size="large" />
         </View>

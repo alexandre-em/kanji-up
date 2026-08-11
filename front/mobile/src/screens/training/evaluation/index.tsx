@@ -130,12 +130,14 @@ export default function EvaluationScreen() {
   if (isSessionOver) return <EvaluationResult />;
 
   return (
-    <Layout screen="evaluation" hideBanner>
+    <Layout screen="evaluation">
       <View flex height="100%" spread>
         <View centerH>
           <View width="100%">
             <RNView style={styles.progressHeader}>
-              <Text text70BL>Session progress</Text>
+              <Text text70BL $textDefault>
+                Session progress
+              </Text>
               <Text text80BL $textPrimary>
                 {currentIndex + 1} / {evaluationItems.length}
               </Text>
@@ -159,7 +161,9 @@ export default function EvaluationScreen() {
             </Text>
           </RNView>
           <Spacing y={10} />
-          <Text h1>{currentKanji?.kanji?.kanji?.meaning?.join(', ')}</Text>
+          <Text h1 $textDefault>
+            {currentKanji?.kanji?.kanji?.meaning?.join(', ')}
+          </Text>
           <Spacing y={20} />
           <RNView style={styles.yomi}>
             <Chip label={'ON'} />

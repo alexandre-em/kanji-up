@@ -124,7 +124,7 @@ export default function WordEvaluationScreen() {
 
   if (items.length === 0 && (status === 'idle' || status === 'pending')) {
     return (
-      <Layout screen="wordEvaluation" hideBanner>
+      <Layout screen="wordEvaluation">
         <View center flex>
           <ActivityIndicator color={Colors.$textPrimary} size="large" />
         </View>
@@ -134,7 +134,7 @@ export default function WordEvaluationScreen() {
 
   if (status === 'failed') {
     return (
-      <Layout screen="wordEvaluation" hideBanner>
+      <Layout screen="wordEvaluation">
         <View center flex>
           <Text text70BO $textDefault center>
             {t('wordEvaluation.error.title')}
@@ -152,7 +152,7 @@ export default function WordEvaluationScreen() {
 
   if (status === 'succeeded' && items.length === 0) {
     return (
-      <Layout screen="wordEvaluation" hideBanner>
+      <Layout screen="wordEvaluation">
         <View center flex>
           <Text text70BO $textDefault center>
             {t('wordEvaluation.empty.title')}
@@ -169,7 +169,7 @@ export default function WordEvaluationScreen() {
   if (isSessionOver) return <WordEvaluationResult />;
 
   return (
-    <Layout screen="wordEvaluation" hideBanner>
+    <Layout screen="wordEvaluation">
       <RNView style={styles.progressHeader}>
         <Text text80M $textNeutral>
           {t('wordEvaluation.progress')}
