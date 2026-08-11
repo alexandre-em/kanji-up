@@ -12,6 +12,7 @@ import { useToaster } from '../../../providers/toaster';
 import { completeMissionTask } from '../../../store/slices/missions';
 import { syncKanjiProgression, user } from '../../../store/slices/user';
 import {
+  computeWordProgressionDeltas,
   confirmItem,
   getEffectiveStatus,
   getKanjiCharacters,
@@ -148,8 +149,9 @@ export default function WordEvaluationResult() {
   );
 
   const handleValidate = useCallback(async () => {
-    // Word evaluation doesn't feed kanji progression (a word's own progression tracking is a
-    // separate, not-yet-built feature) — it only contributes daily/total score points.
+    // Word evaluation feeds its own word-keyed progression, kept separate from kanji progression
+    const deltas = computeWordProgressionDeltas(items);
+    deltas.forEach((delta) => dispatch(user.actions.updateWordProgression(delta)));
     if (correctCount > 0) dispatch(user.actions.addScore(correctCount));
 
     setIsSaving(true);
@@ -169,7 +171,7 @@ export default function WordEvaluationResult() {
     } else {
       toast?.show({ message: t('wordEvaluationResult.toast.error'), type: 'failure' });
     }
-  }, [correctCount, dispatch, navigation, toast, t, showInterstitialAd, userId]);
+  }, [items, correctCount, dispatch, navigation, toast, t, showInterstitialAd, userId]);
 
   const buttonLabel = useMemo(
     () =>

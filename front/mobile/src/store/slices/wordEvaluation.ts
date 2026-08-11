@@ -42,6 +42,30 @@ export function getKanjiCharacters(word: string): string[] {
   return Array.from(word).filter((character) => KANJI_REGEX.test(character));
 }
 
+/** Progression deltas for a finished (or abandoned) word-evaluation run, recomputed from the
+ * items themselves — same resilience reasoning as the kanji evaluation's own
+ * computeProgressionDeltas: items survive an app kill, in-memory Redux state doesn't. */
+export function computeWordProgressionDeltas(items: WordEvaluationItemType[]): { id: string; correct: boolean }[] {
+  const deltas: { id: string; correct: boolean }[] = [];
+
+  items.forEach((item) => {
+    const wordId = item.word.word_id;
+    if (!wordId) return;
+
+    if (item.status === 'correct') {
+      deltas.push({ id: wordId, correct: true });
+    } else if (item.status === 'incorrect') {
+      // A word with every slot left empty doesn't count as an attempt — same as a kanji skip
+      const isSkip = item.slots.every((slot) => !slot.image || slot.strokesCount === 0);
+      if (!isSkip) deltas.push({ id: wordId, correct: false });
+    } else if (item.status === 'review' && item.userConfirmation !== null) {
+      deltas.push({ id: wordId, correct: item.userConfirmation });
+    }
+  });
+
+  return deltas;
+}
+
 export const init = createAsyncThunk('wordEvaluation/init', async (payload: { number?: number } | undefined, { getState }) => {
   const selectedKanji = (getState() as RootState).selectedKanji.selectedKanji;
   const characters = Object.values(selectedKanji)
@@ -60,9 +84,6 @@ export const updateItemSlots = createAsyncThunk(
     const expected = state.wordEvaluation.items[currentIndex].word.word?.[0] ?? '';
     const expectedCharacters = getKanjiCharacters(expected);
 
-    // Kanji progression is shared with the kanji-only evaluation flow, which rejects a wrong
-    // stroke count outright — without this, drawing badly here would be the easy way to inflate
-    // the same shared score
     const strokesByCharacter: Record<string, number> = {};
     Object.values(state.selectedKanji.selectedKanji).forEach((kanji) => {
       if (kanji.kanji?.character && kanji.kanji.strokes !== undefined)

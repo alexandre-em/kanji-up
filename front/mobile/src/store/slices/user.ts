@@ -29,6 +29,7 @@ const initialState: UserState = {
   totalScore: 0,
   dailyScores: {},
   progression: {},
+  wordProgression: {},
 
   getUserStatus: 'idle',
   createUserStatus: 'idle',
@@ -94,10 +95,12 @@ export const unlockContent = createAsyncThunk<{ creditsSpent: number }, UnlockCo
 // Best-effort, fire-and-forget: a network hiccup here shouldn't block or surface an error to the
 // user, the local state (already incremented live per answer) is what actually matters
 export const syncKanjiProgression = createAsyncThunk('user/syncKanjiProgression', async (_: void, { getState }) => {
-  const { userId, totalScore, dailyScores, progression } = (getState() as RootState).user;
+  const { userId, totalScore, dailyScores, progression, wordProgression } = (getState() as RootState).user;
   if (!userId) return;
 
-  await core.authService!.updateKanjiProgression(userId, { totalScore, dailyScores, progression }).catch(() => undefined);
+  await core
+    .authService!.updateKanjiProgression(userId, { totalScore, dailyScores, progression, wordProgression })
+    .catch(() => undefined);
 });
 
 export const user = createSlice({
@@ -111,6 +114,12 @@ export const user = createSlice({
       const current = normalizeProgressionEntry(state.progression[id]);
 
       state.progression[id] = { correct: current.correct + (correct ? 1 : 0), total: current.total + 1 };
+    },
+    updateWordProgression: (state, action: PayloadAction<{ id: string; correct: boolean }>) => {
+      const { id, correct } = action.payload;
+      const current = state.wordProgression[id] ?? { correct: 0, total: 0 };
+
+      state.wordProgression[id] = { correct: current.correct + (correct ? 1 : 0), total: current.total + 1 };
     },
     addScore: (state, action: PayloadAction<number>) => {
       const today = todayLocal();
@@ -153,6 +162,7 @@ export const user = createSlice({
         state.totalScore = action.payload.totalScore ?? 0;
         state.dailyScores = action.payload.dailyScores ?? {};
         state.progression = action.payload.progression ?? {};
+        state.wordProgression = action.payload.wordProgression ?? {};
       })
       .addCase(getUser.rejected, (state) => {
         state.getUserStatus = 'failed';
