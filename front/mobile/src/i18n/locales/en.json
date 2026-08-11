@@ -262,6 +262,7 @@
   "profile.activity.title": "Recent activity",
 
   "wordDetails.error": "Couldn't load this word, try again",
+  "wordDetails.mastery.title": "Mastery",
   "wordDetails.readings": "Readings",
   "wordDetails.kanji.title": "Kanji in this word",
   "wordDetails.kanji.subtitle": "Tap a kanji you don't know yet to add it to your selection",

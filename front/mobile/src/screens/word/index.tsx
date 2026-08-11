@@ -1,15 +1,17 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, StyleSheet, TouchableOpacity, View as RNView } from 'react-native';
-import { Assets, Colors, Icon, Text } from 'react-native-ui-lib';
+import { Assets, Colors, Icon, ProgressBar, Text } from 'react-native-ui-lib';
 
 import Layout from '../../components/layout';
 import Spacing from '../../components/spacing';
+import { getAccuracyPercent, PROGRESSION_MASTERY_THRESHOLD_PERCENT } from '../../constants/progression';
 import { useAppDispatch, useAppSelector } from '../../hooks/useStore';
 import { useToaster } from '../../providers/toaster';
 import { core } from '../../services/http';
 import { getOne as getKanji, selectEntities } from '../../store/slices/kanji';
 import { save, selectedKanji, selectSelectedKanji } from '../../store/slices/selectedKanji';
+import { selectUserState } from '../../store/slices/user';
 import { getKanjiCharacters } from '../../store/slices/wordEvaluation';
 
 type WordDetailProps = RouteParamsProps<{ id: string }>;
@@ -25,6 +27,7 @@ export default function WordDetail(props: WordDetailProps) {
 
   const kanjiEntities = useAppSelector(selectEntities);
   const selectedKanjiState = useAppSelector(selectSelectedKanji);
+  const userState = useAppSelector(selectUserState);
 
   useEffect(() => {
     setStatus('pending');
@@ -77,6 +80,10 @@ export default function WordDetail(props: WordDetailProps) {
     );
   }
 
+  // Below the 20-attempt minimum (including zero answers), the real percentage isn't meaningful
+  // yet — shown as an empty 0% bar rather than hiding the section entirely, same as kanji detail
+  const displayPercent = getAccuracyPercent(userState.wordProgression[word.word_id]) ?? 0;
+
   return (
     <Layout screen="wordDetails">
       <RNView style={styles.chipRow}>
@@ -86,6 +93,26 @@ export default function WordDetail(props: WordDetailProps) {
           </Text>
         ))}
       </RNView>
+
+      <Spacing y={16} />
+      <RNView style={styles.masteryRow}>
+        <Text text90M $textNeutral>
+          {t('wordDetails.mastery.title')}
+        </Text>
+        <Text
+          text90BO
+          style={{ color: displayPercent > PROGRESSION_MASTERY_THRESHOLD_PERCENT ? Colors.$textSuccess : Colors.$textPrimary }}>
+          {displayPercent}%
+        </Text>
+      </RNView>
+      <Spacing y={4} />
+      <ProgressBar
+        progress={displayPercent}
+        style={{ backgroundColor: Colors.$backgroundNeutralMedium }}
+        progressColor={
+          displayPercent > PROGRESSION_MASTERY_THRESHOLD_PERCENT ? Colors.$backgroundSuccessHeavy : Colors.$backgroundPrimaryHeavy
+        }
+      />
 
       <Spacing y={20} />
       <Text text70BO>{t('wordDetails.readings')}</Text>
@@ -168,6 +195,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
+  },
+  masteryRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   chip: {
     paddingHorizontal: 12,

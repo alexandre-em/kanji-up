@@ -210,6 +210,7 @@
   "profile.activity.title": "Activité récente",
 
   "wordDetails.error": "Impossible de charger ce mot, réessaie",
+  "wordDetails.mastery.title": "Maîtrise",
   "wordDetails.readings": "Lectures",
   "wordDetails.kanji.title": "Kanji de ce mot",
   "wordDetails.kanji.subtitle": "Touche un kanji que tu ne connais pas encore pour l'ajouter à ta sélection",
