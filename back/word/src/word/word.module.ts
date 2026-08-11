@@ -5,7 +5,7 @@ import { WordController } from './word.controller';
 import { WordService } from './word.service';
 import { Word, WordSchema } from './word.schema';
 import { SentenceModule } from '../sentence/sentence.module';
-import { JwtStrategy } from 'src/security/jwt.strategy';
+import { JwtStrategy } from '../security/jwt.strategy';
 
 @Module({
   controllers: [WordController],

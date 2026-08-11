@@ -1,6 +1,6 @@
 import { CanActivate, ExecutionContext, mixin, Type } from '@nestjs/common';
 import JwtAuthenticationGuard from './jwt.guard';
-import Permission from 'src/utils/permission.type';
+import Permission from '../utils/permission.type';
 
 const PermissionGuard = (permissions: Permission[]): Type<CanActivate> => {
   class PermissionGuardMixin extends JwtAuthenticationGuard {
