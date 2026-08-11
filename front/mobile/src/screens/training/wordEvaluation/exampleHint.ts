@@ -5,13 +5,15 @@ export type MaskedExampleHint = {
   reading: string | null;
 };
 
-// Finds the first example sentence (across all definitions) that literally contains one of the
+// Picks a random example sentence (across all definitions) that literally contains one of the
 // word's spellings, so it can be masked out and replaced by a blank the player has to draw.
 // `word.word[i]`/`word.reading[i]` are assumed paired by index (matches how the dictionary data is
 // authored — see the word detail screen's spelling/reading chips).
 export function findMaskedExampleHint(word: Partial<WordType>): MaskedExampleHint | null {
   const spellings = word.word ?? [];
   const readings = word.reading ?? [];
+
+  const hints: MaskedExampleHint[] = [];
 
   for (const definition of word.definition ?? []) {
     for (const example of definition.example ?? []) {
@@ -23,15 +25,17 @@ export function findMaskedExampleHint(word: Partial<WordType>): MaskedExampleHin
         const matchIndex = sentence.indexOf(spelling);
         if (matchIndex === -1) continue;
 
-        return {
+        hints.push({
           prefix: sentence.slice(0, matchIndex),
           suffix: sentence.slice(matchIndex + spelling.length),
           spelling,
           reading: readings[i] ?? readings[0] ?? null,
-        };
+        });
+        break;
       }
     }
   }
 
-  return null;
+  if (hints.length === 0) return null;
+  return hints[Math.floor(Math.random() * hints.length)];
 }
