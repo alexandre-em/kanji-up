@@ -1,7 +1,7 @@
 import { useNavigation } from '@react-navigation/native';
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Image, ScrollView, StyleSheet, TouchableOpacity, View as RNView } from 'react-native';
+import { Image, ScrollView, TouchableOpacity, View as RNView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Assets, Button, Colors, Icon, Text, View } from 'react-native-ui-lib';
 
@@ -27,6 +27,7 @@ import {
 import { completeMissionTask } from '../../../store/slices/missions';
 import { syncKanjiProgression, user } from '../../../store/slices/user';
 import ReviewModal from './reviewModal';
+import { useResultStyles } from './useResultStyles';
 
 function useItemMessage(item: EvaluationItemType) {
   const { t } = useTranslation();
@@ -48,6 +49,7 @@ function useItemMessage(item: EvaluationItemType) {
 }
 
 function StatusIcon({ item }: { item: EvaluationItemType }) {
+  const styles = useResultStyles();
   const effectiveStatus = getEffectiveStatus(item);
 
   if (effectiveStatus === 'correct') {
@@ -82,6 +84,7 @@ type ResultItemRowProps = {
 };
 
 function ResultItemRow({ item, onPress }: ResultItemRowProps) {
+  const styles = useResultStyles();
   const message = useItemMessage(item);
 
   const content = (
@@ -93,7 +96,9 @@ function ResultItemRow({ item, onPress }: ResultItemRowProps) {
       )}
       <RNView style={styles.rowContent}>
         <RNView style={styles.rowHeader}>
-          <Text text40BL>{item.kanji.kanji?.character}</Text>
+          <Text text40BL $textDefault>
+            {item.kanji.kanji?.character}
+          </Text>
           <StatusIcon item={item} />
         </RNView>
         <Text text90M $textDefault numberOfLines={2}>
@@ -114,6 +119,7 @@ function ResultItemRow({ item, onPress }: ResultItemRowProps) {
 
 export default function EvaluationResult() {
   const { t } = useTranslation();
+  const styles = useResultStyles();
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const dispatch = useAppDispatch();
@@ -215,7 +221,9 @@ export default function EvaluationResult() {
   return (
     <View style={styles.container}>
       <RNView style={styles.summary}>
-        <Text text60BL>{t('evaluationResult.summary.score', { correct: correctCount, total: items.length })}</Text>
+        <Text text60BL $textDefault>
+          {t('evaluationResult.summary.score', { correct: correctCount, total: items.length })}
+        </Text>
         {pendingReviewCount > 0 && (
           <Text text90M $textWarning>
             {t('evaluationResult.summary.pending', { count: pendingReviewCount })}
@@ -245,62 +253,3 @@ export default function EvaluationResult() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.$backgroundDefault,
-  },
-  summary: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 10,
-    gap: 4,
-  },
-  list: {
-    flex: 1,
-  },
-  listContent: {
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    paddingVertical: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: Colors.$outlineNeutral,
-  },
-  thumbnail: {
-    width: 56,
-    height: 56,
-    borderRadius: 8,
-    backgroundColor: '#fff',
-  },
-  thumbnailPlaceholder: {
-    backgroundColor: Colors.$backgroundGeneralLight,
-  },
-  rowContent: {
-    flex: 1,
-    gap: 2,
-  },
-  rowHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  statusIcon: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  stickyBar: {
-    paddingHorizontal: 20,
-    paddingTop: 12,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: Colors.$outlineNeutral,
-  },
-});

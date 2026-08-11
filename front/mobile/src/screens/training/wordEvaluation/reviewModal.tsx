@@ -3,9 +3,12 @@ import { Image, ScrollView, StyleSheet, View as RNView } from 'react-native';
 import { Button, Colors, Text } from 'react-native-ui-lib';
 import Incubator from 'react-native-ui-lib/incubator';
 
+import { useThemedStyles } from '../../../hooks/useThemedStyles';
 import { getKanjiCharacters, WordEvaluationItemType } from '../../../store/slices/wordEvaluation';
 
 const { Dialog } = Incubator;
+
+const CANVAS_PREVIEW_SIZE = 130;
 
 type WordReviewModalProps = {
   item: WordEvaluationItemType | undefined;
@@ -22,6 +25,69 @@ export default function WordReviewModal({ item, position, total, onChoose, onClo
   // in read-only comparison mode: no position in a queue, no Yes/No — there's nothing left to
   // arbitrate, just what was drawn vs what was expected
   const isPending = item?.status === 'review' && item.userConfirmation === null;
+  const styles = useThemedStyles(() =>
+    StyleSheet.create({
+      container: {
+        padding: 20,
+        gap: 20,
+        backgroundColor: Colors.$backgroundDefault,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+      },
+      header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+      },
+      pairs: {
+        maxHeight: 320,
+      },
+      pairsContent: {
+        gap: 16,
+      },
+      compare: {
+        flexDirection: 'row',
+        gap: 16,
+      },
+      compareItem: {
+        flex: 1,
+        alignItems: 'center',
+        gap: 8,
+      },
+      drawing: {
+        width: CANVAS_PREVIEW_SIZE,
+        height: CANVAS_PREVIEW_SIZE,
+        borderRadius: 12,
+        backgroundColor: Colors.$backgroundNeutralLight,
+        borderWidth: StyleSheet.hairlineWidth,
+        borderColor: Colors.$outlineNeutral,
+      },
+      thumbnailPlaceholder: {
+        backgroundColor: Colors.$backgroundNeutralLight,
+      },
+      expectedBox: {
+        width: CANVAS_PREVIEW_SIZE,
+        height: CANVAS_PREVIEW_SIZE,
+        borderRadius: 12,
+        backgroundColor: Colors.$backgroundNeutralLight,
+        borderWidth: StyleSheet.hairlineWidth,
+        borderColor: Colors.$outlineNeutral,
+        alignItems: 'center',
+        justifyContent: 'center',
+      },
+      expectedCharacter: {
+        fontSize: 72,
+        color: Colors.$textDefault,
+      },
+      actions: {
+        flexDirection: 'row',
+        gap: 12,
+      },
+      actionButton: {
+        flex: 1,
+      },
+    }),
+  );
 
   return (
     <Dialog
@@ -95,67 +161,3 @@ export default function WordReviewModal({ item, position, total, onChoose, onClo
     </Dialog>
   );
 }
-
-const CANVAS_PREVIEW_SIZE = 130;
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    gap: 20,
-    backgroundColor: Colors.$backgroundDefault,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  pairs: {
-    maxHeight: 320,
-  },
-  pairsContent: {
-    gap: 16,
-  },
-  compare: {
-    flexDirection: 'row',
-    gap: 16,
-  },
-  compareItem: {
-    flex: 1,
-    alignItems: 'center',
-    gap: 8,
-  },
-  drawing: {
-    width: CANVAS_PREVIEW_SIZE,
-    height: CANVAS_PREVIEW_SIZE,
-    borderRadius: 12,
-    backgroundColor: Colors.$backgroundNeutralLight,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: Colors.$outlineNeutral,
-  },
-  thumbnailPlaceholder: {
-    backgroundColor: Colors.$backgroundNeutralLight,
-  },
-  expectedBox: {
-    width: CANVAS_PREVIEW_SIZE,
-    height: CANVAS_PREVIEW_SIZE,
-    borderRadius: 12,
-    backgroundColor: Colors.$backgroundNeutralLight,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: Colors.$outlineNeutral,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  expectedCharacter: {
-    fontSize: 72,
-    color: Colors.$textDefault,
-  },
-  actions: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  actionButton: {
-    flex: 1,
-  },
-});

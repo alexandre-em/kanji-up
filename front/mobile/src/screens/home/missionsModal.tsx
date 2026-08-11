@@ -4,6 +4,7 @@ import { Assets, Colors, Icon, ProgressBar, Text } from 'react-native-ui-lib';
 import Incubator from 'react-native-ui-lib/incubator';
 
 import Spacing from '../../components/spacing';
+import { useThemedStyles } from '../../hooks/useThemedStyles';
 
 const { Dialog } = Incubator;
 
@@ -17,16 +18,63 @@ type MissionsModalProps = {
 
 export default function MissionsModal({ visible, missions, onClose }: MissionsModalProps) {
   const { t } = useTranslation();
+  const styles = useThemedStyles(() =>
+    StyleSheet.create({
+      modal: {
+        backgroundColor: Colors.$backgroundDefault,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+        padding: 20,
+      },
+      header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+      },
+      taskRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+        paddingVertical: 8,
+      },
+      taskIcon: {
+        width: 24,
+        height: 24,
+        borderRadius: 12,
+        borderWidth: 1.5,
+        borderColor: Colors.$outlineNeutral,
+        alignItems: 'center',
+        justifyContent: 'center',
+      },
+      taskIconDone: {
+        backgroundColor: Colors.$backgroundSuccessLight,
+        borderColor: Colors.$backgroundSuccessLight,
+      },
+      taskLabel: {
+        flex: 1,
+      },
+    }),
+  );
 
   const doneCount = missions ? MISSION_TASKS.filter((task) => missions.tasks[task]).length : 0;
   const allDone = doneCount === MISSION_TASKS.length;
 
   return (
-    <Dialog visible={visible} onDismiss={onClose} bottom useSafeArea width="100%">
+    <Dialog
+      visible={visible}
+      onDismiss={onClose}
+      bottom
+      useSafeArea
+      width="100%"
+      // RNUI's Dialog memoizes its own background without a theme dependency, so it can freeze
+      // on whichever scheme was active at first mount — this forces it fresh on every render
+      containerStyle={{ backgroundColor: Colors.$backgroundDefault }}>
       <RNView style={styles.modal}>
         <RNView style={styles.header}>
           <Icon source={Assets.icons.check} size={28} tintColor={Colors.$iconPrimary} />
-          <Text text70BO>{t('missions.title')}</Text>
+          <Text text70BO $textDefault>
+            {t('missions.title')}
+          </Text>
         </RNView>
         <Spacing y={4} />
         <Text text90M $textGeneral>
@@ -71,39 +119,3 @@ export default function MissionsModal({ visible, missions, onClose }: MissionsMo
     </Dialog>
   );
 }
-
-const styles = StyleSheet.create({
-  modal: {
-    backgroundColor: Colors.$backgroundDefault,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    padding: 20,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  taskRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    paddingVertical: 8,
-  },
-  taskIcon: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    borderWidth: 1.5,
-    borderColor: Colors.$outlineNeutral,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  taskIconDone: {
-    backgroundColor: Colors.$backgroundSuccessLight,
-    borderColor: Colors.$backgroundSuccessLight,
-  },
-  taskLabel: {
-    flex: 1,
-  },
-});

@@ -7,6 +7,7 @@ import { Assets, Colors, Icon, Text } from 'react-native-ui-lib';
 import { useSelector } from 'react-redux';
 
 import { useAppDispatch } from '../../hooks/useStore';
+import { useThemedStyles } from '../../hooks/useThemedStyles';
 import { useToaster } from '../../providers/toaster';
 import { recoverAccount, selectUserState } from '../../store/slices/user';
 
@@ -16,6 +17,29 @@ export default function GoogleSignInButton() {
   const toast = useToaster();
   const userState = useSelector(selectUserState);
   const [isSigningIn, setIsSigningIn] = useState(false);
+  const styles = useThemedStyles(() =>
+    StyleSheet.create({
+      button: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 10,
+        paddingHorizontal: 16,
+        paddingVertical: 14,
+        borderRadius: 12,
+        backgroundColor: Colors.$backgroundPrimaryHeavy,
+      },
+      linkedRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+        paddingHorizontal: 16,
+        paddingVertical: 14,
+        borderRadius: 12,
+        backgroundColor: Colors.$backgroundNeutralLight,
+      },
+    }),
+  );
 
   useEffect(() => {
     GoogleSignin.configure({ webClientId: Config.GOOGLE_CLIENT_ID });
@@ -79,25 +103,3 @@ export default function GoogleSignInButton() {
     </TouchableOpacity>
   );
 }
-
-const styles = StyleSheet.create({
-  button: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderRadius: 12,
-    backgroundColor: Colors.$backgroundPrimaryHeavy,
-  },
-  linkedRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderRadius: 12,
-    backgroundColor: Colors.$backgroundNeutralLight,
-  },
-});

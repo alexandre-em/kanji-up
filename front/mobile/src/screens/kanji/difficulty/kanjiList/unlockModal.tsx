@@ -7,6 +7,7 @@ import Incubator from 'react-native-ui-lib/incubator';
 
 import Spacing from '../../../../components/spacing';
 import { screenNames } from '../../../../constants/screens';
+import { useThemedStyles } from '../../../../hooks/useThemedStyles';
 
 const { Dialog } = Incubator;
 
@@ -24,6 +25,23 @@ export default function UnlockModal({ visible, label, cost, credits, isUnlocking
   const { t } = useTranslation();
   const navigation = useNavigation();
   const canAfford = credits >= cost;
+  const styles = useThemedStyles(() =>
+    StyleSheet.create({
+      modal: {
+        backgroundColor: Colors.$backgroundDefault,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+        padding: 20,
+      },
+      actions: {
+        flexDirection: 'row',
+        gap: 10,
+      },
+      button: {
+        flex: 1,
+      },
+    }),
+  );
 
   const handleGoEarnCredits = useCallback(() => {
     onClose();
@@ -31,9 +49,19 @@ export default function UnlockModal({ visible, label, cost, credits, isUnlocking
   }, [onClose, navigation]);
 
   return (
-    <Dialog visible={visible} onDismiss={onClose} bottom useSafeArea width="100%">
+    <Dialog
+      visible={visible}
+      onDismiss={onClose}
+      bottom
+      useSafeArea
+      width="100%"
+      // RNUI's Dialog memoizes its own background without a theme dependency, so it can freeze
+      // on whichever scheme was active at first mount — this forces it fresh on every render
+      containerStyle={{ backgroundColor: Colors.$backgroundDefault }}>
       <RNView style={styles.modal}>
-        <Text text70BO>{t('kanjiList.unlock.title', { label })}</Text>
+        <Text text70BO $textDefault>
+          {t('kanjiList.unlock.title', { label })}
+        </Text>
         <Spacing y={8} />
         <Text text80M $textGeneral>
           {t('kanjiList.unlock.cost', { cost })}
@@ -63,19 +91,3 @@ export default function UnlockModal({ visible, label, cost, credits, isUnlocking
     </Dialog>
   );
 }
-
-const styles = StyleSheet.create({
-  modal: {
-    backgroundColor: Colors.$backgroundDefault,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    padding: 20,
-  },
-  actions: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  button: {
-    flex: 1,
-  },
-});

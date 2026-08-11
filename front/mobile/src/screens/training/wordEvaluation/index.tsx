@@ -9,6 +9,7 @@ import Layout from '../../../components/layout';
 import Spacing from '../../../components/spacing';
 import { RECOGNITION_MODEL_LABELS } from '../../../constants/recognitionLabels';
 import { useAppDispatch, useAppSelector } from '../../../hooks/useStore';
+import { useThemedStyles } from '../../../hooks/useThemedStyles';
 import { useToaster } from '../../../providers/toaster';
 import {
   getKanjiCharacters,
@@ -40,6 +41,99 @@ export default function WordEvaluationScreen() {
   const status = useAppSelector(selectWordEvaluationStatus);
   const toast = useToaster();
   const { t } = useTranslation();
+  const styles = useThemedStyles(() =>
+    StyleSheet.create({
+      hintCard: {
+        backgroundColor: Colors.$backgroundNeutralLight,
+        borderRadius: 16,
+        padding: 16,
+      },
+      hintSentence: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        alignItems: 'flex-end',
+        rowGap: 8,
+      },
+      hintBlank: {
+        alignItems: 'center',
+        marginHorizontal: 4,
+      },
+      hintReading: {
+        fontSize: 11,
+        color: Colors.$textNeutral,
+        marginBottom: 2,
+      },
+      hintChip: {
+        height: 28,
+        borderRadius: 6,
+        borderWidth: 1,
+        borderColor: Colors.$outlineNeutral,
+        backgroundColor: Colors.$backgroundDefault,
+      },
+      progressHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+      },
+      progressBadge: {
+        backgroundColor: Colors.$backgroundPrimaryLight,
+        borderRadius: 20,
+        paddingHorizontal: 12,
+        paddingVertical: 4,
+      },
+      progressBar: {
+        height: 8,
+        borderRadius: 4,
+      },
+      slotsScroll: {
+        flexGrow: 0,
+      },
+      slots: {
+        gap: 12,
+        alignItems: 'center',
+      },
+      slotWrapper: {
+        position: 'relative',
+      },
+      slot: {
+        borderRadius: 14,
+        borderWidth: 1,
+        borderColor: Colors.$outlineNeutral,
+        backgroundColor: Colors.$backgroundNeutralLight,
+        alignItems: 'center',
+        justifyContent: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 6,
+        elevation: 2,
+      },
+      slotImage: {
+        borderRadius: 14,
+      },
+      removeSlot: {
+        position: 'absolute',
+        top: -8,
+        right: -8,
+        width: 24,
+        height: 24,
+        borderRadius: 12,
+        backgroundColor: Colors.$backgroundPrimaryHeavy,
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 10,
+      },
+      addSlot: {
+        borderRadius: 14,
+        borderWidth: 1.5,
+        borderColor: Colors.$outlinePrimary,
+        borderStyle: 'dashed',
+        backgroundColor: Colors.$backgroundPrimaryLight,
+        alignItems: 'center',
+        justifyContent: 'center',
+      },
+    }),
+  );
 
   // Cards only ever show a completed drawing — an empty slot exists in state only while its
   // modal is open (see handleAddSlot/handleModalClose), never rendered as a placeholder card
@@ -251,95 +345,3 @@ export default function WordEvaluationScreen() {
     </Layout>
   );
 }
-
-const styles = StyleSheet.create({
-  hintCard: {
-    backgroundColor: Colors.$backgroundNeutralLight,
-    borderRadius: 16,
-    padding: 16,
-  },
-  hintSentence: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems: 'flex-end',
-    rowGap: 8,
-  },
-  hintBlank: {
-    alignItems: 'center',
-    marginHorizontal: 4,
-  },
-  hintReading: {
-    fontSize: 11,
-    color: Colors.$textNeutral,
-    marginBottom: 2,
-  },
-  hintChip: {
-    height: 28,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: Colors.$outlineNeutral,
-    backgroundColor: Colors.$backgroundDefault,
-  },
-  progressHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  progressBadge: {
-    backgroundColor: Colors.$backgroundPrimaryLight,
-    borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-  },
-  progressBar: {
-    height: 8,
-    borderRadius: 4,
-  },
-  slotsScroll: {
-    flexGrow: 0,
-  },
-  slots: {
-    gap: 12,
-    alignItems: 'center',
-  },
-  slotWrapper: {
-    position: 'relative',
-  },
-  slot: {
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: Colors.$outlineNeutral,
-    backgroundColor: Colors.$backgroundNeutralLight,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    elevation: 2,
-  },
-  slotImage: {
-    borderRadius: 14,
-  },
-  removeSlot: {
-    position: 'absolute',
-    top: -8,
-    right: -8,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: Colors.$backgroundPrimaryHeavy,
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 10,
-  },
-  addSlot: {
-    borderRadius: 14,
-    borderWidth: 1.5,
-    borderColor: Colors.$outlinePrimary,
-    borderStyle: 'dashed',
-    backgroundColor: Colors.$backgroundPrimaryLight,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});

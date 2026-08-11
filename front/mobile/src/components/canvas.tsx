@@ -3,6 +3,8 @@ import { PanResponder, StyleSheet, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { Assets, Button, Colors } from 'react-native-ui-lib';
 
+import { useThemedStyles } from '../hooks/useThemedStyles';
+
 /**
  * Convert a list of points into a smooth quadratic Bezier SVG path.
  * @param {Array<{x:number, y:number}>} points
@@ -58,6 +60,43 @@ const Canvas = forwardRef(
   ) => {
     const [paths, setPaths] = useState<{ x: number; y: number }[][]>([]);
     const [currentPoints, setCurrentPoints] = useState<{ x: number; y: number }[]>([]);
+    const styles = useThemedStyles(() =>
+      StyleSheet.create({
+        canvas: {
+          position: 'relative',
+        },
+        canvasBackground: {
+          backgroundColor: Colors.$backgroundNeutralLight,
+        },
+        canvasBorder: {
+          borderWidth: 0.75,
+          borderColor: Colors.$textDefault + '30',
+          borderRadius: 8,
+        },
+        vertical: {
+          position: 'absolute',
+          width: '50%',
+          height: '100%',
+          borderRightWidth: 0.5,
+          borderRightColor: Colors.$textDefault + '25',
+        },
+        horizontal: {
+          position: 'absolute',
+          height: '50%',
+          width: '100%',
+          borderBottomWidth: 0.5,
+          borderBottomColor: Colors.$textDefault + '25',
+        },
+        clean: {
+          position: 'absolute',
+          top: 5,
+          right: 5,
+          width: 35,
+          height: 35,
+          zIndex: 100,
+        },
+      }),
+    );
 
     const handleClear = useCallback(() => {
       setPaths([]);
@@ -154,41 +193,5 @@ const Canvas = forwardRef(
     );
   },
 );
-
-const styles = StyleSheet.create({
-  canvas: {
-    position: 'relative',
-  },
-  canvasBackground: {
-    backgroundColor: Colors.$backgroundNeutralLight,
-  },
-  canvasBorder: {
-    borderWidth: 0.75,
-    borderColor: Colors.$textDefault + '30',
-    borderRadius: 8,
-  },
-  vertical: {
-    position: 'absolute',
-    width: '50%',
-    height: '100%',
-    borderRightWidth: 0.5,
-    borderRightColor: Colors.$textDefault + '25',
-  },
-  horizontal: {
-    position: 'absolute',
-    height: '50%',
-    width: '100%',
-    borderBottomWidth: 0.5,
-    borderBottomColor: Colors.$textDefault + '25',
-  },
-  clean: {
-    position: 'absolute',
-    top: 5,
-    right: 5,
-    width: 35,
-    height: 35,
-    zIndex: 100,
-  },
-});
 
 export default Canvas;

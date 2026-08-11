@@ -7,6 +7,7 @@ import Layout from '../../components/layout';
 import Spacing from '../../components/spacing';
 import { getAccuracyPercent, PROGRESSION_MASTERY_THRESHOLD_PERCENT } from '../../constants/progression';
 import { useAppDispatch, useAppSelector } from '../../hooks/useStore';
+import { useThemedStyles } from '../../hooks/useThemedStyles';
 import { useToaster } from '../../providers/toaster';
 import { core } from '../../services/http';
 import { getOne as getKanji, selectEntities } from '../../store/slices/kanji';
@@ -21,6 +22,60 @@ export default function WordDetail(props: WordDetailProps) {
   const dispatch = useAppDispatch();
   const toast = useToaster();
   const { id } = props.route.params;
+  const styles = useThemedStyles(() =>
+    StyleSheet.create({
+      center: {
+        paddingVertical: 60,
+        alignItems: 'center',
+      },
+      chipRow: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 8,
+      },
+      masteryRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+      },
+      chip: {
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 16,
+        backgroundColor: Colors.$backgroundPrimaryLight,
+      },
+      kanjiTile: {
+        width: 56,
+        height: 56,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: Colors.$outlineNeutral,
+      },
+      kanjiTileSelected: {
+        borderColor: Colors.$backgroundSuccessHeavy,
+        backgroundColor: Colors.$backgroundSuccessLight,
+      },
+      kanjiCheck: {
+        position: 'absolute',
+        top: 4,
+        right: 4,
+      },
+      definitionRow: {
+        paddingVertical: 8,
+        borderBottomWidth: StyleSheet.hairlineWidth,
+        borderBottomColor: Colors.$outlineNeutral,
+      },
+      exampleRow: {
+        marginTop: 6,
+        paddingLeft: 12,
+        borderLeftWidth: 2,
+        borderLeftColor: Colors.$outlineNeutral,
+        gap: 2,
+      },
+    }),
+  );
 
   const [word, setWord] = useState<WordType | null>(null);
   const [status, setStatus] = useState<RequestStatusType>('pending');
@@ -185,56 +240,3 @@ export default function WordDetail(props: WordDetailProps) {
     </Layout>
   );
 }
-
-const styles = StyleSheet.create({
-  center: {
-    paddingVertical: 60,
-    alignItems: 'center',
-  },
-  chipRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  masteryRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  chip: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-    backgroundColor: Colors.$backgroundPrimaryLight,
-  },
-  kanjiTile: {
-    width: 56,
-    height: 56,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: Colors.$outlineNeutral,
-  },
-  kanjiTileSelected: {
-    borderColor: Colors.$backgroundSuccessHeavy,
-    backgroundColor: Colors.$backgroundSuccessLight,
-  },
-  kanjiCheck: {
-    position: 'absolute',
-    top: 4,
-    right: 4,
-  },
-  definitionRow: {
-    paddingVertical: 8,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: Colors.$outlineNeutral,
-  },
-  exampleRow: {
-    marginTop: 6,
-    paddingLeft: 12,
-    borderLeftWidth: 2,
-    borderLeftColor: Colors.$outlineNeutral,
-    gap: 2,
-  },
-});

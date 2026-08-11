@@ -1,7 +1,7 @@
 import { useNavigation } from '@react-navigation/native';
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ScrollView, StyleSheet, TouchableOpacity, View as RNView } from 'react-native';
+import { ScrollView, TouchableOpacity, View as RNView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Assets, Button, Colors, Icon, Text, View } from 'react-native-ui-lib';
 
@@ -23,6 +23,7 @@ import {
   WordEvaluationItemType,
 } from '../../../store/slices/wordEvaluation';
 import WordReviewModal from './reviewModal';
+import { useResultStyles } from './useResultStyles';
 
 function useItemMessage(item: WordEvaluationItemType) {
   const { t } = useTranslation();
@@ -43,6 +44,7 @@ function useItemMessage(item: WordEvaluationItemType) {
 }
 
 function StatusIcon({ item }: { item: WordEvaluationItemType }) {
+  const styles = useResultStyles();
   const effectiveStatus = getEffectiveStatus(item);
 
   if (effectiveStatus === 'correct') {
@@ -76,6 +78,7 @@ type ResultItemRowProps = {
 };
 
 function ResultItemRow({ item, onPress }: ResultItemRowProps) {
+  const styles = useResultStyles();
   const message = useItemMessage(item);
   const wordText = item.word.word?.[0] ?? '';
   const meaning = item.word.definition?.[0]?.meaning?.join(', ');
@@ -104,6 +107,7 @@ function ResultItemRow({ item, onPress }: ResultItemRowProps) {
 
 export default function WordEvaluationResult() {
   const { t } = useTranslation();
+  const styles = useResultStyles();
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const dispatch = useAppDispatch();
@@ -205,65 +209,3 @@ export default function WordEvaluationResult() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.$backgroundDefault,
-  },
-  summary: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 10,
-    gap: 4,
-  },
-  list: {
-    flex: 1,
-  },
-  listContent: {
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    paddingVertical: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: Colors.$outlineNeutral,
-  },
-  wordBox: {
-    width: 56,
-    height: 56,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: Colors.$backgroundNeutralLight,
-  },
-  rowContent: {
-    flex: 1,
-    gap: 2,
-  },
-  rowHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 8,
-  },
-  meaning: {
-    flex: 1,
-  },
-  statusIcon: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  stickyBar: {
-    paddingHorizontal: 20,
-    paddingTop: 12,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: Colors.$outlineNeutral,
-  },
-});

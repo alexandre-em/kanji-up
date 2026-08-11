@@ -5,6 +5,7 @@ import { Assets, Button, Colors, Icon, Text } from 'react-native-ui-lib';
 import Incubator from 'react-native-ui-lib/incubator';
 
 import { CANVAS_WIDTH } from '../../../constants/styles';
+import { useThemedStyles } from '../../../hooks/useThemedStyles';
 import WordSlotCanvas, { WordSlotCanvasHandle } from './wordSlotCanvas';
 
 const { Dialog } = Incubator;
@@ -18,6 +19,24 @@ type DrawSlotModalProps = {
 export default function DrawSlotModal({ visible, onClose, onDone }: DrawSlotModalProps) {
   const { t } = useTranslation();
   const canvasRef = useRef<WordSlotCanvasHandle>(null);
+  const styles = useThemedStyles(() =>
+    StyleSheet.create({
+      container: {
+        padding: 20,
+        gap: 20,
+        backgroundColor: Colors.$backgroundDefault,
+        borderRadius: 20,
+      },
+      header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+      },
+      canvasWrapper: {
+        alignItems: 'center',
+      },
+    }),
+  );
 
   const handleDone = async () => {
     const strokesCount = canvasRef.current?.getStrokesCount() ?? 0;
@@ -57,20 +76,3 @@ export default function DrawSlotModal({ visible, onClose, onDone }: DrawSlotModa
     </Dialog>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    gap: 20,
-    backgroundColor: Colors.$backgroundDefault,
-    borderRadius: 20,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  canvasWrapper: {
-    alignItems: 'center',
-  },
-});
