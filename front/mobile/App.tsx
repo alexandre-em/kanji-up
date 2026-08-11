@@ -3,6 +3,7 @@ import './src/config/rnui';
 
 import { useEffect } from 'react';
 import { StatusBar, StyleSheet } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import mobileAds from 'react-native-google-mobile-ads';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Colors, View } from 'react-native-ui-lib';
@@ -55,18 +56,23 @@ function AppContent() {
 
 function App() {
   return (
-    <SafeAreaProvider>
-      <Provider store={store}>
-        <ThemeProvider>
-          <AppContent />
-        </ThemeProvider>
-      </Provider>
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={styles.gestureRoot}>
+      <SafeAreaProvider>
+        <Provider store={store}>
+          <ThemeProvider>
+            <AppContent />
+          </ThemeProvider>
+        </Provider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }
 
 const styles = StyleSheet.create({
   screen: {
+    flex: 1,
+  },
+  gestureRoot: {
     flex: 1,
   },
 });

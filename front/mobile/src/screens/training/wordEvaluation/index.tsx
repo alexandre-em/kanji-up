@@ -2,8 +2,8 @@ import { predict } from '@kanjiup/recognition';
 import { useNavigation } from '@react-navigation/native';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, Image, ScrollView, StyleSheet, TouchableOpacity, View as RNView } from 'react-native';
-import { Assets, Button, Colors, Icon, ProgressBar, Text, View } from 'react-native-ui-lib';
+import { ActivityIndicator, StyleSheet, View as RNView } from 'react-native';
+import { Button, Colors, ProgressBar, Text, View } from 'react-native-ui-lib';
 
 import Layout from '../../../components/layout';
 import Spacing from '../../../components/spacing';
@@ -20,6 +20,7 @@ import {
   updateItemSlots,
   WordSlotType,
 } from '../../../store/slices/wordEvaluation';
+import DraggableSlotRow from './draggableSlotRow';
 import DrawSlotModal from './drawSlotModal';
 import { findMaskedExampleHint } from './exampleHint';
 import WordEvaluationResult from './result';
@@ -90,54 +91,6 @@ export default function WordEvaluationScreen() {
       progressBar: {
         height: 8,
         borderRadius: 4,
-      },
-      slotsScroll: {
-        flexGrow: 0,
-      },
-      slots: {
-        gap: 12,
-        alignItems: 'center',
-      },
-      slotWrapper: {
-        position: 'relative',
-      },
-      slot: {
-        borderRadius: 14,
-        borderWidth: 1,
-        borderColor: Colors.$outlineNeutral,
-        backgroundColor: Colors.$backgroundNeutralLight,
-        alignItems: 'center',
-        justifyContent: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.08,
-        shadowRadius: 6,
-        elevation: 2,
-      },
-      slotImage: {
-        borderRadius: 14,
-      },
-      slotBadge: {
-        position: 'absolute',
-        top: -8,
-        right: -8,
-        minWidth: 24,
-        height: 24,
-        borderRadius: 12,
-        paddingHorizontal: 6,
-        backgroundColor: Colors.$backgroundPrimaryHeavy,
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 10,
-      },
-      addSlot: {
-        borderRadius: 14,
-        borderWidth: 1.5,
-        borderColor: Colors.$outlinePrimary,
-        borderStyle: 'dashed',
-        backgroundColor: Colors.$backgroundPrimaryLight,
-        alignItems: 'center',
-        justifyContent: 'center',
       },
     }),
   );
@@ -343,38 +296,22 @@ export default function WordEvaluationScreen() {
           <Text text80BO $textNeutral>
             {t('wordEvaluation.drawings.title')}
           </Text>
+          {filledSlots.length > 1 && (
+            <Text text100L $textNeutral>
+              {t('wordEvaluation.drawings.reorderHint')}
+            </Text>
+          )}
           <Spacing y={10} />
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={[styles.slotsScroll, { height: slotSize + 16 }]}
-            contentContainerStyle={styles.slots}>
-            {filledSlots.map((slot, index) => (
-              <RNView key={slot.id} style={styles.slotWrapper}>
-                <TouchableOpacity
-                  style={[styles.slot, { width: slotSize, height: slotSize }]}
-                  onPress={() => setActiveSlotId(slot.id)}
-                  accessibilityRole="button"
-                  accessibilityLabel={t('wordEvaluation.slot.accessibilityLabel')}>
-                  <Image
-                    source={{ uri: `data:image/png;base64,${slot.image}` }}
-                    style={[styles.slotImage, { width: slotSize, height: slotSize }]}
-                  />
-                </TouchableOpacity>
-                <RNView style={styles.slotBadge}>
-                  <Text text100BO white>
-                    {index + 1}
-                  </Text>
-                </RNView>
-              </RNView>
-            ))}
-            <TouchableOpacity
-              style={[styles.addSlot, { width: slotSize, height: slotSize }]}
-              onPress={handleAddSlot}
-              accessibilityRole="button">
-              <Icon source={Assets.icons.add} size={28} tintColor={Colors.$iconPrimary} />
-            </TouchableOpacity>
-          </ScrollView>
+          <DraggableSlotRow
+            slots={filledSlots}
+            slotSize={slotSize}
+            onReorder={setSlots}
+            onSlotPress={(id) => setActiveSlotId(id)}
+            onAddSlot={handleAddSlot}
+            addSlotAccessibilityLabel={t('wordEvaluation.addSlot.accessibilityLabel')}
+            slotAccessibilityLabel={t('wordEvaluation.slot.accessibilityLabel')}
+            slotAccessibilityHint={t('wordEvaluation.slot.accessibilityHint')}
+          />
           <Spacing y={20} />
           <Button label={t('wordEvaluation.validate')} onPress={handleValidate} disabled={isSubmitting} />
         </RNView>
