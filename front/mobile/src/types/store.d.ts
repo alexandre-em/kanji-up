@@ -58,7 +58,7 @@ type UserState = {
   unlockedKanji: string[];
   totalScore: number;
   dailyScores: Record<string, number>;
-  progression: Record<string, number>;
+  progression: Record<string, { correct: number; total: number } | number>;
 
   getUserStatus: StatusType;
   createUserStatus: StatusType;

@@ -103,12 +103,13 @@ type RegisteredUser = {
   unlockedKanji: string[];
 };
 
-// Per-kanji mastery (0-20), shared between kanji and word training modes — see
-// src/constants/progression.ts for the tuning constants
+// Per-kanji accuracy (correct / total attempts) — see src/constants/progression.ts for the
+// mastery threshold. Values may still be a plain number for accounts predating this shape (the
+// old momentum score); normalizeProgressionEntry in constants/progression.ts handles that.
 type KanjiProgressionType = {
   totalScore: number;
   dailyScores: Record<string, number>;
-  progression: Record<string, number>;
+  progression: Record<string, { correct: number; total: number } | number>;
 };
 
 type UserType = UnregisteredUser & RegisteredUser & KanjiProgressionType;
