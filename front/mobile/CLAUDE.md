@@ -105,7 +105,11 @@ Reanimated 4, i18next. **Android uniquement pour l'instant : il n'y a pas de dos
 
 **Conventions**
 - Couleurs : toujours les tokens RNUI (`Colors.$backgroundPrimaryHeavy`, `$textDefault`…), jamais
-  un hex en dur — sauf le blanc sur fond de marque.
+  un hex en dur — sauf le blanc sur fond de marque. **Seule autre exception : le composant
+  `Canvas`** (`src/components/canvas.tsx`) — fond blanc et trait noir **toujours** en dur, quel que
+  soit le thème. Ce n'est pas un oubli : l'image du canvas est envoyée telle quelle au modèle de
+  reconnaissance, qui n'a été entraîné que sur ce pattern (fond blanc, trait noir). Le faire suivre
+  le thème casserait la reconnaissance en mode sombre.
 - Icônes : PNG déjà chargés via `Assets.icons.*` (aucune lib d'icônes vectorielles) ; sinon
   `react-native-svg` dans `src/components/svg/`.
 - i18n : **clés plates** (`"home.menu.selection.title"`), à ajouter dans `en.json` **et** `fr.json`.

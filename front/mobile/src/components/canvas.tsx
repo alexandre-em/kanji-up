@@ -65,8 +65,10 @@ const Canvas = forwardRef(
         canvas: {
           position: 'relative',
         },
+        // Hardcoded regardless of theme: this is captured as the recognition model's input image,
+        // and the model was only ever trained on a white background with black strokes
         canvasBackground: {
-          backgroundColor: Colors.$backgroundNeutralLight,
+          backgroundColor: '#fff',
         },
         canvasBorder: {
           borderWidth: 0.75,
