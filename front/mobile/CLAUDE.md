@@ -110,14 +110,19 @@ Reanimated 4, i18next. **Android uniquement pour l'instant : il n'y a pas de dos
   `react-native-svg` dans `src/components/svg/`.
 - i18n : **clés plates** (`"home.menu.selection.title"`), à ajouter dans `en.json` **et** `fr.json`.
 - Espacements : `GENERAL_MARGIN` de `src/constants/styles.ts`, composant `Spacing`.
-- Découpage fichiers : un fichier = une responsabilité claire, devinable par son nom. Il peut
-  contenir plusieurs fonctions/composants/hooks **tant qu'ils sont liés entre eux et répondent
-  tous à ce que le nom du fichier décrit** — ex. une page (`index.tsx`) qui orchestre plusieurs
-  sous-composants et appelle des hooks pour l'affichage, ou un fichier utilitaire qui regroupe
-  plusieurs fonctions liées. Dès qu'un composant/fonction/hook a sa propre responsabilité
-  indépendante du fichier qui le contient, il part dans son propre fichier nommé en conséquence
-  (ex. `kanjiResultCard.tsx` pour la carte, `difficultyTag.tsx` pour la logique de tag de
-  difficulté, séparés de `kanjiResults.tsx` qui ne garde que la liste/pagination).
+- Découpage fichiers : **un fichier = une seule entité de haut niveau** — une page, un composant,
+  un hook, ou un groupe de fonctions utilitaires. Jamais de mélange entre catégories différentes
+  (hook + composant, page + sous-composant, fonction utilitaire + hook) dans le même fichier, même
+  si elles sont liées ou n'ont qu'un seul appelant. En revanche, **grouper est légitime à l'intérieur
+  d'une même catégorie** tant que tout le contenu sert ce que le nom du fichier annonce : plusieurs
+  fonctions outils dans un fichier utilitaire nommé pour ce qu'elles font ensemble (ex.
+  `progression.ts` regroupant `getAccuracyPercent`, `isKanjiMastered`, `hasNewlyMasteredKanji`…),
+  ou un hook qui s'appuie sur plusieurs fonctions internes non exportées tant qu'elles ne servent
+  qu'à ce hook (ex. `useResultStyles.ts` qui a son propre helper interne de calcul). Nom du fichier
+  = nom de l'entité principale qu'il expose (ex. `kanjiResultCard.tsx` pour le composant carte,
+  `useResultStyles.ts` pour le hook de styles) — jamais de fichier fourre-tout type
+  `helpers.ts`/`utils.ts` sans rapport de nom avec son contenu. Un composant ne cohabite jamais avec
+  un hook qu'il utilise, une page ne cohabite jamais avec ses sous-composants.
 
 **Émulateur / screenshots** (SDK dans `~/Library/Android/sdk`, AVD `Pixel_7_Pro_API_34`)
 ```sh
