@@ -1,9 +1,9 @@
 import { useNavigation } from '@react-navigation/native';
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Image, ScrollView, TouchableOpacity, View as RNView } from 'react-native';
+import { ScrollView, View as RNView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Assets, Button, Colors, Icon, Text, View } from 'react-native-ui-lib';
+import { Button, Text, View } from 'react-native-ui-lib';
 
 import { hasNewlyMasteredKanji } from '../../../constants/progression';
 import { screenNames } from '../../../constants/screens';
@@ -15,8 +15,6 @@ import {
   clearLocalSession,
   computeProgressionDeltas,
   confirmItem,
-  EvaluationItemType,
-  getEffectiveStatus,
   reset as resetEvaluation,
   selectCorrectCount,
   selectEvaluationItems,
@@ -26,96 +24,9 @@ import {
 } from '../../../store/slices/evaluation';
 import { completeMissionTask } from '../../../store/slices/missions';
 import { syncKanjiProgression, user } from '../../../store/slices/user';
+import ResultItemRow from './resultItemRow';
 import ReviewModal from './reviewModal';
 import { useResultStyles } from './useResultStyles';
-
-function useItemMessage(item: EvaluationItemType) {
-  const { t } = useTranslation();
-
-  if (item.status === 'correct') return t('evaluationResult.status.correct');
-
-  if (item.status === 'incorrect') {
-    if (!item.image) return t('evaluationResult.status.timeout');
-    if (item.strokesCount === 0) return t('evaluationResult.status.empty');
-
-    const expectedStrokes = item.kanji.kanji?.strokes;
-    return t('evaluationResult.status.wrongStrokes', { expected: expectedStrokes, actual: item.strokesCount });
-  }
-
-  // status === 'review'
-  if (item.userConfirmation === true) return t('evaluationResult.status.confirmedCorrect');
-  if (item.userConfirmation === false) return t('evaluationResult.status.confirmedIncorrect');
-  return t('evaluationResult.status.review');
-}
-
-function StatusIcon({ item }: { item: EvaluationItemType }) {
-  const styles = useResultStyles();
-  const effectiveStatus = getEffectiveStatus(item);
-
-  if (effectiveStatus === 'correct') {
-    return (
-      <RNView style={[styles.statusIcon, { backgroundColor: Colors.$backgroundSuccessLight }]}>
-        <Icon source={Assets.icons.check} size={16} tintColor={Colors.$iconSuccess} />
-      </RNView>
-    );
-  }
-
-  if (effectiveStatus === 'incorrect') {
-    return (
-      <RNView style={[styles.statusIcon, { backgroundColor: Colors.$backgroundPrimaryLight }]}>
-        <Icon source={Assets.icons.cross} size={16} tintColor={Colors.$iconPrimary} />
-      </RNView>
-    );
-  }
-
-  return (
-    <RNView style={[styles.statusIcon, { backgroundColor: Colors.$backgroundWarningLight }]}>
-      <Text text80BO $textWarning>
-        ?
-      </Text>
-    </RNView>
-  );
-}
-
-type ResultItemRowProps = {
-  item: EvaluationItemType;
-  /** Only 'review' answers are interactive: tapping one opens the review modal on it */
-  onPress?: () => void;
-};
-
-function ResultItemRow({ item, onPress }: ResultItemRowProps) {
-  const styles = useResultStyles();
-  const message = useItemMessage(item);
-
-  const content = (
-    <>
-      {item.image ? (
-        <Image source={{ uri: `data:image/png;base64,${item.image}` }} style={styles.thumbnail} />
-      ) : (
-        <RNView style={[styles.thumbnail, styles.thumbnailPlaceholder]} />
-      )}
-      <RNView style={styles.rowContent}>
-        <RNView style={styles.rowHeader}>
-          <Text text40BL $textDefault>
-            {item.kanji.kanji?.character}
-          </Text>
-          <StatusIcon item={item} />
-        </RNView>
-        <Text text90M $textDefault numberOfLines={2}>
-          {message}
-        </Text>
-      </RNView>
-    </>
-  );
-
-  if (!onPress) return <RNView style={styles.row}>{content}</RNView>;
-
-  return (
-    <TouchableOpacity style={styles.row} onPress={onPress} accessibilityRole="button" accessibilityLabel={message}>
-      {content}
-    </TouchableOpacity>
-  );
-}
 
 export default function EvaluationResult() {
   const { t } = useTranslation();

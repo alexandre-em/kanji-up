@@ -1,9 +1,9 @@
 import { useNavigation } from '@react-navigation/native';
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ScrollView, TouchableOpacity, View as RNView } from 'react-native';
+import { ScrollView, View as RNView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Assets, Button, Colors, Icon, Text, View } from 'react-native-ui-lib';
+import { Button, Text, View } from 'react-native-ui-lib';
 
 import { screenNames } from '../../../constants/screens';
 import { useEvaluationInterstitialAd } from '../../../hooks/useEvaluationInterstitialAd';
@@ -14,96 +14,14 @@ import { syncKanjiProgression, user } from '../../../store/slices/user';
 import {
   computeWordProgressionDeltas,
   confirmItem,
-  getEffectiveStatus,
-  getKanjiCharacters,
   reset as resetWordEvaluation,
   selectWordCorrectCount,
   selectWordEvaluationItems,
   selectWordPendingReviewCount,
-  WordEvaluationItemType,
 } from '../../../store/slices/wordEvaluation';
+import ResultItemRow from './resultItemRow';
 import WordReviewModal from './reviewModal';
 import { useResultStyles } from './useResultStyles';
-
-function useItemMessage(item: WordEvaluationItemType) {
-  const { t } = useTranslation();
-  const expectedLength = getKanjiCharacters(item.word.word?.[0] ?? '').length;
-
-  if (item.status === 'correct') return t('wordEvaluationResult.status.correct');
-
-  if (item.status === 'incorrect') {
-    if (item.slots.length !== expectedLength) {
-      return t('wordEvaluationResult.status.wrongLength', { expected: expectedLength, actual: item.slots.length });
-    }
-    return t('wordEvaluationResult.status.empty');
-  }
-
-  if (item.userConfirmation === true) return t('wordEvaluationResult.status.confirmedCorrect');
-  if (item.userConfirmation === false) return t('wordEvaluationResult.status.confirmedIncorrect');
-  return t('wordEvaluationResult.status.review');
-}
-
-function StatusIcon({ item }: { item: WordEvaluationItemType }) {
-  const styles = useResultStyles();
-  const effectiveStatus = getEffectiveStatus(item);
-
-  if (effectiveStatus === 'correct') {
-    return (
-      <RNView style={[styles.statusIcon, { backgroundColor: Colors.$backgroundSuccessLight }]}>
-        <Icon source={Assets.icons.check} size={16} tintColor={Colors.$iconSuccess} />
-      </RNView>
-    );
-  }
-
-  if (effectiveStatus === 'incorrect') {
-    return (
-      <RNView style={[styles.statusIcon, { backgroundColor: Colors.$backgroundPrimaryLight }]}>
-        <Icon source={Assets.icons.cross} size={16} tintColor={Colors.$iconPrimary} />
-      </RNView>
-    );
-  }
-
-  return (
-    <RNView style={[styles.statusIcon, { backgroundColor: Colors.$backgroundWarningLight }]}>
-      <Text text80BO $textWarning>
-        ?
-      </Text>
-    </RNView>
-  );
-}
-
-type ResultItemRowProps = {
-  item: WordEvaluationItemType;
-  onPress: () => void;
-};
-
-function ResultItemRow({ item, onPress }: ResultItemRowProps) {
-  const styles = useResultStyles();
-  const message = useItemMessage(item);
-  const wordText = item.word.word?.[0] ?? '';
-  const meaning = item.word.definition?.[0]?.meaning?.join(', ');
-
-  return (
-    <TouchableOpacity style={styles.row} onPress={onPress} accessibilityRole="button" accessibilityLabel={message}>
-      <RNView style={styles.wordBox}>
-        <Text text40BL $textDefault>
-          {wordText}
-        </Text>
-      </RNView>
-      <RNView style={styles.rowContent}>
-        <RNView style={styles.rowHeader}>
-          <Text text80M $textDefault numberOfLines={1} style={styles.meaning}>
-            {meaning}
-          </Text>
-          <StatusIcon item={item} />
-        </RNView>
-        <Text text90M $textDefault numberOfLines={2}>
-          {message}
-        </Text>
-      </RNView>
-    </TouchableOpacity>
-  );
-}
 
 export default function WordEvaluationResult() {
   const { t } = useTranslation();
