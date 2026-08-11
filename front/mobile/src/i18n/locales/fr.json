@@ -74,6 +74,7 @@
   "wordEvaluation.drawModal.title": "Dessine le kanji",
   "wordEvaluation.drawModal.done": "Terminé",
   "wordEvaluation.drawModal.next": "Dessiner le kanji suivant",
+  "wordEvaluation.drawModal.delete": "Supprimer ce dessin",
   "wordEvaluation.drawModal.close": "Fermer sans enregistrer",
 
   "wordEvaluationResult.summary.score": "{{correct}} / {{total}} réussis",

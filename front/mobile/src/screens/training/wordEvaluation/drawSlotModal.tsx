@@ -19,9 +19,19 @@ type DrawSlotModalProps = {
   onClose: () => void;
   onDone: (image: string | null, strokesCount: number) => void;
   onDoneAndContinue: (image: string | null, strokesCount: number) => void;
+  /** Only set when editing an already-drawn slot — a fresh slot has nothing to delete yet, closing
+   * it (the X) already discards it */
+  onDelete?: () => void;
 };
 
-export default function DrawSlotModal({ visible, canAddAnother, onClose, onDone, onDoneAndContinue }: DrawSlotModalProps) {
+export default function DrawSlotModal({
+  visible,
+  canAddAnother,
+  onClose,
+  onDone,
+  onDoneAndContinue,
+  onDelete,
+}: DrawSlotModalProps) {
   const { t } = useTranslation();
   const canvasRef = useRef<WordSlotCanvasHandle>(null);
   const styles = useThemedStyles(() =>
@@ -93,6 +103,7 @@ export default function DrawSlotModal({ visible, canAddAnother, onClose, onDone,
         <RNView style={styles.canvasWrapper}>{visible && <WordSlotCanvas ref={canvasRef} size={CANVAS_WIDTH} />}</RNView>
         {canAddAnother && <Button label={t('wordEvaluation.drawModal.next')} onPress={handleDoneAndContinue} />}
         <Button label={t('wordEvaluation.drawModal.done')} onPress={handleDone} outline={canAddAnother} />
+        {onDelete && <Button label={t('wordEvaluation.drawModal.delete')} onPress={onDelete} outline />}
       </RNView>
     </Dialog>
   );

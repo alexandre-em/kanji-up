@@ -117,13 +117,14 @@ export default function WordEvaluationScreen() {
       slotImage: {
         borderRadius: 14,
       },
-      removeSlot: {
+      slotBadge: {
         position: 'absolute',
         top: -8,
         right: -8,
-        width: 24,
+        minWidth: 24,
         height: 24,
         borderRadius: 12,
+        paddingHorizontal: 6,
         backgroundColor: Colors.$backgroundPrimaryHeavy,
         alignItems: 'center',
         justifyContent: 'center',
@@ -179,9 +180,12 @@ export default function WordEvaluationScreen() {
     setActiveSlotId(id);
   }, []);
 
-  const handleRemoveSlot = useCallback((id: number) => {
-    setSlots((prev) => prev.filter((slot) => slot.id !== id));
-  }, []);
+  // Deleting from inside the modal (editing an existing drawing) also closes it — there is
+  // nothing left to show once the drawing it was showing is gone
+  const handleModalDelete = useCallback(() => {
+    setSlots((prev) => prev.filter((slot) => slot.id !== activeSlotId));
+    setActiveSlotId(null);
+  }, [activeSlotId]);
 
   const handleModalDone = useCallback(
     (image: string | null, strokesCount: number) => {
@@ -345,7 +349,7 @@ export default function WordEvaluationScreen() {
             showsHorizontalScrollIndicator={false}
             style={[styles.slotsScroll, { height: slotSize + 16 }]}
             contentContainerStyle={styles.slots}>
-            {filledSlots.map((slot) => (
+            {filledSlots.map((slot, index) => (
               <RNView key={slot.id} style={styles.slotWrapper}>
                 <TouchableOpacity
                   style={[styles.slot, { width: slotSize, height: slotSize }]}
@@ -357,9 +361,11 @@ export default function WordEvaluationScreen() {
                     style={[styles.slotImage, { width: slotSize, height: slotSize }]}
                   />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.removeSlot} onPress={() => handleRemoveSlot(slot.id)} accessibilityRole="button">
-                  <Icon source={Assets.icons.cross} size={14} tintColor="#fff" />
-                </TouchableOpacity>
+                <RNView style={styles.slotBadge}>
+                  <Text text100BO white>
+                    {index + 1}
+                  </Text>
+                </RNView>
               </RNView>
             ))}
             <TouchableOpacity
@@ -379,6 +385,7 @@ export default function WordEvaluationScreen() {
         onClose={handleModalClose}
         onDone={handleModalDone}
         onDoneAndContinue={handleModalDoneAndContinue}
+        onDelete={canAddAnother ? undefined : handleModalDelete}
       />
     </Layout>
   );
