@@ -150,6 +150,10 @@ export default function WordEvaluationScreen() {
 
   const currentItem = items[currentIndex];
   const isSessionOver = currentIndex >= items.length;
+  const activeSlot = useMemo(() => slots.find((slot) => slot.id === activeSlotId), [slots, activeSlotId]);
+  // Only a fresh, never-drawn slot can chain into another one — editing an existing drawing has
+  // nothing to "add" after it
+  const canAddAnother = activeSlot?.image === null;
   const filledSlots = useMemo(() => slots.filter((slot): slot is LocalSlot & { image: string } => slot.image !== null), [slots]);
   // A single-kanji word gets the full-size slot; a multi-kanji word shrinks each one so more of
   // the word fits on screen at once instead of scrolling through full-size tiles
@@ -183,6 +187,19 @@ export default function WordEvaluationScreen() {
     (image: string | null, strokesCount: number) => {
       setSlots((prev) => prev.map((slot) => (slot.id === activeSlotId ? { ...slot, image, strokesCount } : slot)));
       setActiveSlotId(null);
+    },
+    [activeSlotId],
+  );
+
+  // Same as handleModalDone, but chains straight into a fresh slot instead of closing the modal
+  const handleModalDoneAndContinue = useCallback(
+    (image: string | null, strokesCount: number) => {
+      const newId = nextSlotId.current++;
+      setSlots((prev) => [
+        ...prev.map((slot) => (slot.id === activeSlotId ? { ...slot, image, strokesCount } : slot)),
+        { id: newId, image: null, strokesCount: 0 },
+      ]);
+      setActiveSlotId(newId);
     },
     [activeSlotId],
   );
@@ -356,7 +373,13 @@ export default function WordEvaluationScreen() {
           <Button label={t('wordEvaluation.validate')} onPress={handleValidate} disabled={isSubmitting} />
         </RNView>
       </RNView>
-      <DrawSlotModal visible={activeSlotId !== null} onClose={handleModalClose} onDone={handleModalDone} />
+      <DrawSlotModal
+        visible={activeSlotId !== null}
+        canAddAnother={canAddAnother}
+        onClose={handleModalClose}
+        onDone={handleModalDone}
+        onDoneAndContinue={handleModalDoneAndContinue}
+      />
     </Layout>
   );
 }

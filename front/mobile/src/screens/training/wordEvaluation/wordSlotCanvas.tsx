@@ -6,6 +6,7 @@ import Canvas from '../../../components/canvas';
 export type WordSlotCanvasHandle = {
   capture: () => Promise<string>;
   getStrokesCount: () => number;
+  clear: () => void;
 };
 
 type WordSlotCanvasProps = {
@@ -14,6 +15,7 @@ type WordSlotCanvasProps = {
 
 const WordSlotCanvas = forwardRef<WordSlotCanvasHandle, WordSlotCanvasProps>(({ size }, ref) => {
   const viewShotRef = useRef<ViewShot>(null);
+  const canvasRef = useRef(null);
   const strokesCountRef = useRef(0);
   // Forcing the canvas to its white/black capture colors is a state change, so it needs a render
   // to actually commit before the snapshot is taken — see the effect below
@@ -36,11 +38,13 @@ const WordSlotCanvas = forwardRef<WordSlotCanvasHandle, WordSlotCanvasProps>(({ 
         setIsCapturing(true);
       }),
     getStrokesCount: () => strokesCountRef.current,
+    clear: () => (canvasRef.current as unknown as { clear: () => void } | null)?.clear(),
   }));
 
   return (
     <ViewShot ref={viewShotRef} style={{ width: size, height: size }} options={{ result: 'base64' }}>
       <Canvas
+        ref={canvasRef}
         width={size}
         height={size}
         strokeWidth={6}

@@ -13,11 +13,15 @@ const { Dialog } = Incubator;
 
 type DrawSlotModalProps = {
   visible: boolean;
+  /** Only a fresh, never-drawn slot can chain into another one — editing an existing drawing has
+   * nothing to "add" after it */
+  canAddAnother: boolean;
   onClose: () => void;
   onDone: (image: string | null, strokesCount: number) => void;
+  onDoneAndContinue: (image: string | null, strokesCount: number) => void;
 };
 
-export default function DrawSlotModal({ visible, onClose, onDone }: DrawSlotModalProps) {
+export default function DrawSlotModal({ visible, canAddAnother, onClose, onDone, onDoneAndContinue }: DrawSlotModalProps) {
   const { t } = useTranslation();
   const canvasRef = useRef<WordSlotCanvasHandle>(null);
   const styles = useThemedStyles(() =>
@@ -39,16 +43,27 @@ export default function DrawSlotModal({ visible, onClose, onDone }: DrawSlotModa
     }),
   );
 
-  const handleDone = async () => {
+  const submit = async () => {
     const strokesCount = canvasRef.current?.getStrokesCount() ?? 0;
 
     if (!canvasRef.current || strokesCount === 0) {
-      onDone(null, 0);
-      return;
+      return { image: null, strokesCount: 0 };
     }
 
     const image = await canvasRef.current.capture();
+    return { image, strokesCount };
+  };
+
+  const handleDone = async () => {
+    const { image, strokesCount } = await submit();
     onDone(image, strokesCount);
+  };
+
+  const handleDoneAndContinue = async () => {
+    const { image, strokesCount } = await submit();
+    onDoneAndContinue(image, strokesCount);
+    // The dialog stays open for the next kanji: only the canvas needs resetting
+    canvasRef.current?.clear();
   };
 
   return (
@@ -76,7 +91,8 @@ export default function DrawSlotModal({ visible, onClose, onDone }: DrawSlotModa
           </TouchableOpacity>
         </RNView>
         <RNView style={styles.canvasWrapper}>{visible && <WordSlotCanvas ref={canvasRef} size={CANVAS_WIDTH} />}</RNView>
-        <Button label={t('wordEvaluation.drawModal.done')} onPress={handleDone} />
+        {canAddAnother && <Button label={t('wordEvaluation.drawModal.next')} onPress={handleDoneAndContinue} />}
+        <Button label={t('wordEvaluation.drawModal.done')} onPress={handleDone} outline={canAddAnother} />
       </RNView>
     </Dialog>
   );

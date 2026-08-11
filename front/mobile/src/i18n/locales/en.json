@@ -196,6 +196,7 @@
   "wordEvaluation.error.retry": "Retry",
   "wordEvaluation.drawModal.title": "Draw the kanji",
   "wordEvaluation.drawModal.done": "Done",
+  "wordEvaluation.drawModal.next": "Draw the next kanji",
   "wordEvaluation.drawModal.close": "Close without saving",
 
   "wordEvaluationResult.summary.score": "{{correct}} / {{total}} correct",
