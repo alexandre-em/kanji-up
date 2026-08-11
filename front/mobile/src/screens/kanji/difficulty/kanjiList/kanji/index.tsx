@@ -12,7 +12,7 @@ import Layout from '../../../../../components/layout.tsx';
 import Spacing from '../../../../../components/spacing.tsx';
 import Lock from '../../../../../components/svg/lock';
 import SvgSilhouette from '../../../../../components/svgSilhouette.tsx';
-import { KANJI_PROGRESSION_MAX } from '../../../../../constants/progression.ts';
+import { getAccuracyPercent, KANJI_MASTERY_THRESHOLD_PERCENT } from '../../../../../constants/progression.ts';
 import { screenNames } from '../../../../../constants/screens.ts';
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from '../../../../../constants/styles.ts';
 import { PER_KANJI_UNLOCK_COST } from '../../../../../constants/unlockCosts.ts';
@@ -56,9 +56,7 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
   const jlptTag = getJlptTag(kanji?.kanji?.jlpt, t);
   const advancedTag = kanji && !gradeTag && !jlptTag ? getAdvancedTag(t) : undefined;
   // undefined = never practiced yet, distinct from a real 0 — no bar shown in that case
-  const progressionScore = userState.progression[character];
-  const progressPercent =
-    progressionScore !== undefined ? Math.min(100, Math.round((progressionScore / KANJI_PROGRESSION_MAX) * 100)) : null;
+  const progressPercent = getAccuracyPercent(userState.progression[character]);
   // A kanji can belong to both a JLPT tier and a school grade tier — locked here only means
   // every classification it has is a paid, not-yet-unlocked one (see utils/kanjiLock)
   const locked = useMemo(() => (kanji ? isKanjiLocked(kanji, userState) : false), [kanji, userState]);
@@ -254,7 +252,9 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
             <Text text90M $textNeutral>
               {t('kanjiDetails.mastery.title')}
             </Text>
-            <Text text90BO style={{ color: progressPercent >= 100 ? Colors.$textSuccess : Colors.$textPrimary }}>
+            <Text
+              text90BO
+              style={{ color: progressPercent > KANJI_MASTERY_THRESHOLD_PERCENT ? Colors.$textSuccess : Colors.$textPrimary }}>
               {progressPercent}%
             </Text>
           </View>
@@ -262,7 +262,9 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
           <ProgressBar
             progress={progressPercent}
             style={{ backgroundColor: Colors.$backgroundNeutralMedium }}
-            progressColor={progressPercent >= 100 ? Colors.$backgroundSuccessHeavy : Colors.$backgroundPrimaryHeavy}
+            progressColor={
+              progressPercent > KANJI_MASTERY_THRESHOLD_PERCENT ? Colors.$backgroundSuccessHeavy : Colors.$backgroundPrimaryHeavy
+            }
           />
         </>
       )}

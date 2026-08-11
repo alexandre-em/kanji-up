@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 import AccountSummary from '../../components/accountSummary';
 import Layout from '../../components/layout';
 import Spacing from '../../components/spacing';
-import { KANJI_PROGRESSION_MAX } from '../../constants/progression';
+import { isKanjiMastered } from '../../constants/progression';
 import { GENERAL_MARGIN } from '../../constants/styles';
 import { localDateKey, selectUserState } from '../../store/slices/user';
 
@@ -31,7 +31,7 @@ export default function Profile() {
   const { t, i18n } = useTranslation();
   const userState = useSelector(selectUserState);
 
-  const masteredCount = Object.values(userState.progression).filter((value) => value >= KANJI_PROGRESSION_MAX).length;
+  const masteredCount = Object.values(userState.progression).filter(isKanjiMastered).length;
   const hasAnyActivity = userState.totalScore > 0 || Object.keys(userState.progression).length > 0;
 
   // Fixed 7-day window (today + 6 previous days), not just the sparse days with an entry — a flat

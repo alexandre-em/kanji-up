@@ -11,7 +11,7 @@ import { TAB_BAR_TOTAL_HEIGHT } from '../../../../components/bottomNavBar';
 import Layout from '../../../../components/layout';
 import Spacing from '../../../../components/spacing';
 import Lock from '../../../../components/svg/lock';
-import { KANJI_PROGRESSION_MAX } from '../../../../constants/progression';
+import { getAccuracyPercent, KanjiProgressionEntry } from '../../../../constants/progression';
 import { screenNames } from '../../../../constants/screens';
 import { MAX_FREE_SELECTED_KANJI } from '../../../../constants/selectionLimit';
 import { BULK_UNLOCK_COST, getTierKey, PER_KANJI_UNLOCK_COST } from '../../../../constants/unlockCosts';
@@ -41,19 +41,18 @@ type KanjiCardElementProps = {
   kanji: Partial<KanjiType>;
   onPress: (kanji: Partial<KanjiType>) => void;
   isLocked: boolean;
-  /** undefined for a kanji never practiced yet — no bar shown, distinct from a real 0 */
-  progressionScore: number | undefined;
+  /** undefined for a kanji never practiced yet — no bar shown, distinct from a real 0% */
+  progressionEntry: KanjiProgressionEntry | number | undefined;
 };
 
 const CARD_SIZE = 50;
 
-const KanjiCardElement = ({ kanji, onPress, isLocked, progressionScore }: KanjiCardElementProps) => {
+const KanjiCardElement = ({ kanji, onPress, isLocked, progressionEntry }: KanjiCardElementProps) => {
   const entities = useSelector(selectSelectedKanji);
   const toAdd = useSelector(selectKanjiToAdd);
   const toRemove = useSelector(selectKanjiToDelete);
 
-  const progressPercent =
-    progressionScore !== undefined ? Math.min(100, Math.round((progressionScore / KANJI_PROGRESSION_MAX) * 100)) : null;
+  const progressPercent = getAccuracyPercent(progressionEntry);
 
   const color = useMemo(() => {
     if (toRemove[kanji.kanji_id!]) {
@@ -280,7 +279,7 @@ export default function KanjiList(props: KanjiListProps) {
             kanji={item}
             onPress={() => handlePress(item)}
             isLocked={isKanjiLocked(item, userState)}
-            progressionScore={userState.progression[item.kanji_id!]}
+            progressionEntry={userState.progression[item.kanji_id!]}
           />
         )}
         onEndReached={handleEndReached}

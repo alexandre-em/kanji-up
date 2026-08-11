@@ -163,7 +163,7 @@ export default function EvaluationResult() {
     const deltas = computeProgressionDeltas(items);
     const justMasteredAKanji = hasNewlyMasteredKanji(deltas, progressionState);
     deltas.forEach((delta) => dispatch(user.actions.updateProgression(delta)));
-    const points = deltas.filter((delta) => delta.inc > 0).length;
+    const points = deltas.filter((delta) => delta.correct).length;
     if (points > 0) dispatch(user.actions.addScore(points));
 
     setIsSaving(true);

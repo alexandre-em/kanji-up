@@ -13,7 +13,7 @@ import Layout from '../../components/layout';
 import Spacing from '../../components/spacing';
 import SearchIcon from '../../components/svg/search';
 import { homeMenuButtons } from '../../constants/homeButtons';
-import { KANJI_PROGRESSION_MAX } from '../../constants/progression';
+import { isKanjiMastered } from '../../constants/progression';
 import { screenNames } from '../../constants/screens';
 import { GENERAL_MARGIN } from '../../constants/styles';
 import { useRewardedCreditsAd } from '../../hooks/useRewardedCreditsAd';
@@ -44,14 +44,14 @@ export default function Home() {
 
   const missionsDoneCount = todayMissions ? Object.values(todayMissions.tasks).filter(Boolean).length : 0;
 
-  // "Mastered" mirrors the same threshold the evaluation flow itself uses to clamp progression —
-  // out of the kanji currently selected, not the whole joyo corpus, so this tracks what the user
-  // actually set out to learn rather than showing a near-zero, demotivating global percentage
+  // "Mastered" mirrors the same accuracy threshold the evaluation flow uses — out of the kanji
+  // currently selected, not the whole joyo corpus, so this tracks what the user actually set out
+  // to learn rather than showing a near-zero, demotivating global percentage
   const masteryPercent = useMemo(() => {
     const selectedCount = selectedKanjiState ? Object.keys(selectedKanjiState).length : 0;
     if (selectedCount === 0) return 0;
 
-    const masteredCount = Object.values(userState.progression ?? {}).filter((score) => score >= KANJI_PROGRESSION_MAX).length;
+    const masteredCount = Object.values(userState.progression ?? {}).filter(isKanjiMastered).length;
 
     return Math.min(100, Math.round((masteredCount / selectedCount) * 100));
   }, [userState.progression, selectedKanjiState]);
