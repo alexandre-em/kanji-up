@@ -36,7 +36,7 @@ export default function WordEvaluationHoc() {
         <View center>
           <ActivityIndicator color={Colors.$textPrimary} size="large" />
           <Spacing y={10} />
-          <Text>Loading kanji recognition model...</Text>
+          <Text $textDefault>Loading kanji recognition model...</Text>
         </View>
       </Layout>
     );

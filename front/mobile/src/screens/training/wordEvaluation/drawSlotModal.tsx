@@ -32,10 +32,21 @@ export default function DrawSlotModal({ visible, onClose, onDone }: DrawSlotModa
   };
 
   return (
-    <Dialog visible={visible} onDismiss={onClose} useSafeArea centerH centerV width="90%">
+    <Dialog
+      visible={visible}
+      onDismiss={onClose}
+      useSafeArea
+      centerH
+      centerV
+      width="90%"
+      // RNUI's Dialog memoizes its own background without a theme dependency, so it can freeze
+      // on whichever scheme was active at first mount — this forces it fresh on every render
+      containerStyle={{ backgroundColor: Colors.$backgroundDefault }}>
       <RNView style={styles.container}>
         <RNView style={styles.header}>
-          <Text text70BO>{t('wordEvaluation.drawModal.title')}</Text>
+          <Text text70BO $textDefault>
+            {t('wordEvaluation.drawModal.title')}
+          </Text>
           <TouchableOpacity onPress={onClose} accessibilityRole="button" accessibilityLabel={t('wordEvaluation.drawModal.close')}>
             <Icon source={Assets.icons.cross} size={18} tintColor={Colors.$iconNeutral} />
           </TouchableOpacity>
