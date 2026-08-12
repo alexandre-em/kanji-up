@@ -97,7 +97,6 @@ export default function WordDetail(props: WordDetailProps) {
       errorMessage={status === 'failed' || !word ? t('wordDetails.error') : undefined}>
       {word && (
         <>
-          <Spacing y={10} />
           <RNView style={styles.wordRow}>
             {word.word.map((spelling) => (
               <Text key={spelling} text50BL $textPrimary center>

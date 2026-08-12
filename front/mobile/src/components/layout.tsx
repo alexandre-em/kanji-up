@@ -97,7 +97,7 @@ export default function Layout({ screen, withTabBar, loadingMessage, errorMessag
         {!hideBanner && (
           <>
             <AppBannerAd style={styles.banner} />
-            <Spacing y={10} />
+            <Spacing y={20} />
           </>
         )}
         {body}
