@@ -2,7 +2,7 @@ import { predict } from '@kanjiup/recognition';
 import { useNavigation } from '@react-navigation/native';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, View as RNView } from 'react-native';
+import { ActivityIndicator, StyleSheet, View as RNView } from 'react-native';
 import { Assets, Button, Chip, Colors, Icon, ProgressBar, Text, View } from 'react-native-ui-lib';
 import ViewShot from 'react-native-view-shot';
 
@@ -12,6 +12,7 @@ import Spacing from '../../../components/spacing.tsx';
 import { RECOGNITION_MODEL_LABELS } from '../../../constants/recognitionLabels.ts';
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from '../../../constants/styles.ts';
 import { useAppDispatch, useAppSelector } from '../../../hooks/useStore';
+import { useThemedStyles } from '../../../hooks/useThemedStyles';
 import { useIsOffline } from '../../../providers/network';
 import { useToaster } from '../../../providers/toaster';
 import { selectCurrentIndex, selectEvaluationItems, updateItemScore } from '../../../store/slices/evaluation';
@@ -29,9 +30,52 @@ export default function EvaluationScreen() {
   const viewShotRef = useRef(null);
   const canvasRef = useRef(null);
   const [isCapturing, setIsCapturing] = useState(false);
+  // Spans the whole capture → predict → save pipeline, wider than isCapturing (which only covers
+  // the snapshot itself) — this is what the loader and the disabled Validate button key off
+  const [isSaving, setIsSaving] = useState(false);
   const [strokesCount, setStrokesCount] = useState(0);
   const [timer, setTimer] = useState<number>(TIMER_DURATION);
   const toast = useToaster();
+  const styles = useThemedStyles(() =>
+    StyleSheet.create({
+      yomi: {
+        flexDirection: 'row',
+        alignItems: 'center',
+      },
+      progressHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+      },
+      timer: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+      },
+      progressBar: {
+        height: 8,
+      },
+      viewShot: {
+        width: CANVAS_WIDTH,
+        height: CANVAS_HEIGHT,
+      },
+      canvasContainer: {
+        position: 'relative',
+      },
+      savingOverlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: Colors.$backgroundDefault,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 8,
+      },
+    }),
+  );
 
   const currentKanji = useMemo(() => {
     return evaluationItems[currentIndex];
@@ -41,38 +85,44 @@ export default function EvaluationScreen() {
   const isSessionOver = currentIndex >= evaluationItems.length;
 
   const onCapture = useCallback(() => {
+    setIsSaving(true);
     setIsCapturing(true);
   }, []);
 
   const onPredict = useCallback(
     (uri: string) => {
-      if (uri) {
-        const character = currentKanji?.kanji?.kanji?.character;
-
-        // The model only classifies into the fixed set it was trained on — calling predict() for
-        // a character outside that set can only ever misclassify. Passing no predictions routes
-        // this to the existing 'review' status (updateItemScore), same as a doubtful answer the
-        // model failed to recognize: the user arbitrates it themselves on the result screen.
-        if (character && !RECOGNITION_MODEL_LABELS.has(character)) {
-          dispatch(updateItemScore({ result: [], strokesCount, image: uri }));
-          toast?.show({ message: 'Answer saved', type: 'success' });
-          setTimer(TIMER_DURATION);
-          return;
-        }
-
-        predict(uri)
-          .then((res: PredictionType[]) => {
-            // The drawing is kept: the user needs to see it again to arbitrate a doubtful answer
-            dispatch(updateItemScore({ result: res, strokesCount, image: uri }));
-            toast?.show({ message: 'Answer saved', type: 'success' });
-          })
-          .catch(() => {
-            toast?.show({ message: 'An error occurred when saving the answer', type: 'failure' });
-          })
-          .finally(() => {
-            setTimer(TIMER_DURATION);
-          });
+      if (!uri) {
+        setIsSaving(false);
+        return;
       }
+
+      const character = currentKanji?.kanji?.kanji?.character;
+
+      // The model only classifies into the fixed set it was trained on — calling predict() for
+      // a character outside that set can only ever misclassify. Passing no predictions routes
+      // this to the existing 'review' status (updateItemScore), same as a doubtful answer the
+      // model failed to recognize: the user arbitrates it themselves on the result screen.
+      if (character && !RECOGNITION_MODEL_LABELS.has(character)) {
+        dispatch(updateItemScore({ result: [], strokesCount, image: uri }));
+        toast?.show({ message: 'Answer saved', type: 'success' });
+        setTimer(TIMER_DURATION);
+        setIsSaving(false);
+        return;
+      }
+
+      predict(uri)
+        .then((res: PredictionType[]) => {
+          // The drawing is kept: the user needs to see it again to arbitrate a doubtful answer
+          dispatch(updateItemScore({ result: res, strokesCount, image: uri }));
+          toast?.show({ message: 'Answer saved', type: 'success' });
+        })
+        .catch(() => {
+          toast?.show({ message: 'An error occurred when saving the answer', type: 'failure' });
+        })
+        .finally(() => {
+          setTimer(TIMER_DURATION);
+          setIsSaving(false);
+        });
     },
     [dispatch, toast, strokesCount, currentKanji],
   );
@@ -121,6 +171,10 @@ export default function EvaluationScreen() {
         .then((uri: string) => {
           onPredict(uri);
         })
+        .catch(() => {
+          toast?.show({ message: 'An error occurred when saving the answer', type: 'failure' });
+          setIsSaving(false);
+        })
         .finally(() => {
           setIsCapturing(false);
           canvasRef.current?.clear();
@@ -128,7 +182,7 @@ export default function EvaluationScreen() {
     }, 200);
 
     return () => clearTimeout(timeout);
-  }, [isCapturing, onPredict]);
+  }, [isCapturing, onPredict, toast]);
 
   // Same route as the quiz (see EvaluationHoc): no separate screen to navigate to, so there is
   // no "back into the quiz" state for the Android back button to return to
@@ -187,53 +241,37 @@ export default function EvaluationScreen() {
           </RNView>
         </View>
         <View centerH>
-          <ViewShot ref={viewShotRef} style={styles.viewShot} options={{ result: 'base64' }}>
-            <Canvas
-              ref={canvasRef}
-              width={CANVAS_WIDTH}
-              height={CANVAS_HEIGHT}
-              hideGuides={isCapturing}
-              hideBorder={isCapturing}
-              hideClearButton={isCapturing}
-              forceCaptureColors={isCapturing}
-              onStrokeUpdate={setStrokesCount}
-            />
-          </ViewShot>
+          <RNView style={styles.canvasContainer}>
+            <ViewShot ref={viewShotRef} style={styles.viewShot} options={{ result: 'base64' }}>
+              <Canvas
+                ref={canvasRef}
+                width={CANVAS_WIDTH}
+                height={CANVAS_HEIGHT}
+                hideGuides={isCapturing}
+                hideBorder={isCapturing}
+                hideClearButton={isCapturing}
+                forceCaptureColors={isCapturing}
+                onStrokeUpdate={setStrokesCount}
+              />
+            </ViewShot>
+            {/* Covers the gap between the drawing being captured and the next kanji appearing —
+                without this the canvas just sits blank (freshly cleared) with no sign anything
+                is happening while predict() and the save are still in flight */}
+            {isSaving && !isCapturing && (
+              <RNView style={styles.savingOverlay}>
+                <ActivityIndicator color={Colors.$textPrimary} size="large" />
+              </RNView>
+            )}
+          </RNView>
           <Spacing y={5} />
           <Text text70BL $textPrimary>
             Strokes : {strokesCount}
           </Text>
         </View>
         {/* <Spacing y={20} /> */}
-        <Button label="Validate" onPress={onCapture} disabled={isSessionOver} />
+        <Button label="Validate" onPress={onCapture} disabled={isSessionOver || isSaving} />
       </View>
       {/* <Image source={{ uri: 'data:image/png;base64,' + source }} /> */}
     </Layout>
   );
 }
-
-const styles = StyleSheet.create({
-  yomi: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  progressHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  timer: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  progressBar: {
-    height: 8,
-  },
-  // transparent: { backgroundColor: '#00000000' },
-  viewShot: {
-    width: CANVAS_WIDTH,
-    height: CANVAS_HEIGHT,
-  },
-});
