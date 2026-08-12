@@ -233,9 +233,8 @@
   "wordDetails.mastery.title": "Maîtrise",
   "wordDetails.readings": "Lectures",
   "wordDetails.kanji.title": "Kanji de ce mot",
-  "wordDetails.kanji.subtitle": "Touche un kanji que tu ne connais pas encore pour l'ajouter à ta sélection",
-  "wordDetails.kanji.added": "Ajouté à ta sélection",
-  "wordDetails.kanji.removed": "Retiré de ta sélection",
+  "wordDetails.kanji.subtitle": "Touche un kanji pour voir ses détails",
+  "wordDetails.kanji.viewDetail": "Voir les détails de {{character}}",
   "wordDetails.definitions": "Signification",
 
   "ocr.title": "Scan",

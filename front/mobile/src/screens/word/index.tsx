@@ -1,16 +1,16 @@
+import { useNavigation } from '@react-navigation/native';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TouchableOpacity, View as RNView } from 'react-native';
-import { Assets, Colors, Icon, ProgressBar, Text } from 'react-native-ui-lib';
+import { Colors, ProgressBar, Text } from 'react-native-ui-lib';
 
 import Layout from '../../components/layout';
 import Spacing from '../../components/spacing';
 import { getAccuracyPercent, PROGRESSION_MASTERY_THRESHOLD_PERCENT } from '../../constants/progression';
+import { screenNames } from '../../constants/screens';
 import { useAppDispatch, useAppSelector } from '../../hooks/useStore';
-import { useToaster } from '../../providers/toaster';
 import { core } from '../../services/http';
-import { getOne as getKanji, selectEntities } from '../../store/slices/kanji';
-import { save, selectedKanji, selectSelectedKanji } from '../../store/slices/selectedKanji';
+import { search as searchKanji, selectSearchResult } from '../../store/slices/kanji';
 import { selectUserState } from '../../store/slices/user';
 import { getKanjiCharacters } from '../../store/slices/wordEvaluation';
 import { useWordDetailStyles } from './useWordDetailStyles';
@@ -20,15 +20,14 @@ type WordDetailProps = RouteParamsProps<{ id: string }>;
 export default function WordDetail(props: WordDetailProps) {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
-  const toast = useToaster();
+  const navigation = useNavigation();
   const { id } = props.route.params;
   const styles = useWordDetailStyles();
 
   const [word, setWord] = useState<WordType | null>(null);
   const [status, setStatus] = useState<RequestStatusType>('pending');
 
-  const kanjiEntities = useAppSelector(selectEntities);
-  const selectedKanjiState = useAppSelector(selectSelectedKanji);
+  const searchResults = useAppSelector(selectSearchResult);
   const userState = useAppSelector(selectUserState);
 
   useEffect(() => {
@@ -46,18 +45,25 @@ export default function WordDetail(props: WordDetailProps) {
 
   useEffect(() => {
     characters.forEach((character) => {
-      if (!kanjiEntities[character]) dispatch(getKanji(character));
+      dispatch(searchKanji({ query: character, limit: 5 }));
     });
-  }, [characters, kanjiEntities, dispatch]);
+  }, [characters, dispatch]);
 
-  const handleToggleKanji = (character: string) => {
-    const kanjiEntity = kanjiEntities[character];
-    if (!kanjiEntity) return;
+  // The detail screen is keyed by kanji_id, not the glyph itself — a word only carries the
+  // character, so its real kanji_id has to be resolved through search before navigating
+  const kanjiIdByCharacter = useMemo(() => {
+    const map: Record<string, string> = {};
+    characters.forEach((character) => {
+      const match = searchResults[character]?.results.find((entry) => entry.kanji?.character === character);
+      if (match?.kanji_id) map[character] = match.kanji_id;
+    });
+    return map;
+  }, [characters, searchResults]);
 
-    const isSelected = !!selectedKanjiState[character];
-    dispatch(isSelected ? selectedKanji.actions.unSelectKanji(kanjiEntity) : selectedKanji.actions.selectKanji(kanjiEntity));
-    dispatch(save());
-    toast?.show({ message: t(isSelected ? 'wordDetails.kanji.removed' : 'wordDetails.kanji.added'), type: 'success' });
+  const handlePressKanji = (character: string) => {
+    const kanjiId = kanjiIdByCharacter[character];
+    if (!kanjiId) return;
+    navigation.navigate(screenNames.KANJI, { character: kanjiId });
   };
 
   // Below the 20-attempt minimum (including zero answers), the real percentage isn't meaningful
@@ -126,27 +132,18 @@ export default function WordDetail(props: WordDetailProps) {
               </Text>
               <Spacing y={12} />
               <RNView style={styles.chipRow}>
-                {characters.map((character) => {
-                  const isSelected = !!selectedKanjiState[character];
-
-                  return (
-                    <TouchableOpacity
-                      key={character}
-                      onPress={() => handleToggleKanji(character)}
-                      style={[styles.kanjiTile, isSelected && styles.kanjiTileSelected]}
-                      accessibilityRole="button"
-                      accessibilityLabel={t(isSelected ? 'wordDetails.kanji.removed' : 'wordDetails.kanji.added')}>
-                      <Text text50BL center>
-                        {character}
-                      </Text>
-                      {isSelected && (
-                        <RNView style={styles.kanjiCheck}>
-                          <Icon source={Assets.icons.check} size={14} tintColor={Colors.$iconSuccess} />
-                        </RNView>
-                      )}
-                    </TouchableOpacity>
-                  );
-                })}
+                {characters.map((character) => (
+                  <TouchableOpacity
+                    key={character}
+                    onPress={() => handlePressKanji(character)}
+                    style={styles.kanjiTile}
+                    accessibilityRole="button"
+                    accessibilityLabel={t('wordDetails.kanji.viewDetail', { character })}>
+                    <Text text50BL center $textDefault>
+                      {character}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
               </RNView>
             </>
           )}

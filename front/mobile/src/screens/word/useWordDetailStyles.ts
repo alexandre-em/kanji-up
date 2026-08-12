@@ -31,15 +31,6 @@ export function useWordDetailStyles() {
         borderWidth: 1,
         borderColor: Colors.$outlineNeutral,
       },
-      kanjiTileSelected: {
-        borderColor: Colors.$backgroundSuccessHeavy,
-        backgroundColor: Colors.$backgroundSuccessLight,
-      },
-      kanjiCheck: {
-        position: 'absolute',
-        top: 4,
-        right: 4,
-      },
       definitionRow: {
         paddingVertical: 8,
         borderBottomWidth: StyleSheet.hairlineWidth,
