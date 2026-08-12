@@ -7,6 +7,7 @@ import { Colors, Text } from 'react-native-ui-lib';
 
 import { screenNames } from '../../constants/screens';
 import { useAppDispatch, useAppSelector } from '../../hooks/useStore';
+import { useToaster } from '../../providers/toaster';
 import { search, selectSearchResult, selectSearchStatus } from '../../store/slices/word';
 import WordResultCard from './components/wordResultCard';
 
@@ -20,6 +21,7 @@ export default function WordResults({ query, bottomPadding = 0 }: WordResultsPro
   const { t } = useTranslation();
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
+  const toast = useToaster();
   const results = useAppSelector(selectSearchResult);
   const status = useAppSelector(selectSearchStatus);
 
@@ -27,8 +29,10 @@ export default function WordResults({ query, bottomPadding = 0 }: WordResultsPro
 
   const handleEndReached = useCallback(() => {
     if (!cache || cache.current >= cache.totalPages || status === 'pending') return;
-    dispatch(search({ query, page: cache.current + 1 }));
-  }, [cache, status, dispatch, query]);
+    dispatch(search({ query, page: cache.current + 1 }))
+      .unwrap()
+      .catch(() => toast?.show({ message: t('search.error'), type: 'failure' }));
+  }, [cache, status, dispatch, query, toast, t]);
 
   const handlePress = useCallback(
     (word: WordType) => {

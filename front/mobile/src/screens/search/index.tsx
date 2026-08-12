@@ -48,18 +48,28 @@ export default function Search() {
   const trimmedQuery = query.trim();
 
   // Only fetches a segment the user actually looks at: switching tabs re-uses the other
-  // segment's cache-by-query if it's already there, and only dispatches when it isn't
+  // segment's cache-by-query if it's already there, and only dispatches when it isn't.
+  // Toasts straight off this specific dispatch's outcome (.unwrap().catch()) rather than
+  // watching the slice's shared status flag — that flag isn't scoped to a query, so a failure
+  // from an unrelated request (an old query, a background pagination fetch) would falsely toast
+  // for a search that actually succeeded.
   const runSearch = useCallback(
     (q: string, segment: number) => {
       if (q === '') return;
 
       if (segment === KANJI_SEGMENT) {
-        if (!kanjiResults[q]) dispatch(searchKanji({ query: q }));
+        if (!kanjiResults[q]) {
+          dispatch(searchKanji({ query: q }))
+            .unwrap()
+            .catch(() => toast?.show({ message: t('search.error'), type: 'failure' }));
+        }
       } else if (!wordResults[q]) {
-        dispatch(searchWord({ query: q }));
+        dispatch(searchWord({ query: q }))
+          .unwrap()
+          .catch(() => toast?.show({ message: t('search.error'), type: 'failure' }));
       }
     },
-    [dispatch, kanjiResults, wordResults],
+    [dispatch, kanjiResults, wordResults, toast, t],
   );
 
   const handleChangeText = useCallback(
@@ -102,13 +112,6 @@ export default function Search() {
   // cache already holds this exact query is what actually tells us a search for it has run.
   const activeCache = activeSegment === KANJI_SEGMENT ? kanjiResults[trimmedQuery] : wordResults[trimmedQuery];
   const activeResultCount = activeCache?.results.length ?? 0;
-
-  useEffect(() => {
-    // Same caveat as activeCache above: activeStatus is global to the slice, so a failure from an
-    // unrelated request (e.g. a background pagination fetch) shouldn't toast while the current
-    // query's results are already cached and rendering fine
-    if (activeStatus === 'failed' && !activeCache) toast?.show({ message: t('search.error'), type: 'failure' });
-  }, [activeStatus, activeCache, toast, t]);
 
   // Clear the pending debounce timer on unmount, so it doesn't fire a search after leaving
   useEffect(() => () => clearTimeout(debounceRef.current), []);
