@@ -24,10 +24,6 @@ export default function WordDetail(props: WordDetailProps) {
   const { id } = props.route.params;
   const styles = useThemedStyles(() =>
     StyleSheet.create({
-      center: {
-        paddingVertical: 60,
-        alignItems: 'center',
-      },
       chipRow: {
         flexDirection: 'row',
         flexWrap: 'wrap',
@@ -113,124 +109,119 @@ export default function WordDetail(props: WordDetailProps) {
     toast?.show({ message: t(isSelected ? 'wordDetails.kanji.removed' : 'wordDetails.kanji.added'), type: 'success' });
   };
 
-  if (status === 'pending') {
-    return <Layout screen="wordDetails" loadingMessage={t('loading.title')} />;
-  }
-
-  if (status === 'failed' || !word) {
-    return (
-      <Layout screen="wordDetails">
-        <RNView style={styles.center}>
-          <Text text80M $textGeneral center>
-            {t('wordDetails.error')}
-          </Text>
-        </RNView>
-      </Layout>
-    );
-  }
-
   // Below the 20-attempt minimum (including zero answers), the real percentage isn't meaningful
   // yet — shown as an empty 0% bar rather than hiding the section entirely, same as kanji detail
-  const displayPercent = getAccuracyPercent(userState.wordProgression[word.word_id]) ?? 0;
+  const displayPercent = word ? (getAccuracyPercent(userState.wordProgression[word.word_id]) ?? 0) : 0;
 
   return (
-    <Layout screen="wordDetails">
-      <RNView style={styles.chipRow}>
-        {word.word.map((spelling) => (
-          <Text key={spelling} text50BL $textPrimary>
-            {spelling}
-          </Text>
-        ))}
-      </RNView>
+    <Layout
+      screen="wordDetails"
+      loadingMessage={status === 'pending' ? t('loading.title') : undefined}
+      errorMessage={status === 'failed' || !word ? t('wordDetails.error') : undefined}>
+      {word && (
+        <>
+          <RNView style={styles.chipRow}>
+            {word.word.map((spelling) => (
+              <Text key={spelling} text50BL $textPrimary>
+                {spelling}
+              </Text>
+            ))}
+          </RNView>
 
-      <Spacing y={16} />
-      <RNView style={styles.masteryRow}>
-        <Text text90M $textNeutral>
-          {t('wordDetails.mastery.title')}
-        </Text>
-        <Text
-          text90BO
-          style={{ color: displayPercent > PROGRESSION_MASTERY_THRESHOLD_PERCENT ? Colors.$textSuccess : Colors.$textPrimary }}>
-          {displayPercent}%
-        </Text>
-      </RNView>
-      <Spacing y={4} />
-      <ProgressBar
-        progress={displayPercent}
-        style={{ backgroundColor: Colors.$backgroundNeutralMedium }}
-        progressColor={
-          displayPercent > PROGRESSION_MASTERY_THRESHOLD_PERCENT ? Colors.$backgroundSuccessHeavy : Colors.$backgroundPrimaryHeavy
-        }
-      />
-
-      <Spacing y={20} />
-      <Text text70BO>{t('wordDetails.readings')}</Text>
-      <Spacing y={8} />
-      <RNView style={styles.chipRow}>
-        {word.reading.map((reading) => (
-          <RNView key={reading} style={styles.chip}>
-            <Text text80M $textPrimary>
-              {reading}
+          <Spacing y={16} />
+          <RNView style={styles.masteryRow}>
+            <Text text90M $textNeutral>
+              {t('wordDetails.mastery.title')}
+            </Text>
+            <Text
+              text90BO
+              style={{
+                color: displayPercent > PROGRESSION_MASTERY_THRESHOLD_PERCENT ? Colors.$textSuccess : Colors.$textPrimary,
+              }}>
+              {displayPercent}%
             </Text>
           </RNView>
-        ))}
-      </RNView>
-
-      {characters.length > 0 && (
-        <>
-          <Spacing y={20} />
-          <Text text70BO>{t('wordDetails.kanji.title')}</Text>
           <Spacing y={4} />
-          <Text text90M $textNeutral>
-            {t('wordDetails.kanji.subtitle')}
-          </Text>
-          <Spacing y={12} />
+          <ProgressBar
+            progress={displayPercent}
+            style={{ backgroundColor: Colors.$backgroundNeutralMedium }}
+            progressColor={
+              displayPercent > PROGRESSION_MASTERY_THRESHOLD_PERCENT
+                ? Colors.$backgroundSuccessHeavy
+                : Colors.$backgroundPrimaryHeavy
+            }
+          />
+
+          <Spacing y={20} />
+          <Text text70BO>{t('wordDetails.readings')}</Text>
+          <Spacing y={8} />
           <RNView style={styles.chipRow}>
-            {characters.map((character) => {
-              const isSelected = !!selectedKanjiState[character];
-
-              return (
-                <TouchableOpacity
-                  key={character}
-                  onPress={() => handleToggleKanji(character)}
-                  style={[styles.kanjiTile, isSelected && styles.kanjiTileSelected]}
-                  accessibilityRole="button"
-                  accessibilityLabel={t(isSelected ? 'wordDetails.kanji.removed' : 'wordDetails.kanji.added')}>
-                  <Text text50BL center>
-                    {character}
-                  </Text>
-                  {isSelected && (
-                    <RNView style={styles.kanjiCheck}>
-                      <Icon source={Assets.icons.check} size={14} tintColor={Colors.$iconSuccess} />
-                    </RNView>
-                  )}
-                </TouchableOpacity>
-              );
-            })}
+            {word.reading.map((reading) => (
+              <RNView key={reading} style={styles.chip}>
+                <Text text80M $textPrimary>
+                  {reading}
+                </Text>
+              </RNView>
+            ))}
           </RNView>
-        </>
-      )}
 
-      <Spacing y={20} />
-      <Text text70BO>{t('wordDetails.definitions')}</Text>
-      <Spacing y={8} />
-      {word.definition.map((definition, index) => (
-        <RNView key={index} style={styles.definitionRow}>
-          <Text text80M $textDefault>
-            {definition.meaning.join(', ')}
-          </Text>
-          {definition.example?.map((example, exampleIndex) => (
-            <RNView key={example.sentence_id ?? exampleIndex} style={styles.exampleRow}>
-              <Text text90M $textDefault>
-                {example.sentence}
-              </Text>
+          {characters.length > 0 && (
+            <>
+              <Spacing y={20} />
+              <Text text70BO>{t('wordDetails.kanji.title')}</Text>
+              <Spacing y={4} />
               <Text text90M $textNeutral>
-                {example.translation}
+                {t('wordDetails.kanji.subtitle')}
               </Text>
+              <Spacing y={12} />
+              <RNView style={styles.chipRow}>
+                {characters.map((character) => {
+                  const isSelected = !!selectedKanjiState[character];
+
+                  return (
+                    <TouchableOpacity
+                      key={character}
+                      onPress={() => handleToggleKanji(character)}
+                      style={[styles.kanjiTile, isSelected && styles.kanjiTileSelected]}
+                      accessibilityRole="button"
+                      accessibilityLabel={t(isSelected ? 'wordDetails.kanji.removed' : 'wordDetails.kanji.added')}>
+                      <Text text50BL center>
+                        {character}
+                      </Text>
+                      {isSelected && (
+                        <RNView style={styles.kanjiCheck}>
+                          <Icon source={Assets.icons.check} size={14} tintColor={Colors.$iconSuccess} />
+                        </RNView>
+                      )}
+                    </TouchableOpacity>
+                  );
+                })}
+              </RNView>
+            </>
+          )}
+
+          <Spacing y={20} />
+          <Text text70BO>{t('wordDetails.definitions')}</Text>
+          <Spacing y={8} />
+          {word.definition.map((definition, index) => (
+            <RNView key={index} style={styles.definitionRow}>
+              <Text text80M $textDefault>
+                {definition.meaning.join(', ')}
+              </Text>
+              {definition.example?.map((example, exampleIndex) => (
+                <RNView key={example.sentence_id ?? exampleIndex} style={styles.exampleRow}>
+                  <Text text90M $textDefault>
+                    {example.sentence}
+                  </Text>
+                  <Text text90M $textNeutral>
+                    {example.translation}
+                  </Text>
+                </RNView>
+              ))}
             </RNView>
           ))}
-        </RNView>
-      ))}
+        </>
+      )}
     </Layout>
   );
 }

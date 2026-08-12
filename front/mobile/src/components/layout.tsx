@@ -22,13 +22,17 @@ type LayoutProps = {
    * depends on an async fetch (e.g. a detail page keyed by a route param) that hasn't resolved
    * yet — omit (or pass an empty string) to render children normally */
   loadingMessage?: string;
+  /** Shows this message in place of children when a fetch the screen depends on has failed —
+   * for a plain "couldn't load" message only; a screen that also needs a Retry action keeps its
+   * own hand-rolled error block instead, since this prop takes no callback */
+  errorMessage?: string;
 };
 
 const { height } = Dimensions.get('window');
 /** Scroll distance ignored before hiding/showing the tab bar, to avoid flickering on small moves */
 const SCROLL_THRESHOLD = 8;
 
-export default function Layout({ screen, withTabBar, loadingMessage, children }: LayoutProps & PropsWithChildren) {
+export default function Layout({ screen, withTabBar, loadingMessage, errorMessage, children }: LayoutProps & PropsWithChildren) {
   const { t } = useTranslation();
 
   const headerHeight = useHeaderHeight();
@@ -67,7 +71,10 @@ export default function Layout({ screen, withTabBar, loadingMessage, children }:
     lastOffset.value = offset;
   });
 
-  return (
+  // Shared chrome (scroll wrapper, title/subtitle, banner) is identical across every state — only
+  // the body below it changes, so it's factored into one render function instead of repeating the
+  // whole wrapper for each of the three early returns below
+  const renderWithChrome = (body: PropsWithChildren['children']) => (
     <Animated.ScrollView
       style={[styles.container, { backgroundColor: Colors.$backgroundDefault }]}
       contentContainerStyle={{ paddingBottom: bottomClearance + GENERAL_MARGIN }}
@@ -93,18 +100,32 @@ export default function Layout({ screen, withTabBar, loadingMessage, children }:
             <Spacing y={10} />
           </>
         )}
-        {loadingMessage ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator color={Colors.$backgroundPrimaryHeavy} size="large" />
-            <Spacing y={12} />
-            <Text $textDefault>{loadingMessage}</Text>
-          </View>
-        ) : (
-          children
-        )}
+        {body}
       </View>
     </Animated.ScrollView>
   );
+
+  if (loadingMessage) {
+    return renderWithChrome(
+      <View style={styles.centerMessage}>
+        <ActivityIndicator color={Colors.$backgroundPrimaryHeavy} size="large" />
+        <Spacing y={12} />
+        <Text $textDefault>{loadingMessage}</Text>
+      </View>,
+    );
+  }
+
+  if (errorMessage) {
+    return renderWithChrome(
+      <View style={styles.centerMessage}>
+        <Text $textDefault center>
+          {errorMessage}
+        </Text>
+      </View>,
+    );
+  }
+
+  return renderWithChrome(children);
 }
 
 const styles = StyleSheet.create({
@@ -116,7 +137,7 @@ const styles = StyleSheet.create({
   banner: {
     alignItems: 'center',
   },
-  loadingContainer: {
+  centerMessage: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',

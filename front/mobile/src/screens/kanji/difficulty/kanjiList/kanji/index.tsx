@@ -172,15 +172,7 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
   // across every kanji fetch, so navigating straight from one detail page to another can read a
   // stale 'succeeded' from the previous character for a frame before the new fetch's 'pending' lands
   if (!kanji && getOneStatus === 'failed') {
-    return (
-      <Layout screen="kanji">
-        <View style={styles.loadingContainer}>
-          <Text text80M $textNeutral center>
-            {t('kanjiDetails.loadError')}
-          </Text>
-        </View>
-      </Layout>
-    );
+    return <Layout screen="kanji" errorMessage={t('kanjiDetails.loadError')} />;
   }
 
   if (!kanji) {
