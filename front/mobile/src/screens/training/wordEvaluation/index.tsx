@@ -112,9 +112,13 @@ export default function WordEvaluationScreen() {
   // A single-kanji word gets the full-size slot; a multi-kanji word shrinks each one so more of
   // the word fits on screen at once instead of scrolling through full-size tiles
   const slotSize = filledSlots.length > 1 ? SLOT_SIZE_COMPACT : SLOT_SIZE;
-  // No example sentence contains any of this word's spellings verbatim: falls back to the plain
-  // meaning hint below rather than leaving the player with nothing to go on
+  // No example sentence contains any of this word's spellings verbatim: falls back to its
+  // reading below rather than leaving the player with nothing to go on
   const exampleHint = useMemo(() => (currentItem ? findMaskedExampleHint(currentItem.word) : null), [currentItem]);
+  const firstKanjiSegmentIndex = useMemo(
+    () => exampleHint?.segments.findIndex((segment) => segment.isKanji) ?? -1,
+    [exampleHint],
+  );
 
   useEffect(() => {
     setSlots([]);
@@ -271,22 +275,38 @@ export default function WordEvaluationScreen() {
               <Text text60M $textDefault>
                 {exampleHint.prefix}
               </Text>
-              <RNView style={styles.hintBlank}>
-                {exampleHint.reading && (
-                  <Text style={styles.hintReading} numberOfLines={1}>
-                    {exampleHint.reading}
+              {exampleHint.segments.map((segment, index) =>
+                segment.isKanji ? (
+                  <RNView key={index} style={styles.hintBlank}>
+                    {index === firstKanjiSegmentIndex && exampleHint.reading && (
+                      <Text style={styles.hintReading} numberOfLines={1}>
+                        {exampleHint.reading}
+                      </Text>
+                    )}
+                    <RNView style={[styles.hintChip, { width: Math.max(40, segment.text.length * 22) }]} />
+                  </RNView>
+                ) : (
+                  <Text key={index} text60M $textDefault>
+                    {segment.text}
                   </Text>
-                )}
-                <RNView style={[styles.hintChip, { width: Math.max(40, exampleHint.spelling.length * 22) }]} />
-              </RNView>
+                ),
+              )}
               <Text text60M $textDefault>
                 {exampleHint.suffix}
               </Text>
             </RNView>
           ) : (
-            <Text h1 $textDefault>
-              {currentItem?.word.definition?.[0]?.meaning?.join(', ')}
-            </Text>
+            // No example sentence contains this word: fall back to its reading, plus the
+            // translation underneath since there's no sentence context to lean on here
+            <>
+              <Text h1 $textDefault>
+                {currentItem?.word.reading?.[0]}
+              </Text>
+              <Spacing y={6} />
+              <Text text80M $textNeutral>
+                {currentItem?.word.definition?.[0]?.meaning?.join(', ')}
+              </Text>
+            </>
           )}
         </RNView>
 

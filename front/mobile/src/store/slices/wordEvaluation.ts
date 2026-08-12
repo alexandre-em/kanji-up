@@ -36,7 +36,7 @@ export function getEffectiveStatus(item: WordEvaluationItemType): AnswerStatusTy
   return item.userConfirmation ? 'correct' : 'incorrect';
 }
 
-const KANJI_REGEX = /[一-鿿㐀-䶿]/;
+export const KANJI_REGEX = /[一-鿿㐀-䶿]/;
 
 export function getKanjiCharacters(word: string): string[] {
   return Array.from(word).filter((character) => KANJI_REGEX.test(character));

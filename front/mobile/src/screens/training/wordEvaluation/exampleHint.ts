@@ -1,9 +1,33 @@
+import { KANJI_REGEX } from '../../../store/slices/wordEvaluation';
+
+export type SpellingSegment = { text: string; isKanji: boolean };
+
 export type MaskedExampleHint = {
   prefix: string;
   suffix: string;
-  spelling: string;
+  segments: SpellingSegment[];
   reading: string | null;
 };
+
+// Only the kanji runs are what the player actually draws — any okurigana/kana mixed into the
+// spelling (e.g. 食べる) has nothing to draw, so it stays visible as plain text between blanks
+// instead of being masked along with the kanji.
+function splitIntoSegments(spelling: string): SpellingSegment[] {
+  const segments: SpellingSegment[] = [];
+
+  for (const character of spelling) {
+    const isKanji = KANJI_REGEX.test(character);
+    const last = segments[segments.length - 1];
+
+    if (last && last.isKanji === isKanji) {
+      last.text += character;
+    } else {
+      segments.push({ text: character, isKanji });
+    }
+  }
+
+  return segments;
+}
 
 // Picks a random example sentence (across all definitions) that literally contains one of the
 // word's spellings, so it can be masked out and replaced by a blank the player has to draw.
@@ -28,7 +52,7 @@ export function findMaskedExampleHint(word: Partial<WordType>): MaskedExampleHin
         hints.push({
           prefix: sentence.slice(0, matchIndex),
           suffix: sentence.slice(matchIndex + spelling.length),
-          spelling,
+          segments: splitIntoSegments(spelling),
           reading: readings[i] ?? readings[0] ?? null,
         });
         break;
