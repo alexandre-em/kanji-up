@@ -1,6 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 
 import evaluation from './slices/evaluation';
+import flashcards from './slices/flashcards';
 import kanji from './slices/kanji';
 import missions from './slices/missions';
 import selectedKanji from './slices/selectedKanji';
@@ -19,6 +20,7 @@ const store = configureStore({
     evaluation,
     wordEvaluation,
     missions,
+    flashcards,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
