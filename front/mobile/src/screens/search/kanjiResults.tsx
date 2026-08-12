@@ -8,7 +8,7 @@ import { Colors, Text } from 'react-native-ui-lib';
 import { screenNames } from '../../constants/screens';
 import { useAppDispatch, useAppSelector } from '../../hooks/useStore';
 import { search, selectSearchResult, selectSearchStatus } from '../../store/slices/kanji';
-import KanjiResultCard from './kanjiResultCard';
+import KanjiResultCard from './components/kanjiResultCard';
 
 type KanjiResultsProps = {
   query: string;

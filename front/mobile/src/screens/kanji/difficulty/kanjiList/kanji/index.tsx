@@ -23,8 +23,8 @@ import { getOne, selectEntities, selectGetOneStatus } from '../../../../../store
 import { save, selectedKanji, selectSaveStatus, selectSelectedKanji } from '../../../../../store/slices/selectedKanji.ts';
 import { selectUserState, unlockContent } from '../../../../../store/slices/user.ts';
 import { getCheapestLockedTier, isKanjiLocked } from '../../../../../utils/kanjiLock.ts';
-import DifficultyTag, { getAdvancedTag, getGradeTag, getJlptTag } from '../../../../search/difficultyTag.tsx';
-import UnlockModal from '../unlockModal.tsx';
+import DifficultyTag, { getAdvancedTag, getGradeTag, getJlptTag } from '../../../../search/components/difficultyTag.tsx';
+import UnlockModal from '../components/unlockModal.tsx';
 
 type KanjiDetailsProps = RouteParamsProps<{
   character: string;

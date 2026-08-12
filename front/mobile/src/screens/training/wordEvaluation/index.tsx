@@ -2,14 +2,13 @@ import { predict } from '@kanjiup/recognition';
 import { useNavigation } from '@react-navigation/native';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, View as RNView } from 'react-native';
+import { View as RNView } from 'react-native';
 import { Button, Colors, ProgressBar, Text, View } from 'react-native-ui-lib';
 
 import Layout from '../../../components/layout';
 import Spacing from '../../../components/spacing';
 import { RECOGNITION_MODEL_LABELS } from '../../../constants/recognitionLabels';
 import { useAppDispatch, useAppSelector } from '../../../hooks/useStore';
-import { useThemedStyles } from '../../../hooks/useThemedStyles';
 import { useToaster } from '../../../providers/toaster';
 import {
   getKanjiCharacters,
@@ -20,9 +19,10 @@ import {
   updateItemSlots,
   WordSlotType,
 } from '../../../store/slices/wordEvaluation';
-import DraggableSlotRow from './draggableSlotRow';
-import DrawSlotModal from './drawSlotModal';
+import DraggableSlotRow from './components/draggableSlotRow';
+import DrawSlotModal from './components/drawSlotModal';
 import { findMaskedExampleHint } from './exampleHint';
+import { useWordEvaluationStyles } from './hooks/useWordEvaluationStyles';
 import WordEvaluationResult from './result';
 
 const SLOT_SIZE = 160;
@@ -42,58 +42,7 @@ export default function WordEvaluationScreen() {
   const status = useAppSelector(selectWordEvaluationStatus);
   const toast = useToaster();
   const { t } = useTranslation();
-  const styles = useThemedStyles(() =>
-    StyleSheet.create({
-      screenContent: {
-        flex: 1,
-      },
-      spacer: {
-        flex: 1,
-      },
-      hintCard: {
-        backgroundColor: Colors.$backgroundNeutralLight,
-        borderRadius: 16,
-        padding: 20,
-      },
-      hintSentence: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        alignItems: 'flex-end',
-        rowGap: 8,
-      },
-      hintBlank: {
-        alignItems: 'center',
-        marginHorizontal: 4,
-      },
-      hintReading: {
-        fontSize: 11,
-        color: Colors.$textNeutral,
-        marginBottom: 2,
-      },
-      hintChip: {
-        height: 28,
-        borderRadius: 6,
-        borderWidth: 1,
-        borderColor: Colors.$outlineNeutral,
-        backgroundColor: Colors.$backgroundDefault,
-      },
-      progressHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-      },
-      progressBadge: {
-        backgroundColor: Colors.$backgroundPrimaryLight,
-        borderRadius: 20,
-        paddingHorizontal: 12,
-        paddingVertical: 4,
-      },
-      progressBar: {
-        height: 8,
-        borderRadius: 4,
-      },
-    }),
-  );
+  const styles = useWordEvaluationStyles();
 
   // Cards only ever show a completed drawing — an empty slot exists in state only while its
   // modal is open (see handleAddSlot/handleModalClose), never rendered as a placeholder card

@@ -8,7 +8,7 @@ import { Colors, Text } from 'react-native-ui-lib';
 import { screenNames } from '../../constants/screens';
 import { useAppDispatch, useAppSelector } from '../../hooks/useStore';
 import { search, selectSearchResult, selectSearchStatus } from '../../store/slices/word';
-import WordResultCard from './wordResultCard';
+import WordResultCard from './components/wordResultCard';
 
 type WordResultsProps = {
   query: string;

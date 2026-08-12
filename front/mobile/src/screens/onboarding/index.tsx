@@ -12,9 +12,9 @@ import { useAppDispatch, useAppSelector } from '../../hooks/useStore';
 import { useToaster } from '../../providers/toaster';
 import { fileServiceInstance } from '../../services/file';
 import { createUser, getUser, selectCreateStatus, selectGetUserStatus, selectUserName } from '../../store/slices/user';
-import Step1 from './step1';
-import Step2 from './step2';
-import Step3 from './step3';
+import Step1 from './components/step1';
+import Step2 from './components/step2';
+import Step3 from './components/step3';
 
 export type StepProps = {
   step: number;

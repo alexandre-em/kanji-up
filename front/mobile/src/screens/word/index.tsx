@@ -1,19 +1,19 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, TouchableOpacity, View as RNView } from 'react-native';
+import { TouchableOpacity, View as RNView } from 'react-native';
 import { Assets, Colors, Icon, ProgressBar, Text } from 'react-native-ui-lib';
 
 import Layout from '../../components/layout';
 import Spacing from '../../components/spacing';
 import { getAccuracyPercent, PROGRESSION_MASTERY_THRESHOLD_PERCENT } from '../../constants/progression';
 import { useAppDispatch, useAppSelector } from '../../hooks/useStore';
-import { useThemedStyles } from '../../hooks/useThemedStyles';
 import { useToaster } from '../../providers/toaster';
 import { core } from '../../services/http';
 import { getOne as getKanji, selectEntities } from '../../store/slices/kanji';
 import { save, selectedKanji, selectSelectedKanji } from '../../store/slices/selectedKanji';
 import { selectUserState } from '../../store/slices/user';
 import { getKanjiCharacters } from '../../store/slices/wordEvaluation';
+import { useWordDetailStyles } from './useWordDetailStyles';
 
 type WordDetailProps = RouteParamsProps<{ id: string }>;
 
@@ -22,56 +22,7 @@ export default function WordDetail(props: WordDetailProps) {
   const dispatch = useAppDispatch();
   const toast = useToaster();
   const { id } = props.route.params;
-  const styles = useThemedStyles(() =>
-    StyleSheet.create({
-      chipRow: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        gap: 8,
-      },
-      masteryRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-      },
-      chip: {
-        paddingHorizontal: 12,
-        paddingVertical: 6,
-        borderRadius: 16,
-        backgroundColor: Colors.$backgroundPrimaryLight,
-      },
-      kanjiTile: {
-        width: 56,
-        height: 56,
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderRadius: 12,
-        borderWidth: 1,
-        borderColor: Colors.$outlineNeutral,
-      },
-      kanjiTileSelected: {
-        borderColor: Colors.$backgroundSuccessHeavy,
-        backgroundColor: Colors.$backgroundSuccessLight,
-      },
-      kanjiCheck: {
-        position: 'absolute',
-        top: 4,
-        right: 4,
-      },
-      definitionRow: {
-        paddingVertical: 8,
-        borderBottomWidth: StyleSheet.hairlineWidth,
-        borderBottomColor: Colors.$outlineNeutral,
-      },
-      exampleRow: {
-        marginTop: 6,
-        paddingLeft: 12,
-        borderLeftWidth: 2,
-        borderLeftColor: Colors.$outlineNeutral,
-        gap: 2,
-      },
-    }),
-  );
+  const styles = useWordDetailStyles();
 
   const [word, setWord] = useState<WordType | null>(null);
   const [status, setStatus] = useState<RequestStatusType>('pending');

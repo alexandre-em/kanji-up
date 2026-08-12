@@ -7,6 +7,7 @@ import { Colors } from 'react-native-ui-lib';
 
 import { tabs } from '../constants/tabs';
 import { useTabBarHidden } from '../providers/tabBar';
+import TabLabel from './tabLabel';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -123,26 +124,6 @@ export default function BottomNavBar({ activeRoute, onTabPress }: BottomNavBarPr
   );
 }
 
-/** Label of the active tab: fades up as the tab becomes active */
-function TabLabel({ label }: { label: string }) {
-  const progress = useSharedValue(0);
-
-  useEffect(() => {
-    progress.value = withTiming(1, { duration: 180 });
-  }, [progress]);
-
-  const style = useAnimatedStyle(() => ({
-    opacity: progress.value,
-    transform: [{ translateY: (1 - progress.value) * 4 }],
-  }));
-
-  return (
-    <Animated.Text style={[styles.label, style]} numberOfLines={1}>
-      {label}
-    </Animated.Text>
-  );
-}
-
 // ---------------------------------------------------------------------------
 // Styles
 // ---------------------------------------------------------------------------
@@ -184,12 +165,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 3,
-  },
-  label: {
-    fontSize: 10,
-    fontWeight: '700',
-    letterSpacing: 0.3,
-    textTransform: 'uppercase',
-    color: ACTIVE_COLOR,
   },
 });

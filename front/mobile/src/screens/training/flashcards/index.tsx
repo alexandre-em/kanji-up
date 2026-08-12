@@ -1,39 +1,20 @@
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, View as RNView } from 'react-native';
+import { View as RNView } from 'react-native';
 import { Button, ProgressBar, Text, View } from 'react-native-ui-lib';
 
 import Layout from '../../../components/layout';
 import Spacing from '../../../components/spacing';
 import { useAppDispatch, useAppSelector } from '../../../hooks/useStore';
-import { useThemedStyles } from '../../../hooks/useThemedStyles';
 import { reviewCard, selectDueFlashcards } from '../../../store/slices/flashcards';
-import Flashcard from './card';
+import Flashcard from './components/card';
+import { useFlashcardsScreenStyles } from './hooks/useFlashcardsScreenStyles';
 
 export default function FlashcardsScreen() {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const dueFlashcards = useAppSelector(selectDueFlashcards);
-  const styles = useThemedStyles(() =>
-    StyleSheet.create({
-      progressHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-      },
-      progressBar: {
-        height: 8,
-        borderRadius: 4,
-      },
-      actions: {
-        flexDirection: 'row',
-        gap: 12,
-      },
-      actionButton: {
-        flex: 1,
-      },
-    }),
-  );
+  const styles = useFlashcardsScreenStyles();
 
   // Snapshotted once at mount: grading a card can make it due again immediately (a "didn't know"
   // reset), and re-deriving the queue from the live due-selector would loop that same card back

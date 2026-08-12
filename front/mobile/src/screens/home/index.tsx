@@ -23,7 +23,7 @@ import { useToaster } from '../../providers/toaster';
 import { fetchTodayMissions, selectTodayMissions } from '../../store/slices/missions';
 import { selectSelectedKanji } from '../../store/slices/selectedKanji';
 import { selectUserName, selectUserPicture, selectUserState } from '../../store/slices/user';
-import MissionsModal from './missionsModal';
+import MissionsModal from './components/missionsModal';
 
 const { width } = Dimensions.get('window');
 const MISSION_TASK_COUNT = 3;

@@ -7,9 +7,9 @@ import AccountSummary from '../../components/accountSummary';
 import Layout from '../../components/layout';
 import Spacing from '../../components/spacing';
 import { screenNames } from '../../constants/screens';
-import GoogleSignInButton from './googleSignIn';
-import LanguageSelector from './languageSelector';
-import ThemeSelector from './themeSelector';
+import GoogleSignInButton from './components/googleSignIn';
+import LanguageSelector from './components/languageSelector';
+import ThemeSelector from './components/themeSelector';
 
 export default function Settings() {
   const { t } = useTranslation();

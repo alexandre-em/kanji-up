@@ -2,7 +2,7 @@ import { predict } from '@kanjiup/recognition';
 import { useNavigation } from '@react-navigation/native';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, StyleSheet, View as RNView } from 'react-native';
+import { ActivityIndicator, View as RNView } from 'react-native';
 import { Assets, Button, Chip, Colors, Icon, ProgressBar, Text, View } from 'react-native-ui-lib';
 import ViewShot from 'react-native-view-shot';
 
@@ -12,11 +12,11 @@ import Spacing from '../../../components/spacing.tsx';
 import { RECOGNITION_MODEL_LABELS } from '../../../constants/recognitionLabels.ts';
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from '../../../constants/styles.ts';
 import { useAppDispatch, useAppSelector } from '../../../hooks/useStore';
-import { useThemedStyles } from '../../../hooks/useThemedStyles';
 import { useIsOffline } from '../../../providers/network';
 import { useToaster } from '../../../providers/toaster';
 import { selectCurrentIndex, selectEvaluationItems, updateItemScore } from '../../../store/slices/evaluation';
-import EvaluationResult from './result.tsx';
+import { useEvaluationScreenStyles } from './hooks/useEvaluationScreenStyles.ts';
+import EvaluationResult from './result/index.tsx';
 
 const TIMER_DURATION = 60;
 
@@ -36,46 +36,7 @@ export default function EvaluationScreen() {
   const [strokesCount, setStrokesCount] = useState(0);
   const [timer, setTimer] = useState<number>(TIMER_DURATION);
   const toast = useToaster();
-  const styles = useThemedStyles(() =>
-    StyleSheet.create({
-      yomi: {
-        flexDirection: 'row',
-        alignItems: 'center',
-      },
-      progressHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-      },
-      timer: {
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-      },
-      progressBar: {
-        height: 8,
-      },
-      viewShot: {
-        width: CANVAS_WIDTH,
-        height: CANVAS_HEIGHT,
-      },
-      canvasContainer: {
-        position: 'relative',
-      },
-      savingOverlay: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: Colors.$backgroundDefault,
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderRadius: 8,
-      },
-    }),
-  );
+  const styles = useEvaluationScreenStyles();
 
   const currentKanji = useMemo(() => {
     return evaluationItems[currentIndex];

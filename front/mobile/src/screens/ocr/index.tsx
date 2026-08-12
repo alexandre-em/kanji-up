@@ -2,7 +2,7 @@ import { useNavigation } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, Image, StyleSheet, TouchableOpacity, View as RNView } from 'react-native';
+import { ActivityIndicator, Image, TouchableOpacity, View as RNView } from 'react-native';
 import { Asset, launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { Assets, Button, Colors, Icon, Text } from 'react-native-ui-lib';
 import ActionSheet from 'react-native-ui-lib/actionSheet';
@@ -11,9 +11,9 @@ import { useSelector } from 'react-redux';
 import AppBannerAd from '../../components/bannerAd';
 import Spacing from '../../components/spacing';
 import { screenNames } from '../../constants/screens';
-import { useThemedStyles } from '../../hooks/useThemedStyles';
 import { core } from '../../services/http';
 import { selectUserState } from '../../store/slices/user';
+import { useOcrStyles } from './hooks/useOcrStyles';
 
 const PICKER_OPTIONS = { mediaType: 'photo' as const, quality: 0.8 as const, maxWidth: 1600, maxHeight: 1600 };
 const HISTORY_LIMIT = 20;
@@ -24,60 +24,7 @@ export default function Ocr() {
   const { t, i18n } = useTranslation();
   const navigation = useNavigation();
   const userState = useSelector(selectUserState);
-  const styles = useThemedStyles(() =>
-    StyleSheet.create({
-      container: {
-        flex: 1,
-        backgroundColor: Colors.$backgroundDefault,
-      },
-      listContent: {
-        paddingHorizontal: 20,
-        paddingBottom: 20,
-      },
-      banner: {
-        alignItems: 'center',
-      },
-      center: {
-        alignItems: 'center',
-        paddingVertical: 40,
-      },
-      tokenRow: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        gap: 6,
-      },
-      token: {
-        paddingHorizontal: 10,
-        paddingVertical: 6,
-        borderRadius: 10,
-      },
-      tokenMatched: {
-        backgroundColor: Colors.$backgroundPrimaryLight,
-      },
-      historyRow: {
-        flexDirection: 'row',
-        gap: 12,
-        paddingVertical: 10,
-        borderBottomWidth: StyleSheet.hairlineWidth,
-        borderBottomColor: Colors.$outlineNeutral,
-      },
-      historyThumbnail: {
-        width: 56,
-        height: 56,
-        borderRadius: 8,
-        backgroundColor: Colors.$backgroundNeutralLight,
-      },
-      historyContent: {
-        flex: 1,
-        justifyContent: 'center',
-        gap: 4,
-      },
-      footer: {
-        paddingVertical: 16,
-        alignItems: 'center',
-      },
-    }),
-  );
+  const styles = useOcrStyles();
 
   const [pickerVisible, setPickerVisible] = useState(false);
   const [status, setStatus] = useState<ScreenStatus>('idle');
