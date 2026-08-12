@@ -7,7 +7,6 @@ import { Button, Text, View } from 'react-native-ui-lib';
 
 import { hasNewlyMasteredKanji } from '../../../constants/progression';
 import { screenNames } from '../../../constants/screens';
-import { useEvaluationInterstitialAd } from '../../../hooks/useEvaluationInterstitialAd';
 import { useAppDispatch, useAppSelector } from '../../../hooks/useStore';
 import { useToaster } from '../../../providers/toaster';
 import { core } from '../../../services/http';
@@ -41,7 +40,6 @@ export default function EvaluationResult() {
   const sessionId = useAppSelector(selectEvaluationSessionId);
   const userId = useAppSelector((state) => state.user.userId);
   const progressionState = useAppSelector((state) => state.user.progression);
-  const showInterstitialAd = useEvaluationInterstitialAd();
 
   // Index into `items` of the answer currently shown in the review modal, null when closed
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
@@ -112,14 +110,11 @@ export default function EvaluationResult() {
       dispatch(resetEvaluation());
       navigation.navigate(screenNames.HOME);
       toast?.show({ message: t('evaluationResult.toast.success'), type: 'success' });
-      // Natural break point: the session is over and results are saved, so an interstitial here
-      // (a no-op for premium/adsDeactivated users) doesn't interrupt anything mid-task
-      showInterstitialAd();
     } else {
       // Left on this screen with the button re-enabled: nothing is lost, they can just retry
       toast?.show({ message: t('evaluationResult.toast.error'), type: 'failure' });
     }
-  }, [items, dispatch, navigation, toast, t, showInterstitialAd, sessionId, correctCount, userId, progressionState]);
+  }, [items, dispatch, navigation, toast, t, sessionId, correctCount, userId, progressionState]);
 
   const buttonLabel = useMemo(
     () =>

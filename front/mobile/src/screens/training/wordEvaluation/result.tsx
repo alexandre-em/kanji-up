@@ -6,7 +6,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button, Text, View } from 'react-native-ui-lib';
 
 import { screenNames } from '../../../constants/screens';
-import { useEvaluationInterstitialAd } from '../../../hooks/useEvaluationInterstitialAd';
 import { useAppDispatch, useAppSelector } from '../../../hooks/useStore';
 import { useToaster } from '../../../providers/toaster';
 import { completeMissionTask } from '../../../store/slices/missions';
@@ -34,7 +33,6 @@ export default function WordEvaluationResult() {
   const correctCount = useAppSelector(selectWordCorrectCount);
   const pendingReviewCount = useAppSelector(selectWordPendingReviewCount);
   const userId = useAppSelector((state) => state.user.userId);
-  const showInterstitialAd = useEvaluationInterstitialAd();
 
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -83,11 +81,10 @@ export default function WordEvaluationResult() {
       dispatch(resetWordEvaluation());
       navigation.navigate(screenNames.HOME);
       toast?.show({ message: t('wordEvaluationResult.toast.success'), type: 'success' });
-      showInterstitialAd();
     } else {
       toast?.show({ message: t('wordEvaluationResult.toast.error'), type: 'failure' });
     }
-  }, [items, correctCount, dispatch, navigation, toast, t, showInterstitialAd, userId]);
+  }, [items, correctCount, dispatch, navigation, toast, t, userId]);
 
   const buttonLabel = useMemo(
     () =>
