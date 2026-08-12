@@ -104,8 +104,11 @@ export default function Search() {
   const activeResultCount = activeCache?.results.length ?? 0;
 
   useEffect(() => {
-    if (activeStatus === 'failed') toast?.show({ message: t('search.error'), type: 'failure' });
-  }, [activeStatus, toast, t]);
+    // Same caveat as activeCache above: activeStatus is global to the slice, so a failure from an
+    // unrelated request (e.g. a background pagination fetch) shouldn't toast while the current
+    // query's results are already cached and rendering fine
+    if (activeStatus === 'failed' && !activeCache) toast?.show({ message: t('search.error'), type: 'failure' });
+  }, [activeStatus, activeCache, toast, t]);
 
   // Clear the pending debounce timer on unmount, so it doesn't fire a search after leaving
   useEffect(() => () => clearTimeout(debounceRef.current), []);
