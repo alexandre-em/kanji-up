@@ -24,6 +24,7 @@ import WordTestBanner from '../assets/images/david-emrich-oQvcurCjD58-unsplash.j
 import KanjiTestBanner from '../assets/images/felirbe-y6VMoH6921w-unsplash.jpg';
 import SchoolBanner from '../assets/images/hiroyoshi-urushima-school.jpg';
 import SchoolBannerDisabled from '../assets/images/hiroyoshi-urushima-school-disabled.jpg';
+import FlashcardsBanner from '../assets/images/kelsy-gagnebin-kZ6UYXwMMD8-unsplash.jpg';
 import AdvancedBanner from '../assets/images/marco-zuppone-advanced.jpg';
 import AdvancedBannerDisabled from '../assets/images/marco-zuppone-advanced-disabled.jpg';
 import JlptBanner from '../assets/images/nguyen-dang-hoang-nhu-jlpt.jpg';
@@ -61,6 +62,7 @@ Assets.loadAssetsGroup('banners', {
   jlpt: JlptBanner,
   kanjiTest: KanjiTestBanner,
   wordTest: WordTestBanner,
+  flashcards: FlashcardsBanner,
 });
 
 Colors.loadSchemes({

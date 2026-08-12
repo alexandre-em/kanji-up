@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
-import { Assets, Colors, Image } from 'react-native-ui-lib';
+import { Assets, Image } from 'react-native-ui-lib';
 
 import { screenNames } from './screens';
 import { GENERAL_MARGIN } from './styles';
@@ -39,10 +39,6 @@ const styles = StyleSheet.create({
 
 const BannerScrim = () => <View style={styles.bannerScrim} />;
 
-// No banner photo asset exists for this mode yet — a plain brand-colored block stands in, same
-// size/position as the photo banners so the card layout stays consistent
-const FlashcardsBanner = () => <View style={[styles.bannerImage, { backgroundColor: Colors.$backgroundPrimaryHeavy }]} />;
-
 export const trainingModes: TrainingModeType[] = [
   {
     textKey: 'training.menu.kanji.title',
@@ -70,6 +66,11 @@ export const trainingModes: TrainingModeType[] = [
     textKey: 'training.menu.flashcards.title',
     subtitle: 'training.menu.flashcards.subtitle',
     screen: screenNames.FLASHCARDS,
-    image: <FlashcardsBanner />,
+    image: (
+      <>
+        <Image source={Assets.banners.flashcards} style={styles.bannerImage} />
+        <BannerScrim />
+      </>
+    ),
   },
 ];
