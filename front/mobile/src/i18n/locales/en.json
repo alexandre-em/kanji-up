@@ -135,6 +135,17 @@
   "training.menu.word.title": "Words",
   "training.menu.word.subtitle": "Draw the kanji that make up a word",
   "training.comingSoon": "Coming soon",
+  "training.menu.flashcards.title": "Flashcards",
+  "training.menu.flashcards.subtitle": "Quick review of your selected kanji",
+
+  "flashcards.progress": "Cards reviewed",
+  "flashcards.reveal": "Tap to reveal",
+  "flashcards.grade.yes": "I knew it",
+  "flashcards.grade.no": "I didn't know it",
+  "flashcards.empty.title": "Nothing to review right now",
+  "flashcards.empty.message": "Come back later — your selected kanji aren't due for review yet.",
+  "flashcards.sessionOver.title": "All done for now",
+  "flashcards.sessionOver.message": "You've reviewed every card due today. Come back later for more.",
   "training.viewStats": "View my stats",
 
   "kanjiDetails.viewMode.button": "Animation mode",

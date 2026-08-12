@@ -170,6 +170,17 @@
   "training.menu.word.title": "Mots",
   "training.menu.word.subtitle": "Dessine les kanji qui composent un mot",
   "training.comingSoon": "Bientôt disponible",
+  "training.menu.flashcards.title": "Flashcards",
+  "training.menu.flashcards.subtitle": "Révision rapide de tes kanji sélectionnés",
+
+  "flashcards.progress": "Cartes révisées",
+  "flashcards.reveal": "Toucher pour révéler",
+  "flashcards.grade.yes": "Je savais",
+  "flashcards.grade.no": "Je savais pas",
+  "flashcards.empty.title": "Rien à réviser pour l'instant",
+  "flashcards.empty.message": "Reviens plus tard — tes kanji sélectionnés ne sont pas encore à réviser.",
+  "flashcards.sessionOver.title": "Terminé pour l'instant",
+  "flashcards.sessionOver.message": "Tu as révisé toutes les cartes du jour. Reviens plus tard pour la suite.",
   "training.viewStats": "Voir mes stats",
 
   "premium.feature.badge": "premium",
