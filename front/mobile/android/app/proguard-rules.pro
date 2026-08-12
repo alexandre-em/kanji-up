@@ -19,3 +19,11 @@
 -keep class com.android.installreferrer.api.** {
   *;
 }
+
+# @kanjiup/recognition's TFLite-backed native module: classes are loaded via JNI/reflection, so
+# R8 stripping them in release builds crashes the app at native module registration (app
+# startup), before any JS screen renders — no consumer proguard rules ship with the library.
+-keep class org.tensorflow.** { *; }
+-dontwarn org.tensorflow.**
+-keep class com.kanjiuprecognition.** { *; }
+-keep class com.recognizer.** { *; }
