@@ -1,3 +1,4 @@
+import { useFocusEffect } from '@react-navigation/native';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { View as RNView } from 'react-native';
@@ -16,12 +17,23 @@ export default function FlashcardsScreen() {
   const dueFlashcards = useAppSelector(selectDueFlashcards);
   const styles = useFlashcardsScreenStyles();
 
-  // Snapshotted once at mount: grading a card can make it due again immediately (a "didn't know"
-  // reset), and re-deriving the queue from the live due-selector would loop that same card back
-  // in mid-session instead of moving on to the next one
-  const [queue] = useState(() => dueFlashcards);
+  // Snapshotted (not read live): grading a card can make it due again immediately (a "didn't
+  // know" reset), and re-deriving the queue from the live due-selector would loop that same card
+  // back in mid-session instead of moving on to the next one
+  const [queue, setQueue] = useState(() => dueFlashcards);
   const [index, setIndex] = useState(0);
   const [isRevealed, setIsRevealed] = useState(false);
+
+  // react-navigation doesn't always fully unmount a screen it navigates back to, so resetting
+  // only in useState's initializer isn't reliable — this re-snapshots every time the screen
+  // actually regains focus, whether or not it was torn down in between
+  useFocusEffect(
+    useCallback(() => {
+      setQueue(dueFlashcards);
+      setIndex(0);
+      setIsRevealed(false);
+    }, [dueFlashcards]),
+  );
 
   const currentCard = queue[index];
   const isSessionOver = index >= queue.length;
