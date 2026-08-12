@@ -54,6 +54,9 @@ const WordSlotCanvas = forwardRef<WordSlotCanvasHandle, WordSlotCanvasProps>(({ 
         width={size}
         height={size}
         strokeWidth={6}
+        hideGuides={isCapturing}
+        hideBorder={isCapturing}
+        hideClearButton={isCapturing}
         forceCaptureColors={isCapturing}
         onStrokeUpdate={(count) => (strokesCountRef.current = count)}
       />

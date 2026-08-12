@@ -106,6 +106,9 @@ const Canvas = forwardRef(
           height: 35,
           zIndex: 100,
         },
+        hidden: {
+          opacity: 0,
+        },
       }),
     );
 
@@ -162,16 +165,18 @@ const Canvas = forwardRef(
           forceCaptureColors ? styles.canvasBackgroundForced : {},
           hideBorder ? {} : styles.canvasBorder,
         ]}>
-        {!hideClearButton && (
-          <Button
-            iconSource={Assets.icons.clear}
-            iconProps={{ size: 25 }}
-            onPress={handleClear}
-            outline
-            size="medium"
-            style={styles.clean}
-          />
-        )}
+        {/* Hidden via opacity rather than unmounted: removing a view from the tree takes longer
+            to actually reflect natively than a style change, and forceCaptureColors' background
+            swap (which this must stay in sync with for a clean capture) is style-driven too */}
+        <Button
+          iconSource={Assets.icons.clear}
+          iconProps={{ size: 25 }}
+          onPress={handleClear}
+          outline
+          size="medium"
+          style={[styles.clean, hideClearButton && styles.hidden]}
+          disabled={hideClearButton}
+        />
         <Svg width={width} height={height}>
           {paths.map((points, i) => (
             <Path
@@ -195,12 +200,8 @@ const Canvas = forwardRef(
             />
           )}
         </Svg>
-        {!hideGuides && (
-          <>
-            <View style={styles.vertical} />
-            <View style={styles.horizontal} />
-          </>
-        )}
+        <View style={[styles.vertical, hideGuides && styles.hidden]} />
+        <View style={[styles.horizontal, hideGuides && styles.hidden]} />
       </View>
     );
   },
