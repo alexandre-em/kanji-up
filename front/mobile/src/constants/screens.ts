@@ -9,6 +9,7 @@ export const screenNames = {
   TRAINING: 'Training',
   EVALUATION: 'Evaluation',
   WORD_EVALUATION: 'WordEvaluation',
+  FLASHCARDS: 'Flashcards',
   PREMIUM: 'Premium',
   SEARCH: 'Search',
   SETTINGS: 'Settings',
