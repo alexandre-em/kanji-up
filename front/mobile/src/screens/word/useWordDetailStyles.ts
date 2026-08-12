@@ -11,6 +11,12 @@ export function useWordDetailStyles() {
         flexWrap: 'wrap',
         gap: 8,
       },
+      wordRow: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+        gap: 8,
+      },
       masteryRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',

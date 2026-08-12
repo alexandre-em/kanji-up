@@ -17,6 +17,26 @@ import { useWordDetailStyles } from './useWordDetailStyles';
 
 type WordDetailProps = RouteParamsProps<{ id: string }>;
 
+// Highlights whichever spelling of the word actually shows up in the example sentence — kanji and
+// kana spellings don't both appear, so only one (if any) will ever match
+function renderHighlightedSentence(sentence: string | undefined, spellings: string[]) {
+  if (!sentence) return sentence;
+
+  const match = spellings.find((spelling) => spelling && sentence.includes(spelling));
+  if (!match) return sentence;
+
+  return sentence.split(match).flatMap((part, index, parts) =>
+    index < parts.length - 1
+      ? [
+          part,
+          <Text key={index} text90BO $textPrimary>
+            {match}
+          </Text>,
+        ]
+      : [part],
+  );
+}
+
 export default function WordDetail(props: WordDetailProps) {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
@@ -77,15 +97,52 @@ export default function WordDetail(props: WordDetailProps) {
       errorMessage={status === 'failed' || !word ? t('wordDetails.error') : undefined}>
       {word && (
         <>
-          <RNView style={styles.chipRow}>
+          <Spacing y={10} />
+          <RNView style={styles.wordRow}>
             {word.word.map((spelling) => (
-              <Text key={spelling} text50BL $textPrimary>
+              <Text key={spelling} text50BL $textPrimary center>
                 {spelling}
               </Text>
             ))}
           </RNView>
+          <Spacing y={14} />
+          <Text text90M $textNeutral>
+            {t('wordDetails.readings')}
+          </Text>
+          <Spacing y={6} />
+          <RNView style={styles.chipRow}>
+            {word.reading.map((reading) => (
+              <RNView key={reading} style={styles.chip}>
+                <Text text80M $textPrimary>
+                  {reading}
+                </Text>
+              </RNView>
+            ))}
+          </RNView>
+          <Spacing y={10} />
+          <Text text90M $textNeutral>
+            {t('wordDetails.definitions')}
+          </Text>
+          <Spacing y={6} />
+          {word.definition.map((definition, index) => (
+            <RNView key={index} style={styles.definitionRow}>
+              <Text text80M $textDefault>
+                {definition.meaning.join(', ')}
+              </Text>
+              {definition.example?.map((example, exampleIndex) => (
+                <RNView key={example.sentence_id ?? exampleIndex} style={styles.exampleRow}>
+                  <Text text90M $textDefault>
+                    {renderHighlightedSentence(example.sentence, word.word)}
+                  </Text>
+                  <Text text90M $textNeutral>
+                    {example.translation}
+                  </Text>
+                </RNView>
+              ))}
+            </RNView>
+          ))}
 
-          <Spacing y={16} />
+          <Spacing y={20} />
           <RNView style={styles.masteryRow}>
             <Text text90M $textNeutral>
               {t('wordDetails.mastery.title')}
@@ -108,19 +165,6 @@ export default function WordDetail(props: WordDetailProps) {
                 : Colors.$backgroundPrimaryHeavy
             }
           />
-
-          <Spacing y={20} />
-          <Text text70BO>{t('wordDetails.readings')}</Text>
-          <Spacing y={8} />
-          <RNView style={styles.chipRow}>
-            {word.reading.map((reading) => (
-              <RNView key={reading} style={styles.chip}>
-                <Text text80M $textPrimary>
-                  {reading}
-                </Text>
-              </RNView>
-            ))}
-          </RNView>
 
           {characters.length > 0 && (
             <>
@@ -147,27 +191,6 @@ export default function WordDetail(props: WordDetailProps) {
               </RNView>
             </>
           )}
-
-          <Spacing y={20} />
-          <Text text70BO>{t('wordDetails.definitions')}</Text>
-          <Spacing y={8} />
-          {word.definition.map((definition, index) => (
-            <RNView key={index} style={styles.definitionRow}>
-              <Text text80M $textDefault>
-                {definition.meaning.join(', ')}
-              </Text>
-              {definition.example?.map((example, exampleIndex) => (
-                <RNView key={example.sentence_id ?? exampleIndex} style={styles.exampleRow}>
-                  <Text text90M $textDefault>
-                    {example.sentence}
-                  </Text>
-                  <Text text90M $textNeutral>
-                    {example.translation}
-                  </Text>
-                </RNView>
-              ))}
-            </RNView>
-          ))}
         </>
       )}
     </Layout>
