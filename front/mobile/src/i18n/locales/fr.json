@@ -8,6 +8,7 @@
   "kanjiDetails.loadError": "Impossible de charger ce kanji, réessaie",
   "kanjiDetails.mastery.title": "Maîtrise",
   "evaluation.offline.notice": "Hors ligne — tes résultats seront envoyés une fois reconnecté",
+  "evaluation.loadingModel": "Chargement du modèle de reconnaissance...",
   "onboarding.welcome.title": "Welcome to KanjiUp",
   "onboarding.welcome.subtitle": "Level up your kanji knowledge with KanjiUp!",
   "onboarding.welcome.subtitle.highlight": "Level up",

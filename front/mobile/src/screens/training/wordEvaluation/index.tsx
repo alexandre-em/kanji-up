@@ -2,7 +2,7 @@ import { predict } from '@kanjiup/recognition';
 import { useNavigation } from '@react-navigation/native';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, StyleSheet, View as RNView } from 'react-native';
+import { StyleSheet, View as RNView } from 'react-native';
 import { Button, Colors, ProgressBar, Text, View } from 'react-native-ui-lib';
 
 import Layout from '../../../components/layout';
@@ -201,13 +201,7 @@ export default function WordEvaluationScreen() {
   }, [filledSlots, dispatch, toast, t, currentItem]);
 
   if (items.length === 0 && (status === 'idle' || status === 'pending')) {
-    return (
-      <Layout screen="wordEvaluation">
-        <View center flex>
-          <ActivityIndicator color={Colors.$textPrimary} size="large" />
-        </View>
-      </Layout>
-    );
+    return <Layout screen="wordEvaluation" loadingMessage={t('loading.title')} />;
   }
 
   if (status === 'failed') {

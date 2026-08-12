@@ -184,7 +184,7 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
   }
 
   if (!kanji) {
-    return <Layout screen="kanji" isLoading />;
+    return <Layout screen="kanji" loadingMessage={t('loading.title')} />;
   }
 
   if (locked) {

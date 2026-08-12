@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, StyleSheet, TouchableOpacity, View as RNView } from 'react-native';
+import { StyleSheet, TouchableOpacity, View as RNView } from 'react-native';
 import { Assets, Colors, Icon, ProgressBar, Text } from 'react-native-ui-lib';
 
 import Layout from '../../components/layout';
@@ -114,13 +114,7 @@ export default function WordDetail(props: WordDetailProps) {
   };
 
   if (status === 'pending') {
-    return (
-      <Layout screen="wordDetails">
-        <RNView style={styles.center}>
-          <ActivityIndicator color={Colors.$backgroundPrimaryHeavy} size="large" />
-        </RNView>
-      </Layout>
-    );
+    return <Layout screen="wordDetails" loadingMessage={t('loading.title')} />;
   }
 
   if (status === 'failed' || !word) {

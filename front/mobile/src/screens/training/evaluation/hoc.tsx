@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator } from 'react-native';
-import { Button, Colors, Text, View } from 'react-native-ui-lib';
+import { Button, Text, View } from 'react-native-ui-lib';
 
 import Layout from '../../../components/layout';
 import Spacing from '../../../components/spacing';
@@ -170,16 +169,7 @@ export default function EvaluationHoc() {
     setPendingResume(null);
   }, [dispatch, kanjiQueue, pendingResume]);
 
-  if (!isModelLoaded || isChecking)
-    return (
-      <Layout screen="evaluation">
-        <View center>
-          <ActivityIndicator color={Colors.$textPrimary} size="large" />
-          <Spacing y={10} />
-          <Text>Loading kanji recognition model...</Text>
-        </View>
-      </Layout>
-    );
+  if (!isModelLoaded || isChecking) return <Layout screen="evaluation" loadingMessage={t('evaluation.loadingModel')} />;
 
   if (pendingResume) {
     return (
@@ -219,14 +209,7 @@ export default function EvaluationHoc() {
     );
   }
 
-  if (evaluationItems.length === 0)
-    return (
-      <Layout screen="evaluation">
-        <View center>
-          <ActivityIndicator color={Colors.$textPrimary} size="large" />
-        </View>
-      </Layout>
-    );
+  if (evaluationItems.length === 0) return <Layout screen="evaluation" loadingMessage={t('loading.title')} />;
 
   return <EvaluationScreen />;
 }

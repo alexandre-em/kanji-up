@@ -18,16 +18,17 @@ type LayoutProps = {
   screen?: string;
   /** Set on the screens displaying the floating tab bar, to keep their content above it */
   withTabBar?: boolean;
-  /** Shows a centered spinner in place of children — for screens whose content depends on an
-   * async fetch (e.g. a detail page keyed by a route param) that hasn't resolved yet */
-  isLoading?: boolean;
+  /** Shows a centered spinner + this message in place of children, for screens whose content
+   * depends on an async fetch (e.g. a detail page keyed by a route param) that hasn't resolved
+   * yet — omit (or pass an empty string) to render children normally */
+  loadingMessage?: string;
 };
 
 const { height } = Dimensions.get('window');
 /** Scroll distance ignored before hiding/showing the tab bar, to avoid flickering on small moves */
 const SCROLL_THRESHOLD = 8;
 
-export default function Layout({ screen, withTabBar, isLoading, children }: LayoutProps & PropsWithChildren) {
+export default function Layout({ screen, withTabBar, loadingMessage, children }: LayoutProps & PropsWithChildren) {
   const { t } = useTranslation();
 
   const headerHeight = useHeaderHeight();
@@ -92,11 +93,11 @@ export default function Layout({ screen, withTabBar, isLoading, children }: Layo
             <Spacing y={10} />
           </>
         )}
-        {isLoading ? (
+        {loadingMessage ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator color={Colors.$backgroundPrimaryHeavy} size="large" />
             <Spacing y={12} />
-            <Text $textDefault>{t('loading.title')}</Text>
+            <Text $textDefault>{loadingMessage}</Text>
           </View>
         ) : (
           children

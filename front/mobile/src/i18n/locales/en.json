@@ -2,6 +2,7 @@
   "offline.banner": "You're offline — some features are unavailable",
   "offline.badge": "Offline",
   "evaluation.offline.notice": "You're offline — your results will be saved and sent once you're back online",
+  "evaluation.loadingModel": "Loading kanji recognition model...",
   "onboarding.welcome.title": "Welcome to KanjiUp",
   "onboarding.welcome.subtitle": "Level up your kanji knowledge with KanjiUp!",
   "onboarding.welcome.subtitle.highlight": "Level up",

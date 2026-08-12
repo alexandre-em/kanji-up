@@ -1,9 +1,7 @@
 import { useEffect } from 'react';
-import { ActivityIndicator } from 'react-native';
-import { Colors, Text, View } from 'react-native-ui-lib';
+import { useTranslation } from 'react-i18next';
 
 import Layout from '../../../components/layout';
-import Spacing from '../../../components/spacing';
 import { useRecognitionModel } from '../../../hooks/useRecognitionModel';
 import { useAppDispatch } from '../../../hooks/useStore';
 import { useToaster } from '../../../providers/toaster';
@@ -16,6 +14,7 @@ export default function WordEvaluationHoc() {
   const dispatch = useAppDispatch();
   const { isLoaded: isModelLoaded, hasError: modelLoadError } = useRecognitionModel();
   const toast = useToaster();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (modelLoadError) toast?.show({ message: 'An error occurred when loading the recognition model', type: 'failure' });
@@ -26,16 +25,7 @@ export default function WordEvaluationHoc() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (!isModelLoaded)
-    return (
-      <Layout screen="wordEvaluation">
-        <View center>
-          <ActivityIndicator color={Colors.$textPrimary} size="large" />
-          <Spacing y={10} />
-          <Text $textDefault>Loading kanji recognition model...</Text>
-        </View>
-      </Layout>
-    );
+  if (!isModelLoaded) return <Layout screen="wordEvaluation" loadingMessage={t('evaluation.loadingModel')} />;
 
   return <WordEvaluationScreen />;
 }
