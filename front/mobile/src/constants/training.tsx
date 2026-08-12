@@ -41,6 +41,17 @@ const BannerScrim = () => <View style={styles.bannerScrim} />;
 
 export const trainingModes: TrainingModeType[] = [
   {
+    textKey: 'training.menu.flashcards.title',
+    subtitle: 'training.menu.flashcards.subtitle',
+    screen: screenNames.FLASHCARDS,
+    image: (
+      <>
+        <Image source={Assets.banners.flashcards} style={styles.bannerImage} />
+        <BannerScrim />
+      </>
+    ),
+  },
+  {
     textKey: 'training.menu.kanji.title',
     subtitle: 'training.menu.kanji.subtitle',
     screen: screenNames.EVALUATION,
@@ -58,17 +69,6 @@ export const trainingModes: TrainingModeType[] = [
     image: (
       <>
         <Image source={Assets.banners.wordTest} style={styles.bannerImage} />
-        <BannerScrim />
-      </>
-    ),
-  },
-  {
-    textKey: 'training.menu.flashcards.title',
-    subtitle: 'training.menu.flashcards.subtitle',
-    screen: screenNames.FLASHCARDS,
-    image: (
-      <>
-        <Image source={Assets.banners.flashcards} style={styles.bannerImage} />
         <BannerScrim />
       </>
     ),
