@@ -27,3 +27,7 @@
 -dontwarn org.tensorflow.**
 -keep class com.kanjiuprecognition.** { *; }
 -keep class com.recognizer.** { *; }
+# IResult lives in the bare `com` package (not a subpackage of the two above) — a separate
+# interface bridging KanjiUpRecognitionModule and its result classes, easy to miss since it's
+# outside the module's own namespace.
+-keep class com.IResult { *; }
