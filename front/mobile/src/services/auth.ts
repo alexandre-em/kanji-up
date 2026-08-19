@@ -40,6 +40,14 @@ export default class AuthService {
     return this._instance.patch<{ userId: string; migrated: boolean }>(`/${userId}/recover`, { idToken }, options);
   }
 
+  // Bootstrap only, like create() above: the client has no stored userId yet on a fresh device
+  // signing in with Google directly rather than creating a plain named account.
+  signInWithGoogle(payload: { idToken: string; macAddress: string }, options?: AxiosRequestConfig) {
+    if (!this._instance) throw new Error('Auth instance not ready...');
+
+    return this._instance.post<{ userId: string }>('/sign-in-with-google', payload, options);
+  }
+
   earnCredits(userId: string, options?: AxiosRequestConfig) {
     if (!this._instance) throw new Error('Auth instance not ready...');
 
