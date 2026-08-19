@@ -136,6 +136,9 @@ export const lists = createSlice({
     selectKanjiForActiveList,
     unSelectKanjiForActiveList,
     cancelActiveListSelection,
+    resetSaveStatus: (state: ListsState) => {
+      state.saveStatus = 'idle';
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(initialize.pending, (state) => {
@@ -185,3 +188,15 @@ export const selectListsSaveStatus = (state: RootState) => state.lists.saveStatu
 export const selectListsCount = (state: RootState) => Object.keys(state.lists.lists).length;
 export const selectKanjiToAddToActiveList = (state: RootState) => state.lists.toAdd;
 export const selectKanjiToRemoveFromActiveList = (state: RootState) => state.lists.toRemove;
+
+// What the active list's kanji count WOULD be if saved right now — mirrors
+// selectedKanji's selectSelectedKanjiCount, scoped to whichever list is active
+export const selectActiveListPendingCount = (state: RootState) => {
+  const { lists: allLists, activeListId, toAdd, toRemove } = state.lists;
+  const activeList = activeListId ? allLists[activeListId] : undefined;
+  if (!activeList) return 0;
+
+  const committedCount = activeList.kanjiIds.filter((id) => !toRemove[id]).length;
+
+  return committedCount + Object.keys(toAdd).length;
+};

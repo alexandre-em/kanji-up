@@ -5,7 +5,11 @@ import { useSelector } from 'react-redux';
 
 import Lock from '../../../../../components/svg/lock';
 import { getAccuracyPercent, ProgressionEntry } from '../../../../../constants/progression';
-import { selectKanjiToAdd, selectKanjiToDelete, selectSelectedKanji } from '../../../../../store/slices/selectedKanji';
+import {
+  selectActiveList,
+  selectKanjiToAddToActiveList,
+  selectKanjiToRemoveFromActiveList,
+} from '../../../../../store/slices/lists';
 
 type KanjiCardElementProps = {
   kanji: Partial<KanjiType>;
@@ -18,9 +22,10 @@ type KanjiCardElementProps = {
 const CARD_SIZE = 50;
 
 export default function KanjiCardElement({ kanji, onPress, isLocked, progressionEntry }: KanjiCardElementProps) {
-  const entities = useSelector(selectSelectedKanji);
-  const toAdd = useSelector(selectKanjiToAdd);
-  const toRemove = useSelector(selectKanjiToDelete);
+  const activeList = useSelector(selectActiveList);
+  const toAdd = useSelector(selectKanjiToAddToActiveList);
+  const toRemove = useSelector(selectKanjiToRemoveFromActiveList);
+  const isInActiveList = !!activeList?.kanjiIds.includes(kanji.kanji_id!);
 
   const progressPercent = getAccuracyPercent(progressionEntry);
 
@@ -31,11 +36,11 @@ export default function KanjiCardElement({ kanji, onPress, isLocked, progression
     if (toAdd[kanji.kanji_id!]) {
       return Colors.$backgroundSuccessHeavy;
     }
-    if (entities[kanji.kanji_id!]) {
+    if (isInActiveList) {
       return Colors.$backgroundNeutralHeavy;
     }
     return Colors.$backgroundNeutralLight;
-  }, [kanji.kanji_id, entities, toAdd, toRemove]);
+  }, [kanji.kanji_id, isInActiveList, toAdd, toRemove]);
 
   const label = useMemo(() => {
     if (toRemove[kanji.kanji_id!]) {
@@ -44,15 +49,15 @@ export default function KanjiCardElement({ kanji, onPress, isLocked, progression
     if (toAdd[kanji.kanji_id!]) {
       return Assets.icons.add;
     }
-    if (entities[kanji.kanji_id!]) {
+    if (isInActiveList) {
       return Assets.icons.check;
     }
     return undefined;
-  }, [kanji.kanji_id, entities, toAdd, toRemove]);
+  }, [kanji.kanji_id, isInActiveList, toAdd, toRemove]);
 
   const isBadgeVisible = useMemo(() => {
-    return toRemove[kanji.kanji_id!] || toAdd[kanji.kanji_id!] || entities[kanji.kanji_id!];
-  }, [kanji.kanji_id, entities, toAdd, toRemove]);
+    return toRemove[kanji.kanji_id!] || toAdd[kanji.kanji_id!] || isInActiveList;
+  }, [kanji.kanji_id, isInActiveList, toAdd, toRemove]);
 
   return (
     <Card style={[styles.cardContainer, isLocked && styles.cardLocked]} width={CARD_SIZE} height={CARD_SIZE} onPress={onPress}>

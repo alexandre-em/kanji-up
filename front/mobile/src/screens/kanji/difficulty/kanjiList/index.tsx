@@ -1,6 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -18,16 +18,18 @@ import { useToaster } from '../../../../providers/toaster.tsx';
 import { getAll, selectGetAllStatus, selectLastGet } from '../../../../store/slices/kanji';
 import { selectGetAllResult } from '../../../../store/slices/kanji';
 import {
-  save,
-  selectedKanji,
-  selectKanjiToAdd,
-  selectKanjiToDelete,
-  selectSaveStatus,
-  selectSelectedKanji,
-  selectSelectedKanjiCount,
-} from '../../../../store/slices/selectedKanji';
+  lists,
+  saveActiveListSelection,
+  selectActiveList,
+  selectActiveListPendingCount,
+  selectKanjiToAddToActiveList,
+  selectKanjiToRemoveFromActiveList,
+  selectLists as selectAllLists,
+  selectListsSaveStatus,
+} from '../../../../store/slices/lists';
 import { selectUserState, unlockContent } from '../../../../store/slices/user';
 import { isKanjiLocked } from '../../../../utils/kanjiLock';
+import ActiveListSelector from './components/activeListSelector';
 import KanjiCardElement from './components/kanjiCardElement';
 import UnlockModal from './components/unlockModal';
 
@@ -47,11 +49,12 @@ export default function KanjiList(props: KanjiListProps) {
   const last = useAppSelector(selectLastGet);
   const kanjis = useAppSelector(selectGetAllResult);
   const kanjisStatus = useAppSelector(selectGetAllStatus);
-  const entities = useSelector(selectSelectedKanji);
-  const toAdd = useSelector(selectKanjiToAdd);
-  const toRemove = useSelector(selectKanjiToDelete);
-  const saveStatus = useSelector(selectSaveStatus);
-  const selectedCount = useAppSelector(selectSelectedKanjiCount);
+  const allLists = useSelector(selectAllLists);
+  const activeList = useSelector(selectActiveList);
+  const toAdd = useSelector(selectKanjiToAddToActiveList);
+  const toRemove = useSelector(selectKanjiToRemoveFromActiveList);
+  const saveStatus = useSelector(selectListsSaveStatus);
+  const pendingCount = useAppSelector(selectActiveListPendingCount);
   const { difficulty, category } = props.route.params;
   const toaster = useToaster();
   const userState = useAppSelector(selectUserState);
@@ -64,13 +67,6 @@ export default function KanjiList(props: KanjiListProps) {
   // Only paid tiers (present in the cost table) have anything to unlock — free tiers (JLPT
   // N5/N4, grade 1-6) never gate a single kanji, perKanjiCost stays undefined for them
   const isTierPaid = perKanjiCost !== undefined;
-
-  const kanjiList = useMemo(() => {
-    const isOnline = true;
-    if (isOnline) return kanjis; // TODO: check connection
-
-    return Object.values(entities).filter((entity) => Number(entity.kanji?.jlpt) === Number(difficulty));
-  }, [kanjis, difficulty, entities]);
 
   const handleEndReached = useCallback(() => {
     if (difficulty === last?.difficulty && category === last?.type && last.page > 0 && last.page < last.totalPage) {
@@ -87,19 +83,23 @@ export default function KanjiList(props: KanjiListProps) {
 
   const handleSelect = useCallback(
     (kanji: Partial<KanjiType>) => {
-      if (toAdd[kanji.kanji_id!] || (entities[kanji.kanji_id!] && !toRemove[kanji.kanji_id!])) {
-        dispatch(selectedKanji.actions.unSelectKanji(kanji));
+      if (!activeList) return;
+
+      const isInActiveList = activeList.kanjiIds.includes(kanji.kanji_id!);
+
+      if (toAdd[kanji.kanji_id!] || (isInActiveList && !toRemove[kanji.kanji_id!])) {
+        dispatch(lists.actions.unSelectKanjiForActiveList(kanji));
         return;
       }
 
-      if (!isPremium && selectedCount >= MAX_FREE_SELECTED_KANJI) {
+      if (!isPremium && pendingCount >= MAX_FREE_SELECTED_KANJI) {
         toaster?.show({ message: t('kanjiList.selectionLimit.toast', { max: MAX_FREE_SELECTED_KANJI }), type: 'failure' });
         return;
       }
 
-      dispatch(selectedKanji.actions.selectKanji(kanji));
+      dispatch(lists.actions.selectKanjiForActiveList(kanji));
     },
-    [dispatch, toAdd, toRemove, entities, isPremium, selectedCount, toaster, t],
+    [dispatch, toAdd, toRemove, activeList, isPremium, pendingCount, toaster, t],
   );
 
   // Locked kanji navigate through too now — the detail screen is the single place that gates
@@ -127,14 +127,22 @@ export default function KanjiList(props: KanjiListProps) {
   }, [dispatch, userState.userId, tierKey, toaster, t]);
 
   const handleSave = useCallback(() => {
-    dispatch(save());
+    dispatch(saveActiveListSelection());
     setIsSelectModeOn(false);
   }, [dispatch]);
 
   const handleCancel = useCallback(() => {
-    dispatch(selectedKanji.actions.cancel());
+    dispatch(lists.actions.cancelActiveListSelection());
     setIsSelectModeOn(false);
   }, [dispatch]);
+
+  const handleSelectActiveList = useCallback(
+    (id: string) => {
+      dispatch(lists.actions.setActiveList(id));
+      setIsSelectModeOn(false);
+    },
+    [dispatch],
+  );
 
   useEffect(() => {
     if (last?.difficulty !== difficulty || last?.type !== category) {
@@ -146,7 +154,7 @@ export default function KanjiList(props: KanjiListProps) {
     if (toaster) {
       if (saveStatus === 'succeeded') {
         toaster.show({ message: t('kanji.select.toast.success'), type: 'success' });
-        dispatch(selectedKanji.actions.resetSaveStatus());
+        dispatch(lists.actions.resetSaveStatus());
       }
       if (saveStatus === 'failed') {
       }
@@ -158,9 +166,11 @@ export default function KanjiList(props: KanjiListProps) {
     // withTabBar on Layout would reserve clearance on the outer (inert) ScrollView too, creating
     // a double gap and letting that outer scroll fire the scroll-hide-bar behavior wrongly
     <Layout screen="kanjiList">
+      <ActiveListSelector lists={Object.values(allLists)} activeList={activeList} onSelect={handleSelectActiveList} />
+      <Spacing y={12} />
       <View style={styles.buttonGroup}>
         {!isSelectModeOn ? (
-          <Button label="Select" onPress={() => setIsSelectModeOn(!isSelectModeOn)} size="xSmall" />
+          <Button label="Select" onPress={() => setIsSelectModeOn(!isSelectModeOn)} size="xSmall" disabled={!activeList} />
         ) : (
           <>
             <Button label="Save selection" onPress={handleSave} size="xSmall" />
@@ -180,12 +190,12 @@ export default function KanjiList(props: KanjiListProps) {
       </View>
       {isSelectModeOn && !isPremium && (
         <Text $textNeutral text90M style={styles.selectionCounter}>
-          {t('kanjiList.selectionLimit.counter', { count: selectedCount, max: MAX_FREE_SELECTED_KANJI })}
+          {t('kanjiList.selectionLimit.counter', { count: pendingCount, max: MAX_FREE_SELECTED_KANJI })}
         </Text>
       )}
       <Spacing y={10} />
       <FlashList
-        data={kanjiList}
+        data={kanjis}
         keyExtractor={(item) => item.kanji_id!}
         renderItem={({ item }) => (
           <KanjiCardElement

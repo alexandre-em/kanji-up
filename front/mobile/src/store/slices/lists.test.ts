@@ -1,4 +1,5 @@
-import listsReducer, { lists } from './lists';
+import { RootState } from '..';
+import listsReducer, { lists, selectActiveListPendingCount } from './lists';
 
 const kanji1: Partial<KanjiType> = { kanji_id: 'k1' };
 const kanji2: Partial<KanjiType> = { kanji_id: 'k2' };
@@ -86,5 +87,37 @@ describe('cancelActiveListSelection', () => {
 
     expect(result.toAdd).toEqual({});
     expect(result.toRemove).toEqual({});
+  });
+});
+
+describe('selectActiveListPendingCount', () => {
+  const asRootState = (listsState: ListsState) => ({ lists: listsState }) as RootState;
+
+  it('is 0 when there is no active list', () => {
+    const state: ListsState = { ...baseState, activeListId: null };
+
+    expect(selectActiveListPendingCount(asRootState(state))).toBe(0);
+  });
+
+  it("counts the active list's committed kanji when nothing is staged", () => {
+    expect(selectActiveListPendingCount(asRootState(baseState))).toBe(1);
+  });
+
+  it('adds staged additions', () => {
+    const state: ListsState = { ...baseState, toAdd: { k2: kanji2 } };
+
+    expect(selectActiveListPendingCount(asRootState(state))).toBe(2);
+  });
+
+  it('subtracts staged removals', () => {
+    const state: ListsState = { ...baseState, toRemove: { k1: kanji1 } };
+
+    expect(selectActiveListPendingCount(asRootState(state))).toBe(0);
+  });
+
+  it('nets additions and removals together', () => {
+    const state: ListsState = { ...baseState, toAdd: { k2: kanji2 }, toRemove: { k1: kanji1 } };
+
+    expect(selectActiveListPendingCount(asRootState(state))).toBe(1);
   });
 });
