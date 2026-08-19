@@ -18,9 +18,15 @@ export default function LanguageSelector() {
   const toast = useToaster();
   const [isPickerVisible, setPickerVisible] = useState(false);
 
+  // i18n.language is a full device locale tag (e.g. "en-US", "fr-FR") until the user picks one
+  // manually here — SUPPORTED_LANGUAGES and every settings.language.<code> key only know the base
+  // code, so looking either up with the raw tag silently misses (label falls back to the raw key,
+  // and the picker's checkmark never lands on any option on first launch)
+  const currentLanguageCode = SUPPORTED_LANGUAGES.find((code) => i18n.language.startsWith(code)) ?? SUPPORTED_LANGUAGES[0];
+
   const handleSelect = (code: string) => {
     setPickerVisible(false);
-    if (code === i18n.language) return;
+    if (code === currentLanguageCode) return;
     i18n.changeLanguage(code);
     toast?.show({ message: t('settings.language.toast'), type: 'success' });
   };
@@ -35,7 +41,7 @@ export default function LanguageSelector() {
           {t('settings.language.title')}
         </Text>
         <Text text80M $textNeutral>
-          {t(`settings.language.${i18n.language}`)}
+          {t(`settings.language.${currentLanguageCode}`)}
         </Text>
       </TouchableOpacity>
       <Dialog visible={isPickerVisible} onDismiss={() => setPickerVisible(false)} bottom useSafeArea width="100%">
@@ -46,7 +52,7 @@ export default function LanguageSelector() {
           <Spacing y={12} />
           <ScrollView style={styles.list} showsVerticalScrollIndicator={false}>
             {SUPPORTED_LANGUAGES.map((code) => {
-              const isActive = code === i18n.language;
+              const isActive = code === currentLanguageCode;
 
               return (
                 <TouchableOpacity
