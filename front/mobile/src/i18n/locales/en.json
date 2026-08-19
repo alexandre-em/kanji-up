@@ -145,6 +145,11 @@
 
   "kanjiList.title": "Kanji List",
   "kanjiList.subtitle": "Tap a kanji to select or unselect it, then press Save to confirm. Long-press any kanji to view its details",
+  "kanjiList.activeList.label": "Active list",
+  "kanjiList.activeList.choose": "Choose a list",
+  "kanjiList.activeList.none.title": "No list yet",
+  "kanjiList.activeList.none.subtitle": "Create a list to start selecting kanji",
+  "kanjiList.activeList.none.action": "Create a list",
   "kanjiList.unlock.bulkButton": "Unlock all ({{cost}})",
   "kanjiList.unlock.single.label": "this kanji",
   "kanjiList.unlock.bulk.label": "this whole level",
