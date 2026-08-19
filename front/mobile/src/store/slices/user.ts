@@ -80,6 +80,20 @@ export const recoverAccount = createAsyncThunk<{ userId: string; migrated: boole
   },
 );
 
+// Same "refetch the full profile afterward" reasoning as recoverAccount above — the returned
+// userId is authoritative (an existing account for this Google identity, or a freshly created
+// one), and getUser populates everything else. No dedicated status field: callers track their
+// own pending/error state locally, same as GoogleSignInButton already does for recoverAccount.
+export const signInWithGoogle = createAsyncThunk<{ userId: string }, { idToken: string; macAddress: string }>(
+  'user/signInWithGoogle',
+  async ({ idToken, macAddress }, { dispatch }) => {
+    const response = await core.authService!.signInWithGoogle({ idToken, macAddress });
+    await dispatch(getUser({ userId: response.data.userId }));
+
+    return response.data;
+  },
+);
+
 export const earnCredits = createAsyncThunk<{ creditsEarned: number }, { userId: string }>(
   'user/earnCredits',
   async ({ userId }) => {
