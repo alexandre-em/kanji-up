@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 
 import { LAST_KNOWN_REGISTRATION_KEY, ONBOARDING_FINISHED_KEY } from '../constants/storage';
 import { fileServiceInstance } from '../services/file';
-import { getUser, selectGetUserStatus, selectUserName } from '../store/slices/user';
+import { getUser, selectGetUserStatus } from '../store/slices/user';
 import { useAppDispatch } from './useStore';
 
 // getUniqueId() or the getUser request can hang with nothing to catch (flaky emulator, dead
@@ -14,7 +14,6 @@ const BOOT_TIMEOUT_MS = 10000;
 
 export const useIsNotRegistered = () => {
   const dispatch = useAppDispatch();
-  const userName = useSelector(selectUserName);
   const getUserStatus = useSelector(selectGetUserStatus);
   const [isUserDataStocked, setIsUserDataStocked] = useState<boolean>();
   const [hasBootTimedOut, setHasBootTimedOut] = useState(false);
@@ -62,7 +61,12 @@ export const useIsNotRegistered = () => {
 
   const isGetUserSettled = getUserStatus === 'succeeded' || getUserStatus === 'failed' || hasBootTimedOut;
   const isLiveResultReady = isUserDataStocked !== undefined && isGetUserSettled;
-  const liveResult = isLiveResultReady ? accountConfirmedMissing || (userName === '' && isUserDataStocked === false) : undefined;
+  // Deliberately NOT keyed on userName: it's the same Redux field the onboarding name field
+  // writes to on every keystroke, well before any account exists — trusting it here let a typed
+  // (but never submitted-successfully) name make this resolve "registered" with no real account.
+  // isUserDataStocked is the durable signal instead: only ever set once ONBOARDING_FINISHED_KEY
+  // is actually persisted, either after a successful create or a confirmed existing account.
+  const liveResult = isLiveResultReady ? accountConfirmedMissing || isUserDataStocked === false : undefined;
 
   useEffect(() => {
     if (liveResult === undefined) return;
