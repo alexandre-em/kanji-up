@@ -74,7 +74,7 @@ export default function Onboarding() {
   }, [userName]);
 
   return (
-    <View height="100%">
+    <View height="100%" paddingH-20>
       <Step1 step={step} />
       <Step2 step={step} />
       <Step3 step={step} />
