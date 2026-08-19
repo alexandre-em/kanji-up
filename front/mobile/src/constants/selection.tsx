@@ -86,6 +86,18 @@ export const selectionMenuButtons: SelectionButtonsType[] = [
     screen: 'advanced',
     premium: true,
   },
+  {
+    textKey: 'selection.menu.myLists.title',
+    subtitle: 'selection.menu.myLists.subtitle',
+    image: (
+      <>
+        <Image source={Assets.banners.flashcards} style={styles.bannerImage} />
+        <BannerScrim />
+      </>
+    ),
+    screen: 'myLists',
+    premium: false,
+  },
 ];
 
 export const schoolDifficulties = [
