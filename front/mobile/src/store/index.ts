@@ -7,6 +7,7 @@ import lists from './slices/lists';
 import missions from './slices/missions';
 import selectedKanji from './slices/selectedKanji';
 import selectedWord from './slices/selectedWord';
+import sessionHistory from './slices/sessionHistory';
 import user from './slices/user';
 import word from './slices/word';
 import wordEvaluation from './slices/wordEvaluation';
@@ -23,6 +24,7 @@ const store = configureStore({
     missions,
     flashcards,
     lists,
+    sessionHistory,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
