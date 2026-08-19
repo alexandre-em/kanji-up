@@ -11,6 +11,9 @@ export type TrainingModeType = {
   screen: string;
   image: ReactNode;
   comingSoon?: boolean;
+  // Modes that don't draw from a selected-kanji list (e.g. a history viewer) skip the
+  // choose-a-list prompt entirely and navigate straight through
+  skipListPicker?: boolean;
 };
 
 const { width } = Dimensions.get('window');
@@ -69,6 +72,18 @@ export const trainingModes: TrainingModeType[] = [
     image: (
       <>
         <Image source={Assets.banners.wordTest} style={styles.bannerImage} />
+        <BannerScrim />
+      </>
+    ),
+  },
+  {
+    textKey: 'training.menu.history.title',
+    subtitle: 'training.menu.history.subtitle',
+    screen: screenNames.HISTORY,
+    skipListPicker: true,
+    image: (
+      <>
+        <Image source={Assets.banners.jlpt} style={styles.bannerImage} />
         <BannerScrim />
       </>
     ),

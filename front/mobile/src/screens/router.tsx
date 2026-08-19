@@ -27,6 +27,7 @@ import Settings from './settings';
 import TrainingModes from './training';
 import EvaluationHoc from './training/evaluation/hoc';
 import FlashcardsScreen from './training/flashcards';
+import HistoryScreen from './training/history';
 import WordEvaluationHoc from './training/wordEvaluation/hoc';
 import WordDetail from './word';
 
@@ -84,6 +85,7 @@ export default function RootNavigation() {
           <Stack.Screen name={screenNames.EVALUATION} component={EvaluationHoc} options={headerOptions} />
           <Stack.Screen name={screenNames.WORD_EVALUATION} component={WordEvaluationHoc} options={headerOptions} />
           <Stack.Screen name={screenNames.FLASHCARDS} component={FlashcardsScreen} options={headerOptions} />
+          <Stack.Screen name={screenNames.HISTORY} component={HistoryScreen} options={headerOptions} />
           <Stack.Screen name={screenNames.SEARCH} component={Search} />
           <Stack.Screen name={screenNames.CATEGORIES} component={KanjiCategoriesScreen} />
           <Stack.Screen name={screenNames.MY_LISTS} component={ListsScreen} options={headerOptions} />

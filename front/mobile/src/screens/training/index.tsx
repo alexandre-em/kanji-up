@@ -26,11 +26,20 @@ export default function TrainingModes() {
   const [isListPickerVisible, setIsListPickerVisible] = useState(false);
   const [emptyListId, setEmptyListId] = useState<string | null>(null);
 
-  const handlePress = useCallback((mode: TrainingModeType) => {
-    if (mode.comingSoon) return;
-    setPendingMode(mode);
-    setIsListPickerVisible(true);
-  }, []);
+  const handlePress = useCallback(
+    (mode: TrainingModeType) => {
+      if (mode.comingSoon) return;
+
+      if (mode.skipListPicker) {
+        navigation.navigate(mode.screen as never);
+        return;
+      }
+
+      setPendingMode(mode);
+      setIsListPickerVisible(true);
+    },
+    [navigation],
+  );
 
   const handleListPicked = useCallback(
     (id: string) => {
