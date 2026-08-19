@@ -27,6 +27,12 @@ export default class SessionsService {
     return this._instance.get<SessionType | null>('/active', { ...options, params: { userId, type } });
   }
 
+  findByUser(userId: string, type: SessionKind, page = 1, limit = 20, options?: AxiosRequestConfig) {
+    if (!this._instance) throw new Error('Sessions instance not ready...');
+
+    return this._instance.get<SessionType[]>(`/user/${userId}`, { ...options, params: { type, page, limit } });
+  }
+
   updateQuestion(sessionId: string, question: SessionType['questions'][number], options?: AxiosRequestConfig) {
     if (!this._instance) throw new Error('Sessions instance not ready...');
 
