@@ -111,6 +111,7 @@
   "lists.card.kanjiCount_one": "{{count}} kanji",
   "lists.card.kanjiCount_other": "{{count}} kanji",
   "lists.card.empty": "No kanji in this list yet",
+  "lists.card.emptyDescription": "This list is empty",
   "lists.card.rename": "Rename",
   "lists.card.delete": "Delete",
   "lists.delete.confirmTitle": "Delete \"{{name}}\"?",

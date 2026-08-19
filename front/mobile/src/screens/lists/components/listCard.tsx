@@ -30,43 +30,45 @@ export default function ListCard({ list, onRename, onDelete }: ListCardProps) {
 
   return (
     <View style={styles.card}>
-      <ExpandableSection expanded={isExpanded} onPress={() => setIsExpanded((prev) => !prev)}>
-        <RNView style={styles.cardHeader}>
-          <View flex>
-            <Text text70BO $textDefault numberOfLines={1}>
-              {list.name}
-            </Text>
-            <Text text90M $textNeutral>
-              {t('lists.card.kanjiCount', { count: list.kanjiIds.length })}
-            </Text>
-          </View>
+      <ExpandableSection
+        expanded={isExpanded}
+        onPress={() => setIsExpanded((prev) => !prev)}
+        sectionHeader={
+          <RNView style={styles.cardHeader}>
+            <View flex>
+              <Text text70BO $textDefault numberOfLines={1}>
+                {list.name}
+              </Text>
+              <Text text90M $textNeutral>
+                {list.kanjiIds.length === 0
+                  ? t('lists.card.emptyDescription')
+                  : t('lists.card.kanjiCount', { count: list.kanjiIds.length })}
+              </Text>
+            </View>
+          </RNView>
+        }>
+        <Spacing y={12} />
+        {list.kanjiIds.length === 0 ? (
+          <Text text90M $textNeutral>
+            {t('lists.card.empty')}
+          </Text>
+        ) : (
+          <RNView style={styles.chipRow}>
+            {list.kanjiIds.map((kanjiId) => (
+              <RNView key={kanjiId} style={styles.chip}>
+                <Text text80M $textDefault>
+                  {kanjiEntities[kanjiId]?.kanji?.character ?? '…'}
+                </Text>
+              </RNView>
+            ))}
+          </RNView>
+        )}
+        <Spacing y={16} />
+        <RNView style={styles.cardActions}>
+          <Button label={t('lists.card.rename')} outline size="xSmall" onPress={onRename} />
+          <Button label={t('lists.card.delete')} outline size="xSmall" onPress={onDelete} />
         </RNView>
       </ExpandableSection>
-      {isExpanded && (
-        <>
-          <Spacing y={12} />
-          {list.kanjiIds.length === 0 ? (
-            <Text text90M $textNeutral>
-              {t('lists.card.empty')}
-            </Text>
-          ) : (
-            <RNView style={styles.chipRow}>
-              {list.kanjiIds.map((kanjiId) => (
-                <RNView key={kanjiId} style={styles.chip}>
-                  <Text text80M $textDefault>
-                    {kanjiEntities[kanjiId]?.kanji?.character ?? '…'}
-                  </Text>
-                </RNView>
-              ))}
-            </RNView>
-          )}
-          <Spacing y={16} />
-          <RNView style={styles.cardActions}>
-            <Button label={t('lists.card.rename')} outline size="xSmall" onPress={onRename} />
-            <Button label={t('lists.card.delete')} outline size="xSmall" onPress={onDelete} />
-          </RNView>
-        </>
-      )}
     </View>
   );
 }
