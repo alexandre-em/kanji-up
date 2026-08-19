@@ -20,7 +20,7 @@ import { useAppDispatch, useAppSelector } from '../../../../../hooks/useStore.ts
 import { useToaster } from '../../../../../providers/toaster.tsx';
 import { core } from '../../../../../services/http.ts';
 import { getOne, selectEntities, selectGetOneStatus } from '../../../../../store/slices/kanji.ts';
-import { save, selectedKanji, selectSaveStatus, selectSelectedKanji } from '../../../../../store/slices/selectedKanji.ts';
+import { lists, saveActiveListSelection, selectActiveList, selectListsSaveStatus } from '../../../../../store/slices/lists.ts';
 import { selectUserState, unlockContent } from '../../../../../store/slices/user.ts';
 import { getCheapestLockedTier, isKanjiLocked } from '../../../../../utils/kanjiLock.ts';
 import DifficultyTag, { getAdvancedTag, getGradeTag, getJlptTag } from '../../../../search/components/difficultyTag.tsx';
@@ -38,8 +38,8 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
   const dispatch = useAppDispatch();
   const entities = useAppSelector(selectEntities);
   const getOneStatus = useAppSelector(selectGetOneStatus);
-  const selectedKanjiState = useAppSelector(selectSelectedKanji);
-  const selectedSaveStatus = useAppSelector(selectSaveStatus);
+  const activeList = useAppSelector(selectActiveList);
+  const listsSaveStatus = useAppSelector(selectListsSaveStatus);
   const { character } = props.route.params;
   const [svg, setSvg] = useState<string>();
   const [isDrawMode, setIsDrawMode] = useState<boolean>(false);
@@ -123,40 +123,41 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
     setIsDrawMode((prev) => !prev);
   }, []);
 
+  const isInActiveList = !!activeList?.kanjiIds.includes(character);
+
   const handleSelect = useCallback(() => {
-    if (entities[character]) {
-      if (!selectedKanjiState[character]) {
-        dispatch(selectedKanji.actions.selectKanji(entities[character]));
-        setShowModal(true);
-      } else {
-        dispatch(selectedKanji.actions.unSelectKanji(entities[character]));
-        setShowModal(true);
-      }
+    if (!activeList || !entities[character]) return;
+
+    if (!isInActiveList) {
+      dispatch(lists.actions.selectKanjiForActiveList(entities[character]));
+    } else {
+      dispatch(lists.actions.unSelectKanjiForActiveList(entities[character]));
     }
-  }, [entities[character], selectedKanjiState[character]]);
+    setShowModal(true);
+  }, [activeList, entities[character], isInActiveList]);
 
   const handleSubmit = useCallback(() => {
-    dispatch(save());
+    dispatch(saveActiveListSelection());
     setShowModal(false);
   }, []);
 
   const handleCancel = useCallback(() => {
-    dispatch(selectedKanji.actions.cancel());
+    dispatch(lists.actions.cancelActiveListSelection());
     setShowModal(false);
   }, []);
 
   useEffect(() => {
     if (toaster) {
-      if (selectedSaveStatus === 'succeeded') {
+      if (listsSaveStatus === 'succeeded') {
         toaster.show({ message: t('kanji.select.toast.success'), type: 'success' });
-        dispatch(selectedKanji.actions.resetSaveStatus());
+        dispatch(lists.actions.resetSaveStatus());
         setShowModal(false);
       }
-      if (selectedSaveStatus === 'failed') {
+      if (listsSaveStatus === 'failed') {
         setShowModal(false);
       }
     }
-  }, [selectedSaveStatus]);
+  }, [listsSaveStatus]);
 
   useEffect(() => {
     if (!entities[character]) dispatch(getOne(character));
@@ -282,8 +283,9 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
         <Button
           iconSource={isDrawMode ? Assets.icons.video : Assets.icons.draw}
           iconProps={{ size: 20 }}
-          label={selectedKanjiState[character] ? t('kanjiDetails.unselect.button') : t('kanjiDetails.select.button')}
+          label={isInActiveList ? t('kanjiDetails.unselect.button') : t('kanjiDetails.select.button')}
           onPress={handleSelect}
+          disabled={!activeList}
           outline
         />
       </View>
