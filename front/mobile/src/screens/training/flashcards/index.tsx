@@ -1,5 +1,5 @@
 import { useFocusEffect } from '@react-navigation/native';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { View as RNView } from 'react-native';
 import { Button, ProgressBar, Text, View } from 'react-native-ui-lib';
@@ -8,32 +8,53 @@ import Layout from '../../../components/layout';
 import Spacing from '../../../components/spacing';
 import { useAppDispatch, useAppSelector } from '../../../hooks/useStore';
 import { reviewCard, selectDueFlashcards } from '../../../store/slices/flashcards';
+import { getOne, selectEntities } from '../../../store/slices/kanji';
+import { selectActiveList } from '../../../store/slices/lists';
 import Flashcard from './components/card';
 import { useFlashcardsScreenStyles } from './hooks/useFlashcardsScreenStyles';
 
 export default function FlashcardsScreen() {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
+  const activeList = useAppSelector(selectActiveList);
+  const kanjiEntities = useAppSelector(selectEntities);
   const dueFlashcards = useAppSelector(selectDueFlashcards);
   const styles = useFlashcardsScreenStyles();
+
+  // The active list only stores kanji_ids — fetch whichever ones aren't already cached before a
+  // due-card queue can be built from them
+  useEffect(() => {
+    activeList?.kanjiIds.forEach((id) => {
+      if (!kanjiEntities[id]) dispatch(getOne(id));
+    });
+  }, [activeList, kanjiEntities, dispatch]);
+
+  const isKanjiPoolReady = !!activeList && activeList.kanjiIds.every((id) => !!kanjiEntities[id]);
 
   // Snapshotted (not read live): grading a card can make it due again immediately (a "didn't
   // know" reset), and re-deriving the queue from the live due-selector would loop that same card
   // back in mid-session instead of moving on to the next one
-  const [queue, setQueue] = useState(() => dueFlashcards);
+  const [queue, setQueue] = useState<Partial<KanjiType>[]>([]);
   const [index, setIndex] = useState(0);
   const [isRevealed, setIsRevealed] = useState(false);
+  const [hasSnapshotted, setHasSnapshotted] = useState(false);
 
   // react-navigation doesn't always fully unmount a screen it navigates back to, so resetting
-  // only in useState's initializer isn't reliable — this re-snapshots every time the screen
-  // actually regains focus, whether or not it was torn down in between
+  // only in useState's initializer isn't reliable — this re-arms the snapshot every time the
+  // screen actually regains focus, whether or not it was torn down in between
   useFocusEffect(
     useCallback(() => {
-      setQueue(dueFlashcards);
+      setHasSnapshotted(false);
       setIndex(0);
       setIsRevealed(false);
-    }, [dueFlashcards]),
+    }, []),
   );
+
+  useEffect(() => {
+    if (!isKanjiPoolReady || hasSnapshotted) return;
+    setQueue(dueFlashcards);
+    setHasSnapshotted(true);
+  }, [isKanjiPoolReady, hasSnapshotted, dueFlashcards]);
 
   const currentCard = queue[index];
   const isSessionOver = index >= queue.length;
@@ -41,13 +62,16 @@ export default function FlashcardsScreen() {
   const handleGrade = useCallback(
     (knew: boolean) => {
       if (!currentCard?.kanji_id) return;
-
       dispatch(reviewCard({ kanjiId: currentCard.kanji_id, knew }));
       setIsRevealed(false);
       setIndex((prev) => prev + 1);
     },
     [currentCard, dispatch],
   );
+
+  if (!hasSnapshotted) {
+    return <Layout screen="flashcards" loadingMessage={t('loading.title')} />;
+  }
 
   if (queue.length === 0 || isSessionOver) {
     return (

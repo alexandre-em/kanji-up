@@ -63,7 +63,15 @@ export default flashcards.reducer;
 export const selectFlashcardInitStatus = (state: RootState) => state.flashcards.initStatus;
 export const selectFlashcardProgress = (state: RootState) => state.flashcards.progress;
 
-// The selected-kanji pool, filtered down to what's actually due for review right now — never-
-// reviewed kanji count as due, same as a fresh Leitner card
-export const selectDueFlashcards = (state: RootState): Partial<KanjiType>[] =>
-  Object.values(state.selectedKanji.selectedKanji).filter((kanji) => isCardDue(state.flashcards.progress[kanji.kanji_id!]));
+// The active list's kanji, filtered down to what's actually due for review right now — never-
+// reviewed kanji count as due, same as a fresh Leitner card. Only resolves ids already cached in
+// the kanji slice — the screen is responsible for fetching any missing ones first.
+export const selectDueFlashcards = (state: RootState): Partial<KanjiType>[] => {
+  const activeList = state.lists.activeListId ? state.lists.lists[state.lists.activeListId] : undefined;
+  if (!activeList) return [];
+
+  return activeList.kanjiIds
+    .map((id) => state.kanji.entities[id])
+    .filter((kanji): kanji is KanjiType => !!kanji)
+    .filter((kanji) => isCardDue(state.flashcards.progress[kanji.kanji_id!]));
+};

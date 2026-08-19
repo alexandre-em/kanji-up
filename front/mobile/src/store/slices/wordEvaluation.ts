@@ -66,10 +66,14 @@ export function computeWordProgressionDeltas(items: WordEvaluationItemType[]): {
   return deltas;
 }
 
+// Assumes the active list's kanji_ids are already resolved in state.kanji.entities — the caller
+// (WordEvaluationHoc) is responsible for fetching any missing ones first, same as kanji
+// evaluation and flashcards
 export const init = createAsyncThunk('wordEvaluation/init', async (payload: { number?: number } | undefined, { getState }) => {
-  const selectedKanji = (getState() as RootState).selectedKanji.selectedKanji;
-  const characters = Object.values(selectedKanji)
-    .map((kanji) => kanji.kanji?.character)
+  const state = getState() as RootState;
+  const activeList = state.lists.activeListId ? state.lists.lists[state.lists.activeListId] : undefined;
+  const characters = (activeList?.kanjiIds ?? [])
+    .map((id) => state.kanji.entities[id]?.kanji?.character)
     .filter((character): character is string => !!character);
 
   const response = await core.wordService!.getPracticeWords(characters, payload?.number ?? 10);
@@ -84,9 +88,11 @@ export const updateItemSlots = createAsyncThunk(
     const expected = state.wordEvaluation.items[currentIndex].word.word?.[0] ?? '';
     const expectedCharacters = getKanjiCharacters(expected);
 
+    const activeList = state.lists.activeListId ? state.lists.lists[state.lists.activeListId] : undefined;
     const strokesByCharacter: Record<string, number> = {};
-    Object.values(state.selectedKanji.selectedKanji).forEach((kanji) => {
-      if (kanji.kanji?.character && kanji.kanji.strokes !== undefined)
+    (activeList?.kanjiIds ?? []).forEach((id) => {
+      const kanji = state.kanji.entities[id];
+      if (kanji?.kanji?.character && kanji.kanji.strokes !== undefined)
         strokesByCharacter[kanji.kanji.character] = kanji.kanji.strokes;
     });
 
