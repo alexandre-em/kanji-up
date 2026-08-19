@@ -104,8 +104,8 @@
   "wordEvaluationResult.toast.success": "Progression enregistrée",
   "wordEvaluationResult.toast.error": "Impossible d'enregistrer ta progression, réessaie",
 
-  "home.evaluation.emptySelection.title": "Aucun kanji sélectionné",
-  "home.evaluation.emptySelection.message": "Choisis les kanji que tu veux pratiquer avant de commencer une évaluation.",
+  "home.evaluation.emptySelection.title": "Cette liste est vide",
+  "home.evaluation.emptySelection.message": "Ajoute des kanji à cette liste avant de commencer une évaluation.",
   "home.evaluation.emptySelection.confirm": "Choisir des kanji",
   "home.evaluation.emptySelection.cancel": "Annuler",
   "home.menu.ad.reward.toast": "Credits gagnés, merci d'avoir regardé !",

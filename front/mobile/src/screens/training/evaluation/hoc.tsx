@@ -22,8 +22,9 @@ import {
   selectEvaluationStatus,
   startFreshSession,
 } from '../../../store/slices/evaluation';
+import { getOne, selectEntities } from '../../../store/slices/kanji';
+import { selectActiveList } from '../../../store/slices/lists';
 import { completeMissionTask } from '../../../store/slices/missions';
-import { selectSelectedKanji } from '../../../store/slices/selectedKanji';
 import { syncKanjiProgression, user } from '../../../store/slices/user';
 import EvaluationScreen from '.';
 
@@ -32,7 +33,8 @@ const numberKanji = 20;
 type PendingResume = { source: 'local'; session: PendingLocalSession } | { source: 'server'; session: SessionType };
 
 export default function EvaluationHoc() {
-  const kanjis = useAppSelector(selectSelectedKanji);
+  const activeList = useAppSelector(selectActiveList);
+  const kanjiEntities = useAppSelector(selectEntities);
   const evaluationItems = useAppSelector(selectEvaluationItems);
   const evaluationStatus = useAppSelector(selectEvaluationStatus);
   const isPremium = useAppSelector((state) => state.user.subscriptionPlan === 'premium');
@@ -45,14 +47,25 @@ export default function EvaluationHoc() {
   const toast = useToaster();
   const { t } = useTranslation();
 
+  // The active list only stores kanji_ids — fetch whichever ones aren't already cached before a
+  // session can be built from them
+  useEffect(() => {
+    activeList?.kanjiIds.forEach((id) => {
+      if (!kanjiEntities[id]) dispatch(getOne(id));
+    });
+  }, [activeList, kanjiEntities, dispatch]);
+
+  const isKanjiPoolReady = !!activeList && activeList.kanjiIds.every((id) => !!kanjiEntities[id]);
+
   const kanjiQueue = useCallback(() => {
-    const kanjiValues = Object.values(kanjis);
+    const kanjiValues =
+      activeList?.kanjiIds.map((id) => kanjiEntities[id]).filter((entity): entity is KanjiType => !!entity) ?? [];
 
     if (kanjiValues.length > 0) {
       return Array.from(Array(numberKanji).keys()).map(() => kanjiValues[Math.floor(Math.random() * kanjiValues.length)]);
     }
     return [];
-  }, [kanjis]);
+  }, [activeList, kanjiEntities]);
 
   useEffect(() => {
     if (modelLoadError) toast?.show({ message: 'An error occurred when loading the recognition model', type: 'failure' });
@@ -151,9 +164,10 @@ export default function EvaluationHoc() {
   }, [dispatch, kanjiQueue, isPremium, finalizeAsIncomplete]);
 
   useEffect(() => {
+    if (!isKanjiPoolReady) return;
     void startSession();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isKanjiPoolReady]);
 
   const handleResume = useCallback(async () => {
     if (!pendingResume) return;
@@ -169,7 +183,9 @@ export default function EvaluationHoc() {
     setPendingResume(null);
   }, [dispatch, kanjiQueue, pendingResume]);
 
-  if (!isModelLoaded || isChecking) return <Layout screen="evaluation" loadingMessage={t('evaluation.loadingModel')} />;
+  if (!isModelLoaded || !isKanjiPoolReady || isChecking) {
+    return <Layout screen="evaluation" loadingMessage={t('evaluation.loadingModel')} />;
+  }
 
   if (pendingResume) {
     return (

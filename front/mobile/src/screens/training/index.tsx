@@ -4,41 +4,51 @@ import { useTranslation } from 'react-i18next';
 import { Dimensions, StyleSheet, View as RNView } from 'react-native';
 import { Button, Card, Colors, Text, View } from 'react-native-ui-lib';
 import Incubator from 'react-native-ui-lib/incubator';
-import { useSelector } from 'react-redux';
 
 import Layout from '../../components/layout';
 import Spacing from '../../components/spacing';
 import { screenNames } from '../../constants/screens';
 import { GENERAL_MARGIN } from '../../constants/styles';
 import { trainingModes, TrainingModeType } from '../../constants/training';
-import { selectSelectedKanji } from '../../store/slices/selectedKanji';
+import { useAppDispatch, useAppSelector } from '../../hooks/useStore';
+import { lists, selectLists } from '../../store/slices/lists';
+import ListPickerDialog from '../kanji/difficulty/kanjiList/components/listPickerDialog';
 
 const { width } = Dimensions.get('window');
 const { Dialog } = Incubator;
 
 export default function TrainingModes() {
   const navigation = useNavigation();
+  const dispatch = useAppDispatch();
   const { t } = useTranslation();
-  const selectedKanjiState = useSelector(selectSelectedKanji);
-  const [isEmptySelectionVisible, setEmptySelectionVisible] = useState(false);
+  const allLists = useAppSelector(selectLists);
+  const [pendingMode, setPendingMode] = useState<TrainingModeType | null>(null);
+  const [isListPickerVisible, setIsListPickerVisible] = useState(false);
+  const [emptyListId, setEmptyListId] = useState<string | null>(null);
 
-  const handlePress = useCallback(
-    (mode: TrainingModeType) => {
-      if (mode.comingSoon) return;
+  const handlePress = useCallback((mode: TrainingModeType) => {
+    if (mode.comingSoon) return;
+    setPendingMode(mode);
+    setIsListPickerVisible(true);
+  }, []);
 
-      const hasSelectedKanji = Object.keys(selectedKanjiState ?? {}).length > 0;
-      if (!hasSelectedKanji) {
-        setEmptySelectionVisible(true);
+  const handleListPicked = useCallback(
+    (id: string) => {
+      setIsListPickerVisible(false);
+      dispatch(lists.actions.setActiveList(id));
+
+      if (!allLists[id] || allLists[id].kanjiIds.length === 0) {
+        setEmptyListId(id);
         return;
       }
 
-      navigation.navigate(mode.screen as never);
+      if (pendingMode) navigation.navigate(pendingMode.screen as never);
     },
-    [navigation, selectedKanjiState],
+    [allLists, dispatch, pendingMode, navigation],
   );
 
   const handleGoToSelection = useCallback(() => {
-    setEmptySelectionVisible(false);
+    setEmptyListId(null);
     navigation.navigate(screenNames.CATEGORIES as never);
   }, [navigation]);
 
@@ -87,7 +97,13 @@ export default function TrainingModes() {
           </Card>
         </View>
       ))}
-      <Dialog visible={isEmptySelectionVisible} onDismiss={() => setEmptySelectionVisible(false)} bottom useSafeArea width="100%">
+      <ListPickerDialog
+        visible={isListPickerVisible}
+        lists={Object.values(allLists)}
+        onSelect={handleListPicked}
+        onClose={() => setIsListPickerVisible(false)}
+      />
+      <Dialog visible={!!emptyListId} onDismiss={() => setEmptyListId(null)} bottom useSafeArea width="100%">
         <RNView style={[styles.emptySelectionModal, { backgroundColor: Colors.$backgroundDefault }]}>
           <Text text70BO $textDefault>
             {t('home.evaluation.emptySelection.title')}
@@ -101,7 +117,7 @@ export default function TrainingModes() {
             <Button
               label={t('home.evaluation.emptySelection.cancel')}
               outline
-              onPress={() => setEmptySelectionVisible(false)}
+              onPress={() => setEmptyListId(null)}
               style={styles.emptySelectionButton}
             />
             <Button
