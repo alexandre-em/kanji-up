@@ -3,6 +3,7 @@ import { getUniqueId } from 'react-native-device-info';
 
 import { useAppDispatch } from '../hooks/useStore';
 import { initialize as initializeFlashcards } from '../store/slices/flashcards';
+import { initialize as initializeLists } from '../store/slices/lists';
 import { initialize as initializeKanji } from '../store/slices/selectedKanji';
 import { getUser } from '../store/slices/user';
 
@@ -21,6 +22,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       dispatch(getUser({ macAddress: deviceId }));
       dispatch(initializeKanji());
       dispatch(initializeFlashcards());
+      dispatch(initializeLists());
     });
   }, [dispatch]);
 

@@ -14,6 +14,23 @@ type SelectedKanjiState = {
   saveStatus: StatusType;
 };
 
+type SelectionList = {
+  id: string;
+  name: string;
+  kanjiIds: string[];
+};
+
+type ListsState = {
+  lists: Record<string, SelectionList>;
+  activeListId: string | null;
+  // Staged edits for whichever list is currently active — mirrors SelectedKanjiState's
+  // toAdd/toRemove pattern, just committed onto the active list's kanjiIds instead of a flat pool
+  toAdd: { [key: string]: Partial<KanjiType> };
+  toRemove: { [key: string]: Partial<KanjiType> };
+  initStatus: StatusType;
+  saveStatus: StatusType;
+};
+
 type SelectedWordState = {
   selectedWord: { [key: string]: Partial<WordType> };
   toAdd: { [key: string]: Partial<WordType> };
