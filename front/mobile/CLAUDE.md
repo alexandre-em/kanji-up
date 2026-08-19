@@ -158,16 +158,16 @@ npx react-native run-android --no-packager                        # build (~20 m
   mensuel/annuel + lifetime), vérifié côté serveur (`/billing/verify-purchase`). `Ocr`
   (`src/screens/ocr/index.tsx`) utilise réellement la caméra/galerie (`react-native-image-picker`)
   et upload l'image au backend (`scanService.create`, `/scans`).
-- Le mode sombre est désactivé en dur (`Colors.setScheme('light')` dans `App.tsx`) : la palette
-  `dark` de `rnui.ts` est du code mort. Aperçu réel fait le 2026-07-31 (bascule temporaire de
-  `setScheme`) : les tokens de `rnui.ts` s'appliquent correctement, mais plusieurs écrans ont des
-  bugs d'affichage jamais vus puisque jamais testés — sur Home, le texte « Welcome back » / « X
-  kanji selected » est quasi invisible (texte sombre sur fond sombre), et les `Card.Section` de
-  SELECT/SCAN/WIN CREDITS gardent un fond blanc plein derrière leur titre. Cause probable : usage
-  de tokens RNUI jamais définis dans notre thème (`$backgroundElevated`, `$backgroundElevatedLight`,
-  `$backgroundInverted`, `$textNeutralHeavy` — voir aussi la nouvelle famille `$*Neutral*` ajoutée
-  pour remplacer ces fallbacks non contrôlés). Activer le mode sombre pour de vrai est un chantier
-  à part, non demandé pour l'instant.
+- ~~Le mode sombre est désactivé en dur (`Colors.setScheme('light')` dans `App.tsx`)~~ — **faux,
+  corrigé le 2026-08-19** : un vrai `ThemeProvider` (`src/providers/theme.tsx`) existe, avec
+  sélection `system`/`light`/`dark` depuis Réglages (`settings/components/themeSelector.tsx`) et
+  persistance (`THEME_OVERRIDE_KEY`). Un bug distinct y a été trouvé et corrigé le même jour : la
+  restauration au démarrage ne mettait à jour que l'état React (`preference`), jamais
+  `Colors.setScheme()` — un thème `dark`/`light` explicite sauvegardé ne se réappliquait donc
+  jamais au lancement (l'app démarrait toujours en `light` jusqu'à resélection manuelle dans
+  Réglages). Les bugs d'affichage relevés lors de l'aperçu du 2026-07-31 (texte invisible sur Home,
+  fonds blancs sur SELECT/SCAN/WIN CREDITS, tokens RNUI non définis dans notre thème) n'ont pas été
+  revérifiés depuis — à re-tester une fois le mode sombre effectivement activable en pratique.
 - **Backend** : `searchCharacter` (`back/kanjiup/src/services/kanji.ts:64`) ne sélectionne pas
   `jlpt` dans le `populate` du sous-document `kanji`, contrairement à `getAll` (ligne 38) qui
   l'inclut. Conséquence côté mobile : le tag JLPT des résultats de recherche kanji

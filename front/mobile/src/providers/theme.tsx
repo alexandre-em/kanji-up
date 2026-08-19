@@ -55,11 +55,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     [systemTheme],
   );
 
-  // The device's own Appearance changing while "system" is selected has no event handler to piggy-
-  // back on, so it's the one legitimate use of an effect here
+  // Keeps RNUI's own scheme in sync with isDark for the two cases setPreference's synchronous call
+  // doesn't cover: the device's Appearance changing while "system" is selected (no event handler
+  // to piggy-back on), and restoring a stored preference on boot (the read above only updates
+  // React state — without this, an explicit dark/light override never re-applied Colors.setScheme
+  // on launch, so the app rendered light regardless of what was saved until reselected in Settings)
   useEffect(() => {
-    if (preference === 'system') Colors.setScheme(systemTheme === 'dark' ? 'dark' : 'light');
-  }, [preference, systemTheme]);
+    Colors.setScheme(isDark ? 'dark' : 'light');
+  }, [isDark]);
 
   return <ThemeContext.Provider value={{ preference, isDark, setPreference }}>{children}</ThemeContext.Provider>;
 }
