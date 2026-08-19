@@ -15,4 +15,5 @@ export const screenNames = {
   SETTINGS: 'Settings',
   PROFILE: 'Profile',
   WORD: 'Word',
+  MY_LISTS: 'MyLists',
 };

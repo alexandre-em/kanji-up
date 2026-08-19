@@ -1,8 +1,8 @@
 import { useNavigation } from '@react-navigation/native';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Dimensions, StyleSheet } from 'react-native';
-import { Colors, View } from 'react-native-ui-lib';
+import { Dimensions, StyleSheet, TouchableOpacity } from 'react-native';
+import { Colors, Text, View } from 'react-native-ui-lib';
 import Badge from 'react-native-ui-lib/badge';
 import Card from 'react-native-ui-lib/card';
 import { useSelector } from 'react-redux';
@@ -79,6 +79,18 @@ export default function KanjiCategoriesScreen() {
           </View>
         );
       })}
+      <Spacing y={15} />
+      <TouchableOpacity
+        style={[styles.myListsCard, { borderColor: Colors.$outlineNeutral }]}
+        onPress={() => navigation.navigate(screenNames.MY_LISTS)}
+        accessibilityRole="button">
+        <Text text70BO $textDefault>
+          {t('selection.menu.myLists.title')}
+        </Text>
+        <Text text90M $textNeutral>
+          {t('selection.menu.myLists.subtitle')}
+        </Text>
+      </TouchableOpacity>
     </Layout>
   );
 }
@@ -86,6 +98,11 @@ export default function KanjiCategoriesScreen() {
 const styles = StyleSheet.create({
   card: {
     padding: 15,
+  },
+  myListsCard: {
+    padding: 15,
+    borderRadius: 10,
+    borderWidth: 1,
   },
   cardDisabled: {
     opacity: 0.5,
