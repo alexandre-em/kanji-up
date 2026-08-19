@@ -26,6 +26,8 @@
   "onboarding.submit.button": "Let's begin",
   "onboarding.toast.success": "Welcome to KanjiUp!",
   "onboarding.toast.error": "Something went wrong",
+  "onboarding.googleSignIn.button": "Already have an account? Sign in with Google",
+  "onboarding.googleSignIn.error": "Sign-in failed, try again",
 
   "tabs.home.label": "Accueil",
   "tabs.selection.label": "Sélection",
