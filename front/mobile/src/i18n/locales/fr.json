@@ -332,8 +332,7 @@
 
   "kanjiDetails.viewMode.button": "Mode animation",
   "kanjiDetails.drawMode.button": "Mode entraînement",
-  "kanjiDetails.select.button": "Sélectionner",
-  "kanjiDetails.unselect.button": "Désélectionner",
+  "kanjiDetails.addToList.button": "Ajouter à une liste",
   "kanjiDetails.strokes": "Traits",
   "kanjiDetails.meanings": "Significations",
   "kanjiDetails.grade.school": "Scolaire",

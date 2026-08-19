@@ -20,10 +20,11 @@ import { useAppDispatch, useAppSelector } from '../../../../../hooks/useStore.ts
 import { useToaster } from '../../../../../providers/toaster.tsx';
 import { core } from '../../../../../services/http.ts';
 import { getOne, selectEntities, selectGetOneStatus } from '../../../../../store/slices/kanji.ts';
-import { lists, saveActiveListSelection, selectActiveList, selectListsSaveStatus } from '../../../../../store/slices/lists.ts';
+import { lists, saveActiveListSelection, selectLists, selectListsSaveStatus } from '../../../../../store/slices/lists.ts';
 import { selectUserState, unlockContent } from '../../../../../store/slices/user.ts';
 import { getCheapestLockedTier, isKanjiLocked } from '../../../../../utils/kanjiLock.ts';
 import DifficultyTag, { getAdvancedTag, getGradeTag, getJlptTag } from '../../../../search/components/difficultyTag.tsx';
+import ListPickerDialog from '../components/listPickerDialog.tsx';
 import UnlockModal from '../components/unlockModal.tsx';
 
 type KanjiDetailsProps = RouteParamsProps<{
@@ -38,12 +39,13 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
   const dispatch = useAppDispatch();
   const entities = useAppSelector(selectEntities);
   const getOneStatus = useAppSelector(selectGetOneStatus);
-  const activeList = useAppSelector(selectActiveList);
+  const allLists = useAppSelector(selectLists);
   const listsSaveStatus = useAppSelector(selectListsSaveStatus);
   const { character } = props.route.params;
   const [svg, setSvg] = useState<string>();
   const [isDrawMode, setIsDrawMode] = useState<boolean>(false);
   const [showModal, setShowModal] = useState(false);
+  const [isListPickerVisible, setIsListPickerVisible] = useState(false);
   const [showRadical, setShowRadical] = useState(false);
   const [showExample, setShowExample] = useState(false);
   const [isUnlockVisible, setIsUnlockVisible] = useState(false);
@@ -123,18 +125,32 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
     setIsDrawMode((prev) => !prev);
   }, []);
 
-  const isInActiveList = !!activeList?.kanjiIds.includes(character);
-
+  // Reached from Search or Word detail as much as from the kanjiList grid — always ask which
+  // list rather than silently acting on whatever happened to still be active, since that could be
+  // stale/forgotten from an earlier, unrelated visit
   const handleSelect = useCallback(() => {
-    if (!activeList || !entities[character]) return;
+    if (!entities[character]) return;
+    setIsListPickerVisible(true);
+  }, [entities[character]]);
 
-    if (!isInActiveList) {
-      dispatch(lists.actions.selectKanjiForActiveList(entities[character]));
-    } else {
-      dispatch(lists.actions.unSelectKanjiForActiveList(entities[character]));
-    }
-    setShowModal(true);
-  }, [activeList, entities[character], isInActiveList]);
+  const handleListPicked = useCallback(
+    (id: string) => {
+      setIsListPickerVisible(false);
+      dispatch(lists.actions.setActiveList(id));
+
+      const kanjiEntity = entities[character];
+      if (!kanjiEntity) return;
+
+      const alreadyInChosenList = !!allLists[id]?.kanjiIds.includes(character);
+      dispatch(
+        alreadyInChosenList
+          ? lists.actions.unSelectKanjiForActiveList(kanjiEntity)
+          : lists.actions.selectKanjiForActiveList(kanjiEntity),
+      );
+      setShowModal(true);
+    },
+    [dispatch, entities[character], character, allLists],
+  );
 
   const handleSubmit = useCallback(() => {
     dispatch(saveActiveListSelection());
@@ -281,11 +297,10 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
         />
         <Spacing x={10} />
         <Button
-          iconSource={isDrawMode ? Assets.icons.video : Assets.icons.draw}
+          iconSource={Assets.icons.add}
           iconProps={{ size: 20 }}
-          label={isInActiveList ? t('kanjiDetails.unselect.button') : t('kanjiDetails.select.button')}
+          label={t('kanjiDetails.addToList.button')}
           onPress={handleSelect}
-          disabled={!activeList}
           outline
         />
       </View>
@@ -469,6 +484,12 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
           { label: 'Save selection', onPress: handleSubmit },
           { label: 'Cancel', onPress: handleCancel },
         ]}
+      />
+      <ListPickerDialog
+        visible={isListPickerVisible}
+        lists={Object.values(allLists)}
+        onSelect={handleListPicked}
+        onClose={() => setIsListPickerVisible(false)}
       />
     </Layout>
   );
