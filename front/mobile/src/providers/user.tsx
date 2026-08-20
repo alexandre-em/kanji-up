@@ -6,6 +6,7 @@ import { initialize as initializeFlashcards } from '../store/slices/flashcards';
 import { initialize as initializeLists } from '../store/slices/lists';
 import { initialize as initializeKanji } from '../store/slices/selectedKanji';
 import { getUser } from '../store/slices/user';
+import { initialize as initializeWordLists } from '../store/slices/wordLists';
 
 const UserContext = React.createContext<null>(null);
 
@@ -23,6 +24,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       dispatch(initializeKanji());
       dispatch(initializeFlashcards());
       dispatch(initializeLists());
+      dispatch(initializeWordLists());
     });
   }, [dispatch]);
 
