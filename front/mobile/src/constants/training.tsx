@@ -47,6 +47,9 @@ export const trainingModes: TrainingModeType[] = [
     textKey: 'training.menu.flashcards.title',
     subtitle: 'training.menu.flashcards.subtitle',
     screen: screenNames.FLASHCARDS,
+    // The list to draw from now depends on the Kanji/Mots toggle inside the flashcards screen
+    // itself, so the choice happens there instead of upfront
+    skipListPicker: true,
     image: (
       <>
         <Image source={Assets.banners.flashcards} style={styles.bannerImage} />

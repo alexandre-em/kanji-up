@@ -25,6 +25,11 @@ export function useFlashcardStyles() {
       character: {
         fontSize: 96,
       },
+      // Words can be several characters long — a smaller size than the single kanji glyph keeps
+      // typical 2-3 character words from overflowing the card
+      wordCharacter: {
+        fontSize: 56,
+      },
       hint: {
         marginTop: 8,
       },
