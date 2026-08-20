@@ -31,7 +31,6 @@ import HistoryScreen from './training/history';
 import HistoryDetail from './training/history/detail';
 import WordEvaluationHoc from './training/wordEvaluation/hoc';
 import WordDetail from './word';
-import WordListsScreen from './wordLists';
 
 const Stack = createNativeStackNavigator();
 
@@ -92,7 +91,6 @@ export default function RootNavigation() {
           <Stack.Screen name={screenNames.SEARCH} component={Search} />
           <Stack.Screen name={screenNames.CATEGORIES} component={KanjiCategoriesScreen} />
           <Stack.Screen name={screenNames.MY_LISTS} component={ListsScreen} options={headerOptions} />
-          <Stack.Screen name={screenNames.MY_WORD_LISTS} component={WordListsScreen} options={headerOptions} />
           <Stack.Screen name={screenNames.DIFFICULTIES} component={KanjiDifficulties} />
           <Stack.Screen name={screenNames.KANJIS} component={KanjiList} />
           <Stack.Screen name={screenNames.KANJI} component={KanjiDetail} options={headerOptions} />

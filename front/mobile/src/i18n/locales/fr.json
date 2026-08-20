@@ -261,7 +261,7 @@
   "selection.menu.myLists.subtitle": "Consulte et gère tes listes de kanji",
 
   "lists.title": "Mes listes",
-  "lists.subtitle": "Crée et organise tes sélections de kanji",
+  "lists.subtitle": "Crée et organise tes sélections de kanji et de mots",
   "lists.create.button": "+ Nouvelle liste",
   "lists.create.title": "Nouvelle liste",
   "lists.rename.title": "Renommer la liste",
@@ -287,8 +287,6 @@
   "lists.toast.renamed": "Liste renommée",
   "lists.toast.deleted": "Liste supprimée",
 
-  "wordLists.title": "Mes listes de mots",
-  "wordLists.subtitle": "Crée et organise tes sélections de mots",
   "wordLists.card.wordCount_one": "{{count}} mot",
   "wordLists.card.wordCount_other": "{{count}} mots",
   "wordLists.card.empty": "Aucun mot dans cette liste pour l'instant",

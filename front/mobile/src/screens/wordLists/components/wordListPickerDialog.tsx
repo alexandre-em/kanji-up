@@ -26,7 +26,8 @@ export default function WordListPickerDialog({ visible, lists, activeListId, onS
 
   const handleGoCreateList = () => {
     onClose();
-    navigation.navigate(screenNames.MY_WORD_LISTS as never);
+    // MY_LISTS now covers both kinds behind a Kanji/Mots toggle — open it straight on Mots
+    navigation.navigate(screenNames.MY_LISTS as never, { initialKind: 'word' } as never);
   };
 
   return (
