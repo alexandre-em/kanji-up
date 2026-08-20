@@ -38,6 +38,7 @@
 
   "evaluationResult.summary.score": "{{correct}} / {{total}} réussis",
   "evaluationResult.summary.pending": "{{count}} à vérifier",
+  "evaluationResult.status.notAttempted": "Non atteint",
   "evaluationResult.status.correct": "Reconnu",
   "evaluationResult.status.timeout": "Temps écoulé",
   "evaluationResult.status.empty": "Aucun tracé",

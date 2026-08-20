@@ -23,7 +23,7 @@ import {
 } from '../../../../store/slices/evaluation';
 import { completeMissionTask } from '../../../../store/slices/missions';
 import { syncKanjiProgression, user } from '../../../../store/slices/user';
-import ResultItemRow from './components/resultItemRow';
+import ResultItemRow from '../../components/resultItemRow';
 import ReviewModal from './components/reviewModal';
 import { useResultStyles } from './hooks/useResultStyles';
 

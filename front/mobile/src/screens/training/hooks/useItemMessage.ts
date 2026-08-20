@@ -1,9 +1,15 @@
 import { useTranslation } from 'react-i18next';
 
-import { EvaluationItemType } from '../../../../../store/slices/evaluation';
+import { EvaluationItemType } from '../../../store/slices/evaluation';
 
 export function useItemMessage(item: EvaluationItemType) {
   const { t } = useTranslation();
+
+  // The live result screen never actually reaches this: every item has been drawn by the time
+  // it's shown there. An abandoned session's trailing, never-reached kanji can genuinely be idle
+  // here though — falling through to the 'review' branch below would misleadingly say "needs
+  // review" for a kanji that was never even attempted.
+  if (item.status === 'idle') return t('evaluationResult.status.notAttempted');
 
   if (item.status === 'correct') return t('evaluationResult.status.correct');
 

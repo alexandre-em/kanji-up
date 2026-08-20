@@ -218,6 +218,7 @@
 
   "evaluationResult.summary.score": "{{correct}} / {{total}} correct",
   "evaluationResult.summary.pending": "{{count}} to check",
+  "evaluationResult.status.notAttempted": "Not attempted",
   "evaluationResult.status.correct": "Recognized",
   "evaluationResult.status.timeout": "Time's up",
   "evaluationResult.status.empty": "Nothing drawn",

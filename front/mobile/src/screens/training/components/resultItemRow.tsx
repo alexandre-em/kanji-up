@@ -1,19 +1,20 @@
 import { Image, TouchableOpacity, View as RNView } from 'react-native';
 import { Text } from 'react-native-ui-lib';
 
-import { EvaluationItemType } from '../../../../../store/slices/evaluation';
+import { EvaluationItemType } from '../../../store/slices/evaluation';
 import { useItemMessage } from '../hooks/useItemMessage';
-import { useResultStyles } from '../hooks/useResultStyles';
+import { useResultRowStyles } from '../hooks/useResultRowStyles';
 import StatusIcon from './statusIcon';
 
 type ResultItemRowProps = {
   item: EvaluationItemType;
-  /** Only 'review' answers are interactive: tapping one opens the review modal on it */
+  /** Only 'review' answers are interactive: tapping one opens the review modal on it. Omit for a
+   * read-only view (e.g. session history) — even a 'review' item then just displays as-is. */
   onPress?: () => void;
 };
 
 export default function ResultItemRow({ item, onPress }: ResultItemRowProps) {
-  const styles = useResultStyles();
+  const styles = useResultRowStyles();
   const message = useItemMessage(item);
 
   const content = (
