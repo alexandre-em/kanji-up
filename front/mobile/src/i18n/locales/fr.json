@@ -189,6 +189,7 @@
   "history.empty.message": "Les sessions que tu termines apparaîtront ici.",
   "history.word.notTracked.title": "Pas encore suivi",
   "history.word.notTracked.message": "L'historique des sessions de mots n'est pas encore enregistré — reviens plus tard.",
+  "historyDetail.notFound": "Session introuvable.",
 
   "flashcards.progress": "Cartes révisées",
   "flashcards.reveal": "Toucher pour révéler",

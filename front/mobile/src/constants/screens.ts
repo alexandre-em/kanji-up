@@ -17,4 +17,5 @@ export const screenNames = {
   WORD: 'Word',
   MY_LISTS: 'MyLists',
   HISTORY: 'History',
+  HISTORY_DETAIL: 'HistoryDetail',
 };

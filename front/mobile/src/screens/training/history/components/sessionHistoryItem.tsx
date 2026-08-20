@@ -1,7 +1,9 @@
+import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
-import { View as RNView } from 'react-native';
+import { TouchableOpacity, View as RNView } from 'react-native';
 import { Colors, Text } from 'react-native-ui-lib';
 
+import { screenNames } from '../../../../constants/screens';
 import { useHistoryScreenStyles } from '../hooks/useHistoryScreenStyles';
 
 type SessionHistoryItemProps = {
@@ -10,6 +12,7 @@ type SessionHistoryItemProps = {
 
 export default function SessionHistoryItem({ session }: SessionHistoryItemProps) {
   const { t, i18n } = useTranslation();
+  const navigation = useNavigation();
   const styles = useHistoryScreenStyles();
 
   const date = new Date(session.createdAt).toLocaleDateString(i18n.language, {
@@ -26,7 +29,9 @@ export default function SessionHistoryItem({ session }: SessionHistoryItemProps)
         : Colors.$textPrimary;
 
   return (
-    <RNView style={styles.row}>
+    <TouchableOpacity
+      style={styles.row}
+      onPress={() => navigation.navigate(screenNames.HISTORY_DETAIL as never, { sessionId: session.sessionId } as never)}>
       <RNView>
         <Text text80M $textDefault>
           {date}
@@ -38,6 +43,6 @@ export default function SessionHistoryItem({ session }: SessionHistoryItemProps)
       <Text text80BO $textDefault>
         {session.score !== null ? `${session.score}/${session.questions.length}` : '—'}
       </Text>
-    </RNView>
+    </TouchableOpacity>
   );
 }
