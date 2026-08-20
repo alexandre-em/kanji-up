@@ -5,6 +5,7 @@ import { RootState } from 'store';
 import { normalizeProgressionEntry } from '../../constants/progression';
 import { core } from '../../services/http';
 import { completeMissionTask } from './missions';
+import { enqueueProgressionSync } from './syncQueue';
 
 // Bootstrap (first launch, no stored userId yet) resolves by device macAddress; every other
 // refresh (e.g. after account recovery) resolves by the stable userId
@@ -46,10 +47,27 @@ function todayLocal(): string {
 
 export const getUser = createAsyncThunk<UserType, GetUserInput, { rejectValue: { status?: number } }>(
   'user/get',
-  async (input, { rejectWithValue }) => {
+  async (input, { rejectWithValue, getState }) => {
     try {
       const response =
         'userId' in input ? await core.authService!.get(input.userId) : await core.authService!.getByMacAddress(input.macAddress);
+
+      const state = getState() as RootState;
+      const hasPendingProgressionSync = state.syncQueue.items.some((item) => item.type === 'syncProgression');
+
+      // A queued-but-not-yet-synced local change hasn't reached the server yet — accepting the
+      // server's response here as-is would silently overwrite it (not just delay it), since
+      // nothing else re-applies a local change once getUser has run. Keeping the local values
+      // until the queue actually flushes is what makes the retry queue meaningful at all.
+      if (hasPendingProgressionSync) {
+        return {
+          ...response.data,
+          totalScore: state.user.totalScore,
+          dailyScores: state.user.dailyScores,
+          progression: state.user.progression,
+          wordProgression: state.user.wordProgression,
+        };
+      }
 
       return response.data;
     } catch (error) {
@@ -119,13 +137,18 @@ export const unlockContent = createAsyncThunk<{ creditsSpent: number }, UnlockCo
 
 // Best-effort, fire-and-forget: a network hiccup here shouldn't block or surface an error to the
 // user, the local state (already incremented live per answer) is what actually matters
-export const syncKanjiProgression = createAsyncThunk('user/syncKanjiProgression', async (_: void, { getState }) => {
+export const syncKanjiProgression = createAsyncThunk('user/syncKanjiProgression', async (_: void, { getState, dispatch }) => {
   const { userId, totalScore, dailyScores, progression, wordProgression } = (getState() as RootState).user;
   if (!userId) return;
 
-  await core
-    .authService!.updateKanjiProgression(userId, { totalScore, dailyScores, progression, wordProgression })
-    .catch(() => undefined);
+  try {
+    await core.authService!.updateKanjiProgression(userId, { totalScore, dailyScores, progression, wordProgression });
+  } catch {
+    // Queued instead of just dropped — flushed on the next reconnect or app launch, see
+    // syncQueue.ts. Still resolves fulfilled either way: the local state (already updated live
+    // per answer) is what the caller actually needs to proceed, not the server round-trip.
+    await dispatch(enqueueProgressionSync());
+  }
 });
 
 export const user = createSlice({

@@ -22,6 +22,7 @@ import {
   toKanjiQuestion,
 } from '../../../../store/slices/evaluation';
 import { completeMissionTask } from '../../../../store/slices/missions';
+import { enqueueSessionFinish } from '../../../../store/slices/syncQueue';
 import { syncKanjiProgression, user } from '../../../../store/slices/user';
 import ResultItemRow from '../../components/resultItemRow';
 import ReviewModal from './components/reviewModal';
@@ -95,16 +96,27 @@ export default function EvaluationResult() {
       }
 
       // Best-effort, same as the per-answer PATCH: a network hiccup here shouldn't block the
-      // user from moving on
+      // user from moving on — queued for retry instead of dropped, see syncQueue.ts
       if (sessionId) {
-        core.sessionsService!.finish(sessionId, correctCount).catch(() => undefined);
+        core.sessionsService!.finish(sessionId, correctCount).catch(() => {
+          dispatch(enqueueSessionFinish({ sessionId, score: correctCount }));
+        });
       } else if (userId) {
         // Ran entirely offline: push a finished record now for history, if a connection happens
         // to be back by the time the run is done — kanji progress itself is already saved either way
-        core
-          .sessionsService!.create({ userId, type: 'kanji', questions: items.map(toKanjiQuestion) })
-          .then((response) => core.sessionsService!.finish(response.data.sessionId, correctCount))
-          .catch(() => undefined);
+        (async () => {
+          try {
+            const response = await core.sessionsService!.create({ userId, type: 'kanji', questions: items.map(toKanjiQuestion) });
+            try {
+              await core.sessionsService!.finish(response.data.sessionId, correctCount);
+            } catch {
+              // The session itself did get created — only the finish needs retrying, not both
+              dispatch(enqueueSessionFinish({ sessionId: response.data.sessionId, score: correctCount }));
+            }
+          } catch {
+            dispatch(enqueueSessionFinish({ userId, kind: 'kanji', questions: items.map(toKanjiQuestion), score: correctCount }));
+          }
+        })();
       }
 
       dispatch(resetEvaluation());

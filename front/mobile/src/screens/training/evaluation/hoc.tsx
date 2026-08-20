@@ -25,6 +25,7 @@ import {
 import { getOne, selectEntities } from '../../../store/slices/kanji';
 import { selectActiveList } from '../../../store/slices/lists';
 import { completeMissionTask } from '../../../store/slices/missions';
+import { enqueueSessionFinish } from '../../../store/slices/syncQueue';
 import { syncKanjiProgression, user } from '../../../store/slices/user';
 import EvaluationScreen from '.';
 
@@ -122,7 +123,9 @@ export default function EvaluationHoc() {
 
           if (sessionId) {
             const correctCount = answered.filter((item) => getEffectiveStatus(item) === 'correct').length;
-            core.sessionsService!.finish(sessionId, correctCount).catch(() => undefined);
+            core.sessionsService!.finish(sessionId, correctCount).catch(() => {
+              dispatch(enqueueSessionFinish({ sessionId, score: correctCount }));
+            });
           }
         }
       } catch {
