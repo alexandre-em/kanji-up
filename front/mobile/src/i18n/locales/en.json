@@ -268,6 +268,8 @@
   "wordEvaluation.error": "An error occurred when saving the answer",
   "wordEvaluation.empty.title": "No word available yet",
   "wordEvaluation.empty.message": "None of your selected kanji combine into a full word yet. Select a few more kanji and try again.",
+  "wordEvaluation.noList.title": "No list selected",
+  "wordEvaluation.noList.message": "Pick a list above to start practicing.",
   "wordEvaluation.slot.accessibilityLabel": "Tap to draw this kanji",
   "wordEvaluation.slot.accessibilityHint": "Long-press and drag to reorder",
   "wordEvaluation.addSlot.accessibilityLabel": "Add a new kanji drawing",

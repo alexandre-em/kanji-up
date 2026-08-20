@@ -72,6 +72,9 @@ export const trainingModes: TrainingModeType[] = [
     textKey: 'training.menu.word.title',
     subtitle: 'training.menu.word.subtitle',
     screen: screenNames.WORD_EVALUATION,
+    // Pool source now depends on the Kanji/Mots toggle inside the mode's own screen, same
+    // reasoning as flashcards — the choice happens there instead of upfront
+    skipListPicker: true,
     image: (
       <>
         <Image source={Assets.banners.wordTest} style={styles.bannerImage} />

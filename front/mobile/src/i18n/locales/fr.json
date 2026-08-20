@@ -72,6 +72,8 @@
   "wordEvaluation.error": "Une erreur est survenue en enregistrant la réponse",
   "wordEvaluation.empty.title": "Aucun mot disponible pour l'instant",
   "wordEvaluation.empty.message": "Aucun de tes kanji sélectionnés ne forme encore un mot complet. Sélectionne quelques kanji de plus et réessaie.",
+  "wordEvaluation.noList.title": "Aucune liste sélectionnée",
+  "wordEvaluation.noList.message": "Choisis une liste ci-dessus pour commencer à t'entraîner.",
   "wordEvaluation.slot.accessibilityLabel": "Toucher pour dessiner ce kanji",
   "wordEvaluation.slot.accessibilityHint": "Appui long pour réordonner",
   "wordEvaluation.addSlot.accessibilityLabel": "Ajouter un nouveau dessin de kanji",
