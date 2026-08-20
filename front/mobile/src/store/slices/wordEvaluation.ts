@@ -3,7 +3,9 @@ import { RootState } from 'store';
 
 import { core } from '../../services/http';
 
-type AnswerStatusType = 'idle' | 'correct' | 'incorrect' | 'review';
+export type AnswerStatusType = 'idle' | 'correct' | 'incorrect' | 'review';
+
+export type WordEvaluationKind = 'kanji' | 'word';
 
 export type WordSlotType = {
   image: string | null;
@@ -66,19 +68,68 @@ export function computeWordProgressionDeltas(items: WordEvaluationItemType[]): {
   return deltas;
 }
 
-// Assumes the active list's kanji_ids are already resolved in state.kanji.entities — the caller
-// (WordEvaluationHoc) is responsible for fetching any missing ones first, same as kanji
-// evaluation and flashcards
-export const init = createAsyncThunk('wordEvaluation/init', async (payload: { number?: number } | undefined, { getState }) => {
-  const state = getState() as RootState;
-  const activeList = state.lists.activeListId ? state.lists.lists[state.lists.activeListId] : undefined;
-  const characters = (activeList?.kanjiIds ?? [])
-    .map((id) => state.kanji.entities[id]?.kanji?.character)
-    .filter((character): character is string => !!character);
+// Fisher-Yates partial shuffle — picks `count` items without replacement, order otherwise
+// unspecified. A no-op (returns the input as-is) when there's nothing to trim.
+export function sampleWords(words: WordType[], count: number): WordType[] {
+  if (words.length <= count) return words;
 
-  const response = await core.wordService!.getPracticeWords(characters, payload?.number ?? 10);
-  return response.data;
-});
+  const pool = [...words];
+  for (let i = pool.length - 1; i > pool.length - 1 - count; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  return pool.slice(pool.length - count);
+}
+
+// Kanji mode: unchanged, generates a practice set from the active kanji list's characters via
+// the backend. Word mode: the user already hand-picked these words — no generation needed, just
+// resolve them (assumes state.word.entities is already populated by the caller) and cap the
+// session length the same way kanji mode does.
+export const init = createAsyncThunk(
+  'wordEvaluation/init',
+  async (payload: { kind?: WordEvaluationKind; number?: number } | undefined, { getState }) => {
+    const state = getState() as RootState;
+    const number = payload?.number ?? 10;
+    const kind = payload?.kind ?? 'kanji';
+
+    if (kind === 'word') {
+      const activeList = state.wordLists.activeListId ? state.wordLists.lists[state.wordLists.activeListId] : undefined;
+      const words = (activeList?.wordIds ?? []).map((id) => state.word.entities[id]).filter((word): word is WordType => !!word);
+
+      return sampleWords(words, number);
+    }
+
+    const activeList = state.lists.activeListId ? state.lists.lists[state.lists.activeListId] : undefined;
+    const characters = (activeList?.kanjiIds ?? [])
+      .map((id) => state.kanji.entities[id]?.kanji?.character)
+      .filter((character): character is string => !!character);
+
+    const response = await core.wordService!.getPracticeWords(characters, number);
+    return response.data;
+  },
+);
+
+// Pure so it's testable without mocking Redux state — the thunk below only assembles
+// strokesByCharacter from state, this decides the actual verdict from that plus the drawing.
+export function computeSlotStatus(
+  slots: WordSlotType[],
+  expectedCharacters: string[],
+  strokesByCharacter: Record<string, number>,
+): AnswerStatusType {
+  const hasEmptySlot = slots.some((slot) => !slot.image || slot.strokesCount === 0);
+  const hasWrongStrokeCount = slots.some((slot, index) => {
+    const expectedStrokes = strokesByCharacter[expectedCharacters[index]];
+    return expectedStrokes !== undefined && slot.strokesCount !== expectedStrokes;
+  });
+
+  if (slots.length !== expectedCharacters.length || hasEmptySlot || hasWrongStrokeCount) return 'incorrect';
+
+  if (slots.every((slot, index) => slot.predictions.some((prediction) => prediction.label === expectedCharacters[index]))) {
+    return 'correct';
+  }
+
+  return 'review';
+}
 
 export const updateItemSlots = createAsyncThunk(
   'wordEvaluation/updateItemSlots',
@@ -88,28 +139,16 @@ export const updateItemSlots = createAsyncThunk(
     const expected = state.wordEvaluation.items[currentIndex].word.word?.[0] ?? '';
     const expectedCharacters = getKanjiCharacters(expected);
 
-    const activeList = state.lists.activeListId ? state.lists.lists[state.lists.activeListId] : undefined;
+    // Resolved per character actually in the word being practiced, via the kanji search cache —
+    // not from any active list. A practiced word can (and often does) contain kanji outside
+    // whichever list seeded or selected it, kanji-mode included.
     const strokesByCharacter: Record<string, number> = {};
-    (activeList?.kanjiIds ?? []).forEach((id) => {
-      const kanji = state.kanji.entities[id];
-      if (kanji?.kanji?.character && kanji.kanji.strokes !== undefined)
-        strokesByCharacter[kanji.kanji.character] = kanji.kanji.strokes;
+    expectedCharacters.forEach((character) => {
+      const match = state.kanji.search[character]?.results.find((entry) => entry.kanji?.character === character);
+      if (match?.kanji?.strokes !== undefined) strokesByCharacter[character] = match.kanji.strokes;
     });
 
-    let status: AnswerStatusType = 'review';
-    const hasEmptySlot = payload.slots.some((slot) => !slot.image || slot.strokesCount === 0);
-    const hasWrongStrokeCount = payload.slots.some((slot, index) => {
-      const expectedStrokes = strokesByCharacter[expectedCharacters[index]];
-      return expectedStrokes !== undefined && slot.strokesCount !== expectedStrokes;
-    });
-
-    if (payload.slots.length !== expectedCharacters.length || hasEmptySlot || hasWrongStrokeCount) {
-      status = 'incorrect';
-    } else if (
-      payload.slots.every((slot, index) => slot.predictions.some((prediction) => prediction.label === expectedCharacters[index]))
-    ) {
-      status = 'correct';
-    }
+    const status = computeSlotStatus(payload.slots, expectedCharacters, strokesByCharacter);
 
     return { slots: payload.slots, status };
   },
