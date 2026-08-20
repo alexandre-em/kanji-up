@@ -124,6 +124,14 @@
   "lists.toast.renamed": "List renamed",
   "lists.toast.deleted": "List deleted",
 
+  "wordLists.title": "My word lists",
+  "wordLists.subtitle": "Create and organize your word selections",
+  "wordLists.card.wordCount_one": "{{count}} word",
+  "wordLists.card.wordCount_other": "{{count}} words",
+  "wordLists.card.empty": "No words in this list yet",
+  "wordLists.delete.confirmMessage": "This only removes the list — your progress on these words is kept.",
+  "wordLists.empty.message": "Create a list to start selecting words to practice",
+
   "difficulties.jlpt.title": "JLPT Levels",
   "difficulties.jlpt.subtitle": "Climb through JLPT levels or grab any kanji you like — the challenge is in your hands!",
   "difficulties.jlpt.level5.title": "JLPT N5",

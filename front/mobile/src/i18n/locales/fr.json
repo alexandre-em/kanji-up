@@ -284,6 +284,14 @@
   "lists.toast.renamed": "Liste renommée",
   "lists.toast.deleted": "Liste supprimée",
 
+  "wordLists.title": "Mes listes de mots",
+  "wordLists.subtitle": "Crée et organise tes sélections de mots",
+  "wordLists.card.wordCount_one": "{{count}} mot",
+  "wordLists.card.wordCount_other": "{{count}} mots",
+  "wordLists.card.empty": "Aucun mot dans cette liste pour l'instant",
+  "wordLists.delete.confirmMessage": "Seule la liste est supprimée — ta progression sur ces mots est conservée.",
+  "wordLists.empty.message": "Crée une liste pour commencer à sélectionner des mots à pratiquer",
+
   "ocr.title": "Scan",
   "ocr.subtitle": "Scanne du texte réel et retrouve les mots",
   "ocr.empty.message": "Prends en photo une enseigne, un menu, ou tout texte écrit en japonais",

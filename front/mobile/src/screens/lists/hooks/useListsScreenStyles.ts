@@ -35,6 +35,16 @@ export function useListsScreenStyles() {
         borderRadius: 10,
         backgroundColor: Colors.$backgroundNeutralMedium,
       },
+      // Same chip, but sized to fit a multi-character word instead of a single kanji glyph
+      wordChip: {
+        minWidth: 40,
+        height: 40,
+        paddingHorizontal: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 10,
+        backgroundColor: Colors.$backgroundNeutralMedium,
+      },
       createButton: {
         alignSelf: 'flex-start',
       },

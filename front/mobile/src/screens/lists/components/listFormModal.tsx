@@ -18,11 +18,20 @@ type ListFormModalProps = {
   initialName?: string;
   /** Only meaningful when creating (initialName absent) — an existing list is never blocked from a rename */
   isCapReached?: boolean;
+  /** Free-tier cap shown in the "limit reached" message — kanji and word lists have separate caps */
+  maxFreeLists?: number;
   onSubmit: (name: string) => void;
   onClose: () => void;
 };
 
-export default function ListFormModal({ visible, initialName, isCapReached, onSubmit, onClose }: ListFormModalProps) {
+export default function ListFormModal({
+  visible,
+  initialName,
+  isCapReached,
+  maxFreeLists = MAX_FREE_LISTS,
+  onSubmit,
+  onClose,
+}: ListFormModalProps) {
   const { t } = useTranslation();
   const navigation = useNavigation();
   const styles = useListsScreenStyles();
@@ -65,7 +74,7 @@ export default function ListFormModal({ visible, initialName, isCapReached, onSu
             </Text>
             <Spacing y={8} />
             <Text text80M $textGeneral>
-              {t('lists.cap.message', { max: MAX_FREE_LISTS })}
+              {t('lists.cap.message', { max: maxFreeLists })}
             </Text>
             <Spacing y={20} />
             <RNView style={styles.cardActions}>
