@@ -2,9 +2,18 @@
 // pointless. See CLAUDE.md decisions for the reasoning.
 export const MAX_FREE_LISTS = 3;
 
+// Separate cap from MAX_FREE_LISTS — kanji lists and word lists serve different training modes,
+// capping them together would penalize one usage for no reason tied to the other
+export const MAX_FREE_WORD_LISTS = 3;
+
 export function canCreateList(currentListCount: number, subscriptionPlan: SubscriptionPlan): boolean {
   if (subscriptionPlan === 'premium') return true;
   return currentListCount < MAX_FREE_LISTS;
+}
+
+export function canCreateWordList(currentListCount: number, subscriptionPlan: SubscriptionPlan): boolean {
+  if (subscriptionPlan === 'premium') return true;
+  return currentListCount < MAX_FREE_WORD_LISTS;
 }
 
 // No backend involved for lists (local-only entity), so ids are generated client-side —

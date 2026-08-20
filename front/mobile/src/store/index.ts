@@ -11,6 +11,7 @@ import sessionHistory from './slices/sessionHistory';
 import user from './slices/user';
 import word from './slices/word';
 import wordEvaluation from './slices/wordEvaluation';
+import wordLists from './slices/wordLists';
 
 const store = configureStore({
   reducer: {
@@ -24,6 +25,7 @@ const store = configureStore({
     missions,
     flashcards,
     lists,
+    wordLists,
     sessionHistory,
   },
   middleware: (getDefaultMiddleware) =>

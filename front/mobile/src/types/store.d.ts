@@ -39,6 +39,23 @@ type SelectedWordState = {
   saveStatus: StatusType;
 };
 
+type WordSelectionList = {
+  id: string;
+  name: string;
+  wordIds: string[];
+};
+
+type WordListsState = {
+  lists: Record<string, WordSelectionList>;
+  activeListId: string | null;
+  // Staged edits for whichever list is currently active — mirrors ListsState's toAdd/toRemove
+  // pattern, just committed onto the active list's wordIds instead of kanjiIds
+  toAdd: { [key: string]: Partial<WordType> };
+  toRemove: { [key: string]: Partial<WordType> };
+  initStatus: StatusType;
+  saveStatus: StatusType;
+};
+
 type AnswerType = {
   recognitionId?: string;
   image: string;

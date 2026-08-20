@@ -4,6 +4,7 @@ export const fileNames = {
   SELECTED_KANJI: 'selectedKanji',
   SELECTED_WORD: 'selectedWord',
   LISTS: 'lists',
+  WORD_LISTS: 'wordLists',
   PENDING_KANJI_SESSION: 'pendingKanjiSession',
 };
 
