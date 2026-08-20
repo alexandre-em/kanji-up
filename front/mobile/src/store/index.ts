@@ -8,6 +8,7 @@ import missions from './slices/missions';
 import selectedKanji from './slices/selectedKanji';
 import selectedWord from './slices/selectedWord';
 import sessionHistory from './slices/sessionHistory';
+import syncQueue from './slices/syncQueue';
 import user from './slices/user';
 import word from './slices/word';
 import wordEvaluation from './slices/wordEvaluation';
@@ -27,6 +28,7 @@ const store = configureStore({
     lists,
     wordLists,
     sessionHistory,
+    syncQueue,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
