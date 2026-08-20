@@ -35,7 +35,10 @@ export default function ListCard({ list, onRename, onDelete }: ListCardProps) {
         onPress={() => setIsExpanded((prev) => !prev)}
         sectionHeader={
           <RNView style={styles.cardHeader}>
-            <View flex>
+            {/* Plain RNView, not RNUI's View — RNUI's View defaults to $backgroundDefault via the
+                global ThemeManager override in config/rnui.ts, which painted an opaque box behind
+                this text instead of staying transparent over the card's own background */}
+            <RNView style={styles.cardHeaderText}>
               <Text text70BO $textDefault numberOfLines={1}>
                 {list.name}
               </Text>
@@ -44,7 +47,7 @@ export default function ListCard({ list, onRename, onDelete }: ListCardProps) {
                   ? t('lists.card.emptyDescription')
                   : t('lists.card.kanjiCount', { count: list.kanjiIds.length })}
               </Text>
-            </View>
+            </RNView>
           </RNView>
         }>
         <Spacing y={12} />

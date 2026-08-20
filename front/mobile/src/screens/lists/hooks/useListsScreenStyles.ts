@@ -23,17 +23,25 @@ export function useListsScreenStyles() {
       segmentActive: {
         backgroundColor: Colors.$backgroundPrimaryHeavy,
       },
+      // Matches $backgroundDefault (not $backgroundNeutralLight) on purpose: ExpandableSection
+      // wraps its sectionHeader in its own internal RNUI View, which we can't style — and every
+      // unstyled RNUI View defaults to $backgroundDefault (see the global ThemeManager override in
+      // config/rnui.ts). A different card fill would show through as a mismatched patch behind the
+      // header text. The border alone defines the card's edge.
       card: {
         borderRadius: 16,
         borderWidth: 1,
         borderColor: Colors.$outlineNeutral,
-        backgroundColor: Colors.$backgroundNeutralLight,
+        backgroundColor: Colors.$backgroundDefault,
         padding: 16,
       },
       cardHeader: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
+      },
+      cardHeaderText: {
+        flex: 1,
       },
       cardActions: {
         flexDirection: 'row',

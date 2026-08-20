@@ -35,7 +35,8 @@ export default function WordListCard({ list, onRename, onDelete }: WordListCardP
         onPress={() => setIsExpanded((prev) => !prev)}
         sectionHeader={
           <RNView style={styles.cardHeader}>
-            <View flex>
+            {/* Plain RNView, not RNUI's View — see listCard.tsx for why */}
+            <RNView style={styles.cardHeaderText}>
               <Text text70BO $textDefault numberOfLines={1}>
                 {list.name}
               </Text>
@@ -44,7 +45,7 @@ export default function WordListCard({ list, onRename, onDelete }: WordListCardP
                   ? t('lists.card.emptyDescription')
                   : t('wordLists.card.wordCount', { count: list.wordIds.length })}
               </Text>
-            </View>
+            </RNView>
           </RNView>
         }>
         <Spacing y={12} />
