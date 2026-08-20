@@ -131,6 +131,12 @@
   "wordLists.card.empty": "No words in this list yet",
   "wordLists.delete.confirmMessage": "This only removes the list — your progress on these words is kept.",
   "wordLists.empty.message": "Create a list to start selecting words to practice",
+  "wordLists.activeList.choose": "Choose a list",
+  "wordLists.activeList.none.title": "No list yet",
+  "wordLists.activeList.none.subtitle": "Create a list to start selecting words",
+  "wordLists.activeList.none.action": "Create a list",
+  "wordLists.saveConfirm.title": "Confirmation",
+  "word.select.toast.success": "Word added to selection",
 
   "difficulties.jlpt.title": "JLPT Levels",
   "difficulties.jlpt.subtitle": "Climb through JLPT levels or grab any kanji you like — the challenge is in your hands!",
@@ -340,6 +346,7 @@
   "profile.activity.title": "Recent activity",
 
   "wordDetails.error": "Couldn't load this word, try again",
+  "wordDetails.addToList.button": "Add to a list",
   "wordDetails.mastery.title": "Mastery",
   "wordDetails.readings": "Readings",
   "wordDetails.kanji.title": "Kanji in this word",

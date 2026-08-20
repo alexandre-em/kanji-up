@@ -247,6 +247,7 @@
   "profile.activity.title": "Activité récente",
 
   "wordDetails.error": "Impossible de charger ce mot, réessaie",
+  "wordDetails.addToList.button": "Ajouter à une liste",
   "wordDetails.mastery.title": "Maîtrise",
   "wordDetails.readings": "Lectures",
   "wordDetails.kanji.title": "Kanji de ce mot",
@@ -291,6 +292,12 @@
   "wordLists.card.empty": "Aucun mot dans cette liste pour l'instant",
   "wordLists.delete.confirmMessage": "Seule la liste est supprimée — ta progression sur ces mots est conservée.",
   "wordLists.empty.message": "Crée une liste pour commencer à sélectionner des mots à pratiquer",
+  "wordLists.activeList.choose": "Choisir une liste",
+  "wordLists.activeList.none.title": "Pas encore de liste",
+  "wordLists.activeList.none.subtitle": "Crée une liste pour commencer à sélectionner des mots",
+  "wordLists.activeList.none.action": "Créer une liste",
+  "wordLists.saveConfirm.title": "Confirmation",
+  "word.select.toast.success": "Mot ajouté à la sélection",
 
   "ocr.title": "Scan",
   "ocr.subtitle": "Scanne du texte réel et retrouve les mots",

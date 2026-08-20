@@ -17,6 +17,10 @@ export function useWordDetailStyles() {
         justifyContent: 'center',
         gap: 8,
       },
+      actions: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+      },
       masteryRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',

@@ -1,18 +1,21 @@
 import { useNavigation } from '@react-navigation/native';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TouchableOpacity, View as RNView } from 'react-native';
-import { Colors, ProgressBar, Text } from 'react-native-ui-lib';
+import { ActionSheet, Assets, Button, Colors, ProgressBar, Text } from 'react-native-ui-lib';
 
 import Layout from '../../components/layout';
 import Spacing from '../../components/spacing';
 import { getAccuracyPercent, PROGRESSION_MASTERY_THRESHOLD_PERCENT } from '../../constants/progression';
 import { screenNames } from '../../constants/screens';
 import { useAppDispatch, useAppSelector } from '../../hooks/useStore';
+import { useToaster } from '../../providers/toaster';
 import { core } from '../../services/http';
 import { search as searchKanji, selectSearchResult } from '../../store/slices/kanji';
 import { selectUserState } from '../../store/slices/user';
 import { getKanjiCharacters } from '../../store/slices/wordEvaluation';
+import { saveActiveListSelection, selectWordLists, selectWordListsSaveStatus, wordLists } from '../../store/slices/wordLists';
+import WordListPickerDialog from '../wordLists/components/wordListPickerDialog';
 import { useWordDetailStyles } from './useWordDetailStyles';
 
 type WordDetailProps = RouteParamsProps<{ id: string }>;
@@ -44,11 +47,17 @@ export default function WordDetail(props: WordDetailProps) {
   const { id } = props.route.params;
   const styles = useWordDetailStyles();
 
+  const toaster = useToaster();
+
   const [word, setWord] = useState<WordType | null>(null);
   const [status, setStatus] = useState<RequestStatusType>('pending');
+  const [isListPickerVisible, setIsListPickerVisible] = useState(false);
+  const [showSaveModal, setShowSaveModal] = useState(false);
 
   const searchResults = useAppSelector(selectSearchResult);
   const userState = useAppSelector(selectUserState);
+  const allWordLists = useAppSelector(selectWordLists);
+  const wordListsSaveStatus = useAppSelector(selectWordListsSaveStatus);
 
   useEffect(() => {
     setStatus('pending');
@@ -86,6 +95,52 @@ export default function WordDetail(props: WordDetailProps) {
     navigation.navigate(screenNames.KANJI, { character: kanjiId });
   };
 
+  // Always ask which list rather than silently acting on whatever happened to still be active —
+  // this screen is reached from search or from a kanji's related words, not necessarily right
+  // after picking a word list, so a stale active list could easily be the wrong one
+  const handleAddToList = useCallback(() => {
+    if (!word) return;
+    setIsListPickerVisible(true);
+  }, [word]);
+
+  const handleListPicked = useCallback(
+    (id: string) => {
+      setIsListPickerVisible(false);
+      dispatch(wordLists.actions.setActiveList(id));
+
+      if (!word) return;
+
+      const alreadyInChosenList = !!allWordLists[id]?.wordIds.includes(word.word_id);
+      dispatch(
+        alreadyInChosenList ? wordLists.actions.unSelectWordForActiveList(word) : wordLists.actions.selectWordForActiveList(word),
+      );
+      setShowSaveModal(true);
+    },
+    [dispatch, word, allWordLists],
+  );
+
+  const handleConfirmSave = useCallback(() => {
+    dispatch(saveActiveListSelection());
+    setShowSaveModal(false);
+  }, [dispatch]);
+
+  const handleCancelSave = useCallback(() => {
+    dispatch(wordLists.actions.cancelActiveListSelection());
+    setShowSaveModal(false);
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (!toaster) return;
+    if (wordListsSaveStatus === 'succeeded') {
+      toaster.show({ message: t('word.select.toast.success'), type: 'success' });
+      dispatch(wordLists.actions.resetSaveStatus());
+      setShowSaveModal(false);
+    }
+    if (wordListsSaveStatus === 'failed') {
+      setShowSaveModal(false);
+    }
+  }, [wordListsSaveStatus, toaster, dispatch, t]);
+
   // Below the 20-attempt minimum (including zero answers), the real percentage isn't meaningful
   // yet — shown as an empty 0% bar rather than hiding the section entirely, same as kanji detail
   const displayPercent = word ? (getAccuracyPercent(userState.wordProgression[word.word_id]) ?? 0) : 0;
@@ -103,6 +158,16 @@ export default function WordDetail(props: WordDetailProps) {
                 {spelling}
               </Text>
             ))}
+          </RNView>
+          <Spacing y={16} />
+          <RNView style={styles.actions}>
+            <Button
+              iconSource={Assets.icons.add}
+              iconProps={{ size: 20 }}
+              label={t('wordDetails.addToList.button')}
+              onPress={handleAddToList}
+              outline
+            />
           </RNView>
           <Spacing y={14} />
           <Text text90M $textNeutral>
@@ -192,6 +257,22 @@ export default function WordDetail(props: WordDetailProps) {
           )}
         </>
       )}
+      <ActionSheet
+        visible={showSaveModal}
+        title={t('wordLists.saveConfirm.title')}
+        cancelButtonIndex={2}
+        destructiveButtonIndex={0}
+        options={[
+          { label: t('lists.form.save'), onPress: handleConfirmSave },
+          { label: t('lists.form.cancel'), onPress: handleCancelSave },
+        ]}
+      />
+      <WordListPickerDialog
+        visible={isListPickerVisible}
+        lists={Object.values(allWordLists)}
+        onSelect={handleListPicked}
+        onClose={() => setIsListPickerVisible(false)}
+      />
     </Layout>
   );
 }
