@@ -318,6 +318,9 @@
   "ocr.picker.cancel": "Annuler",
   "ocr.history.title": "Tes scans",
   "ocr.history.empty": "Tes scans précédents apparaîtront ici",
+  "ocr.premiumGate.title": "Le scan est une fonctionnalité premium",
+  "ocr.premiumGate.message": "Scanne et traduis du texte réel avec premium",
+  "ocr.premiumGate.cta": "Passer premium",
 
   "loading.title": "Chargement...",
 

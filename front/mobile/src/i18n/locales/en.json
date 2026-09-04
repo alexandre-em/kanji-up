@@ -373,6 +373,9 @@
   "ocr.picker.cancel": "Cancel",
   "ocr.history.title": "Your scans",
   "ocr.history.empty": "Your past scans will show up here",
+  "ocr.premiumGate.title": "Scan is a premium feature",
+  "ocr.premiumGate.message": "Scan and translate real-world text with premium",
+  "ocr.premiumGate.cta": "Go premium",
 
   "loading.title": "Loading..."
 }

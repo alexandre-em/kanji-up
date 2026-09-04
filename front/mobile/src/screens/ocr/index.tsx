@@ -10,6 +10,7 @@ import { useSelector } from 'react-redux';
 
 import AppBannerAd from '../../components/bannerAd';
 import Spacing from '../../components/spacing';
+import Lock from '../../components/svg/lock';
 import { screenNames } from '../../constants/screens';
 import { core } from '../../services/http';
 import { selectUserState } from '../../store/slices/user';
@@ -115,6 +116,26 @@ export default function Ocr() {
     if (historyStatus === 'pending' || historyItems.length >= historyTotal) return;
     loadHistory(historyPage + 1);
   }, [historyStatus, historyItems.length, historyTotal, historyPage, loadHistory]);
+
+  // OCR calls a paid recognition API per scan — free accounts see an upsell instead of the
+  // camera/history UI rather than being let in and rejected only after taking a photo.
+  if (userState.subscriptionPlan !== 'premium') {
+    return (
+      <RNView style={[styles.container, styles.center]}>
+        <Lock size={48} color={Colors.$iconPrimary} />
+        <Spacing y={16} />
+        <Text text70BO center>
+          {t('ocr.premiumGate.title')}
+        </Text>
+        <Spacing y={8} />
+        <Text text80M $textGeneral center>
+          {t('ocr.premiumGate.message')}
+        </Text>
+        <Spacing y={20} />
+        <Button label={t('ocr.premiumGate.cta')} onPress={() => navigation.navigate(screenNames.PREMIUM)} />
+      </RNView>
+    );
+  }
 
   const listHeader = (
     <RNView>
