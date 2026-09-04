@@ -22,6 +22,9 @@
   "onboarding.toast.error": "Something went wrong",
   "onboarding.googleSignIn.button": "Already have an account? Sign in with Google",
   "onboarding.googleSignIn.error": "Sign-in failed, try again",
+  "onboarding.consent.title": "Help improve kanji recognition",
+  "onboarding.consent.subtitle": "You can let your drawings be used to make kanji recognition better for everyone. You can change this anytime in Settings.",
+  "onboarding.consent.toggle.label": "Use my drawings to improve recognition",
 
   "home.loading.title": "Starting the application...",
 

@@ -16,6 +16,7 @@ import GoogleSignInOption from './components/googleSignInOption';
 import Step1 from './components/step1';
 import Step2 from './components/step2';
 import Step3 from './components/step3';
+import Step4 from './components/step4';
 
 export type StepProps = {
   step: number;
@@ -53,10 +54,10 @@ export default function Onboarding() {
   useEffect(() => {
     if (isSubmitted && userName.length > 0 && (createUserStatus === 'idle' || createUserStatus === 'failed')) {
       getUniqueId().then((deviceId) => {
-        dispatch(createUser({ name: userName, macAddress: deviceId }));
+        dispatch(createUser({ name: userName, macAddress: deviceId, trainingConsent: userState.trainingConsent }));
       });
     }
-  }, [dispatch, userName, isSubmitted, createUserStatus]);
+  }, [dispatch, userName, isSubmitted, createUserStatus, userState.trainingConsent]);
 
   useEffect(() => {
     if (createUserStatus === 'succeeded') {
@@ -79,11 +80,14 @@ export default function Onboarding() {
       <Step1 step={step} />
       <Step2 step={step} />
       <Step3 step={step} />
+      <Step4 step={step} />
       <Button
-        label={step === 2 ? t('onboarding.submit.button') + ' 🚀' : t('onboarding.next.button')}
-        outline={step !== 2}
-        onPress={step === 2 ? handleSubmit : handleNext}
-        disabled={step === 2 && userName.length === 0 && createUserStatus === 'pending'}
+        label={step === 3 ? t('onboarding.submit.button') + ' 🚀' : t('onboarding.next.button')}
+        outline={step !== 3}
+        onPress={step === 3 ? handleSubmit : handleNext}
+        disabled={
+          (step === 2 && userName.trim().length === 0) || (step === 3 && userName.length === 0 && createUserStatus === 'pending')
+        }
       />
       <GoogleSignInOption step={step} />
     </View>

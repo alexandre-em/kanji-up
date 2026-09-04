@@ -28,6 +28,9 @@
   "onboarding.toast.error": "Something went wrong",
   "onboarding.googleSignIn.button": "Already have an account? Sign in with Google",
   "onboarding.googleSignIn.error": "Sign-in failed, try again",
+  "onboarding.consent.title": "Aide à améliorer la reconnaissance",
+  "onboarding.consent.subtitle": "Tu peux autoriser l'utilisation de tes dessins pour améliorer la reconnaissance des kanji pour tout le monde. Modifiable à tout moment dans les Réglages.",
+  "onboarding.consent.toggle.label": "Utiliser mes dessins pour améliorer la reconnaissance",
 
   "tabs.home.label": "Accueil",
   "tabs.selection.label": "Sélection",

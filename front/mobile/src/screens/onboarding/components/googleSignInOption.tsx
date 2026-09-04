@@ -6,13 +6,14 @@ import { ActivityIndicator, TouchableOpacity } from 'react-native';
 import { Config } from 'react-native-config';
 import { getUniqueId } from 'react-native-device-info';
 import { Text } from 'react-native-ui-lib';
+import { useSelector } from 'react-redux';
 
 import { screenNames } from '../../../constants/screens';
 import { ONBOARDING_FINISHED_KEY } from '../../../constants/storage';
 import { useAppDispatch } from '../../../hooks/useStore';
 import { useToaster } from '../../../providers/toaster';
 import { fileServiceInstance } from '../../../services/file';
-import { signInWithGoogle } from '../../../store/slices/user';
+import { selectTrainingConsent, signInWithGoogle } from '../../../store/slices/user';
 import { StepProps } from '..';
 
 // Secondary path, deliberately lighter than the name-entry flow above it: a brand-new device has
@@ -22,6 +23,7 @@ export default function GoogleSignInOption({ step }: StepProps) {
   const dispatch = useAppDispatch();
   const navigation = useNavigation();
   const toast = useToaster();
+  const trainingConsent = useSelector(selectTrainingConsent);
   const [isSigningIn, setIsSigningIn] = useState(false);
 
   useEffect(() => {
@@ -41,7 +43,7 @@ export default function GoogleSignInOption({ step }: StepProps) {
       }
 
       const macAddress = await getUniqueId();
-      const action = await dispatch(signInWithGoogle({ idToken: response.data.idToken, macAddress }));
+      const action = await dispatch(signInWithGoogle({ idToken: response.data.idToken, macAddress, trainingConsent }));
 
       if (signInWithGoogle.fulfilled.match(action)) {
         await fileServiceInstance.write(ONBOARDING_FINISHED_KEY, true);
@@ -55,9 +57,9 @@ export default function GoogleSignInOption({ step }: StepProps) {
     } finally {
       setIsSigningIn(false);
     }
-  }, [dispatch, navigation, toast, t]);
+  }, [dispatch, navigation, toast, t, trainingConsent]);
 
-  if (step !== 2) return null;
+  if (step !== 3) return null;
 
   return (
     <TouchableOpacity

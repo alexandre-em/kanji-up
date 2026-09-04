@@ -258,6 +258,7 @@ export const user = createSlice({
 export default user.reducer;
 
 export const selectUserName = (state: RootState) => state.user.name;
+export const selectTrainingConsent = (state: RootState) => state.user.trainingConsent;
 export const selectUserPicture = (state: RootState) => state.user.picture;
 export const selectUserState = (state: RootState) => state.user;
 export const selectGetUserStatus = (state: RootState) => state.user.getUserStatus;
