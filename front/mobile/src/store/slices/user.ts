@@ -19,6 +19,7 @@ const initialState: UserState = {
   macAddress: '',
   isAnonymous: true,
   adsDeactivated: false,
+  trainingConsent: false,
   subscriptionPlan: 'free',
   email: null,
   picture: null,
@@ -79,10 +80,13 @@ export const getUser = createAsyncThunk<UserType, GetUserInput, { rejectValue: {
   },
 );
 
-export const createUser = createAsyncThunk<void, Pick<UserType, 'name' | 'macAddress'>>('user/create', async (payload) => {
-  await core.authService!.create(payload);
-  return;
-});
+export const createUser = createAsyncThunk<void, Pick<UserType, 'name' | 'macAddress'> & { trainingConsent?: boolean }>(
+  'user/create',
+  async (payload) => {
+    await core.authService!.create(payload);
+    return;
+  },
+);
 
 // Refetches the full profile afterward: on a migrated (recovered) account, name/credits/progression/
 // everything just changed to a different userId, a manual field merge isn't worth it. The returned
@@ -102,15 +106,15 @@ export const recoverAccount = createAsyncThunk<{ userId: string; migrated: boole
 // userId is authoritative (an existing account for this Google identity, or a freshly created
 // one), and getUser populates everything else. No dedicated status field: callers track their
 // own pending/error state locally, same as GoogleSignInButton already does for recoverAccount.
-export const signInWithGoogle = createAsyncThunk<{ userId: string }, { idToken: string; macAddress: string }>(
-  'user/signInWithGoogle',
-  async ({ idToken, macAddress }, { dispatch }) => {
-    const response = await core.authService!.signInWithGoogle({ idToken, macAddress });
-    await dispatch(getUser({ userId: response.data.userId }));
+export const signInWithGoogle = createAsyncThunk<
+  { userId: string },
+  { idToken: string; macAddress: string; trainingConsent?: boolean }
+>('user/signInWithGoogle', async ({ idToken, macAddress, trainingConsent }, { dispatch }) => {
+  const response = await core.authService!.signInWithGoogle({ idToken, macAddress, trainingConsent });
+  await dispatch(getUser({ userId: response.data.userId }));
 
-    return response.data;
-  },
-);
+  return response.data;
+});
 
 export const earnCredits = createAsyncThunk<{ creditsEarned: number }, { userId: string }>(
   'user/earnCredits',
@@ -131,6 +135,14 @@ export const unlockContent = createAsyncThunk<{ creditsSpent: number }, UnlockCo
   'user/unlockContent',
   async ({ userId, scope, tier, kanjiId }) => {
     const response = await core.authService!.unlockContent(userId, { scope, tier, kanjiId });
+    return response!.data;
+  },
+);
+
+export const updateTrainingConsent = createAsyncThunk<{ trainingConsent: boolean }, { userId: string; trainingConsent: boolean }>(
+  'user/updateTrainingConsent',
+  async ({ userId, trainingConsent }) => {
+    const response = await core.authService!.updateTrainingConsent(userId, trainingConsent);
     return response!.data;
   },
 );
@@ -194,6 +206,7 @@ export const user = createSlice({
         state.macAddress = action.payload.macAddress;
         state.isAnonymous = action.payload.isAnonymous;
         state.adsDeactivated = action.payload.adsDeactivated;
+        state.trainingConsent = action.payload.trainingConsent ?? false;
         state.subscriptionPlan = action.payload.subscriptionPlan;
         state.email = action.payload.email;
         state.picture = action.payload.picture;
@@ -235,6 +248,9 @@ export const user = createSlice({
       })
       .addCase(completeMissionTask.fulfilled, (state, action) => {
         state.credits += action.payload.creditsGranted;
+      })
+      .addCase(updateTrainingConsent.fulfilled, (state, action) => {
+        state.trainingConsent = action.payload.trainingConsent;
       });
   },
 });

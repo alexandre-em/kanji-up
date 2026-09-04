@@ -84,6 +84,7 @@ type UnregisteredUser = {
   macAddress: string;
   isAnonymous: boolean;
   adsDeactivated: boolean;
+  trainingConsent: boolean;
   subscriptionPlan: SubscriptionPlan;
 
   createdAt: Date;

@@ -81,6 +81,7 @@ type UserState = {
   macAddress: string;
   isAnonymous: boolean;
   adsDeactivated: boolean;
+  trainingConsent: boolean;
   subscriptionPlan: SubscriptionPlan;
   email: string | null;
   picture: string | null;

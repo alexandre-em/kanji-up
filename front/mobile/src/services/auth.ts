@@ -28,7 +28,7 @@ export default class AuthService {
     return this._instance.get<UserType>(`/${userId}`, options);
   }
 
-  create(payload: Pick<UserType, 'name' | 'macAddress'>, options?: AxiosRequestConfig) {
+  create(payload: Pick<UserType, 'name' | 'macAddress'> & { trainingConsent?: boolean }, options?: AxiosRequestConfig) {
     if (!this._instance) throw new Error('Auth instance not ready...');
 
     return this._instance?.post('/', payload, options as AxiosRequestConfig);
@@ -42,7 +42,7 @@ export default class AuthService {
 
   // Bootstrap only, like create() above: the client has no stored userId yet on a fresh device
   // signing in with Google directly rather than creating a plain named account.
-  signInWithGoogle(payload: { idToken: string; macAddress: string }, options?: AxiosRequestConfig) {
+  signInWithGoogle(payload: { idToken: string; macAddress: string; trainingConsent?: boolean }, options?: AxiosRequestConfig) {
     if (!this._instance) throw new Error('Auth instance not ready...');
 
     return this._instance.post<{ userId: string }>('/sign-in-with-google', payload, options);
@@ -68,5 +68,11 @@ export default class AuthService {
     if (!this._instance) throw new Error('Auth instance not ready...');
 
     return this._instance?.patch(`/${userId}/kanji-progression`, payload, options as AxiosRequestConfig);
+  }
+
+  updateTrainingConsent(userId: string, trainingConsent: boolean, options?: AxiosRequestConfig) {
+    if (!this._instance) throw new Error('Auth instance not ready...');
+
+    return this._instance?.patch(`/${userId}/training-consent`, { trainingConsent }, options as AxiosRequestConfig);
   }
 }
