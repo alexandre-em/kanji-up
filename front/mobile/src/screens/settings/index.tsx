@@ -10,6 +10,7 @@ import { screenNames } from '../../constants/screens';
 import GoogleSignInButton from './components/googleSignIn';
 import LanguageSelector from './components/languageSelector';
 import ThemeSelector from './components/themeSelector';
+import TrainingConsentToggle from './components/trainingConsentToggle';
 
 export default function Settings() {
   const { t } = useTranslation();
@@ -33,6 +34,16 @@ export default function Settings() {
       <LanguageSelector />
       <Spacing y={16} />
       <ThemeSelector />
+      <Spacing y={28} />
+      <Text text70BO $textDefault>
+        {t('settings.section.privacy')}
+      </Text>
+      <Spacing y={8} />
+      <Text text90L $textNeutral>
+        {t('settings.trainingConsent.subtitle')}
+      </Text>
+      <Spacing y={12} />
+      <TrainingConsentToggle />
     </Layout>
   );
 }
