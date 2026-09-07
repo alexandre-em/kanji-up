@@ -14,7 +14,10 @@
     @com.facebook.react.uimanager.annotations.ReactProp <methods>;
 }
 -dontwarn com.facebook.react.**
--keep class com.qivia.BuildConfig { *; }
+# react-native-config reads env vars via reflection on Class.forName(getPackageName() +
+# ".BuildConfig") — must be kept or R8 strips it in release builds and every Config.* value
+# comes back empty (AxiosInstance then throws "Endpoints not ready" at startup)
+-keep class com.kanjiup.BuildConfig { *; }
 
 -keep class com.android.installreferrer.api.** {
   *;
