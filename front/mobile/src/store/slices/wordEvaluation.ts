@@ -68,17 +68,25 @@ export function computeWordProgressionDeltas(items: WordEvaluationItemType[]): {
   return deltas;
 }
 
-// Fisher-Yates partial shuffle — picks `count` items without replacement, order otherwise
-// unspecified. A no-op (returns the input as-is) when there's nothing to trim.
-export function sampleWords(words: WordType[], count: number): WordType[] {
-  if (words.length <= count) return words;
-
-  const pool = [...words];
-  for (let i = pool.length - 1; i > pool.length - 1 - count; i--) {
+function shuffle<T>(items: T[]): T[] {
+  const pool = [...items];
+  for (let i = pool.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [pool[i], pool[j]] = [pool[j], pool[i]];
   }
-  return pool.slice(pool.length - count);
+  return pool;
+}
+
+// Picks `count` words, shuffled. A list shorter than `count` is cycled (shuffled each lap) so a
+// small word list still fills a full session, at the cost of repeats.
+export function sampleWords(words: WordType[], count: number): WordType[] {
+  if (words.length === 0) return [];
+
+  const result: WordType[] = [];
+  while (result.length < count) {
+    result.push(...shuffle(words));
+  }
+  return result.slice(0, count);
 }
 
 // Kanji mode: unchanged, generates a practice set from the active kanji list's characters via

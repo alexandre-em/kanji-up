@@ -3,10 +3,13 @@ import { computeSlotStatus, sampleWords, WordSlotType } from './wordEvaluation';
 const word = (id: string): WordType => ({ word_id: id, word: [id], reading: [], definition: [] }) as unknown as WordType;
 
 describe('sampleWords', () => {
-  it('returns the input untouched when already at or under the cap', () => {
+  it('repeats words to fill the count when the list is shorter', () => {
     const words = [word('a'), word('b')];
 
-    expect(sampleWords(words, 5)).toBe(words);
+    const result = sampleWords(words, 5);
+
+    expect(result).toHaveLength(5);
+    result.forEach((w) => expect(words).toContain(w));
   });
 
   it('trims down to exactly the requested count', () => {
