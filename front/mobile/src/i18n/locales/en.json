@@ -224,6 +224,7 @@
   "kanjiDetails.viewMode.button": "Animation mode",
   "kanjiDetails.drawMode.button": "Practice mode",
   "kanjiDetails.addToList.button": "Add to a list",
+  "kanjiDetails.recognitionUnsupported.message": "This kanji can't be recognized automatically — you'll need to judge your own drawing during practice.",
   "kanjiDetails.strokes": "Strokes",
   "kanjiDetails.meanings": "Meanings",
   "kanjiDetails.grade.school": "School",

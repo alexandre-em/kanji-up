@@ -376,6 +376,7 @@
   "kanjiDetails.viewMode.button": "Mode animation",
   "kanjiDetails.drawMode.button": "Mode entraînement",
   "kanjiDetails.addToList.button": "Ajouter à une liste",
+  "kanjiDetails.recognitionUnsupported.message": "Ce kanji ne peut pas être reconnu automatiquement — tu devras juger toi-même ton dessin pendant l'entraînement.",
   "kanjiDetails.strokes": "Traits",
   "kanjiDetails.meanings": "Significations",
   "kanjiDetails.grade.school": "Scolaire",

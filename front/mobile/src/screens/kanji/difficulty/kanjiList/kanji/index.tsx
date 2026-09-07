@@ -13,6 +13,7 @@ import Spacing from '../../../../../components/spacing.tsx';
 import Lock from '../../../../../components/svg/lock';
 import SvgSilhouette from '../../../../../components/svgSilhouette.tsx';
 import { getAccuracyPercent, PROGRESSION_MASTERY_THRESHOLD_PERCENT } from '../../../../../constants/progression.ts';
+import { RECOGNITION_MODEL_LABELS } from '../../../../../constants/recognitionLabels.ts';
 import { screenNames } from '../../../../../constants/screens.ts';
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from '../../../../../constants/styles.ts';
 import { PER_KANJI_UNLOCK_COST } from '../../../../../constants/unlockCosts.ts';
@@ -244,6 +245,16 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
   return (
     <Layout screen="kanji">
       <View style={styles.header}>{isDrawMode ? CanvasMode : ViewMode}</View>
+      {!RECOGNITION_MODEL_LABELS.has(character) && (
+        <>
+          <Spacing y={12} />
+          <View style={[styles.recognitionWarning, { backgroundColor: Colors.$backgroundWarningLight }]}>
+            <Text text90BO center style={{ color: Colors.$textWarning }}>
+              {t('kanjiDetails.recognitionUnsupported.message')}
+            </Text>
+          </View>
+        </>
+      )}
       {(jlptTag || gradeTag || advancedTag) && (
         <>
           <Spacing y={12} />
@@ -503,6 +514,11 @@ const styles = StyleSheet.create({
   },
   tagRow: {
     gap: 6,
+  },
+  recognitionWarning: {
+    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
   },
   lockedContainer: {
     flex: 1,
