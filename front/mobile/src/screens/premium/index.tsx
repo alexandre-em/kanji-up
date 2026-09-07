@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dimensions, StyleSheet, View as RNView } from 'react-native';
-import { Product, Purchase, PurchaseError, Subscription } from 'react-native-iap';
+import { ErrorCode, Product, ProductSubscription, Purchase, PurchaseError } from 'react-native-iap';
 import { Assets, Button, Card, Colors, Icon, Text, View } from 'react-native-ui-lib';
 import { useSelector } from 'react-redux';
 
@@ -41,7 +41,7 @@ export default function Premium() {
   const toast = useToaster();
   const dispatch = useAppDispatch();
   const userState = useSelector(selectUserState);
-  const [offers, setOffers] = useState<{ subscriptions: Subscription[]; products: Product[] }>({
+  const [offers, setOffers] = useState<{ subscriptions: ProductSubscription[]; products: Product[] }>({
     subscriptions: [],
     products: [],
   });
@@ -93,7 +93,7 @@ export default function Premium() {
     (error: PurchaseError) => {
       setPurchasingPlan(null);
       // A user backing out of the purchase sheet isn't an error worth surfacing
-      if (error.code !== 'E_USER_CANCELLED') {
+      if (error.code !== ErrorCode.UserCancelled) {
         toast?.show({ message: t('premium.purchase.error'), type: 'failure' });
       }
     },
@@ -148,7 +148,7 @@ export default function Premium() {
           return;
         }
 
-        const subscription = offers.subscriptions.find((item) => item.productId === PREMIUM_SUBSCRIPTION_SKUS[plan]);
+        const subscription = offers.subscriptions.find((item) => item.id === PREMIUM_SUBSCRIPTION_SKUS[plan]);
         if (!subscription) throw new Error('Offer not available yet');
 
         await purchaseSubscription(subscription);
