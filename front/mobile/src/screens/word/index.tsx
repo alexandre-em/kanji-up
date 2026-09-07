@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { TouchableOpacity, View as RNView } from 'react-native';
 import { ActionSheet, Assets, Button, Colors, ProgressBar, Text } from 'react-native-ui-lib';
 
+import FuriganaText from '../../components/furiganaText';
 import Layout from '../../components/layout';
 import Spacing from '../../components/spacing';
 import { getAccuracyPercent, PROGRESSION_MASTERY_THRESHOLD_PERCENT } from '../../constants/progression';
@@ -153,11 +154,15 @@ export default function WordDetail(props: WordDetailProps) {
       {word && (
         <>
           <RNView style={styles.wordRow}>
-            {word.word.map((spelling) => (
-              <Text key={spelling} text50BL $textPrimary center>
-                {spelling}
-              </Text>
-            ))}
+            {word.word.map((spelling, index) =>
+              index === 0 && word.reading[0] ? (
+                <FuriganaText key={spelling} text={spelling} reading={word.reading[0]} />
+              ) : (
+                <Text key={spelling} text50BL $textPrimary center>
+                  {spelling}
+                </Text>
+              ),
+            )}
           </RNView>
           <Spacing y={16} />
           <RNView style={styles.actions}>
