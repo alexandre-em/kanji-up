@@ -108,7 +108,7 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
     () => (
       <View style={[styles.canvas, { backgroundColor: Colors.$backgroundNeutralLight, borderColor: Colors.$outlineNeutral }]}>
         <View style={[styles.canvasContainer, styles.character]}>
-          <Canvas width={CANVAS_WIDTH} height={CANVAS_HEIGHT} hideBackground />
+          <Canvas width={CANVAS_WIDTH} height={CANVAS_HEIGHT} hideBackground color={Colors.$backgroundPrimaryHeavy} />
         </View>
         <View style={[styles.svg, styles.character]}>
           {svg ? (
