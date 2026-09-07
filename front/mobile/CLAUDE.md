@@ -118,6 +118,9 @@ Reanimated 4, i18next. **Android uniquement pour l'instant : il n'y a pas de dos
   `react-native-svg` dans `src/components/svg/`.
 - i18n : **clés plates** (`"home.menu.selection.title"`), à ajouter dans `en.json` **et** `fr.json`.
 - Espacements : `GENERAL_MARGIN` de `src/constants/styles.ts`, composant `Spacing`.
+- Commentaires : **jamais**. Si un commentaire semble nécessaire pour expliquer un bout de code,
+  c'est le signe que le code lui-même n'est pas assez clair — renommer ou redécouper plutôt que
+  commenter.
 - Découpage fichiers : **un fichier = une seule entité de haut niveau** — une page, un composant,
   un hook, ou un groupe de fonctions utilitaires. Jamais de mélange entre catégories différentes
   (hook + composant, page + sous-composant, fonction utilitaire + hook) dans le même fichier, même
