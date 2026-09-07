@@ -138,27 +138,36 @@ export default function Ocr() {
     );
   }
 
-  const renderTokens = (tokens: ScanTokenType[]) =>
-    tokens.length === 0 ? (
+  const renderTokens = (tokens: ScanTokenType[], recognizedText: string) => {
+    if (tokens.length > 0) {
+      return (
+        <RNView style={styles.tokenRow}>
+          {tokens.map((token, index) => (
+            <TouchableOpacity
+              key={`${token.text}-${index}`}
+              disabled={!token.wordId}
+              onPress={() => handleTokenPress(token)}
+              style={[styles.token, token.wordId && styles.tokenMatched]}
+              accessibilityRole={token.wordId ? 'button' : undefined}>
+              <Text text70M color={token.wordId ? Colors.$textPrimary : Colors.$textDefault}>
+                {token.text}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </RNView>
+      );
+    }
+
+    if (recognizedText.trim().length > 0) {
+      return <Text text80M>{recognizedText}</Text>;
+    }
+
+    return (
       <Text text80M $textGeneral>
         {t('ocr.result.empty')}
       </Text>
-    ) : (
-      <RNView style={styles.tokenRow}>
-        {tokens.map((token, index) => (
-          <TouchableOpacity
-            key={`${token.text}-${index}`}
-            disabled={!token.wordId}
-            onPress={() => handleTokenPress(token)}
-            style={[styles.token, token.wordId && styles.tokenMatched]}
-            accessibilityRole={token.wordId ? 'button' : undefined}>
-            <Text text70M color={token.wordId ? Colors.$textPrimary : Colors.$textDefault}>
-              {token.text}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </RNView>
     );
+  };
 
   return (
     <RNView style={styles.container}>
@@ -167,24 +176,20 @@ export default function Ocr() {
         <Text h1>{t('ocr.title')}</Text>
         <Text text80L>{t('ocr.subtitle')}</Text>
         <Spacing y={16} />
-        <RNView style={styles.tabBar}>
+        <RNView style={styles.segmentedControl}>
           <TouchableOpacity
-            style={[styles.tab, activeTab === 'scan' && styles.tabActive]}
+            style={[styles.segment, activeTab === 'scan' && styles.segmentActive]}
             onPress={() => setActiveTab('scan')}
             accessibilityRole="button"
             accessibilityState={{ selected: activeTab === 'scan' }}>
-            <Text text70M color={activeTab === 'scan' ? Colors.$textPrimary : Colors.$textDefault}>
-              {t('ocr.tabs.scan')}
-            </Text>
+            <Text style={{ color: activeTab === 'scan' ? '#fff' : Colors.$textNeutral }}>{t('ocr.tabs.scan')}</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.tab, activeTab === 'history' && styles.tabActive]}
+            style={[styles.segment, activeTab === 'history' && styles.segmentActive]}
             onPress={() => setActiveTab('history')}
             accessibilityRole="button"
             accessibilityState={{ selected: activeTab === 'history' }}>
-            <Text text70M color={activeTab === 'history' ? Colors.$textPrimary : Colors.$textDefault}>
-              {t('ocr.tabs.history')}
-            </Text>
+            <Text style={{ color: activeTab === 'history' ? '#fff' : Colors.$textNeutral }}>{t('ocr.tabs.history')}</Text>
           </TouchableOpacity>
         </RNView>
       </RNView>
@@ -231,7 +236,7 @@ export default function Ocr() {
             <RNView>
               <Text text70BO>{t('ocr.result.title')}</Text>
               <Spacing y={12} />
-              {renderTokens(result.tokens)}
+              {renderTokens(result.tokens, result.recognizedText)}
               <Spacing y={24} />
               <Button label={t('ocr.rescan')} onPress={() => setPickerVisible(true)} outline />
             </RNView>
@@ -245,7 +250,7 @@ export default function Ocr() {
             <RNView style={styles.historyRow}>
               <Image source={{ uri: item.imageUrl }} style={styles.historyThumbnail} />
               <RNView style={styles.historyContent}>
-                {renderTokens(item.tokens)}
+                {renderTokens(item.tokens, item.recognizedText)}
                 <Text text100L $textNeutral>
                   {new Date(item.createdAt).toLocaleDateString(i18n.language)}
                 </Text>

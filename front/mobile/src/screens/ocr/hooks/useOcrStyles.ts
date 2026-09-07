@@ -56,18 +56,22 @@ export function useOcrStyles() {
         paddingVertical: 16,
         alignItems: 'center',
       },
-      tabBar: {
+      segmentedControl: {
         flexDirection: 'row',
-        gap: 8,
+        padding: 4,
+        gap: 4,
+        borderRadius: 25,
+        backgroundColor: Colors.$backgroundNeutralMedium,
       },
-      tab: {
+      segment: {
         flex: 1,
-        alignItems: 'center',
         paddingVertical: 10,
-        borderRadius: 10,
+        borderRadius: 21,
+        alignItems: 'center',
+        justifyContent: 'center',
       },
-      tabActive: {
-        backgroundColor: Colors.$backgroundPrimaryLight,
+      segmentActive: {
+        backgroundColor: Colors.$backgroundPrimaryHeavy,
       },
     }),
   );
