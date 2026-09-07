@@ -18,7 +18,7 @@ import ActiveWordListSelector from '../../wordLists/components/activeWordListSel
 import WordEvaluationScreen from '.';
 import { useWordEvaluationPickerStyles } from './hooks/useWordEvaluationPickerStyles';
 
-const NUMBER_OF_WORDS = 10;
+const NUMBER_OF_WORDS = 20;
 const KANJI_KIND: WordEvaluationKind = 'kanji';
 const WORD_KIND: WordEvaluationKind = 'word';
 
