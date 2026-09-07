@@ -44,6 +44,12 @@ export function getKanjiCharacters(word: string): string[] {
   return Array.from(word).filter((character) => KANJI_REGEX.test(character));
 }
 
+// Word mode practices drawing a word's kanji — a kana-only word has nothing to draw, so it's
+// never a valid practice item there
+export function filterWordsWithKanji(words: WordType[]): WordType[] {
+  return words.filter((word) => getKanjiCharacters(word.word[0] ?? '').length > 0);
+}
+
 /** Progression deltas for a finished (or abandoned) word-evaluation run, recomputed from the
  * items themselves — same resilience reasoning as the kanji evaluation's own
  * computeProgressionDeltas: items survive an app kill, in-memory Redux state doesn't. */
@@ -104,7 +110,7 @@ export const init = createAsyncThunk(
       const activeList = state.wordLists.activeListId ? state.wordLists.lists[state.wordLists.activeListId] : undefined;
       const words = (activeList?.wordIds ?? []).map((id) => state.word.entities[id]).filter((word): word is WordType => !!word);
 
-      return sampleWords(words, number);
+      return sampleWords(filterWordsWithKanji(words), number);
     }
 
     const activeList = state.lists.activeListId ? state.lists.lists[state.lists.activeListId] : undefined;

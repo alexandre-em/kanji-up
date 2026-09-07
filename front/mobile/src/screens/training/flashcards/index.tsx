@@ -6,6 +6,7 @@ import { Button, Colors, ProgressBar, Text, View } from 'react-native-ui-lib';
 
 import Layout from '../../../components/layout';
 import Spacing from '../../../components/spacing';
+import { MIN_LIST_SIZE_FOR_GAME } from '../../../constants/lists';
 import { useAppDispatch, useAppSelector } from '../../../hooks/useStore';
 import { reviewCard, reviewWordCard, selectDueFlashcards, selectDueWordFlashcards } from '../../../store/slices/flashcards';
 import { getOne, selectEntities } from '../../../store/slices/kanji';
@@ -157,6 +158,16 @@ export default function FlashcardsScreen() {
           <Spacing y={8} />
           <Text text80M $textGeneral center>
             {t('flashcards.noList.message')}
+          </Text>
+        </View>
+      ) : activeListIds.length < MIN_LIST_SIZE_FOR_GAME ? (
+        <View center flex>
+          <Text text70BO $textDefault center>
+            {t('flashcards.tooFewItems.title')}
+          </Text>
+          <Spacing y={8} />
+          <Text text80M $textGeneral center>
+            {t('flashcards.tooFewItems.message', { min: MIN_LIST_SIZE_FOR_GAME })}
           </Text>
         </View>
       ) : !hasSnapshotted ? (

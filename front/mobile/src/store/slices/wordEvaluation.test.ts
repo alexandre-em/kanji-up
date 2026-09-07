@@ -1,6 +1,17 @@
-import { computeSlotStatus, sampleWords, WordSlotType } from './wordEvaluation';
+import { computeSlotStatus, filterWordsWithKanji, sampleWords, WordSlotType } from './wordEvaluation';
 
-const word = (id: string): WordType => ({ word_id: id, word: [id], reading: [], definition: [] }) as unknown as WordType;
+const word = (id: string, spelling = id): WordType =>
+  ({ word_id: id, word: [spelling], reading: [], definition: [] }) as unknown as WordType;
+
+describe('filterWordsWithKanji', () => {
+  it('keeps only words whose primary spelling contains a kanji', () => {
+    const words = [word('a', 'ひらがな'), word('b', '漢字'), word('c', 'カタカナ'), word('d', '力')];
+
+    const result = filterWordsWithKanji(words);
+
+    expect(result.map((w) => w.word_id)).toEqual(['b', 'd']);
+  });
+});
 
 describe('sampleWords', () => {
   it('repeats words to fill the count when the list is shorter', () => {

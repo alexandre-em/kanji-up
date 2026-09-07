@@ -1,3 +1,6 @@
+// Below this, a session is too short to be a meaningful evaluation/flashcards run
+export const MIN_LIST_SIZE_FOR_GAME = 5;
+
 // Kept tight on purpose — a generous free cap would leave premium's "unlimited lists" perk
 // pointless. See CLAUDE.md decisions for the reasoning.
 export const MAX_FREE_LISTS = 3;

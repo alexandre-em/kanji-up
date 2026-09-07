@@ -5,13 +5,20 @@ import { Colors, Text, View } from 'react-native-ui-lib';
 
 import Layout from '../../../components/layout';
 import Spacing from '../../../components/spacing';
+import { MIN_LIST_SIZE_FOR_GAME } from '../../../constants/lists';
 import { useRecognitionModel } from '../../../hooks/useRecognitionModel';
 import { useAppDispatch, useAppSelector } from '../../../hooks/useStore';
 import { useToaster } from '../../../providers/toaster';
 import { getOne, search as searchKanji, selectEntities, selectSearchResult } from '../../../store/slices/kanji';
 import { lists, selectActiveList, selectLists } from '../../../store/slices/lists';
 import { getOne as getOneWord, selectGetOne as selectWordEntities } from '../../../store/slices/word';
-import { getKanjiCharacters, init, selectWordEvaluationItems, WordEvaluationKind } from '../../../store/slices/wordEvaluation';
+import {
+  filterWordsWithKanji,
+  getKanjiCharacters,
+  init,
+  selectWordEvaluationItems,
+  WordEvaluationKind,
+} from '../../../store/slices/wordEvaluation';
 import { selectActiveWordList, selectWordLists, wordLists } from '../../../store/slices/wordLists';
 import ActiveListSelector from '../../kanji/difficulty/kanjiList/components/activeListSelector';
 import ActiveWordListSelector from '../../wordLists/components/activeWordListSelector';
@@ -74,6 +81,12 @@ export default function WordEvaluationHoc() {
   // their stroke counts are ready before the user reaches them
   const items = useAppSelector(selectWordEvaluationItems);
   const searchResults = useAppSelector(selectSearchResult);
+
+  const eligibleWordCount = useMemo(() => {
+    if (isKanji || !activeWordList) return null;
+    return filterWordsWithKanji(activeWordList.wordIds.map((id) => wordEntities[id]).filter((word): word is WordType => !!word))
+      .length;
+  }, [isKanji, activeWordList, wordEntities]);
 
   const practiceCharacters = useMemo(
     () => Array.from(new Set(items.flatMap((item) => getKanjiCharacters(item.word.word?.[0] ?? '')))),
@@ -146,6 +159,26 @@ export default function WordEvaluationHoc() {
     );
   }
 
+  const activeListSize = isKanji ? (activeKanjiList?.kanjiIds.length ?? 0) : (activeWordList?.wordIds.length ?? 0);
+
+  if (activeListSize < MIN_LIST_SIZE_FOR_GAME) {
+    return (
+      <Layout screen="wordEvaluation">
+        {picker}
+        <Spacing y={16} />
+        <View center flex>
+          <Text text70BO $textDefault center>
+            {t('wordEvaluation.tooFewItems.title')}
+          </Text>
+          <Spacing y={8} />
+          <Text text80M $textGeneral center>
+            {t('wordEvaluation.tooFewItems.message', { min: MIN_LIST_SIZE_FOR_GAME })}
+          </Text>
+        </View>
+      </Layout>
+    );
+  }
+
   if (!isModelLoaded || !isPoolReady || !isCharacterPoolReady) {
     return (
       <Layout screen="wordEvaluation">
@@ -155,6 +188,24 @@ export default function WordEvaluationHoc() {
           <ActivityIndicator color={Colors.$backgroundPrimaryHeavy} size="large" />
           <Spacing y={12} />
           <Text $textDefault>{t('evaluation.loadingModel')}</Text>
+        </View>
+      </Layout>
+    );
+  }
+
+  if (!isKanji && eligibleWordCount !== null && eligibleWordCount < MIN_LIST_SIZE_FOR_GAME) {
+    return (
+      <Layout screen="wordEvaluation">
+        {picker}
+        <Spacing y={16} />
+        <View center flex>
+          <Text text70BO $textDefault center>
+            {t('wordEvaluation.tooFewKanjiWords.title')}
+          </Text>
+          <Spacing y={8} />
+          <Text text80M $textGeneral center>
+            {t('wordEvaluation.tooFewKanjiWords.message', { min: MIN_LIST_SIZE_FOR_GAME })}
+          </Text>
         </View>
       </Layout>
     );

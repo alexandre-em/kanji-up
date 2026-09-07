@@ -7,6 +7,7 @@ import Incubator from 'react-native-ui-lib/incubator';
 
 import Layout from '../../components/layout';
 import Spacing from '../../components/spacing';
+import { MIN_LIST_SIZE_FOR_GAME } from '../../constants/lists';
 import { screenNames } from '../../constants/screens';
 import { GENERAL_MARGIN } from '../../constants/styles';
 import { trainingModes, TrainingModeType } from '../../constants/training';
@@ -46,7 +47,7 @@ export default function TrainingModes() {
       setIsListPickerVisible(false);
       dispatch(lists.actions.setActiveList(id));
 
-      if (!allLists[id] || allLists[id].kanjiIds.length === 0) {
+      if (!allLists[id] || allLists[id].kanjiIds.length < MIN_LIST_SIZE_FOR_GAME) {
         setEmptyListId(id);
         return;
       }
@@ -119,7 +120,7 @@ export default function TrainingModes() {
           </Text>
           <Spacing y={8} />
           <Text text80M $textGeneral>
-            {t('home.evaluation.emptySelection.message')}
+            {t('home.evaluation.emptySelection.message', { min: MIN_LIST_SIZE_FOR_GAME })}
           </Text>
           <Spacing y={20} />
           <RNView style={styles.emptySelectionActions}>

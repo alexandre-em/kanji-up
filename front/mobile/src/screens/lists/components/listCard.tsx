@@ -3,7 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { View as RNView } from 'react-native';
 import { Button, ExpandableSection, Text, View } from 'react-native-ui-lib';
 
+import ListSizeWarning from '../../../components/listSizeWarning';
 import Spacing from '../../../components/spacing';
+import { MIN_LIST_SIZE_FOR_GAME } from '../../../constants/lists';
 import { useAppDispatch, useAppSelector } from '../../../hooks/useStore';
 import { getOne, selectEntities } from '../../../store/slices/kanji';
 import { useListsScreenStyles } from '../hooks/useListsScreenStyles';
@@ -47,6 +49,14 @@ export default function ListCard({ list, onRename, onDelete }: ListCardProps) {
                   ? t('lists.card.emptyDescription')
                   : t('lists.card.kanjiCount', { count: list.kanjiIds.length })}
               </Text>
+              {list.kanjiIds.length > 0 && list.kanjiIds.length < MIN_LIST_SIZE_FOR_GAME && (
+                <>
+                  <Spacing y={6} />
+                  <ListSizeWarning
+                    message={t('lists.card.sizeWarning', { count: MIN_LIST_SIZE_FOR_GAME - list.kanjiIds.length })}
+                  />
+                </>
+              )}
             </RNView>
           </RNView>
         }>

@@ -3,7 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { View as RNView } from 'react-native';
 import { Button, ExpandableSection, Text, View } from 'react-native-ui-lib';
 
+import ListSizeWarning from '../../../components/listSizeWarning';
 import Spacing from '../../../components/spacing';
+import { MIN_LIST_SIZE_FOR_GAME } from '../../../constants/lists';
 import { useAppDispatch, useAppSelector } from '../../../hooks/useStore';
 import { getOne, selectGetOne } from '../../../store/slices/word';
 import { useListsScreenStyles } from '../../lists/hooks/useListsScreenStyles';
@@ -45,6 +47,14 @@ export default function WordListCard({ list, onRename, onDelete }: WordListCardP
                   ? t('lists.card.emptyDescription')
                   : t('wordLists.card.wordCount', { count: list.wordIds.length })}
               </Text>
+              {list.wordIds.length > 0 && list.wordIds.length < MIN_LIST_SIZE_FOR_GAME && (
+                <>
+                  <Spacing y={6} />
+                  <ListSizeWarning
+                    message={t('wordLists.card.sizeWarning', { count: MIN_LIST_SIZE_FOR_GAME - list.wordIds.length })}
+                  />
+                </>
+              )}
             </RNView>
           </RNView>
         }>

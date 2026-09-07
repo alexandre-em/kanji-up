@@ -1,8 +1,11 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, TouchableOpacity, View as RNView } from 'react-native';
 import { Colors, Text } from 'react-native-ui-lib';
 
+import ListSizeWarning from '../../../../../components/listSizeWarning';
+import Spacing from '../../../../../components/spacing';
+import { MIN_LIST_SIZE_FOR_GAME } from '../../../../../constants/lists';
 import ListPickerDialog from './listPickerDialog';
 
 type ActiveListSelectorProps = {
@@ -33,6 +36,14 @@ export default function ActiveListSelector({ lists, activeList, onSelect }: Acti
           {activeList?.name ?? t('kanjiList.activeList.choose')}
         </Text>
       </TouchableOpacity>
+      {activeList && activeList.kanjiIds.length > 0 && activeList.kanjiIds.length < MIN_LIST_SIZE_FOR_GAME && (
+        <RNView>
+          <Spacing y={6} />
+          <ListSizeWarning
+            message={t('lists.card.sizeWarning', { count: MIN_LIST_SIZE_FOR_GAME - activeList.kanjiIds.length })}
+          />
+        </RNView>
+      )}
       <ListPickerDialog
         visible={isPickerVisible}
         lists={lists}
