@@ -2,7 +2,7 @@ import { useNavigation } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, Image, TouchableOpacity, View as RNView } from 'react-native';
+import { ActivityIndicator, Image, ScrollView, TouchableOpacity, View as RNView } from 'react-native';
 import { Asset, launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { Assets, Button, Colors, Icon, Text } from 'react-native-ui-lib';
 import ActionSheet from 'react-native-ui-lib/actionSheet';
@@ -20,6 +20,7 @@ const PICKER_OPTIONS = { mediaType: 'photo' as const, quality: 0.8 as const, max
 const HISTORY_LIMIT = 20;
 
 type ScreenStatus = 'idle' | 'uploading' | 'error';
+type OcrTab = 'scan' | 'history';
 
 export default function Ocr() {
   const { t, i18n } = useTranslation();
@@ -27,6 +28,7 @@ export default function Ocr() {
   const userState = useSelector(selectUserState);
   const styles = useOcrStyles();
 
+  const [activeTab, setActiveTab] = useState<OcrTab>('scan');
   const [pickerVisible, setPickerVisible] = useState(false);
   const [status, setStatus] = useState<ScreenStatus>('idle');
   const [result, setResult] = useState<ScanResultType | null>(null);
@@ -78,6 +80,7 @@ export default function Ocr() {
             scanId: response.data.scanId,
             imageUrl: response.data.imageUrl,
             recognizedText: response.data.recognizedText,
+            tokens: response.data.tokens,
             createdAt: new Date().toISOString(),
           },
           ...prev,
@@ -117,8 +120,6 @@ export default function Ocr() {
     loadHistory(historyPage + 1);
   }, [historyStatus, historyItems.length, historyTotal, historyPage, loadHistory]);
 
-  // OCR calls a paid recognition API per scan — free accounts see an upsell instead of the
-  // camera/history UI rather than being let in and rejected only after taking a photo.
   if (userState.subscriptionPlan !== 'premium') {
     return (
       <RNView style={[styles.container, styles.center]}>
@@ -137,119 +138,139 @@ export default function Ocr() {
     );
   }
 
-  const listHeader = (
-    <RNView>
-      <Spacing y={20} />
-      <Text h1>{t('ocr.title')}</Text>
-      <Text text80L>{t('ocr.subtitle')}</Text>
-      <Spacing y={10} />
-      <AppBannerAd style={styles.banner} />
-      <Spacing y={10} />
-
-      {status === 'uploading' && (
-        <RNView style={styles.center}>
-          <ActivityIndicator color={Colors.$backgroundPrimaryHeavy} size="large" />
-          <Spacing y={12} />
-          <Text text80M $textGeneral>
-            {t('ocr.uploading')}
-          </Text>
-        </RNView>
-      )}
-
-      {status === 'error' && (
-        <RNView style={styles.center}>
-          <Text text80M $textGeneral center>
-            {t('ocr.error')}
-          </Text>
-          <Spacing y={16} />
-          <Button label={t('ocr.retry')} onPress={() => setPickerVisible(true)} outline />
-        </RNView>
-      )}
-
-      {status === 'idle' && !result && (
-        <RNView style={styles.center}>
-          <Icon source={Assets.icons.recognition} size={48} tintColor={Colors.$iconPrimary} />
-          <Spacing y={12} />
-          <Text text80M $textGeneral center>
-            {t('ocr.empty.message')}
-          </Text>
-          <Spacing y={20} />
-          <Button label={t('ocr.scan.button')} onPress={() => setPickerVisible(true)} />
-        </RNView>
-      )}
-
-      {status === 'idle' && result && (
-        <RNView>
-          <Text text70BO>{t('ocr.result.title')}</Text>
-          <Spacing y={12} />
-          {result.tokens.length === 0 ? (
-            <Text text80M $textGeneral>
-              {t('ocr.result.empty')}
+  const renderTokens = (tokens: ScanTokenType[]) =>
+    tokens.length === 0 ? (
+      <Text text80M $textGeneral>
+        {t('ocr.result.empty')}
+      </Text>
+    ) : (
+      <RNView style={styles.tokenRow}>
+        {tokens.map((token, index) => (
+          <TouchableOpacity
+            key={`${token.text}-${index}`}
+            disabled={!token.wordId}
+            onPress={() => handleTokenPress(token)}
+            style={[styles.token, token.wordId && styles.tokenMatched]}
+            accessibilityRole={token.wordId ? 'button' : undefined}>
+            <Text text70M color={token.wordId ? Colors.$textPrimary : Colors.$textDefault}>
+              {token.text}
             </Text>
-          ) : (
-            <RNView style={styles.tokenRow}>
-              {result.tokens.map((token, index) => (
-                <TouchableOpacity
-                  key={`${token.text}-${index}`}
-                  disabled={!token.wordId}
-                  onPress={() => handleTokenPress(token)}
-                  style={[styles.token, token.wordId && styles.tokenMatched]}
-                  accessibilityRole={token.wordId ? 'button' : undefined}>
-                  <Text text70M color={token.wordId ? Colors.$textPrimary : Colors.$textDefault}>
-                    {token.text}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </RNView>
-          )}
-          <Spacing y={24} />
-          <Button label={t('ocr.rescan')} onPress={() => setPickerVisible(true)} outline />
-        </RNView>
-      )}
-
-      <Spacing y={28} />
-      <Text text70BO>{t('ocr.history.title')}</Text>
-      <Spacing y={12} />
-    </RNView>
-  );
+          </TouchableOpacity>
+        ))}
+      </RNView>
+    );
 
   return (
     <RNView style={styles.container}>
-      <FlashList
-        data={historyItems}
-        keyExtractor={(item) => item.scanId}
-        renderItem={({ item }) => (
-          <RNView style={styles.historyRow}>
-            <Image source={{ uri: item.imageUrl }} style={styles.historyThumbnail} />
-            <RNView style={styles.historyContent}>
-              <Text text80M numberOfLines={2}>
-                {item.recognizedText || t('ocr.result.empty')}
-              </Text>
-              <Text text100L $textNeutral>
-                {new Date(item.createdAt).toLocaleDateString(i18n.language)}
-              </Text>
-            </RNView>
-          </RNView>
-        )}
-        ListHeaderComponent={listHeader}
-        ListEmptyComponent={
-          historyStatus !== 'pending' ? (
-            <Text text80M $textGeneral>
-              {t('ocr.history.empty')}
+      <RNView style={styles.listContent}>
+        <Spacing y={20} />
+        <Text h1>{t('ocr.title')}</Text>
+        <Text text80L>{t('ocr.subtitle')}</Text>
+        <Spacing y={16} />
+        <RNView style={styles.tabBar}>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'scan' && styles.tabActive]}
+            onPress={() => setActiveTab('scan')}
+            accessibilityRole="button"
+            accessibilityState={{ selected: activeTab === 'scan' }}>
+            <Text text70M color={activeTab === 'scan' ? Colors.$textPrimary : Colors.$textDefault}>
+              {t('ocr.tabs.scan')}
             </Text>
-          ) : null
-        }
-        ListFooterComponent={
-          historyStatus === 'pending' && historyPage > 1 ? (
-            <RNView style={styles.footer}>
-              <ActivityIndicator color={Colors.$backgroundPrimaryHeavy} size="small" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'history' && styles.tabActive]}
+            onPress={() => setActiveTab('history')}
+            accessibilityRole="button"
+            accessibilityState={{ selected: activeTab === 'history' }}>
+            <Text text70M color={activeTab === 'history' ? Colors.$textPrimary : Colors.$textDefault}>
+              {t('ocr.tabs.history')}
+            </Text>
+          </TouchableOpacity>
+        </RNView>
+      </RNView>
+
+      {activeTab === 'scan' ? (
+        <ScrollView contentContainerStyle={styles.listContent}>
+          <Spacing y={10} />
+          <AppBannerAd style={styles.banner} />
+          <Spacing y={10} />
+
+          {status === 'uploading' && (
+            <RNView style={styles.center}>
+              <ActivityIndicator color={Colors.$backgroundPrimaryHeavy} size="large" />
+              <Spacing y={12} />
+              <Text text80M $textGeneral>
+                {t('ocr.uploading')}
+              </Text>
             </RNView>
-          ) : null
-        }
-        onEndReached={handleHistoryEndReached}
-        onEndReachedThreshold={0.3}
-        contentContainerStyle={styles.listContent}
-      />
+          )}
+
+          {status === 'error' && (
+            <RNView style={styles.center}>
+              <Text text80M $textGeneral center>
+                {t('ocr.error')}
+              </Text>
+              <Spacing y={16} />
+              <Button label={t('ocr.retry')} onPress={() => setPickerVisible(true)} outline />
+            </RNView>
+          )}
+
+          {status === 'idle' && !result && (
+            <RNView style={styles.center}>
+              <Icon source={Assets.icons.recognition} size={48} tintColor={Colors.$iconPrimary} />
+              <Spacing y={12} />
+              <Text text80M $textGeneral center>
+                {t('ocr.empty.message')}
+              </Text>
+              <Spacing y={20} />
+              <Button label={t('ocr.scan.button')} onPress={() => setPickerVisible(true)} />
+            </RNView>
+          )}
+
+          {status === 'idle' && result && (
+            <RNView>
+              <Text text70BO>{t('ocr.result.title')}</Text>
+              <Spacing y={12} />
+              {renderTokens(result.tokens)}
+              <Spacing y={24} />
+              <Button label={t('ocr.rescan')} onPress={() => setPickerVisible(true)} outline />
+            </RNView>
+          )}
+        </ScrollView>
+      ) : (
+        <FlashList
+          data={historyItems}
+          keyExtractor={(item) => item.scanId}
+          renderItem={({ item }) => (
+            <RNView style={styles.historyRow}>
+              <Image source={{ uri: item.imageUrl }} style={styles.historyThumbnail} />
+              <RNView style={styles.historyContent}>
+                {renderTokens(item.tokens)}
+                <Text text100L $textNeutral>
+                  {new Date(item.createdAt).toLocaleDateString(i18n.language)}
+                </Text>
+              </RNView>
+            </RNView>
+          )}
+          ListEmptyComponent={
+            historyStatus !== 'pending' ? (
+              <Text text80M $textGeneral>
+                {t('ocr.history.empty')}
+              </Text>
+            ) : null
+          }
+          ListFooterComponent={
+            historyStatus === 'pending' && historyPage > 1 ? (
+              <RNView style={styles.footer}>
+                <ActivityIndicator color={Colors.$backgroundPrimaryHeavy} size="small" />
+              </RNView>
+            ) : null
+          }
+          onEndReached={handleHistoryEndReached}
+          onEndReachedThreshold={0.3}
+          contentContainerStyle={styles.listContent}
+        />
+      )}
 
       <ActionSheet
         visible={pickerVisible}

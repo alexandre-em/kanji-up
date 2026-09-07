@@ -175,6 +175,7 @@ type ScanSummaryType = {
   scanId: string;
   imageUrl: string;
   recognizedText: string;
+  tokens: ScanTokenType[];
   createdAt: string;
 };
 

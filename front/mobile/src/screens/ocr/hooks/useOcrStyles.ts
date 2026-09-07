@@ -56,6 +56,19 @@ export function useOcrStyles() {
         paddingVertical: 16,
         alignItems: 'center',
       },
+      tabBar: {
+        flexDirection: 'row',
+        gap: 8,
+      },
+      tab: {
+        flex: 1,
+        alignItems: 'center',
+        paddingVertical: 10,
+        borderRadius: 10,
+      },
+      tabActive: {
+        backgroundColor: Colors.$backgroundPrimaryLight,
+      },
     }),
   );
 }

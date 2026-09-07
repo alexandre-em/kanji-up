@@ -311,6 +311,8 @@
 
   "ocr.title": "Scan",
   "ocr.subtitle": "Scanne du texte réel et retrouve les mots",
+  "ocr.tabs.scan": "Scanner",
+  "ocr.tabs.history": "Historique",
   "ocr.empty.message": "Prends en photo une enseigne, un menu, ou tout texte écrit en japonais",
   "ocr.scan.button": "Scanner",
   "ocr.uploading": "Lecture du texte...",

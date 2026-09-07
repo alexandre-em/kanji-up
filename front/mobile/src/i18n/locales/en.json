@@ -367,6 +367,8 @@
 
   "ocr.title": "Scan",
   "ocr.subtitle": "Scan real text and find the words in it",
+  "ocr.tabs.scan": "Scan",
+  "ocr.tabs.history": "History",
   "ocr.empty.message": "Take a photo of a sign, menu, or anything written in Japanese",
   "ocr.scan.button": "Scan",
   "ocr.uploading": "Reading the text...",
