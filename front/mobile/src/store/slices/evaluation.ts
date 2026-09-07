@@ -72,7 +72,9 @@ export function computeProgressionDeltas(items: EvaluationItemType[]): { id: str
 export function toKanjiQuestion(item: EvaluationItemType): KanjiSessionQuestion {
   return {
     kanjiId: item.kanji.kanji_id ?? '',
-    image: item.image,
+    // A blank canvas (0 strokes: skipped or timed out) carries nothing worth storing — dropping it
+    // here keeps the upload and the session document itself skip-free of empty images
+    image: item.strokesCount > 0 ? item.image : null,
     strokesCount: item.strokesCount,
     status: item.status,
     userConfirmation: item.userConfirmation,
