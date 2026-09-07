@@ -53,6 +53,11 @@ export function useWordDetailStyles() {
         borderLeftColor: Colors.$outlineNeutral,
         gap: 2,
       },
+      sentenceRow: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        alignItems: 'flex-end',
+      },
     }),
   );
 }

@@ -1,7 +1,7 @@
 import { useNavigation } from '@react-navigation/native';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { TouchableOpacity, View as RNView } from 'react-native';
+import { TouchableOpacity, View as RNView, ViewStyle } from 'react-native';
 import { ActionSheet, Assets, Button, Colors, ProgressBar, Text } from 'react-native-ui-lib';
 
 import FuriganaText from '../../components/furiganaText';
@@ -21,23 +21,48 @@ import { useWordDetailStyles } from './useWordDetailStyles';
 
 type WordDetailProps = RouteParamsProps<{ id: string }>;
 
-// Highlights whichever spelling of the word actually shows up in the example sentence — kanji and
-// kana spellings don't both appear, so only one (if any) will ever match
-function renderHighlightedSentence(sentence: string | undefined, spellings: string[]) {
-  if (!sentence) return sentence;
+function renderHighlightedSentence(
+  sentence: string | undefined,
+  spellings: string[],
+  reading: string | undefined,
+  sentenceRowStyle: ViewStyle,
+) {
+  if (!sentence) return null;
 
   const match = spellings.find((spelling) => spelling && sentence.includes(spelling));
-  if (!match) return sentence;
+  if (!match) {
+    return (
+      <Text text90M $textDefault>
+        {sentence}
+      </Text>
+    );
+  }
 
-  return sentence.split(match).flatMap((part, index, parts) =>
-    index < parts.length - 1
-      ? [
-          part,
-          <Text key={index} text90BO $textPrimary>
-            {match}
-          </Text>,
-        ]
-      : [part],
+  return (
+    <RNView style={sentenceRowStyle}>
+      {sentence.split(match).flatMap((part, index, parts) => {
+        const pieces = [];
+        if (part) {
+          pieces.push(
+            <Text key={`text-${index}`} text90M $textDefault>
+              {part}
+            </Text>,
+          );
+        }
+        if (index < parts.length - 1) {
+          pieces.push(
+            reading ? (
+              <FuriganaText key={`match-${index}`} text={match} reading={reading} size="small" furiganaSize="XS" />
+            ) : (
+              <Text key={`match-${index}`} text90BO $textPrimary>
+                {match}
+              </Text>
+            ),
+          );
+        }
+        return pieces;
+      })}
+    </RNView>
   );
 }
 
@@ -156,7 +181,7 @@ export default function WordDetail(props: WordDetailProps) {
           <RNView style={styles.wordRow}>
             {word.word.map((spelling, index) =>
               index === 0 && word.reading[0] ? (
-                <FuriganaText key={spelling} text={spelling} reading={word.reading[0]} />
+                <FuriganaText key={spelling} text={spelling} reading={word.reading[0]} furiganaSize="L" />
               ) : (
                 <Text key={spelling} text50BL $textPrimary center>
                   {spelling}
@@ -201,7 +226,7 @@ export default function WordDetail(props: WordDetailProps) {
               {definition.example?.map((example, exampleIndex) => (
                 <RNView key={example.sentence_id ?? exampleIndex} style={styles.exampleRow}>
                   <Text text90M $textDefault>
-                    {renderHighlightedSentence(example.sentence, word.word)}
+                    {renderHighlightedSentence(example.sentence, word.word, word.reading[0], styles.sentenceRow)}
                   </Text>
                   <Text text90M $textNeutral>
                     {example.translation}
