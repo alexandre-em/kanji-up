@@ -21,6 +21,7 @@ import {
   selectEvaluationItems,
   selectEvaluationStatus,
   startFreshSession,
+  toKanjiQuestion,
 } from '../../../store/slices/evaluation';
 import { getOne, selectEntities } from '../../../store/slices/kanji';
 import { selectActiveList } from '../../../store/slices/lists';
@@ -121,11 +122,34 @@ export default function EvaluationHoc() {
             dispatch(completeMissionTask({ userId, task: 'kanjiMastery' }));
           }
 
+          const correctCount = answered.filter((item) => getEffectiveStatus(item) === 'correct').length;
+
           if (sessionId) {
-            const correctCount = answered.filter((item) => getEffectiveStatus(item) === 'correct').length;
             core.sessionsService!.finish(sessionId, correctCount).catch(() => {
               dispatch(enqueueSessionFinish({ sessionId, score: correctCount }));
             });
+          } else if (userId) {
+            // The run's own startFreshSession never got a sessionId (offline, or the create
+            // request failed) — same fallback as a normal finish: create-then-finish now, queue
+            // whatever step fails, so this history entry isn't silently lost
+            (async () => {
+              try {
+                const response = await core.sessionsService!.create({
+                  userId,
+                  type: 'kanji',
+                  questions: items.map(toKanjiQuestion),
+                });
+                try {
+                  await core.sessionsService!.finish(response.data.sessionId, correctCount);
+                } catch {
+                  dispatch(enqueueSessionFinish({ sessionId: response.data.sessionId, score: correctCount }));
+                }
+              } catch {
+                dispatch(
+                  enqueueSessionFinish({ userId, kind: 'kanji', questions: items.map(toKanjiQuestion), score: correctCount }),
+                );
+              }
+            })();
           }
         }
       } catch {
