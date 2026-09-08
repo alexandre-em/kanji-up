@@ -149,6 +149,13 @@ type SessionType = {
   updatedAt: string;
 };
 
+type FeedbackCategoryType = 'bug' | 'suggestion' | 'other';
+
+type FeedbackType = {
+  feedbackId: string;
+  createdAt: string;
+};
+
 type MissionTaskKey = 'kanjiSession' | 'wordSession' | 'kanjiMastery';
 
 type DailyMissionType = {

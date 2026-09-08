@@ -44,6 +44,19 @@ export default function Settings() {
       </Text>
       <Spacing y={12} />
       <TrainingConsentToggle />
+      <Spacing y={28} />
+      <Text text70BO $textDefault>
+        {t('settings.section.support')}
+      </Text>
+      <Spacing y={12} />
+      <TouchableOpacity
+        onPress={() => navigation.navigate(screenNames.FEEDBACK)}
+        accessibilityRole="button"
+        accessibilityLabel={t('settings.reportIssue')}>
+        <Text text80M $textPrimary>
+          {t('settings.reportIssue')}
+        </Text>
+      </TouchableOpacity>
     </Layout>
   );
 }

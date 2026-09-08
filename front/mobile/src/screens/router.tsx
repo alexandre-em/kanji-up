@@ -12,6 +12,7 @@ import OfflineBanner from '../components/offlineBanner';
 import { screenNames } from '../constants/screens';
 import { TAB_VISIBLE_ROUTES } from '../constants/tabs';
 import { useIsNotRegistered } from '../hooks/useIsAlreadyRegistered';
+import Feedback from './feedback';
 import Home from './home';
 import KanjiCategoriesScreen from './kanji';
 import KanjiDifficulties from './kanji/difficulty';
@@ -96,6 +97,7 @@ export default function RootNavigation() {
           <Stack.Screen name={screenNames.KANJI} component={KanjiDetail} options={headerOptions} />
           <Stack.Screen name={screenNames.OCR} component={Ocr} options={headerOptions} />
           <Stack.Screen name={screenNames.SETTINGS} component={Settings} />
+          <Stack.Screen name={screenNames.FEEDBACK} component={Feedback} options={headerOptions} />
           <Stack.Screen name={screenNames.PREMIUM} component={Premium} options={headerOptions} />
           <Stack.Screen name={screenNames.PROFILE} component={Profile} />
           <Stack.Screen name={screenNames.WORD} component={WordDetail} options={headerOptions} />

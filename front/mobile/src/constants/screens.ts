@@ -13,6 +13,7 @@ export const screenNames = {
   PREMIUM: 'Premium',
   SEARCH: 'Search',
   SETTINGS: 'Settings',
+  FEEDBACK: 'Feedback',
   PROFILE: 'Profile',
   WORD: 'Word',
   MY_LISTS: 'MyLists',
