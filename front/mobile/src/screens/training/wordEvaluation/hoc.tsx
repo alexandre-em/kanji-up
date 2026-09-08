@@ -1,11 +1,13 @@
+import { useNavigation } from '@react-navigation/native';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, TouchableOpacity, View as RNView } from 'react-native';
-import { Colors, Text, View } from 'react-native-ui-lib';
+import { Button, Colors, Text, View } from 'react-native-ui-lib';
 
 import Layout from '../../../components/layout';
 import Spacing from '../../../components/spacing';
 import { MIN_LIST_SIZE_FOR_GAME } from '../../../constants/lists';
+import { screenNames } from '../../../constants/screens';
 import { useRecognitionModel } from '../../../hooks/useRecognitionModel';
 import { useAppDispatch, useAppSelector } from '../../../hooks/useStore';
 import { useToaster } from '../../../providers/toaster';
@@ -30,6 +32,7 @@ const KANJI_KIND: WordEvaluationKind = 'kanji';
 const WORD_KIND: WordEvaluationKind = 'word';
 
 export default function WordEvaluationHoc() {
+  const navigation = useNavigation();
   const dispatch = useAppDispatch();
   const { isLoaded: isModelLoaded, hasError: modelLoadError } = useRecognitionModel();
   const toast = useToaster();
@@ -108,6 +111,13 @@ export default function WordEvaluationHoc() {
 
   const picker = (
     <>
+      <Button
+        label={t('training.viewStats')}
+        outline
+        size={Button.sizes.small}
+        onPress={() => navigation.navigate(screenNames.PROFILE as never)}
+      />
+      <Spacing y={16} />
       <RNView style={styles.segmentedControl}>
         {segments.map((segment) => {
           const isActive = segment.key === kind;
