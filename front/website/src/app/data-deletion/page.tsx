@@ -54,6 +54,8 @@ export default function DataDeletion() {
             <ul className="mt-2 list-disc space-y-1 pl-5">
               <li>Your account information (name, email, profile picture).</li>
               <li>Your kanji selections and evaluation/progress history.</li>
+              <li>Your kanji and word drawings, and any scanned images.</li>
+              <li>Any feedback or bug reports you&apos;ve submitted.</li>
             </ul>
             <p className="mt-2">
               See our{" "}

@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description: "How Kanji Up collects, uses, and protects your data.",
 };
 
-const lastUpdated = "2026-08-10";
+const lastUpdated = "2026-09-09";
 
 export default function PrivacyPolicy() {
   return (
@@ -54,6 +54,26 @@ export default function PrivacyPolicy() {
                 study and your evaluation results, so the app can track your
                 progress over time.
               </li>
+              <li>
+                <strong>Drawings and scanned images</strong> — when you
+                practice writing a kanji or word, or scan text with your
+                camera or photo library, the app uploads the resulting image
+                to our servers to recognize the character or text. If you
+                turn on the optional training setting in the app, your
+                drawings may also be used to improve our recognition model.
+              </li>
+              <li>
+                <strong>Purchase information</strong> — if you buy Premium,
+                Google Play Billing shares your purchase details (plan,
+                transaction status) with us to activate your subscription. We
+                never receive your payment card details.
+              </li>
+              <li>
+                <strong>Feedback you send us</strong> — if you use the
+                in-app &quot;Report a problem or suggestion&quot; form, we
+                receive the message and category you submit, along with your
+                device identifier.
+              </li>
             </ul>
           </section>
 
@@ -83,8 +103,10 @@ export default function PrivacyPolicy() {
             </h2>
             <p className="mt-2">
               We use the data above to operate your account, keep your kanji
-              progress in sync, and show ads that help fund the app. We do
-              not sell your personal data.
+              progress in sync, recognize the characters and text you draw or
+              scan, activate and manage your Premium subscription, respond to
+              feedback you send us, and show ads that help fund the app. We
+              do not sell your personal data.
             </p>
           </section>
 

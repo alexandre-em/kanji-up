@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description: "The terms that apply to using the Kanji Up app.",
 };
 
-const lastUpdated = "2026-08-10";
+const lastUpdated = "2026-09-09";
 
 export default function Terms() {
   return (
@@ -62,6 +62,24 @@ export default function Terms() {
                 Privacy Policy
               </Link>{" "}
               for details on the data we collect.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-lg font-semibold text-black dark:text-zinc-50">
+              Premium subscriptions and purchases
+            </h2>
+            <p className="mt-2">
+              Kanji Up offers an optional Premium upgrade: monthly and annual
+              auto-renewing subscriptions, or a one-time lifetime purchase.
+              All purchases are processed through Google Play Billing; prices
+              and billing periods are shown in the app and on the Play Store
+              listing before you buy. Subscriptions renew automatically
+              unless cancelled at least 24 hours before the renewal date. You
+              can manage or cancel a subscription at any time from the Google
+              Play Store&apos;s Subscriptions settings — this isn&apos;t
+              available directly in the app. Refunds follow Google
+              Play&apos;s own refund policy.
             </p>
           </section>
 
