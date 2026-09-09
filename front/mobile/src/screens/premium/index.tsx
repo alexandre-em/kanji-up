@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Dimensions, StyleSheet, View as RNView } from 'react-native';
+import { Dimensions, Linking, StyleSheet, View as RNView } from 'react-native';
 import { ErrorCode, Product, ProductSubscription, Purchase, PurchaseError } from 'react-native-iap';
 import { Assets, Button, Card, Colors, Icon, Text, View } from 'react-native-ui-lib';
 import { useSelector } from 'react-redux';
@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux';
 import Layout from '../../components/layout';
 import Spacing from '../../components/spacing';
 import { PREMIUM_LIFETIME_SKU, PREMIUM_SUBSCRIPTION_SKUS, PremiumPlanKey } from '../../constants/billing';
+import { PRIVACY_POLICY_URL, TERMS_URL } from '../../constants/legal';
 import { GENERAL_MARGIN } from '../../constants/styles';
 import { useAppDispatch } from '../../hooks/useStore';
 import { useToaster } from '../../providers/toaster';
@@ -46,6 +47,17 @@ export default function Premium() {
     products: [],
   });
   const [purchasingPlan, setPurchasingPlan] = useState<PremiumPlanKey | null>(null);
+
+  const getSubscriptionPrice = (sku: string) => {
+    const subscription = offers.subscriptions.find((item) => item.id === sku);
+    return subscription && 'subscriptionOffers' in subscription ? subscription.subscriptionOffers?.[0]?.displayPrice : undefined;
+  };
+
+  const planPrices: Partial<Record<PremiumPlanKey, string>> = {
+    monthly: getSubscriptionPrice(PREMIUM_SUBSCRIPTION_SKUS.monthly),
+    annual: getSubscriptionPrice(PREMIUM_SUBSCRIPTION_SKUS.annual),
+    lifetime: offers.products.find((item) => item.id === PREMIUM_LIFETIME_SKU)?.displayPrice,
+  };
 
   // Server is the source of truth: the purchase token is only proof a checkout happened, it's the
   // /billing/verify-purchase check against the Google Play Developer API that actually grants
@@ -219,7 +231,7 @@ export default function Premium() {
               )}
             </RNView>
             <Text text80M $textGeneral>
-              {t(`premium.plans.${plan}.price`)}
+              {planPrices[plan] ?? t('premium.plans.priceLoading')}
             </Text>
             <Spacing y={12} />
             <Button
@@ -232,6 +244,20 @@ export default function Premium() {
           <Spacing y={16} />
         </RNView>
       ))}
+      <Text text90M $textNeutral center>
+        {t('premium.subscriptionDisclosure')}
+      </Text>
+      <Spacing y={12} />
+      <Text text90M $textNeutral center>
+        {t('premium.legal.prefix')}{' '}
+        <Text text90M $textPrimary onPress={() => Linking.openURL(TERMS_URL)}>
+          {t('premium.legal.terms')}
+        </Text>{' '}
+        {t('premium.legal.and')}{' '}
+        <Text text90M $textPrimary onPress={() => Linking.openURL(PRIVACY_POLICY_URL)}>
+          {t('premium.legal.privacyPolicy')}
+        </Text>
+      </Text>
     </Layout>
   );
 }

@@ -1,11 +1,12 @@
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
-import { TouchableOpacity } from 'react-native';
+import { Linking, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-ui-lib';
 
 import AccountSummary from '../../components/accountSummary';
 import Layout from '../../components/layout';
 import Spacing from '../../components/spacing';
+import { PRIVACY_POLICY_URL, TERMS_URL } from '../../constants/legal';
 import { screenNames } from '../../constants/screens';
 import GoogleSignInButton from './components/googleSignIn';
 import LanguageSelector from './components/languageSelector';
@@ -55,6 +56,28 @@ export default function Settings() {
         accessibilityLabel={t('settings.reportIssue')}>
         <Text text80M $textPrimary>
           {t('settings.reportIssue')}
+        </Text>
+      </TouchableOpacity>
+      <Spacing y={28} />
+      <Text text70BO $textDefault>
+        {t('settings.section.legal')}
+      </Text>
+      <Spacing y={12} />
+      <TouchableOpacity
+        onPress={() => Linking.openURL(PRIVACY_POLICY_URL)}
+        accessibilityRole="link"
+        accessibilityLabel={t('settings.privacyPolicy')}>
+        <Text text80M $textPrimary>
+          {t('settings.privacyPolicy')}
+        </Text>
+      </TouchableOpacity>
+      <Spacing y={12} />
+      <TouchableOpacity
+        onPress={() => Linking.openURL(TERMS_URL)}
+        accessibilityRole="link"
+        accessibilityLabel={t('settings.terms')}>
+        <Text text80M $textPrimary>
+          {t('settings.terms')}
         </Text>
       </TouchableOpacity>
     </Layout>
