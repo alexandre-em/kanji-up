@@ -18,7 +18,6 @@ import {
   endBilling,
   fetchPremiumOffers,
   initBilling,
-  purchaseLifetime,
   purchaseSubscription,
   restorePurchases,
 } from '../../services/billing';
@@ -28,7 +27,8 @@ import { selectUserState, user } from '../../store/slices/user';
 const { width } = Dimensions.get('window');
 
 const BENEFIT_KEYS = ['noAds', 'advancedKanji', 'scan', 'resume'] as const;
-const PLANS: PremiumPlanKey[] = ['monthly', 'annual', 'lifetime'];
+type PurchasablePlan = Exclude<PremiumPlanKey, 'lifetime'>;
+const PLANS: PurchasablePlan[] = ['monthly', 'annual'];
 
 function planFromProductId(productId: string): PremiumPlanKey | null {
   if (productId === PREMIUM_SUBSCRIPTION_SKUS.monthly) return 'monthly';
@@ -46,7 +46,7 @@ export default function Premium() {
     subscriptions: [],
     products: [],
   });
-  const [purchasingPlan, setPurchasingPlan] = useState<PremiumPlanKey | null>(null);
+  const [purchasingPlan, setPurchasingPlan] = useState<PurchasablePlan | null>(null);
 
   const getSubscriptionPrice = (sku: string) => {
     const subscription = offers.subscriptions.find((item) => item.id === sku);
@@ -56,7 +56,6 @@ export default function Premium() {
   const planPrices: Partial<Record<PremiumPlanKey, string>> = {
     monthly: getSubscriptionPrice(PREMIUM_SUBSCRIPTION_SKUS.monthly),
     annual: getSubscriptionPrice(PREMIUM_SUBSCRIPTION_SKUS.annual),
-    lifetime: offers.products.find((item) => item.id === PREMIUM_LIFETIME_SKU)?.displayPrice,
   };
 
   // Server is the source of truth: the purchase token is only proof a checkout happened, it's the
@@ -142,7 +141,7 @@ export default function Premium() {
   }, []);
 
   const handleSelectPlan = useCallback(
-    async (plan: PremiumPlanKey) => {
+    async (plan: PurchasablePlan) => {
       // Dev shortcut: skips real Play Billing (unavailable on the emulator/no Play Services)
       // entirely and grants premium locally, so the paywalled UI can be tested without a real
       // purchase. __DEV__ is false in release builds, so this never ships.
@@ -155,11 +154,6 @@ export default function Premium() {
       setPurchasingPlan(plan);
 
       try {
-        if (plan === 'lifetime') {
-          await purchaseLifetime();
-          return;
-        }
-
         const subscription = offers.subscriptions.find((item) => item.id === PREMIUM_SUBSCRIPTION_SKUS[plan]);
         if (!subscription) throw new Error('Offer not available yet');
 

@@ -38,10 +38,6 @@ export function purchaseSubscription(subscription: ProductSubscription) {
   });
 }
 
-export function purchaseLifetime() {
-  return requestPurchase({ request: { google: { skus: [PREMIUM_LIFETIME_SKU] } }, type: 'in-app' });
-}
-
 export function addPurchaseListeners(onPurchase: (purchase: Purchase) => void, onError: (error: PurchaseError) => void) {
   const updateSubscription = purchaseUpdatedListener(onPurchase);
   const errorSubscription = purchaseErrorListener(onError);
