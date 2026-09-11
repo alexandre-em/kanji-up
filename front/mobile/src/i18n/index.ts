@@ -5,15 +5,25 @@ import * as RNLocalize from 'react-native-localize';
 import { LANGUAGE_OVERRIDE_KEY } from '../constants/storage';
 import { fileServiceInstance } from '../services/file';
 import en from './locales/en.json';
+import es from './locales/es.json';
 import fr from './locales/fr.json';
+import it from './locales/it.json';
 import ja from './locales/ja.json';
 import jaHrkt from './locales/ja-Hrkt.json';
+import th from './locales/th.json';
+import vi from './locales/vi.json';
+import zh from './locales/zh.json';
 
 const resources = {
   en: { translation: en },
   fr: { translation: fr },
   ja: { translation: ja },
   'ja-Hrkt': { translation: jaHrkt },
+  es: { translation: es },
+  it: { translation: it },
+  zh: { translation: zh },
+  vi: { translation: vi },
+  th: { translation: th },
 };
 
 // Single source of truth for the language picker in Settings — adding a language only means
