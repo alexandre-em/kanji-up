@@ -69,10 +69,16 @@ export default function KanjiList(props: KanjiListProps) {
   const isTierPaid = perKanjiCost !== undefined;
 
   const handleEndReached = useCallback(() => {
-    if (difficulty === last?.difficulty && category === last?.type && last.page > 0 && last.page < last.totalPage) {
+    if (
+      kanjisStatus !== 'pending' &&
+      difficulty === last?.difficulty &&
+      category === last?.type &&
+      last.page > 0 &&
+      last.page < last.totalPage
+    ) {
       dispatch(getAll({ type: category, difficulty, page: last.page + 1 }));
     }
-  }, [dispatch, last?.difficulty, last?.type, last?.page, last?.totalPage, category, difficulty]);
+  }, [dispatch, kanjisStatus, last?.difficulty, last?.type, last?.page, last?.totalPage, category, difficulty]);
 
   const handleRedirect = useCallback(
     (kanji: Partial<KanjiType>) => {
@@ -206,7 +212,7 @@ export default function KanjiList(props: KanjiListProps) {
           />
         )}
         onEndReached={handleEndReached}
-        onEndReachedThreshold={0.15}
+        onEndReachedThreshold={0}
         // FlashList scrolls itself, so Layout's own bottom clearance (built for its outer
         // ScrollView) never reaches it: the floating tab bar would sit on top of the last row
         contentContainerStyle={{ paddingBottom: TAB_BAR_TOTAL_HEIGHT + insets.bottom }}

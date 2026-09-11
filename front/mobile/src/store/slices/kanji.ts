@@ -65,11 +65,18 @@ export const getAll = createAsyncThunk<
   const typeParams = params.type === 'advanced' ? { advanced: true } : { [params.type]: params.difficulty };
   const response = await core.kanjiService!.getAll({ page, ...typeParams, limit: 50 });
 
-  if (params.difficulty !== kanji.last?.difficulty) {
+  const kanjiAfterResponse = (getState() as RootState).kanji;
+
+  if (params.difficulty !== kanjiAfterResponse.last?.difficulty || params.type !== kanjiAfterResponse.last?.type) {
     return { ...response.data, difficulty: params.difficulty, type: params.type };
   }
 
-  return { ...response.data, docs: kanji.kanjis.concat(response.data.docs), difficulty: params.difficulty, type: params.type };
+  return {
+    ...response.data,
+    docs: kanjiAfterResponse.kanjis.concat(response.data.docs),
+    difficulty: params.difficulty,
+    type: params.type,
+  };
 });
 
 export const getRandom = createAsyncThunk<KanjiType[], number>('kanjis/getRandom', async (number) => {
@@ -109,8 +116,11 @@ const kanjiSlice = createSlice({
     builder.addCase(getOne.rejected, (state) => {
       state.getOneStatus = 'failed';
     });
-    builder.addCase(getAll.pending, (state) => {
+    builder.addCase(getAll.pending, (state, action) => {
       state.getAllStatus = 'pending';
+      if (action.meta.arg.type !== state.last?.type || action.meta.arg.difficulty !== state.last?.difficulty) {
+        state.kanjis = [];
+      }
     });
     builder.addCase(getAll.fulfilled, (state, action) => {
       if (action.payload === null) return;
