@@ -141,6 +141,8 @@
   "settings.language.title": "Langue d'affichage",
   "settings.language.fr": "Français",
   "settings.language.en": "English",
+  "settings.language.ja": "日本語 (japonais)",
+  "settings.language.ja-Hrkt": "にほんご（かな） (japonais, kana uniquement)",
   "settings.language.toast": "Langue mise à jour",
   "settings.language.choose": "Choisir une langue",
   "settings.theme.title": "Thème",

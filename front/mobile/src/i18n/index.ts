@@ -6,10 +6,14 @@ import { LANGUAGE_OVERRIDE_KEY } from '../constants/storage';
 import { fileServiceInstance } from '../services/file';
 import en from './locales/en.json';
 import fr from './locales/fr.json';
+import ja from './locales/ja.json';
+import jaHrkt from './locales/ja-Hrkt.json';
 
 const resources = {
   en: { translation: en },
   fr: { translation: fr },
+  ja: { translation: ja },
+  'ja-Hrkt': { translation: jaHrkt },
 };
 
 // Single source of truth for the language picker in Settings — adding a language only means
