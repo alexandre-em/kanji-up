@@ -245,7 +245,7 @@ export default function KanjiDetail(props: KanjiDetailsProps) {
   return (
     <Layout screen="kanji">
       <View style={styles.header}>{isDrawMode ? CanvasMode : ViewMode}</View>
-      {!RECOGNITION_MODEL_LABELS.has(character) && (
+      {!RECOGNITION_MODEL_LABELS.has(kanji?.kanji?.character ?? '') && (
         <>
           <Spacing y={12} />
           <View style={[styles.recognitionWarning, { backgroundColor: Colors.$backgroundWarningLight }]}>
