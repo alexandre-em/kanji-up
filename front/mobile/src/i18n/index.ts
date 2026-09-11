@@ -10,6 +10,7 @@ import fr from './locales/fr.json';
 import it from './locales/it.json';
 import ja from './locales/ja.json';
 import jaHrkt from './locales/ja-Hrkt.json';
+import ko from './locales/ko.json';
 import ru from './locales/ru.json';
 import th from './locales/th.json';
 import vi from './locales/vi.json';
@@ -22,6 +23,7 @@ const resources = {
   it: { translation: it },
   ja: { translation: ja },
   'ja-Hrkt': { translation: jaHrkt },
+  ko: { translation: ko },
   ru: { translation: ru },
   es: { translation: es },
   th: { translation: th },
