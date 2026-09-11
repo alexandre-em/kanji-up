@@ -10,6 +10,7 @@ import fr from './locales/fr.json';
 import it from './locales/it.json';
 import ja from './locales/ja.json';
 import jaHrkt from './locales/ja-Hrkt.json';
+import ru from './locales/ru.json';
 import th from './locales/th.json';
 import vi from './locales/vi.json';
 import zh from './locales/zh.json';
@@ -24,6 +25,7 @@ const resources = {
   zh: { translation: zh },
   vi: { translation: vi },
   th: { translation: th },
+  ru: { translation: ru },
 };
 
 // Single source of truth for the language picker in Settings — adding a language only means
