@@ -15,8 +15,6 @@ import { MAX_FREE_SELECTED_KANJI } from '../../../../constants/selectionLimit';
 import { BULK_UNLOCK_COST, getTierKey, PER_KANJI_UNLOCK_COST } from '../../../../constants/unlockCosts';
 import { useAppDispatch, useAppSelector } from '../../../../hooks/useStore';
 import { useToaster } from '../../../../providers/toaster.tsx';
-import { getAll, selectGetAllStatus, selectLastGet } from '../../../../store/slices/kanji';
-import { selectGetAllResult } from '../../../../store/slices/kanji';
 import {
   lists,
   saveActiveListSelection,
@@ -32,6 +30,7 @@ import { isKanjiLocked } from '../../../../utils/kanjiLock';
 import ActiveListSelector from './components/activeListSelector';
 import KanjiCardElement from './components/kanjiCardElement';
 import UnlockModal from './components/unlockModal';
+import { useKanjiListPage } from './hooks/useKanjiListPage';
 
 type KanjiListProps = RouteParamsProps<{
   difficulty: string;
@@ -46,16 +45,14 @@ export default function KanjiList(props: KanjiListProps) {
   const [isBulkUnlockVisible, setIsBulkUnlockVisible] = useState(false);
   const [isUnlocking, setIsUnlocking] = useState(false);
   const navigation = useNavigation();
-  const last = useAppSelector(selectLastGet);
-  const kanjis = useAppSelector(selectGetAllResult);
-  const kanjisStatus = useAppSelector(selectGetAllStatus);
+  const { difficulty, category } = props.route.params;
+  const { kanjis, status: kanjisStatus, fetchNextPage } = useKanjiListPage(category, difficulty);
   const allLists = useSelector(selectAllLists);
   const activeList = useSelector(selectActiveList);
   const toAdd = useSelector(selectKanjiToAddToActiveList);
   const toRemove = useSelector(selectKanjiToRemoveFromActiveList);
   const saveStatus = useSelector(selectListsSaveStatus);
   const pendingCount = useAppSelector(selectActiveListPendingCount);
-  const { difficulty, category } = props.route.params;
   const toaster = useToaster();
   const userState = useAppSelector(selectUserState);
 
@@ -67,18 +64,6 @@ export default function KanjiList(props: KanjiListProps) {
   // Only paid tiers (present in the cost table) have anything to unlock — free tiers (JLPT
   // N5/N4, grade 1-6) never gate a single kanji, perKanjiCost stays undefined for them
   const isTierPaid = perKanjiCost !== undefined;
-
-  const handleEndReached = useCallback(() => {
-    if (
-      kanjisStatus !== 'pending' &&
-      difficulty === last?.difficulty &&
-      category === last?.type &&
-      last.page > 0 &&
-      last.page < last.totalPage
-    ) {
-      dispatch(getAll({ type: category, difficulty, page: last.page + 1 }));
-    }
-  }, [dispatch, kanjisStatus, last?.difficulty, last?.type, last?.page, last?.totalPage, category, difficulty]);
 
   const handleRedirect = useCallback(
     (kanji: Partial<KanjiType>) => {
@@ -151,12 +136,6 @@ export default function KanjiList(props: KanjiListProps) {
   );
 
   useEffect(() => {
-    if (last?.difficulty !== difficulty || last?.type !== category) {
-      dispatch(getAll({ type: category, difficulty, page: 1 }));
-    }
-  }, [category, difficulty, dispatch, last?.page, last?.difficulty, last?.type]);
-
-  useEffect(() => {
     if (toaster) {
       if (saveStatus === 'succeeded') {
         toaster.show({ message: t('kanji.select.toast.success'), type: 'success' });
@@ -211,7 +190,7 @@ export default function KanjiList(props: KanjiListProps) {
             progressionEntry={userState.progression[item.kanji_id!]}
           />
         )}
-        onEndReached={handleEndReached}
+        onEndReached={fetchNextPage}
         onEndReachedThreshold={0}
         // FlashList scrolls itself, so Layout's own bottom clearance (built for its outer
         // ScrollView) never reaches it: the floating tab bar would sit on top of the last row

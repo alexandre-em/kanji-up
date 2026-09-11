@@ -5,28 +5,12 @@ import { RootState } from '../';
 
 interface KanjiState {
   entities: { [uuid: string]: KanjiType };
-  kanjis: KanjiType[];
-  last: {
-    page: number;
-    type: 'grade' | 'jlpt' | 'advanced';
-    difficulty: string;
-    totalPage: number;
-  } | null;
   search: { [search: string]: SearchResult<KanjiType> };
   random: KanjiType[] | undefined;
   getOneStatus: RequestStatusType;
-  getAllStatus: RequestStatusType;
   getRandomStatus: RequestStatusType;
   searchStatus: RequestStatusType;
 }
-
-type GetAllInput = {
-  // 'advanced' has no sub-levels — difficulty is an unused placeholder (kept as a required string
-  // so the same cache/pagination fields work uniformly across all three types)
-  difficulty: string;
-  page?: number;
-  type: 'grade' | 'jlpt' | 'advanced';
-};
 
 interface SearchKanjiInput {
   query: string;
@@ -36,12 +20,9 @@ interface SearchKanjiInput {
 
 const initialState: KanjiState = {
   entities: {},
-  kanjis: [],
   random: undefined,
   search: {},
-  last: null,
   getOneStatus: 'idle',
-  getAllStatus: 'idle',
   getRandomStatus: 'idle',
   searchStatus: 'idle',
 };
@@ -51,32 +32,6 @@ export const getOne = createAsyncThunk<KanjiType, string>('kanjis/getById', asyn
   if (kanji.entities[id]?.kanji_id) return kanji.entities[id];
   const response = await core.kanjiService!.getOne({ id });
   return response.data;
-});
-
-export const getAll = createAsyncThunk<
-  (Pagination<KanjiType> & { difficulty: string; type: 'grade' | 'jlpt' | 'advanced' }) | null,
-  GetAllInput
->('kanjis/getAll', async ({ page = 1, ...params }, { getState }) => {
-  const { kanji } = getState() as RootState;
-  if (params.type === kanji.last?.type && params.difficulty === kanji.last?.difficulty && page <= kanji.last.page) {
-    return null;
-  }
-
-  const typeParams = params.type === 'advanced' ? { advanced: true } : { [params.type]: params.difficulty };
-  const response = await core.kanjiService!.getAll({ page, ...typeParams, limit: 50 });
-
-  const kanjiAfterResponse = (getState() as RootState).kanji;
-
-  if (params.difficulty !== kanjiAfterResponse.last?.difficulty || params.type !== kanjiAfterResponse.last?.type) {
-    return { ...response.data, difficulty: params.difficulty, type: params.type };
-  }
-
-  return {
-    ...response.data,
-    docs: kanjiAfterResponse.kanjis.concat(response.data.docs),
-    difficulty: params.difficulty,
-    type: params.type,
-  };
 });
 
 export const getRandom = createAsyncThunk<KanjiType[], number>('kanjis/getRandom', async (number) => {
@@ -116,26 +71,6 @@ const kanjiSlice = createSlice({
     builder.addCase(getOne.rejected, (state) => {
       state.getOneStatus = 'failed';
     });
-    builder.addCase(getAll.pending, (state, action) => {
-      state.getAllStatus = 'pending';
-      if (action.meta.arg.type !== state.last?.type || action.meta.arg.difficulty !== state.last?.difficulty) {
-        state.kanjis = [];
-      }
-    });
-    builder.addCase(getAll.fulfilled, (state, action) => {
-      if (action.payload === null) return;
-      state.kanjis = action.payload.docs;
-      state.last = {
-        page: action.payload.page,
-        difficulty: action.payload.difficulty,
-        type: action.payload.type,
-        totalPage: action.payload.totalPages,
-      };
-      state.getAllStatus = 'succeeded';
-    });
-    builder.addCase(getAll.rejected, (state) => {
-      state.getAllStatus = 'failed';
-    });
     builder.addCase(getRandom.pending, (state) => {
       state.getRandomStatus = 'pending';
     });
@@ -159,11 +94,8 @@ const kanjiSlice = createSlice({
   },
 });
 
-export const selectLastGet = (state: RootState) => state.kanji.last;
 export const selectEntities = (state: RootState) => state.kanji.entities;
 export const selectGetOneStatus = (state: RootState) => state.kanji.getOneStatus;
-export const selectGetAllResult = (state: RootState) => state.kanji.kanjis;
-export const selectGetAllStatus = (state: RootState) => state.kanji.getAllStatus;
 export const selectGetRandomResult = (state: RootState) => state.kanji.random;
 export const selectGetRandomStatus = (state: RootState) => state.kanji.getRandomStatus;
 export const selectSearchResult = (state: RootState) => state.kanji.search;
