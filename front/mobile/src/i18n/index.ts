@@ -16,16 +16,16 @@ import vi from './locales/vi.json';
 import zh from './locales/zh.json';
 
 const resources = {
+  zh: { translation: zh },
   en: { translation: en },
   fr: { translation: fr },
+  it: { translation: it },
   ja: { translation: ja },
   'ja-Hrkt': { translation: jaHrkt },
-  es: { translation: es },
-  it: { translation: it },
-  zh: { translation: zh },
-  vi: { translation: vi },
-  th: { translation: th },
   ru: { translation: ru },
+  es: { translation: es },
+  th: { translation: th },
+  vi: { translation: vi },
 };
 
 // Single source of truth for the language picker in Settings — adding a language only means
