@@ -125,42 +125,45 @@ export class WordService {
   deleteOneById(id: string) {
     return this.model.updateOne({ word_id: id }, { deleted_at: new Date() }).exec();
   }
+  // Atlas Search's multi-analyzer / token field types didn't reliably match against these
+  // array-valued fields in testing (word/reading are both arrays) — a plain Mongo exact match
+  // is proven reliable on them (see findExactWordMatch), so it's used here directly instead of
+  // trying to get the same guarantee out of Atlas Search's relevance scoring
+  private readonly searchProjection = {
+    _id: 0,
+    'definition.example': 0,
+    'definition._id': 0,
+    'definition.relation': 0,
+    'definition.related_word': 0,
+    'definition.type': 0,
+    'definition.description': 0,
+    __v: 0,
+    created_at: 0,
+    deleted_at: 0,
+  };
+
   async searchWord(query: string, page = 1, limit = 20) {
     const wordAggregate = this.model
       .aggregate()
-      .search({
-        index: 'default',
-        compound: {
-          // Base CJK-tokenized match across word/reading/definitions, kept broad so partial and
-          // fuzzy hits (compounds, related words) still surface — same behavior as before
-          should: [
-            { text: { query, path: ['word', 'reading', 'definition.meaning'] } },
-            // A verbatim match on the un-analyzed spelling/reading (e.g. querying "そば" and a
-            // document's word/reading being exactly "そば") should always outrank a compound
-            // that merely contains it (塩そば, そば屋, ...) — a flat score instead of a boost
-            // multiplier, since a multiplier only helps proportionally to the base match's own
-            // score, and that base score already gets diluted by length normalization on a
-            // reading array with several entries (そば's own word has 3, 辞書's has 1)
-            { text: { query, path: ['word.exact', 'reading.exact'], score: { constant: { value: 100 } } } },
-          ],
-          minimumShouldMatch: 1,
-        },
-      })
+      .search({ index: 'default', text: { query, path: { wildcard: '*' } } })
       .match({ deleted_at: null })
-      .project({
-        _id: 0,
-        'definition.example': 0,
-        'definition._id': 0,
-        'definition.relation': 0,
-        'definition.related_word': 0,
-        'definition.type': 0,
-        'definition.description': 0,
-        __v: 0,
-        created_at: 0,
-        deleted_at: 0,
-      });
+      .project(this.searchProjection);
 
-    return createPaginateDataFromAggregation(page, limit, wordAggregate);
+    const [exactMatch, results] = await Promise.all([
+      page === 1
+        ? this.model
+            .findOne({ deleted_at: null, $or: [{ word: query }, { reading: query }] })
+            .select(this.searchProjection)
+            .exec()
+        : null,
+      createPaginateDataFromAggregation(page, limit, wordAggregate),
+    ]);
+
+    if (exactMatch) {
+      results.docs = [exactMatch, ...results.docs.filter((doc) => doc.word_id !== exactMatch.word_id)].slice(0, limit);
+    }
+
+    return results;
   }
 
   getNRandomWord(number: number, inIds?: string[]) {
