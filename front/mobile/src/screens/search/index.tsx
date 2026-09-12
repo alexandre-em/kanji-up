@@ -2,12 +2,13 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, StyleSheet, TextInput, TouchableOpacity, View as RNView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Assets, Colors, Icon, Text, View } from 'react-native-ui-lib';
+import { Assets, Badge, Colors, Icon, Text, View } from 'react-native-ui-lib';
 
 import AppBannerAd from '../../components/bannerAd';
 import { TAB_BAR_TOTAL_HEIGHT } from '../../components/bottomNavBar';
 import SearchIcon from '../../components/svg/search';
 import { useAppDispatch, useAppSelector } from '../../hooks/useStore';
+import { useIsOffline } from '../../providers/network';
 import {
   search as searchKanji,
   selectSearchResult as selectKanjiSearchResult,
@@ -29,6 +30,7 @@ const WORD_SEGMENT = 1;
 export default function Search() {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
+  const isOffline = useIsOffline();
   const insets = useSafeAreaInsets();
   // Now a tab screen: the floating tab bar overlays the bottom of the list, so the last results
   // need clearance the same way Layout reserves it for its own screens
@@ -111,16 +113,24 @@ export default function Search() {
         {/* A plain TextInput, not react-native-ui-lib's SearchInput: typing a character into
             *either* one crashes the native bridge on this RN 0.80 New Architecture emulator setup
             (see CLAUDE.md §4) — an environment issue, not something specific to this component */}
-        <RNView style={[styles.searchInputContainer, { borderColor: Colors.$outlineNeutral }]}>
+        <RNView style={[styles.searchInputContainer, { borderColor: Colors.$outlineNeutral }, isOffline && styles.disabled]}>
           <SearchIcon size={18} color={Colors.$iconNeutral} />
           <TextInput
             value={query}
             onChangeText={handleChangeText}
+            editable={!isOffline}
             placeholder={t('home.search.placeholder')}
             placeholderTextColor={Colors.$textNeutral}
             style={[styles.searchInput, { color: Colors.$textDefault }]}
           />
-          {activeStatus === 'pending' ? (
+          {isOffline ? (
+            <Badge
+              label={t('offline.badge')}
+              size={20}
+              backgroundColor={Colors.$backgroundNeutralMedium}
+              labelStyle={{ color: Colors.$textNeutral }}
+            />
+          ) : activeStatus === 'pending' ? (
             <ActivityIndicator color={Colors.$textPrimary} size="small" />
           ) : (
             query !== '' && (
@@ -231,6 +241,9 @@ const styles = StyleSheet.create({
   segmentLabel: {
     fontSize: 14,
     fontWeight: '600',
+  },
+  disabled: {
+    opacity: 0.5,
   },
   body: {
     flex: 1,
