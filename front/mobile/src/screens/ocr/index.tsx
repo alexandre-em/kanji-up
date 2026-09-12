@@ -9,6 +9,7 @@ import ActionSheet from 'react-native-ui-lib/actionSheet';
 import { useSelector } from 'react-redux';
 
 import AppBannerAd from '../../components/bannerAd';
+import RecognizedTokens from '../../components/recognizedTokens';
 import Spacing from '../../components/spacing';
 import Lock from '../../components/svg/lock';
 import { screenNames } from '../../constants/screens';
@@ -19,13 +20,6 @@ import { useOcrStyles } from './hooks/useOcrStyles';
 
 const PICKER_OPTIONS = { mediaType: 'photo' as const, quality: 0.8 as const, maxWidth: 1600, maxHeight: 1600 };
 const HISTORY_LIMIT = 20;
-// Kana, kanji, and Japanese punctuation only — the recognition model sometimes picks up stray
-// roman letters/digits from a photo's background or watermark, which don't belong in the reading
-const JAPANESE_CHARACTER_PATTERN = /[^　-〿぀-ヿ一-鿿]/g;
-
-function filterJapaneseText(text: string) {
-  return text.replace(JAPANESE_CHARACTER_PATTERN, '');
-}
 
 type ScreenStatus = 'idle' | 'uploading' | 'error';
 type OcrTab = 'scan' | 'history';
@@ -116,14 +110,6 @@ export default function Ocr() {
     runScan(response.assets[0]);
   }, [runScan]);
 
-  const handleTokenPress = useCallback(
-    (token: ScanTokenType) => {
-      if (!token.wordId) return;
-      navigation.navigate(screenNames.WORD as never, { id: token.wordId } as never);
-    },
-    [navigation],
-  );
-
   const handleHistoryEndReached = useCallback(() => {
     if (historyStatus === 'pending' || historyItems.length >= historyTotal) return;
     loadHistory(historyPage + 1);
@@ -142,42 +128,10 @@ export default function Ocr() {
           {t('ocr.premiumGate.message')}
         </Text>
         <Spacing y={20} />
-        <Button label={t('ocr.premiumGate.cta')} onPress={() => navigation.navigate(screenNames.PREMIUM)} />
+        <Button label={t('ocr.premiumGate.cta')} onPress={() => navigation.navigate(screenNames.PREMIUM as never)} />
       </RNView>
     );
   }
-
-  const renderTokens = (tokens: ScanTokenType[], recognizedText: string) => {
-    if (tokens.length > 0) {
-      return (
-        <RNView style={styles.tokenRow}>
-          {tokens.map((token, index) => (
-            <TouchableOpacity
-              key={`${token.text}-${index}`}
-              disabled={!token.wordId}
-              onPress={() => handleTokenPress(token)}
-              style={[styles.token, token.wordId && styles.tokenMatched]}
-              accessibilityRole={token.wordId ? 'button' : undefined}>
-              <Text text70M color={token.wordId ? Colors.$textPrimary : Colors.$textDefault}>
-                {token.text}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </RNView>
-      );
-    }
-
-    const filteredText = filterJapaneseText(recognizedText);
-    if (filteredText.trim().length > 0) {
-      return <Text text80M>{filteredText}</Text>;
-    }
-
-    return (
-      <Text text80M $textGeneral>
-        {t('ocr.result.empty')}
-      </Text>
-    );
-  };
 
   return (
     <RNView style={styles.container}>
@@ -270,7 +224,7 @@ export default function Ocr() {
               <Spacing y={16} />
               <Text text70BO>{t('ocr.result.title')}</Text>
               <Spacing y={12} />
-              {renderTokens(result.tokens, result.recognizedText)}
+              <RecognizedTokens tokens={result.tokens} recognizedText={result.recognizedText} />
               <Spacing y={24} />
               <RNView style={styles.center}>
                 <Button label={t('ocr.rescan')} onPress={() => setPickerVisible(true)} outline disabled={isOffline} />
@@ -294,15 +248,18 @@ export default function Ocr() {
           data={historyItems}
           keyExtractor={(item) => item.scanId}
           renderItem={({ item }) => (
-            <RNView style={styles.historyRow}>
+            <TouchableOpacity
+              style={styles.historyRow}
+              onPress={() => navigation.navigate(screenNames.SCAN_DETAIL as never, { scan: item } as never)}
+              accessibilityRole="button">
               <Image source={{ uri: item.imageUrl }} style={styles.historyThumbnail} />
               <RNView style={styles.historyContent}>
-                {renderTokens(item.tokens, item.recognizedText)}
+                <RecognizedTokens tokens={item.tokens} recognizedText={item.recognizedText} />
                 <Text text100L $textNeutral>
                   {new Date(item.createdAt).toLocaleDateString(i18n.language)}
                 </Text>
               </RNView>
-            </RNView>
+            </TouchableOpacity>
           )}
           ListEmptyComponent={
             historyStatus !== 'pending' ? (

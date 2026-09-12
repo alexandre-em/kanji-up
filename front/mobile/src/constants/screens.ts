@@ -6,6 +6,7 @@ export const screenNames = {
   KANJIS: 'Kanjis',
   KANJI: 'Kanji',
   OCR: 'Ocr',
+  SCAN_DETAIL: 'ScanDetail',
   TRAINING: 'Training',
   EVALUATION: 'Evaluation',
   WORD_EVALUATION: 'WordEvaluation',

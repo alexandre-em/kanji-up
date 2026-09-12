@@ -421,6 +421,7 @@
   "ocr.premiumGate.title": "스캔은 프리미엄 기능입니다",
   "ocr.premiumGate.message": "프리미엄으로 실제 문자를 스캔하고 번역해 보세요",
   "ocr.premiumGate.cta": "프리미엄으로 업그레이드",
+  "scanDetail.translation.title": "번역",
 
   "loading.title": "불러오는 중..."
 }

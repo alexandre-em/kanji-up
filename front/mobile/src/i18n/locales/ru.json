@@ -421,6 +421,7 @@
   "ocr.premiumGate.title": "Сканер — премиум-функция",
   "ocr.premiumGate.message": "Сканируйте и переводите реальный текст с премиумом",
   "ocr.premiumGate.cta": "Перейти на премиум",
+  "scanDetail.translation.title": "Перевод",
 
   "loading.title": "Загрузка..."
 }

@@ -22,6 +22,7 @@ import Ocr from './ocr';
 import Onboarding from './onboarding';
 import Premium from './premium';
 import Profile from './profile';
+import ScanDetail from './scanDetail';
 import Search from './search';
 import Settings from './settings';
 import TrainingModes from './training';
@@ -95,6 +96,7 @@ export default function RootNavigation() {
           <Stack.Screen name={screenNames.KANJIS} component={KanjiList} />
           <Stack.Screen name={screenNames.KANJI} component={KanjiDetail} options={headerOptions} />
           <Stack.Screen name={screenNames.OCR} component={Ocr} options={headerOptions} />
+          <Stack.Screen name={screenNames.SCAN_DETAIL} component={ScanDetail} options={headerOptions} />
           <Stack.Screen name={screenNames.SETTINGS} component={Settings} />
           <Stack.Screen name={screenNames.FEEDBACK} component={Feedback} options={headerOptions} />
           <Stack.Screen name={screenNames.PREMIUM} component={Premium} options={headerOptions} />

@@ -21,19 +21,6 @@ export function useOcrStyles() {
         alignItems: 'center',
         paddingVertical: 40,
       },
-      tokenRow: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        gap: 6,
-      },
-      token: {
-        paddingHorizontal: 10,
-        paddingVertical: 6,
-        borderRadius: 10,
-      },
-      tokenMatched: {
-        backgroundColor: Colors.$backgroundPrimaryLight,
-      },
       historyRow: {
         flexDirection: 'row',
         gap: 12,

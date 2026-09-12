@@ -421,6 +421,7 @@
   "ocr.premiumGate.title": "スキャンはプレミアムきのうです",
   "ocr.premiumGate.message": "プレミアムでじっさいのもじをスキャン・ほんやくしよう",
   "ocr.premiumGate.cta": "プレミアムにする",
+  "scanDetail.translation.title": "ほんやく",
 
   "loading.title": "よみこみちゅう..."
 }

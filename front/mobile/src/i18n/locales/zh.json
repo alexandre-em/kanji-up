@@ -421,6 +421,7 @@
   "ocr.premiumGate.title": "扫描是高级版功能",
   "ocr.premiumGate.message": "升级到高级版即可扫描并翻译真实文字",
   "ocr.premiumGate.cta": "升级到高级版",
+  "scanDetail.translation.title": "翻译",
 
   "loading.title": "加载中..."
 }

@@ -421,6 +421,7 @@
   "ocr.premiumGate.title": "スキャンはプレミアム機能です",
   "ocr.premiumGate.message": "プレミアムで実際の文字をスキャン・翻訳しよう",
   "ocr.premiumGate.cta": "プレミアムにする",
+  "scanDetail.translation.title": "翻訳",
 
   "loading.title": "読み込み中..."
 }

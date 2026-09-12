@@ -421,6 +421,7 @@
   "ocr.premiumGate.title": "Scan is a premium feature",
   "ocr.premiumGate.message": "Scan and translate real-world text with premium",
   "ocr.premiumGate.cta": "Go premium",
+  "scanDetail.translation.title": "Translation",
 
   "loading.title": "Loading..."
 }

@@ -421,6 +421,7 @@
   "ocr.premiumGate.title": "การสแกนเป็นฟีเจอร์พรีเมียม",
   "ocr.premiumGate.message": "สแกนและแปลข้อความจริงได้ด้วยพรีเมียม",
   "ocr.premiumGate.cta": "อัปเกรดเป็นพรีเมียม",
+  "scanDetail.translation.title": "คำแปล",
 
   "loading.title": "กำลังโหลด..."
 }

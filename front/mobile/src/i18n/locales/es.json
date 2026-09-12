@@ -421,6 +421,7 @@
   "ocr.premiumGate.title": "Escanear es una función premium",
   "ocr.premiumGate.message": "Escanea y traduce texto real con premium",
   "ocr.premiumGate.cta": "Hazte premium",
+  "scanDetail.translation.title": "Traducción",
 
   "loading.title": "Cargando..."
 }
