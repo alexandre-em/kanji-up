@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Image, ScrollView, TouchableOpacity, View as RNView } from 'react-native';
 import { Asset, launchCamera, launchImageLibrary } from 'react-native-image-picker';
-import { Assets, Button, Colors, Icon, Text } from 'react-native-ui-lib';
+import { Assets, Badge, Button, Colors, Icon, Text } from 'react-native-ui-lib';
 import ActionSheet from 'react-native-ui-lib/actionSheet';
 import { useSelector } from 'react-redux';
 
@@ -12,6 +12,7 @@ import AppBannerAd from '../../components/bannerAd';
 import Spacing from '../../components/spacing';
 import Lock from '../../components/svg/lock';
 import { screenNames } from '../../constants/screens';
+import { useIsOffline } from '../../providers/network';
 import { core } from '../../services/http';
 import { selectUserState } from '../../store/slices/user';
 import { useOcrStyles } from './hooks/useOcrStyles';
@@ -26,6 +27,7 @@ export default function Ocr() {
   const { t, i18n } = useTranslation();
   const navigation = useNavigation();
   const userState = useSelector(selectUserState);
+  const isOffline = useIsOffline();
   const styles = useOcrStyles();
 
   const [activeTab, setActiveTab] = useState<OcrTab>('scan');
@@ -216,7 +218,18 @@ export default function Ocr() {
                 {t('ocr.error')}
               </Text>
               <Spacing y={16} />
-              <Button label={t('ocr.retry')} onPress={() => setPickerVisible(true)} outline />
+              <Button label={t('ocr.retry')} onPress={() => setPickerVisible(true)} outline disabled={isOffline} />
+              {isOffline && (
+                <>
+                  <Spacing y={8} />
+                  <Badge
+                    label={t('offline.badge')}
+                    size={20}
+                    backgroundColor={Colors.$backgroundNeutralMedium}
+                    labelStyle={{ color: Colors.$textNeutral }}
+                  />
+                </>
+              )}
             </RNView>
           )}
 
@@ -228,7 +241,18 @@ export default function Ocr() {
                 {t('ocr.empty.message')}
               </Text>
               <Spacing y={20} />
-              <Button label={t('ocr.scan.button')} onPress={() => setPickerVisible(true)} />
+              <Button label={t('ocr.scan.button')} onPress={() => setPickerVisible(true)} disabled={isOffline} />
+              {isOffline && (
+                <>
+                  <Spacing y={8} />
+                  <Badge
+                    label={t('offline.badge')}
+                    size={20}
+                    backgroundColor={Colors.$backgroundNeutralMedium}
+                    labelStyle={{ color: Colors.$textNeutral }}
+                  />
+                </>
+              )}
             </RNView>
           )}
 
@@ -238,7 +262,20 @@ export default function Ocr() {
               <Spacing y={12} />
               {renderTokens(result.tokens, result.recognizedText)}
               <Spacing y={24} />
-              <Button label={t('ocr.rescan')} onPress={() => setPickerVisible(true)} outline />
+              <RNView style={styles.center}>
+                <Button label={t('ocr.rescan')} onPress={() => setPickerVisible(true)} outline disabled={isOffline} />
+                {isOffline && (
+                  <>
+                    <Spacing y={8} />
+                    <Badge
+                      label={t('offline.badge')}
+                      size={20}
+                      backgroundColor={Colors.$backgroundNeutralMedium}
+                      labelStyle={{ color: Colors.$textNeutral }}
+                    />
+                  </>
+                )}
+              </RNView>
             </RNView>
           )}
         </ScrollView>
