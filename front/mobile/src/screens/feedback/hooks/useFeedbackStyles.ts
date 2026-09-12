@@ -27,6 +27,9 @@ export function useFeedbackStyles() {
         minHeight: 140,
         textAlignVertical: 'top',
       },
+      offlineBadge: {
+        alignSelf: 'center',
+      },
     }),
   );
 }

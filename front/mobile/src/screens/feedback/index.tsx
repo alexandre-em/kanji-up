@@ -2,11 +2,12 @@ import { useNavigation } from '@react-navigation/native';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TouchableOpacity, View as RNView } from 'react-native';
-import { Button, Colors, Text, TextField } from 'react-native-ui-lib';
+import { Badge, Button, Colors, Text, TextField } from 'react-native-ui-lib';
 
 import Layout from '../../components/layout';
 import Spacing from '../../components/spacing';
 import { useAppSelector } from '../../hooks/useStore';
+import { useIsOffline } from '../../providers/network';
 import { useToaster } from '../../providers/toaster';
 import { core } from '../../services/http';
 import { selectUserState } from '../../store/slices/user';
@@ -21,6 +22,7 @@ export default function Feedback() {
   const navigation = useNavigation();
   const styles = useFeedbackStyles();
   const toaster = useToaster();
+  const isOffline = useIsOffline();
   const userState = useAppSelector(selectUserState);
 
   const [category, setCategory] = useState<FeedbackCategoryType>('bug');
@@ -73,7 +75,23 @@ export default function Feedback() {
         fieldStyle={styles.messageField}
       />
       <Spacing y={20} />
-      <Button label={t('feedback.submit')} onPress={handleSubmit} disabled={!message.trim() || status === 'pending'} />
+      <Button
+        label={t('feedback.submit')}
+        onPress={handleSubmit}
+        disabled={!message.trim() || status === 'pending' || isOffline}
+      />
+      {isOffline && (
+        <>
+          <Spacing y={12} />
+          <Badge
+            label={t('offline.badge')}
+            size={20}
+            backgroundColor={Colors.$backgroundNeutralMedium}
+            labelStyle={{ color: Colors.$textNeutral }}
+            style={styles.offlineBadge}
+          />
+        </>
+      )}
     </Layout>
   );
 }
