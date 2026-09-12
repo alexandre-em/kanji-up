@@ -10,22 +10,18 @@ describe('WordService.findExactWordMatch', () => {
     return { service: new WordService(model, sentenceService), findOne, select };
   }
 
-  it('queries by spelling only, excluding soft-deleted words', async () => {
+  it('matches by spelling, or by reading only for a word with no kanji form at all', async () => {
     const { service, findOne } = buildService({ word_id: 'abc' });
 
     await service.findExactWordMatch('そば');
 
-    expect(findOne).toHaveBeenCalledWith({ word: 'そば', deleted_at: null });
-  });
-
-  it('does not query by reading — a shared pronunciation must not count as a spelling match', async () => {
-    const { service, findOne } = buildService(null);
-
-    await service.findExactWordMatch('きょう');
-
-    const query = findOne.mock.calls[0][0];
-    expect(query).not.toHaveProperty('reading');
-    expect(query).not.toHaveProperty('$or');
+    // そば/ラーメン-style words are stored with word: [] and only a reading — the $size: 0
+    // guard is what stops this from also matching a kanji word sharing that pronunciation
+    // (きょう must never match 今日, which has a real, non-empty word array)
+    expect(findOne).toHaveBeenCalledWith({
+      deleted_at: null,
+      $or: [{ word: 'そば' }, { word: { $size: 0 }, reading: 'そば' }],
+    });
   });
 
   it('projects only word_id, not the full document', async () => {

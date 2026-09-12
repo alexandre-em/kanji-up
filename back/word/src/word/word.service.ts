@@ -47,10 +47,14 @@ export class WordService {
     return this.model.find({ 'definition.related_word': { $elemMatch: { $ne: null } } }).exec();
   }
 
-  // Spelling only, not reading — a kana string sharing pronunciation with an unrelated kanji
-  // word (e.g. きょう / 今日) must not count as a match for it, only an actual written form does
+  // Spelling first — a kana string sharing pronunciation with an unrelated kanji word (e.g.
+  // きょう / 今日) must not count as a match for it. Reading only kicks in for a word with no
+  // kanji form at all (word: [], e.g. そば, ラーメン) — there, reading IS the only spelling it has.
   findExactWordMatch(word: string) {
-    return this.model.findOne({ word, deleted_at: null }).select('word_id').exec();
+    return this.model
+      .findOne({ deleted_at: null, $or: [{ word }, { word: { $size: 0 }, reading: word }] })
+      .select('word_id')
+      .exec();
   }
 
   findWordReadingQuery(word: string, word_id?: string) {
