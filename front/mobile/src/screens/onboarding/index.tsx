@@ -2,6 +2,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getUniqueId } from 'react-native-device-info';
+import { Badge, Colors } from 'react-native-ui-lib';
 import Button from 'react-native-ui-lib/button';
 import View from 'react-native-ui-lib/view';
 import { useSelector } from 'react-redux';
@@ -9,6 +10,7 @@ import { useSelector } from 'react-redux';
 import { screenNames } from '../../constants/screens';
 import { ONBOARDING_FINISHED_KEY } from '../../constants/storage';
 import { useAppDispatch, useAppSelector } from '../../hooks/useStore';
+import { useIsOffline } from '../../providers/network';
 import { useToaster } from '../../providers/toaster';
 import { fileServiceInstance } from '../../services/file';
 import { createUser, getUser, selectCreateStatus, selectGetUserStatus, selectUserName } from '../../store/slices/user';
@@ -25,6 +27,7 @@ export default function Onboarding() {
   const toast = useToaster();
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
+  const isOffline = useIsOffline();
   const userName = useSelector(selectUserName);
   const userState = useAppSelector((state) => state.user);
   const getUserStatus = useSelector(selectGetUserStatus);
@@ -85,9 +88,19 @@ export default function Onboarding() {
         outline={step !== 3}
         onPress={step === 3 ? handleSubmit : handleNext}
         disabled={
-          (step === 2 && userName.trim().length === 0) || (step === 3 && userName.length === 0 && createUserStatus === 'pending')
+          (step === 2 && userName.trim().length === 0) ||
+          (step === 3 && ((userName.length === 0 && createUserStatus === 'pending') || isOffline))
         }
       />
+      {step === 3 && isOffline && (
+        <Badge
+          label={t('offline.badge')}
+          size={20}
+          backgroundColor={Colors.$backgroundNeutralMedium}
+          labelStyle={{ color: Colors.$textNeutral }}
+          style={{ alignSelf: 'center', marginTop: 12 }}
+        />
+      )}
     </View>
   );
 }
