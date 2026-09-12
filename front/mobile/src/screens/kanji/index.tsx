@@ -12,6 +12,7 @@ import Spacing from '../../components/spacing';
 import { screenNames } from '../../constants/screens';
 import { selectionMenuButtons } from '../../constants/selection';
 import { GENERAL_MARGIN } from '../../constants/styles';
+import { useIsOffline } from '../../providers/network';
 import { selectUserState } from '../../store/slices/user';
 
 const { width } = Dimensions.get('window');
@@ -19,6 +20,7 @@ const { width } = Dimensions.get('window');
 export default function KanjiCategoriesScreen() {
   const navigation = useNavigation();
   const user = useSelector(selectUserState);
+  const isOffline = useIsOffline();
   const { t } = useTranslation();
 
   const handleRedirect = useCallback(
@@ -44,6 +46,8 @@ export default function KanjiCategoriesScreen() {
     <Layout screen="selection" withTabBar>
       {selectionMenuButtons.map((button) => {
         const isLockedForUser = user.subscriptionPlan === 'free' && button.premium;
+        const isCardOffline = isOffline && button.screen !== 'myLists';
+        const isDisabled = isLockedForUser || isCardOffline;
 
         return (
           <View key={button.textKey}>
@@ -51,17 +55,27 @@ export default function KanjiCategoriesScreen() {
             <Card
               height={105}
               width={width - GENERAL_MARGIN * 2}
-              style={[styles.card, isLockedForUser && styles.cardDisabled]}
-              disabled={isLockedForUser}
+              style={[styles.card, isDisabled && styles.cardDisabled]}
+              disabled={isDisabled}
               onPress={() => handleRedirect(button.screen)}>
-              {isLockedForUser && (
+              {isCardOffline ? (
                 <Badge
-                  label={t('premium.feature.badge')}
+                  label={t('offline.badge')}
                   size={20}
                   backgroundColor={Colors.$backgroundGeneralHeavy}
                   labelStyle={styles.badgeLabel}
                   style={styles.badge}
                 />
+              ) : (
+                isLockedForUser && (
+                  <Badge
+                    label={t('premium.feature.badge')}
+                    size={20}
+                    backgroundColor={Colors.$backgroundGeneralHeavy}
+                    labelStyle={styles.badgeLabel}
+                    style={styles.badge}
+                  />
+                )
               )}
               <Card.Section
                 flex
