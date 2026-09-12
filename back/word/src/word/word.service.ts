@@ -50,11 +50,23 @@ export class WordService {
   // Spelling first — a kana string sharing pronunciation with an unrelated kanji word (e.g.
   // きょう / 今日) must not count as a match for it. Reading only kicks in for a word with no
   // kanji form at all (word: [], e.g. そば, ラーメン) — there, reading IS the only spelling it has.
-  findExactWordMatch(word: string) {
-    return this.model
+  //
+  // Also resolves which reading actually belongs to the matched spelling, so the caller (OCR
+  // furigana) doesn't have to fetch the full word and guess: positional pairing when reading and
+  // word are the same length, otherwise the word's first reading — same fallback as the mobile
+  // word detail screen, since alternate spellings usually share one reading anyway.
+  async findExactWordMatch(word: string) {
+    const doc = await this.model
       .findOne({ deleted_at: null, $or: [{ word }, { word: { $size: 0 }, reading: word }] })
-      .select('word_id')
+      .select('word_id word reading -_id')
       .exec();
+
+    if (!doc) return null;
+
+    const spellingIndex = doc.word.indexOf(word);
+    const reading = spellingIndex !== -1 && doc.reading.length === doc.word.length ? doc.reading[spellingIndex] : doc.reading[0] ?? null;
+
+    return { word_id: doc.word_id, reading };
   }
 
   findWordReadingQuery(word: string, word_id?: string) {
@@ -115,11 +127,18 @@ export class WordService {
       .aggregate()
       .search({
         index: 'default',
-        text: {
-          query,
-          path: {
-            wildcard: '*',
-          },
+        compound: {
+          // Base CJK-tokenized match across word/reading/definitions, kept broad so partial and
+          // fuzzy hits (compounds, related words) still surface — same behavior as before
+          should: [
+            { text: { query, path: ['word', 'reading', 'definition.meaning'] } },
+            // A verbatim match on the un-analyzed spelling/reading (e.g. querying "そば" and a
+            // document's word/reading being exactly "そば") massively outranks any compound that
+            // merely contains it (塩そば, そば屋, ...) — this is what fixes short common words
+            // getting buried under their own compounds in the results
+            { text: { query, path: ['word.exact', 'reading.exact'], score: { boost: { value: 5 } } } },
+          ],
+          minimumShouldMatch: 1,
         },
       })
       .match({ deleted_at: null })
@@ -160,9 +179,6 @@ export class WordService {
     const allowedCharacterClass = characters.map((char) => char.replace(/[\\\]^-]/g, '\\$&')).join('');
     const onlyAllowedCharacters = new RegExp(`^[${allowedCharacterClass}]+$`);
 
-    return this.model.aggregate([
-      { $match: { deleted_at: null, word: onlyAllowedCharacters } },
-      { $sample: { size: number } },
-    ]);
+    return this.model.aggregate([{ $match: { deleted_at: null, word: onlyAllowedCharacters } }, { $sample: { size: number } }]);
   }
 }
