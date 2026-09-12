@@ -57,6 +57,14 @@ export class WordController {
   }
 
   @ApiTags('Words')
+  @ApiOperation({ summary: 'Find a word by an exact spelling match, null if none exists' })
+  @ApiOkResponse({ description: 'Matching word_id, or null' })
+  @Get('/exact/word')
+  findExactWord(@Query('query') query: string) {
+    return this.service.findExactWordMatch(query);
+  }
+
+  @ApiTags('Words')
   @ApiOperation({ summary: 'Create a word', description: '**Permission required:** \n- `add:word`' })
   @Post('')
   @ApiBearerAuth()

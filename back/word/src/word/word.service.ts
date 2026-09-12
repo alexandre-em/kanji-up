@@ -47,6 +47,12 @@ export class WordService {
     return this.model.find({ 'definition.related_word': { $elemMatch: { $ne: null } } }).exec();
   }
 
+  // Spelling only, not reading — a kana string sharing pronunciation with an unrelated kanji
+  // word (e.g. きょう / 今日) must not count as a match for it, only an actual written form does
+  findExactWordMatch(word: string) {
+    return this.model.findOne({ word, deleted_at: null }).select('word_id').exec();
+  }
+
   findWordReadingQuery(word: string, word_id?: string) {
     if (word_id) return this.model.find({ $and: [{ $or: [{ word }, { reading: word }] }, { word_id: { $ne: word_id } }] }).exec();
 
