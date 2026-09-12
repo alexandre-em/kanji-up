@@ -266,7 +266,8 @@ export default function Home() {
           <Card
             height={115}
             width={width - GENERAL_MARGIN * 2}
-            style={styles.card}
+            disabled={isOffline}
+            style={[styles.card, isOffline && styles.cardLocked]}
             onPress={() => handleRediction(screenNames.PREMIUM)}>
             <Icon source={Assets.icons.premium} size={36} tintColor="#fff" />
             <Card.Section
@@ -279,6 +280,15 @@ export default function Home() {
               style={styles.transparent}
             />
             <Image source={Assets.banners.premium} style={styles.bannerImage} />
+            {isOffline && (
+              <Badge
+                label={t('offline.badge')}
+                size={20}
+                backgroundColor={Colors.$backgroundNeutralMedium}
+                labelStyle={{ color: Colors.$textNeutral }}
+                style={styles.badge}
+              />
+            )}
           </Card>
         </>
       )}

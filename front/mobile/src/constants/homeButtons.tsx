@@ -21,7 +21,6 @@ export const homeMenuButtons: HomeButtonsType[] = [
     icon: <Icon source={Assets.icons.selection} size={36} tintColor={Colors.$textPrimary} />,
     screen: screenNames.CATEGORIES,
     premium: false,
-    requiresNetwork: true,
   },
   {
     textKey: 'home.menu.ocr.title',
@@ -29,7 +28,6 @@ export const homeMenuButtons: HomeButtonsType[] = [
     icon: <Icon source={Assets.icons.recognition} size={36} tintColor={Colors.$textPrimary} />,
     screen: screenNames.OCR,
     premium: true,
-    requiresNetwork: true,
   },
 ];
 
