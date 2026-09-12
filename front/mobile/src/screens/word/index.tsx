@@ -51,7 +51,7 @@ function renderHighlightedSentence(
         }
         if (index < parts.length - 1) {
           pieces.push(
-            reading ? (
+            reading && reading !== match ? (
               <FuriganaText key={`match-${index}`} text={match} reading={reading} size="small" furiganaSize="XS" />
             ) : (
               <Text key={`match-${index}`} text90BO $textPrimary>
@@ -192,7 +192,7 @@ export default function WordDetail(props: WordDetailProps) {
               const reading = word.reading.length === word.word.length ? word.reading[index] : word.reading[0];
 
               const pieces = [
-                reading ? (
+                reading && reading !== spelling ? (
                   <FuriganaText key={spelling} text={spelling} reading={reading} furiganaSize="L" />
                 ) : (
                   <Text key={spelling} text50BL $textPrimary center>

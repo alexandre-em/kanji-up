@@ -38,7 +38,7 @@ export default function RecognizedTokens({ tokens, recognizedText }: RecognizedT
             onPress={() => handleTokenPress(token)}
             style={[styles.token, token.wordId && { backgroundColor: Colors.$backgroundPrimaryLight }]}
             accessibilityRole={token.wordId ? 'button' : undefined}>
-            {token.reading ? (
+            {token.reading && token.reading !== token.text ? (
               <FuriganaText text={token.text} reading={token.reading} size="small" furiganaSize="XS" />
             ) : (
               <Text text70M color={token.wordId ? Colors.$textPrimary : Colors.$textDefault}>
