@@ -8,7 +8,6 @@ import { StyleSheet, View } from 'react-native';
 import { Colors, LoaderScreen } from 'react-native-ui-lib';
 
 import BottomNavBar from '../components/bottomNavBar';
-import OfflineBanner from '../components/offlineBanner';
 import { screenNames } from '../constants/screens';
 import { TAB_VISIBLE_ROUTES } from '../constants/tabs';
 import { useIsNotRegistered } from '../hooks/useIsAlreadyRegistered';
@@ -105,7 +104,6 @@ export default function RootNavigation() {
         {activeRoute && TAB_VISIBLE_ROUTES.includes(activeRoute) && (
           <BottomNavBar activeRoute={activeRoute} onTabPress={handleTabPress} />
         )}
-        <OfflineBanner />
       </View>
     </NavigationContainer>
   );

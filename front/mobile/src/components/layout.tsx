@@ -1,5 +1,5 @@
 import { useHeaderHeight } from '@react-navigation/elements';
-import { PropsWithChildren, useEffect } from 'react';
+import { Fragment, PropsWithChildren, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Dimensions, StyleSheet } from 'react-native';
 import Animated, { useAnimatedScrollHandler, useSharedValue, withTiming } from 'react-native-reanimated';
@@ -12,6 +12,7 @@ import { useTabBarHidden } from '../providers/tabBar';
 import { selectUserState } from '../store/slices/user';
 import AppBannerAd from './bannerAd';
 import { TAB_BAR_TOTAL_HEIGHT } from './bottomNavBar';
+import OfflineBanner from './offlineBanner';
 import Spacing from './spacing';
 
 type LayoutProps = {
@@ -75,34 +76,37 @@ export default function Layout({ screen, withTabBar, loadingMessage, errorMessag
   // the body below it changes, so it's factored into one render function instead of repeating the
   // whole wrapper for each of the three early returns below
   const renderWithChrome = (body: PropsWithChildren['children']) => (
-    <Animated.ScrollView
-      style={[styles.container, { backgroundColor: Colors.$backgroundDefault }]}
-      contentContainerStyle={{ paddingBottom: bottomClearance + GENERAL_MARGIN }}
-      onScroll={handleScroll}
-      scrollEventThrottle={16}>
-      <View style={{ minHeight: height - headerHeight - bottomClearance }}>
-        <Spacing y={20} />
-        {title !== `${screen}.title` && (
-          <Text h1 $textDefault>
-            {title}
-          </Text>
-        )}
-        {title !== `${screen}.title` && subtitle !== `${screen}.subtitle` && <Spacing y={5} />}
-        {subtitle !== `${screen}.subtitle` && (
-          <Text text80L $textNeutral>
-            {t(`${screen}.subtitle`)}
-          </Text>
-        )}
-        {title !== `${screen}.title` && subtitle !== `${screen}.subtitle` && <Spacing y={10} />}
-        {!hideBanner && (
-          <>
-            <AppBannerAd style={styles.banner} />
-            <Spacing y={20} />
-          </>
-        )}
-        {body}
-      </View>
-    </Animated.ScrollView>
+    <Fragment>
+      <Animated.ScrollView
+        style={[styles.container, { backgroundColor: Colors.$backgroundDefault }]}
+        contentContainerStyle={{ paddingBottom: bottomClearance + GENERAL_MARGIN }}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}>
+        <View style={{ minHeight: height - headerHeight - bottomClearance }}>
+          <Spacing y={20} />
+          {title !== `${screen}.title` && (
+            <Text h1 $textDefault>
+              {title}
+            </Text>
+          )}
+          {title !== `${screen}.title` && subtitle !== `${screen}.subtitle` && <Spacing y={5} />}
+          {subtitle !== `${screen}.subtitle` && (
+            <Text text80L $textNeutral>
+              {t(`${screen}.subtitle`)}
+            </Text>
+          )}
+          {title !== `${screen}.title` && subtitle !== `${screen}.subtitle` && <Spacing y={10} />}
+          {!hideBanner && (
+            <>
+              <AppBannerAd style={styles.banner} />
+              <Spacing y={20} />
+            </>
+          )}
+          {body}
+        </View>
+      </Animated.ScrollView>
+      <OfflineBanner topOffset={headerHeight} />
+    </Fragment>
   );
 
   if (loadingMessage) {

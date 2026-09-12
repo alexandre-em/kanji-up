@@ -1,19 +1,23 @@
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, View as RNView } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors, Text } from 'react-native-ui-lib';
 
 import { useIsOffline } from '../providers/network';
 
-export default function OfflineBanner() {
+type OfflineBannerProps = {
+  /** Distance from the top of the screen to clear — the caller already knows whether there's a
+   * header to sit below (Layout measures it via useHeaderHeight) */
+  topOffset: number;
+};
+
+export default function OfflineBanner({ topOffset }: OfflineBannerProps) {
   const { t } = useTranslation();
   const isOffline = useIsOffline();
-  const insets = useSafeAreaInsets();
 
   if (!isOffline) return null;
 
   return (
-    <RNView style={[styles.banner, { top: insets.top, backgroundColor: Colors.$backgroundWarningLight }]}>
+    <RNView style={[styles.banner, { top: topOffset, backgroundColor: Colors.$backgroundWarningLight }]}>
       <Text text90BO center style={{ color: Colors.$textWarning }}>
         {t('offline.banner')}
       </Text>
