@@ -1,4 +1,11 @@
-import { computeSlotStatus, filterWordsWithKanji, sampleWords, WordSlotType } from './wordEvaluation';
+import {
+  computeSlotStatus,
+  computeWordProgressionDeltas,
+  filterWordsWithKanji,
+  sampleWords,
+  WordEvaluationItemType,
+  WordSlotType,
+} from './wordEvaluation';
 
 const word = (id: string, spelling = id): WordType =>
   ({ word_id: id, word: [spelling], reading: [], definition: [] }) as unknown as WordType;
@@ -85,5 +92,52 @@ describe('computeSlotStatus', () => {
     const status = computeSlotStatus([slot(), slot()], ['力'], { 力: 2 });
 
     expect(status).toBe('incorrect');
+  });
+});
+
+const item = (overrides: Partial<WordEvaluationItemType> = {}): WordEvaluationItemType => ({
+  word: { word_id: 'a' } as WordType,
+  slots: [slot()],
+  status: 'idle',
+  userConfirmation: null,
+  ...overrides,
+});
+
+describe('computeWordProgressionDeltas', () => {
+  it('counts a correct item as correct', () => {
+    const deltas = computeWordProgressionDeltas([item({ status: 'correct' })]);
+
+    expect(deltas).toEqual([{ id: 'a', correct: true }]);
+  });
+
+  it('counts an incorrect item with an actual attempt as incorrect', () => {
+    const deltas = computeWordProgressionDeltas([item({ status: 'incorrect' })]);
+
+    expect(deltas).toEqual([{ id: 'a', correct: false }]);
+  });
+
+  // A word with every slot left empty was skipped, not attempted — shouldn't count against progression
+  it('ignores an incorrect item whose slots were all left empty', () => {
+    const deltas = computeWordProgressionDeltas([item({ status: 'incorrect', slots: [slot({ image: null, strokesCount: 0 })] })]);
+
+    expect(deltas).toEqual([]);
+  });
+
+  it('resolves a reviewed item by the user confirmation', () => {
+    const deltas = computeWordProgressionDeltas([item({ status: 'review', userConfirmation: true })]);
+
+    expect(deltas).toEqual([{ id: 'a', correct: true }]);
+  });
+
+  it('ignores a reviewed item still awaiting confirmation', () => {
+    const deltas = computeWordProgressionDeltas([item({ status: 'review', userConfirmation: null })]);
+
+    expect(deltas).toEqual([]);
+  });
+
+  it('ignores an idle item', () => {
+    const deltas = computeWordProgressionDeltas([item({ status: 'idle' })]);
+
+    expect(deltas).toEqual([]);
   });
 });

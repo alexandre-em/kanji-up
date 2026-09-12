@@ -6,6 +6,7 @@ export const fileNames = {
   LISTS: 'lists',
   WORD_LISTS: 'wordLists',
   PENDING_KANJI_SESSION: 'pendingKanjiSession',
+  PENDING_WORD_SESSION: 'pendingWordSession',
   SYNC_QUEUE: 'syncQueue',
 };
 

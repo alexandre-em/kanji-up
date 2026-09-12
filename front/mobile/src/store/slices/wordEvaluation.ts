@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from 'store';
 
+import { fileNames, fileServiceInstance } from '../../services/file';
 import { core } from '../../services/http';
 
 export type AnswerStatusType = 'idle' | 'correct' | 'incorrect' | 'review';
@@ -24,13 +25,39 @@ type WordEvaluationState = {
   items: WordEvaluationItemType[];
   currentIndex: number;
   status: RequestStatusType;
+  // Session persisted server-side so the run can be resumed after the app is killed — same
+  // reasoning as the kanji evaluation slice's own sessionId
+  sessionId: string | null;
 };
 
 const initialState: WordEvaluationState = {
   items: [],
   currentIndex: 0,
   status: 'idle',
+  sessionId: null,
 };
+
+/** Local mirror of the run in progress — what a run started offline is made of until it can
+ * sync, and what lets a killed app resume without any network access at all */
+export type PendingLocalWordSession = {
+  items: WordEvaluationItemType[];
+  currentIndex: number;
+  sessionId: string | null;
+};
+
+export const persistLocalSession = (session: PendingLocalWordSession) =>
+  fileServiceInstance.write(fileNames.PENDING_WORD_SESSION, session).catch(() => undefined);
+
+export const clearLocalSession = () => fileServiceInstance.remove(fileNames.PENDING_WORD_SESSION).catch(() => undefined);
+
+export function toWordQuestion(item: WordEvaluationItemType): WordSessionQuestion {
+  return {
+    wordId: item.word.word_id ?? '',
+    slots: item.slots,
+    status: item.status,
+    userConfirmation: item.userConfirmation,
+  };
+}
 
 export function getEffectiveStatus(item: WordEvaluationItemType): AnswerStatusType {
   if (item.status !== 'review' || item.userConfirmation === null) return item.status;
@@ -95,31 +122,79 @@ export function sampleWords(words: WordType[], count: number): WordType[] {
   return result.slice(0, count);
 }
 
-// Kanji mode: unchanged, generates a practice set from the active kanji list's characters via
-// the backend. Word mode: the user already hand-picked these words — no generation needed, just
-// resolve them (assumes state.word.entities is already populated by the caller) and cap the
-// session length the same way kanji mode does.
+// No connection to check with, or no identity yet: nothing to resume, degrade to local-only —
+// offline, this would otherwise wait out a full request timeout just to fail the same way
+export const checkActiveSession = createAsyncThunk(
+  'wordEvaluation/checkActiveSession',
+  async (isOffline: boolean, { getState }) => {
+    const userId = (getState() as RootState).user.userId;
+    if (!userId || isOffline) return null;
+
+    const response = await core.sessionsService!.findActive(userId, 'word');
+
+    return response.data;
+  },
+);
+
+// Kanji mode: generates a practice set from the active kanji list's characters via the backend.
+// Word mode: the user already hand-picked these words — no generation needed, just resolve them
+// (assumes state.word.entities is already populated by the caller) and cap the session length
+// the same way kanji mode does. Either way, also opens the server-side session the run will
+// report progress against — offline, unreachable server, or no identity: the run still starts,
+// just local-only, and becomes a real session later at finish time if a connection is available.
 export const init = createAsyncThunk(
   'wordEvaluation/init',
-  async (payload: { kind?: WordEvaluationKind; number?: number } | undefined, { getState }) => {
+  async (
+    payload: { kind?: WordEvaluationKind; number?: number; isOffline?: boolean; abandonSessionId?: string } | undefined,
+    { getState },
+  ) => {
     const state = getState() as RootState;
     const number = payload?.number ?? 10;
     const kind = payload?.kind ?? 'kanji';
+    const userId = state.user.userId;
 
+    let words: WordType[];
     if (kind === 'word') {
       const activeList = state.wordLists.activeListId ? state.wordLists.lists[state.wordLists.activeListId] : undefined;
-      const words = (activeList?.wordIds ?? []).map((id) => state.word.entities[id]).filter((word): word is WordType => !!word);
+      const listWords = (activeList?.wordIds ?? [])
+        .map((id) => state.word.entities[id])
+        .filter((word): word is WordType => !!word);
 
-      return sampleWords(filterWordsWithKanji(words), number);
+      words = sampleWords(filterWordsWithKanji(listWords), number);
+    } else {
+      const activeList = state.lists.activeListId ? state.lists.lists[state.lists.activeListId] : undefined;
+      const characters = (activeList?.kanjiIds ?? [])
+        .map((id) => state.kanji.entities[id]?.kanji?.character)
+        .filter((character): character is string => !!character);
+
+      const response = await core.wordService!.getPracticeWords(characters, number);
+      words = response.data;
     }
 
-    const activeList = state.lists.activeListId ? state.lists.lists[state.lists.activeListId] : undefined;
-    const characters = (activeList?.kanjiIds ?? [])
-      .map((id) => state.kanji.entities[id]?.kanji?.character)
-      .filter((character): character is string => !!character);
+    const items: WordEvaluationItemType[] = words.map((word) => ({
+      word,
+      slots: [],
+      status: 'idle' as AnswerStatusType,
+      userConfirmation: null,
+    }));
 
-    const response = await core.wordService!.getPracticeWords(characters, number);
-    return response.data;
+    let sessionId: string | null = null;
+    if (userId && !payload?.isOffline) {
+      try {
+        if (payload?.abandonSessionId) {
+          await core.sessionsService!.abandon(payload.abandonSessionId).catch(() => undefined);
+        }
+
+        const response = await core.sessionsService!.create({ userId, type: 'word', questions: items.map(toWordQuestion) });
+        sessionId = response.data.sessionId;
+      } catch {
+        sessionId = null;
+      }
+    }
+
+    await persistLocalSession({ items, currentIndex: 0, sessionId });
+
+    return { items, sessionId };
   },
 );
 
@@ -179,6 +254,17 @@ const wordEvaluationSlice = createSlice({
 
       item.userConfirmation = action.payload.isCorrect;
     },
+    // Resolves a pending session (local or server) into live state — the only way back into a
+    // run that was suspended, mirroring the kanji evaluation slice's own hydrateItems
+    hydrateItems: (
+      state,
+      action: PayloadAction<{ items: WordEvaluationItemType[]; currentIndex: number; sessionId: string | null }>,
+    ) => {
+      state.items = action.payload.items;
+      state.currentIndex = action.payload.currentIndex;
+      state.sessionId = action.payload.sessionId;
+      state.status = 'succeeded';
+    },
     reset: () => initialState,
   },
   extraReducers: (builder) => {
@@ -187,12 +273,8 @@ const wordEvaluationSlice = createSlice({
         state.status = 'pending';
       })
       .addCase(init.fulfilled, (state, action) => {
-        state.items = action.payload.map((word) => ({
-          word,
-          slots: [],
-          status: 'idle' as AnswerStatusType,
-          userConfirmation: null,
-        }));
+        state.items = action.payload.items;
+        state.sessionId = action.payload.sessionId;
         state.currentIndex = 0;
         state.status = 'succeeded';
       })
@@ -208,12 +290,13 @@ const wordEvaluationSlice = createSlice({
   },
 });
 
-export const { confirmItem, reset } = wordEvaluationSlice.actions;
+export const { confirmItem, hydrateItems, reset } = wordEvaluationSlice.actions;
 export default wordEvaluationSlice.reducer;
 
 export const selectWordEvaluationItems = (state: RootState) => state.wordEvaluation.items;
 export const selectWordCurrentIndex = (state: RootState) => state.wordEvaluation.currentIndex;
 export const selectWordEvaluationStatus = (state: RootState) => state.wordEvaluation.status;
+export const selectWordEvaluationSessionId = (state: RootState) => state.wordEvaluation.sessionId;
 export const selectWordPendingReviewCount = (state: RootState) =>
   state.wordEvaluation.items.filter((item) => item.status === 'review' && item.userConfirmation === null).length;
 export const selectWordCorrectCount = (state: RootState) =>
