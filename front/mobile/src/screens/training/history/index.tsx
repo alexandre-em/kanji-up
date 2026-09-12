@@ -79,6 +79,12 @@ export default function HistoryScreen() {
             {t('history.word.notTracked.message')}
           </Text>
         </RNView>
+      ) : items.length === 0 && status === 'failed' ? (
+        <RNView style={styles.empty}>
+          <Text text80M $textGeneral center>
+            {t('history.error')}
+          </Text>
+        </RNView>
       ) : items.length === 0 && status !== 'pending' ? (
         <RNView style={styles.empty}>
           <Text text70BO $textDefault center>

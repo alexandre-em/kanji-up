@@ -221,6 +221,7 @@
   "history.status.finished": "已完成",
   "history.status.abandoned": "已中止",
   "history.status.in_progress": "进行中",
+  "history.error": "无法加载记录，请重试",
   "history.empty.title": "还没有记录",
   "history.empty.message": "你完成的训练记录会显示在这里。",
   "history.word.notTracked.title": "尚未记录",

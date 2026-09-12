@@ -221,6 +221,7 @@
   "history.status.finished": "Completata",
   "history.status.abandoned": "Abbandonata",
   "history.status.in_progress": "In corso",
+  "history.error": "Impossibile caricare la cronologia, riprova",
   "history.empty.title": "Ancora nessuna sessione",
   "history.empty.message": "Le sessioni che completi appariranno qui.",
   "history.word.notTracked.title": "Non ancora registrato",

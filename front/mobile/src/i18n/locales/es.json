@@ -221,6 +221,7 @@
   "history.status.finished": "Terminada",
   "history.status.abandoned": "Abandonada",
   "history.status.in_progress": "En curso",
+  "history.error": "No se pudo cargar tu historial, inténtalo de nuevo",
   "history.empty.title": "Aún no hay sesiones",
   "history.empty.message": "Las sesiones que completes aparecerán aquí.",
   "history.word.notTracked.title": "Aún no se registra",

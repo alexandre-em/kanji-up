@@ -221,6 +221,7 @@
   "history.status.finished": "เสร็จสิ้น",
   "history.status.abandoned": "ยกเลิกกลางคัน",
   "history.status.in_progress": "กำลังดำเนินการ",
+  "history.error": "โหลดประวัติไม่สำเร็จ กรุณาลองใหม่อีกครั้ง",
   "history.empty.title": "ยังไม่มีเซสชัน",
   "history.empty.message": "เซสชันที่คุณทำเสร็จจะแสดงที่นี่",
   "history.word.notTracked.title": "ยังไม่มีการบันทึก",

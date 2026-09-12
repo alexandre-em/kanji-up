@@ -221,6 +221,7 @@
   "history.status.finished": "Đã hoàn thành",
   "history.status.abandoned": "Đã bỏ dở",
   "history.status.in_progress": "Đang thực hiện",
+  "history.error": "Không thể tải lịch sử, vui lòng thử lại",
   "history.empty.title": "Chưa có buổi luyện tập nào",
   "history.empty.message": "Các buổi luyện tập bạn hoàn thành sẽ hiển thị ở đây.",
   "history.word.notTracked.title": "Chưa được ghi nhận",

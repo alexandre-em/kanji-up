@@ -221,6 +221,7 @@
   "history.status.finished": "Finished",
   "history.status.abandoned": "Abandoned",
   "history.status.in_progress": "In progress",
+  "history.error": "Couldn't load your history, please try again",
   "history.empty.title": "No sessions yet",
   "history.empty.message": "Sessions you complete will show up here.",
   "history.word.notTracked.title": "Not tracked yet",

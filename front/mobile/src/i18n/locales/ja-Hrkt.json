@@ -221,6 +221,7 @@
   "history.status.finished": "かんりょう",
   "history.status.abandoned": "ちゅうだん",
   "history.status.in_progress": "しんこうちゅう",
+  "history.error": "りれきをよみこめませんでした。もういちどおためしください",
   "history.empty.title": "セッションはまだありません",
   "history.empty.message": "かんりょうしたセッションがここにひょうじされます。",
   "history.word.notTracked.title": "まだきろくされていません",

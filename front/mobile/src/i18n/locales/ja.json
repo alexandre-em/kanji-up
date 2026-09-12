@@ -221,6 +221,7 @@
   "history.status.finished": "完了",
   "history.status.abandoned": "中断",
   "history.status.in_progress": "進行中",
+  "history.error": "履歴を読み込めませんでした。もう一度お試しください",
   "history.empty.title": "セッションはまだありません",
   "history.empty.message": "完了したセッションがここに表示されます。",
   "history.word.notTracked.title": "まだ記録されていません",

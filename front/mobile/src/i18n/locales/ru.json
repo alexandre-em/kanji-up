@@ -221,6 +221,7 @@
   "history.status.finished": "Завершено",
   "history.status.abandoned": "Прервано",
   "history.status.in_progress": "В процессе",
+  "history.error": "Не удалось загрузить историю, попробуйте снова",
   "history.empty.title": "Пока нет сессий",
   "history.empty.message": "Завершённые сессии появятся здесь.",
   "history.word.notTracked.title": "Пока не отслеживается",
