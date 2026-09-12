@@ -96,7 +96,12 @@ export default function WordDetail(props: WordDetailProps) {
       .catch(() => setStatus('failed'));
   }, [id]);
 
-  const characters = useMemo(() => (word ? Array.from(new Set(getKanjiCharacters(word.word[0] ?? ''))) : []), [word]);
+  // Every spelling can carry its own kanji — an alternate form like 辭書 alongside 辞書 introduces
+  // 辭, which word[0] alone would never surface
+  const characters = useMemo(
+    () => (word ? Array.from(new Set(word.word.flatMap((spelling) => getKanjiCharacters(spelling)))) : []),
+    [word],
+  );
 
   useEffect(() => {
     characters.forEach((character) => {
