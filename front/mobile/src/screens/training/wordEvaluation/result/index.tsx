@@ -8,15 +8,20 @@ import { Button, Text, View } from 'react-native-ui-lib';
 import { screenNames } from '../../../../constants/screens';
 import { useAppDispatch, useAppSelector } from '../../../../hooks/useStore';
 import { useToaster } from '../../../../providers/toaster';
+import { core } from '../../../../services/http';
 import { completeMissionTask } from '../../../../store/slices/missions';
+import { enqueueSessionFinish } from '../../../../store/slices/syncQueue';
 import { syncKanjiProgression, user } from '../../../../store/slices/user';
 import {
+  clearLocalSession,
   computeWordProgressionDeltas,
   confirmItem,
   reset as resetWordEvaluation,
   selectWordCorrectCount,
   selectWordEvaluationItems,
+  selectWordEvaluationSessionId,
   selectWordPendingReviewCount,
+  toWordQuestion,
 } from '../../../../store/slices/wordEvaluation';
 import ResultItemRow from './components/resultItemRow';
 import WordReviewModal from './components/reviewModal';
@@ -32,6 +37,7 @@ export default function WordEvaluationResult() {
   const items = useAppSelector(selectWordEvaluationItems);
   const correctCount = useAppSelector(selectWordCorrectCount);
   const pendingReviewCount = useAppSelector(selectWordPendingReviewCount);
+  const sessionId = useAppSelector(selectWordEvaluationSessionId);
   const userId = useAppSelector((state) => state.user.userId);
 
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
@@ -73,9 +79,34 @@ export default function WordEvaluationResult() {
     setIsSaving(false);
 
     if (syncKanjiProgression.fulfilled.match(action)) {
+      await clearLocalSession();
+
       // Best-effort: missing a daily mission tick isn't worth blocking or erroring the user over
       if (userId) {
         dispatch(completeMissionTask({ userId, task: 'wordSession' }));
+      }
+
+      // Best-effort, same as the per-answer PATCH: a network hiccup here shouldn't block the
+      // user from moving on — queued for retry instead of dropped, see syncQueue.ts
+      if (sessionId) {
+        core.sessionsService!.finish(sessionId, correctCount).catch(() => {
+          dispatch(enqueueSessionFinish({ sessionId, score: correctCount }));
+        });
+      } else if (userId) {
+        // Ran entirely offline: push a finished record now for history, if a connection happens
+        // to be back by the time the run is done — word progress itself is already saved either way
+        (async () => {
+          try {
+            const response = await core.sessionsService!.create({ userId, type: 'word', questions: items.map(toWordQuestion) });
+            try {
+              await core.sessionsService!.finish(response.data.sessionId, correctCount);
+            } catch {
+              dispatch(enqueueSessionFinish({ sessionId: response.data.sessionId, score: correctCount }));
+            }
+          } catch {
+            dispatch(enqueueSessionFinish({ userId, kind: 'word', questions: items.map(toWordQuestion), score: correctCount }));
+          }
+        })();
       }
 
       dispatch(resetWordEvaluation());
@@ -84,7 +115,7 @@ export default function WordEvaluationResult() {
     } else {
       toast?.show({ message: t('wordEvaluationResult.toast.error'), type: 'failure' });
     }
-  }, [items, correctCount, dispatch, navigation, toast, t, userId]);
+  }, [items, correctCount, dispatch, navigation, toast, t, sessionId, userId]);
 
   const buttonLabel = useMemo(
     () =>
