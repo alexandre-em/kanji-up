@@ -224,8 +224,6 @@
   "history.error": "无法加载记录，请重试",
   "history.empty.title": "还没有记录",
   "history.empty.message": "你完成的训练记录会显示在这里。",
-  "history.word.notTracked.title": "尚未记录",
-  "history.word.notTracked.message": "单词训练的历史记录功能尚未上线 — 请稍后再查看。",
   "historyDetail.notFound": "未找到该记录。",
 
   "flashcards.progress": "已复习卡片数",

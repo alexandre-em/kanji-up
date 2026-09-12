@@ -33,16 +33,15 @@ export default function HistoryScreen() {
   const items = itemsByType[activeSegment];
   const hasMore = hasMoreByType[activeSegment];
 
-  // Word isn't tracked server-side yet (see wordEvaluation), so only kanji ever fetches
   useEffect(() => {
-    if (activeSegment === KANJI_SEGMENT && items.length === 0 && userState.userId) {
-      dispatch(fetchSessionHistory({ userId: userState.userId, type: KANJI_SEGMENT }));
+    if (items.length === 0 && userState.userId) {
+      dispatch(fetchSessionHistory({ userId: userState.userId, type: activeSegment }));
     }
   }, [activeSegment, items.length, userState.userId, dispatch]);
 
   const handleEndReached = useCallback(() => {
-    if (activeSegment !== KANJI_SEGMENT || !hasMore || status === 'pending') return;
-    dispatch(fetchSessionHistory({ userId: userState.userId, type: KANJI_SEGMENT }));
+    if (!hasMore || status === 'pending') return;
+    dispatch(fetchSessionHistory({ userId: userState.userId, type: activeSegment }));
   }, [activeSegment, hasMore, status, userState.userId, dispatch]);
 
   const segments: { key: SessionKind; label: string }[] = [
@@ -69,17 +68,7 @@ export default function HistoryScreen() {
         })}
       </RNView>
       <Spacing y={16} />
-      {activeSegment === WORD_SEGMENT ? (
-        <RNView style={styles.empty}>
-          <Text text70BO $textDefault center>
-            {t('history.word.notTracked.title')}
-          </Text>
-          <Spacing y={8} />
-          <Text text80M $textGeneral center>
-            {t('history.word.notTracked.message')}
-          </Text>
-        </RNView>
-      ) : items.length === 0 && status === 'failed' ? (
+      {items.length === 0 && status === 'failed' ? (
         <RNView style={styles.empty}>
           <Text text80M $textGeneral center>
             {t('history.error')}

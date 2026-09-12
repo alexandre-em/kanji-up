@@ -8,7 +8,9 @@ import StatusIcon from './statusIcon';
 
 type ResultItemRowProps = {
   item: WordEvaluationItemType;
-  onPress: () => void;
+  /** Only 'review' answers are interactive: tapping one opens the review modal on it. Omit for a
+   * read-only view (e.g. session history) — even a 'review' item then just displays as-is. */
+  onPress?: () => void;
 };
 
 export default function ResultItemRow({ item, onPress }: ResultItemRowProps) {
@@ -17,8 +19,8 @@ export default function ResultItemRow({ item, onPress }: ResultItemRowProps) {
   const wordText = item.word.word?.[0] ?? '';
   const meaning = item.word.definition?.[0]?.meaning?.join(', ');
 
-  return (
-    <TouchableOpacity style={styles.row} onPress={onPress} accessibilityRole="button" accessibilityLabel={message}>
+  const content = (
+    <>
       <RNView style={styles.wordBox}>
         <Text text40BL $textDefault>
           {wordText}
@@ -35,6 +37,14 @@ export default function ResultItemRow({ item, onPress }: ResultItemRowProps) {
           {message}
         </Text>
       </RNView>
+    </>
+  );
+
+  if (!onPress) return <RNView style={styles.row}>{content}</RNView>;
+
+  return (
+    <TouchableOpacity style={styles.row} onPress={onPress} accessibilityRole="button" accessibilityLabel={message}>
+      {content}
     </TouchableOpacity>
   );
 }

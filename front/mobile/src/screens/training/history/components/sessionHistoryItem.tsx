@@ -31,7 +31,9 @@ export default function SessionHistoryItem({ session }: SessionHistoryItemProps)
   return (
     <TouchableOpacity
       style={styles.row}
-      onPress={() => navigation.navigate(screenNames.HISTORY_DETAIL as never, { sessionId: session.sessionId } as never)}>
+      onPress={() =>
+        navigation.navigate(screenNames.HISTORY_DETAIL as never, { sessionId: session.sessionId, type: session.type } as never)
+      }>
       <RNView>
         <Text text80M $textDefault>
           {date}

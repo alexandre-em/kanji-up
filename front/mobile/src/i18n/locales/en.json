@@ -224,8 +224,6 @@
   "history.error": "Couldn't load your history, please try again",
   "history.empty.title": "No sessions yet",
   "history.empty.message": "Sessions you complete will show up here.",
-  "history.word.notTracked.title": "Not tracked yet",
-  "history.word.notTracked.message": "Word session history isn't recorded yet — check back later.",
   "historyDetail.notFound": "Session not found.",
 
   "flashcards.progress": "Cards reviewed",

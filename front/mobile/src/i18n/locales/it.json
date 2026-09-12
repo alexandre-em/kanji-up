@@ -224,8 +224,6 @@
   "history.error": "Impossibile caricare la cronologia, riprova",
   "history.empty.title": "Ancora nessuna sessione",
   "history.empty.message": "Le sessioni che completi appariranno qui.",
-  "history.word.notTracked.title": "Non ancora registrato",
-  "history.word.notTracked.message": "La cronologia delle sessioni di parole non è ancora registrata — torna più tardi.",
   "historyDetail.notFound": "Sessione non trovata.",
 
   "flashcards.progress": "Carte ripassate",

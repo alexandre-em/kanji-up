@@ -224,8 +224,6 @@
   "history.error": "Не удалось загрузить историю, попробуйте снова",
   "history.empty.title": "Пока нет сессий",
   "history.empty.message": "Завершённые сессии появятся здесь.",
-  "history.word.notTracked.title": "Пока не отслеживается",
-  "history.word.notTracked.message": "История сессий по словам пока не сохраняется — загляните позже.",
   "historyDetail.notFound": "Сессия не найдена.",
 
   "flashcards.progress": "Просмотрено карточек",

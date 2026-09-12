@@ -224,8 +224,6 @@
   "history.error": "りれきをよみこめませんでした。もういちどおためしください",
   "history.empty.title": "セッションはまだありません",
   "history.empty.message": "かんりょうしたセッションがここにひょうじされます。",
-  "history.word.notTracked.title": "まだきろくされていません",
-  "history.word.notTracked.message": "たんごセッションのりれきはまだきろくされていません — あとでかくにんしてください。",
   "historyDetail.notFound": "セッションがみつかりません。",
 
   "flashcards.progress": "ふくしゅうしたカードすう",

@@ -224,8 +224,6 @@
   "history.error": "No se pudo cargar tu historial, inténtalo de nuevo",
   "history.empty.title": "Aún no hay sesiones",
   "history.empty.message": "Las sesiones que completes aparecerán aquí.",
-  "history.word.notTracked.title": "Aún no se registra",
-  "history.word.notTracked.message": "El historial de sesiones de palabras aún no se registra — vuelve más tarde.",
   "historyDetail.notFound": "Sesión no encontrada.",
 
   "flashcards.progress": "Tarjetas revisadas",

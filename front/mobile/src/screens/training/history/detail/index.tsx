@@ -9,33 +9,50 @@ import { useAppDispatch, useAppSelector } from '../../../../hooks/useStore';
 import { EvaluationItemType } from '../../../../store/slices/evaluation';
 import { getOne, selectEntities } from '../../../../store/slices/kanji';
 import { selectSessionHistoryItems } from '../../../../store/slices/sessionHistory';
+import { getOne as getOneWord, selectGetOne as selectWordEntities } from '../../../../store/slices/word';
+import { WordEvaluationItemType } from '../../../../store/slices/wordEvaluation';
 import ResultItemRow from '../../components/resultItemRow';
+import WordResultItemRow from '../../wordEvaluation/result/components/resultItemRow';
 import { useHistoryDetailStyles } from './hooks/useHistoryDetailStyles';
 
-type HistoryDetailProps = RouteParamsProps<{ sessionId: string }>;
+type HistoryDetailProps = RouteParamsProps<{ sessionId: string; type: SessionKind }>;
 
 export default function HistoryDetail(props: HistoryDetailProps) {
   const { t, i18n } = useTranslation();
   const dispatch = useAppDispatch();
   const styles = useHistoryDetailStyles();
-  const { sessionId } = props.route.params;
+  const { sessionId, type } = props.route.params;
   const itemsByType = useAppSelector(selectSessionHistoryItems);
   const kanjiEntities = useAppSelector(selectEntities);
+  const wordEntities = useAppSelector(selectWordEntities);
 
   // Already fetched by the history list screen — no need to hit the server again for one session
-  const session = useMemo(() => itemsByType.kanji.find((s) => s.sessionId === sessionId), [itemsByType.kanji, sessionId]);
+  const session = useMemo(() => itemsByType[type].find((s) => s.sessionId === sessionId), [itemsByType, type, sessionId]);
 
-  const questions = useMemo(() => (session?.questions ?? []) as KanjiSessionQuestion[], [session]);
+  const kanjiQuestions = useMemo(
+    () => (type === 'kanji' ? ((session?.questions ?? []) as KanjiSessionQuestion[]) : []),
+    [session, type],
+  );
+  const wordQuestions = useMemo(
+    () => (type === 'word' ? ((session?.questions ?? []) as WordSessionQuestion[]) : []),
+    [session, type],
+  );
 
   useEffect(() => {
-    questions.forEach((question) => {
+    kanjiQuestions.forEach((question) => {
       if (!kanjiEntities[question.kanjiId]) dispatch(getOne(question.kanjiId));
     });
-  }, [questions, kanjiEntities, dispatch]);
+  }, [kanjiQuestions, kanjiEntities, dispatch]);
 
-  const items: EvaluationItemType[] = useMemo(
+  useEffect(() => {
+    wordQuestions.forEach((question) => {
+      if (!wordEntities[question.wordId]) dispatch(getOneWord(question.wordId));
+    });
+  }, [wordQuestions, wordEntities, dispatch]);
+
+  const kanjiItems: EvaluationItemType[] = useMemo(
     () =>
-      questions.map((question) => ({
+      kanjiQuestions.map((question) => ({
         kanji: kanjiEntities[question.kanjiId] ?? {},
         score: null,
         status: question.status,
@@ -43,7 +60,18 @@ export default function HistoryDetail(props: HistoryDetailProps) {
         strokesCount: question.strokesCount,
         userConfirmation: question.userConfirmation,
       })),
-    [questions, kanjiEntities],
+    [kanjiQuestions, kanjiEntities],
+  );
+
+  const wordItems: WordEvaluationItemType[] = useMemo(
+    () =>
+      wordQuestions.map((question) => ({
+        word: wordEntities[question.wordId] ?? {},
+        slots: question.slots,
+        status: question.status,
+        userConfirmation: question.userConfirmation,
+      })),
+    [wordQuestions, wordEntities],
   );
 
   if (!session) {
@@ -75,9 +103,9 @@ export default function HistoryDetail(props: HistoryDetailProps) {
       )}
       <Spacing y={16} />
       <RNView style={styles.divider}>
-        {items.map((item, index) => (
-          <ResultItemRow key={`${item.kanji.kanji_id}-${index}`} item={item} />
-        ))}
+        {type === 'kanji'
+          ? kanjiItems.map((item, index) => <ResultItemRow key={`${item.kanji.kanji_id}-${index}`} item={item} />)
+          : wordItems.map((item, index) => <WordResultItemRow key={`${item.word.word_id}-${index}`} item={item} />)}
       </RNView>
     </Layout>
   );

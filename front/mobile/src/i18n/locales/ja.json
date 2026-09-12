@@ -224,8 +224,6 @@
   "history.error": "履歴を読み込めませんでした。もう一度お試しください",
   "history.empty.title": "セッションはまだありません",
   "history.empty.message": "完了したセッションがここに表示されます。",
-  "history.word.notTracked.title": "まだ記録されていません",
-  "history.word.notTracked.message": "単語セッションの履歴はまだ記録されていません — あとで確認してください。",
   "historyDetail.notFound": "セッションが見つかりません。",
 
   "flashcards.progress": "復習したカード数",

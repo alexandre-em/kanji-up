@@ -224,8 +224,6 @@
   "history.error": "Không thể tải lịch sử, vui lòng thử lại",
   "history.empty.title": "Chưa có buổi luyện tập nào",
   "history.empty.message": "Các buổi luyện tập bạn hoàn thành sẽ hiển thị ở đây.",
-  "history.word.notTracked.title": "Chưa được ghi nhận",
-  "history.word.notTracked.message": "Lịch sử luyện tập từ vựng chưa được ghi nhận — vui lòng quay lại sau.",
   "historyDetail.notFound": "Không tìm thấy buổi luyện tập này.",
 
   "flashcards.progress": "Số thẻ đã ôn tập",
