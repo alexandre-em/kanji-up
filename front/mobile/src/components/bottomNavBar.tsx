@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from 'react-native-ui-lib';
 
 import { tabs } from '../constants/tabs';
+import { useIsOffline } from '../providers/network';
 import { useTabBarHidden } from '../providers/tabBar';
 import TabLabel from './tabLabel';
 
@@ -22,6 +23,7 @@ const SPRING = { damping: 18, stiffness: 220 };
 const BAR_COLOR = Colors.$backgroundPrimaryHeavy + 'e6'; // slightly translucent so content shows through
 const ACTIVE_COLOR = '#fff';
 const INACTIVE_COLOR = '#ffffffaa';
+const DISABLED_COLOR = '#ffffff55';
 const PILL_COLOR = '#ffffff33';
 
 /** Vertical room the floating bar takes: consumed by Layout to keep content reachable above it */
@@ -47,6 +49,7 @@ type BottomNavBarProps = {
 export default function BottomNavBar({ activeRoute, onTabPress }: BottomNavBarProps) {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
+  const isOffline = useIsOffline();
   const tabBarHidden = useTabBarHidden();
   // Tabs are sized by their content (the active one also shows a label), so the pill
   // follows the measured layout instead of a computed screen fraction
@@ -103,19 +106,22 @@ export default function BottomNavBar({ activeRoute, onTabPress }: BottomNavBarPr
 
       {tabs.map((tab) => {
         const isActive = tab.key === activeRoute;
+        const isTabOffline = tab.requiresNetwork && isOffline;
         const label = t(tab.labelKey);
+        const color = isTabOffline ? DISABLED_COLOR : isActive ? ACTIVE_COLOR : INACTIVE_COLOR;
 
         return (
           <TouchableOpacity
             key={tab.key}
             style={styles.tab}
             activeOpacity={0.7}
+            disabled={isTabOffline}
             onPress={() => onTabPress(tab.key)}
             onLayout={(event) => handleTabLayout(tab.key, event)}
             accessibilityRole="tab"
-            accessibilityState={{ selected: isActive }}
+            accessibilityState={{ selected: isActive, disabled: isTabOffline }}
             accessibilityLabel={label}>
-            {tab.icon({ size: ICON_SIZE, color: isActive ? ACTIVE_COLOR : INACTIVE_COLOR })}
+            {tab.icon({ size: ICON_SIZE, color })}
             {isActive && <TabLabel label={label} />}
           </TouchableOpacity>
         );

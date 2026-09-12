@@ -15,6 +15,8 @@ export type TabType = {
   key: string;
   labelKey: string;
   icon: (props: TabIconProps) => ReactNode;
+  /** Needs a live network call to be useful — dimmed and untappable while offline */
+  requiresNetwork?: boolean;
 };
 
 export const tabs: TabType[] = [
@@ -32,6 +34,7 @@ export const tabs: TabType[] = [
     key: screenNames.SEARCH,
     labelKey: 'tabs.search.label',
     icon: ({ size, color }) => <SearchIcon size={size} color={color} />,
+    requiresNetwork: true,
   },
   {
     key: screenNames.TRAINING,

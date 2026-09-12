@@ -2,7 +2,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dimensions, StyleSheet, View as RNView } from 'react-native';
-import { Button, Card, Colors, Text, View } from 'react-native-ui-lib';
+import { Badge, Button, Card, Colors, Text, View } from 'react-native-ui-lib';
 import Incubator from 'react-native-ui-lib/incubator';
 
 import Layout from '../../components/layout';
@@ -12,6 +12,7 @@ import { screenNames } from '../../constants/screens';
 import { GENERAL_MARGIN } from '../../constants/styles';
 import { trainingModes, TrainingModeType } from '../../constants/training';
 import { useAppDispatch, useAppSelector } from '../../hooks/useStore';
+import { useIsOffline } from '../../providers/network';
 import { lists, selectLists } from '../../store/slices/lists';
 import ListPickerDialog from '../kanji/difficulty/kanjiList/components/listPickerDialog';
 
@@ -22,6 +23,7 @@ export default function TrainingModes() {
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
+  const isOffline = useIsOffline();
   const allLists = useAppSelector(selectLists);
   const [pendingMode, setPendingMode] = useState<TrainingModeType | null>(null);
   const [isListPickerVisible, setIsListPickerVisible] = useState(false);
@@ -29,7 +31,7 @@ export default function TrainingModes() {
 
   const handlePress = useCallback(
     (mode: TrainingModeType) => {
-      if (mode.comingSoon) return;
+      if (mode.comingSoon || (mode.requiresNetwork && isOffline)) return;
 
       if (mode.skipListPicker) {
         navigation.navigate(mode.screen as never);
@@ -39,7 +41,7 @@ export default function TrainingModes() {
       setPendingMode(mode);
       setIsListPickerVisible(true);
     },
-    [navigation],
+    [navigation, isOffline],
   );
 
   const handleListPicked = useCallback(
@@ -71,42 +73,56 @@ export default function TrainingModes() {
         size={Button.sizes.small}
         onPress={() => navigation.navigate(screenNames.PROFILE as never)}
       />
-      {trainingModes.map((mode) => (
-        <View key={mode.textKey}>
-          <Spacing y={15} />
-          <Card
-            height={105}
-            width={width - GENERAL_MARGIN * 2}
-            onPress={() => handlePress(mode)}
-            disabled={mode.comingSoon}
-            style={[styles.card, mode.comingSoon && styles.cardDisabled]}>
-            <Card.Section
-              flex
-              content={[{ text: t(mode.textKey), text60BL: true, white: true }]}
-              contentStyle={styles.transparent}
-              style={styles.transparent}
-              center
-            />
-            <Card.Section
-              flex
-              content={[{ text: t(mode.subtitle), text80M: true, white: true }]}
-              contentStyle={styles.transparent}
-              style={styles.transparent}
-              center
-            />
-            {mode.comingSoon && (
+      {trainingModes.map((mode) => {
+        const isModeOffline = mode.requiresNetwork && isOffline;
+        const isDisabled = mode.comingSoon || isModeOffline;
+
+        return (
+          <View key={mode.textKey}>
+            <Spacing y={15} />
+            <Card
+              height={105}
+              width={width - GENERAL_MARGIN * 2}
+              onPress={() => handlePress(mode)}
+              disabled={isDisabled}
+              style={[styles.card, isDisabled && styles.cardDisabled]}>
+              {isModeOffline && (
+                <Badge
+                  label={t('offline.badge')}
+                  size={20}
+                  backgroundColor={Colors.$backgroundGeneralHeavy}
+                  labelStyle={styles.badgeLabel}
+                  style={styles.badge}
+                />
+              )}
               <Card.Section
                 flex
-                content={[{ text: t('training.comingSoon'), text90M: true, white: true }]}
+                content={[{ text: t(mode.textKey), text60BL: true, white: true }]}
                 contentStyle={styles.transparent}
                 style={styles.transparent}
                 center
               />
-            )}
-            {mode.image}
-          </Card>
-        </View>
-      ))}
+              <Card.Section
+                flex
+                content={[{ text: t(mode.subtitle), text80M: true, white: true }]}
+                contentStyle={styles.transparent}
+                style={styles.transparent}
+                center
+              />
+              {mode.comingSoon && (
+                <Card.Section
+                  flex
+                  content={[{ text: t('training.comingSoon'), text90M: true, white: true }]}
+                  contentStyle={styles.transparent}
+                  style={styles.transparent}
+                  center
+                />
+              )}
+              {mode.image}
+            </Card>
+          </View>
+        );
+      })}
       <ListPickerDialog
         visible={isListPickerVisible}
         lists={Object.values(allLists)}
@@ -149,6 +165,8 @@ const styles = StyleSheet.create({
   cardDisabled: {
     opacity: 0.5,
   },
+  badge: { position: 'absolute', right: 10, top: 10, zIndex: 1 },
+  badgeLabel: { color: '#fff' },
   transparent: { backgroundColor: '#00000000' },
   emptySelectionModal: {
     padding: 20,

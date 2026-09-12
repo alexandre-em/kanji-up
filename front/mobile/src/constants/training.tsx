@@ -14,6 +14,8 @@ export type TrainingModeType = {
   // Modes that don't draw from a selected-kanji list (e.g. a history viewer) skip the
   // choose-a-list prompt entirely and navigate straight through
   skipListPicker?: boolean;
+  /** Needs a live network call to be useful — greyed out with an offline badge when offline */
+  requiresNetwork?: boolean;
 };
 
 const { width } = Dimensions.get('window');
@@ -75,6 +77,9 @@ export const trainingModes: TrainingModeType[] = [
     // Pool source now depends on the Kanji/Mots toggle inside the mode's own screen, same
     // reasoning as flashcards — the choice happens there instead of upfront
     skipListPicker: true,
+    // Kanji mode builds its practice pool from a live word-search call per character — unlike
+    // flashcards/kanji evaluation, there's no cached pool to fall back on
+    requiresNetwork: true,
     image: (
       <>
         <Image source={Assets.banners.wordTest} style={styles.bannerImage} />
@@ -87,6 +92,7 @@ export const trainingModes: TrainingModeType[] = [
     subtitle: 'training.menu.history.subtitle',
     screen: screenNames.HISTORY,
     skipListPicker: true,
+    requiresNetwork: true,
     image: (
       <>
         <Image source={Assets.banners.jlpt} style={styles.bannerImage} />
