@@ -10,22 +10,21 @@ describe('WordService.findExactWordMatch', () => {
     return { service: new WordService(model, sentenceService), findOne, select };
   }
 
-  it('matches by spelling, or by reading only for a word with no kanji form at all', async () => {
-    const { service, findOne } = buildService({ word_id: 'abc', word: ['そば'], reading: ['そば'] });
+  it('matches by spelling or by reading, unconditionally', async () => {
+    const { service, findOne } = buildService({ word_id: 'abc', word: ['蕎麦'], reading: ['そば'] });
 
     await service.findExactWordMatch('そば');
 
-    // そば/ラーメン-style words are stored with word: [] and only a reading — the $size: 0
-    // guard is what stops this from also matching a kanji word sharing that pronunciation
-    // (きょう must never match 今日, which has a real, non-empty word array)
+    // そば (蕎麦) has a real kanji form yet is routinely written/scanned in kana only — a
+    // word:{$size:0} guard here would exclude exactly this common case
     expect(findOne).toHaveBeenCalledWith({
       deleted_at: null,
-      $or: [{ word: 'そば' }, { word: { $size: 0 }, reading: 'そば' }],
+      $or: [{ word: 'そば' }, { reading: 'そば' }],
     });
   });
 
   it('selects only word_id, word and reading, not the full document', async () => {
-    const { service, select } = buildService({ word_id: 'abc', word: ['そば'], reading: ['そば'] });
+    const { service, select } = buildService({ word_id: 'abc', word: ['蕎麦'], reading: ['そば'] });
 
     await service.findExactWordMatch('そば');
 
@@ -58,6 +57,13 @@ describe('WordService.findExactWordMatch', () => {
     });
 
     await expect(service.findExactWordMatch('正油')).resolves.toEqual({ word_id: '8e7cfe95', reading: 'しょうゆ' });
+  });
+
+  it('matches a word by its reading even though it has a real kanji spelling (word not empty)', async () => {
+    // そば's real entry: word: ["蕎麦"], reading includes "そば" — no word: [] involved at all
+    const { service } = buildService({ word_id: '1541347b', word: ['蕎麦'], reading: ['そば', 'そばむぎ', 'そまむぎ'] });
+
+    await expect(service.findExactWordMatch('そば')).resolves.toEqual({ word_id: '1541347b', reading: 'そば' });
   });
 
   it('uses the query itself as the reading for a kana-only word (word: [])', async () => {

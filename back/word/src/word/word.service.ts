@@ -47,24 +47,27 @@ export class WordService {
     return this.model.find({ 'definition.related_word': { $elemMatch: { $ne: null } } }).exec();
   }
 
-  // Spelling first — a kana string sharing pronunciation with an unrelated kanji word (e.g.
-  // きょう / 今日) must not count as a match for it. Reading only kicks in for a word with no
-  // kanji form at all (word: [], e.g. そば, ラーメン) — there, reading IS the only spelling it has.
+  // Matches spelling or reading — そば (蕎麦) has a real kanji form but is routinely written or
+  // scanned in kana only, same for plenty of other words, so restricting to spelling alone missed
+  // most of them. A shared reading occasionally picking an unintended homophone (きょう / 今日) is
+  // an accepted tradeoff: still a real word for that kana string, just not guaranteed the one the
+  // photo meant — better than surfacing nothing at all for kana-only text.
   //
   // Also resolves which reading actually belongs to the matched spelling, so the caller (OCR
   // furigana) doesn't have to fetch the full word and guess: positional pairing when reading and
   // word are the same length, otherwise the word's first reading — same fallback as the mobile
-  // word detail screen, since alternate spellings usually share one reading anyway.
+  // word detail screen, since alternate spellings usually share one reading anyway. Matched via
+  // reading rather than spelling, the reading is simply what was searched.
   async findExactWordMatch(word: string) {
     const doc = await this.model
-      .findOne({ deleted_at: null, $or: [{ word }, { word: { $size: 0 }, reading: word }] })
+      .findOne({ deleted_at: null, $or: [{ word }, { reading: word }] })
       .select('word_id word reading -_id')
       .exec();
 
     if (!doc) return null;
 
     const spellingIndex = doc.word.indexOf(word);
-    const reading = spellingIndex !== -1 && doc.reading.length === doc.word.length ? doc.reading[spellingIndex] : doc.reading[0] ?? null;
+    const reading = spellingIndex === -1 ? word : doc.reading.length === doc.word.length ? doc.reading[spellingIndex] : doc.reading[0] ?? null;
 
     return { word_id: doc.word_id, reading };
   }
