@@ -179,15 +179,33 @@ export default function WordDetail(props: WordDetailProps) {
       {word && (
         <>
           <RNView style={styles.wordRow}>
-            {word.word.map((spelling, index) =>
-              index === 0 && word.reading[0] ? (
-                <FuriganaText key={spelling} text={spelling} reading={word.reading[0]} furiganaSize="L" />
-              ) : (
-                <Text key={spelling} text50BL $textPrimary center>
-                  {spelling}
-                </Text>
-              ),
-            )}
+            {word.word.flatMap((spelling, index) => {
+              // Alternate spellings share the word's single reading unless the API gave one
+              // reading per spelling (reading.length matching word.length) — e.g. 辞書/辭書
+              // both read じしょ, so falling back to reading[0] is correct far more often
+              // than leaving later spellings without furigana at all
+              const reading = word.reading.length === word.word.length ? word.reading[index] : word.reading[0];
+
+              const pieces = [
+                reading ? (
+                  <FuriganaText key={spelling} text={spelling} reading={reading} furiganaSize="L" />
+                ) : (
+                  <Text key={spelling} text50BL $textPrimary center>
+                    {spelling}
+                  </Text>
+                ),
+              ];
+
+              if (index < word.word.length - 1) {
+                pieces.push(
+                  <Text key={`${spelling}-separator`} text50BL $textPrimary>
+                    {'・'}
+                  </Text>,
+                );
+              }
+
+              return pieces;
+            })}
           </RNView>
           <Spacing y={16} />
           <RNView style={styles.actions}>

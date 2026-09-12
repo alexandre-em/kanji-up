@@ -15,6 +15,7 @@ export function useWordDetailStyles() {
         flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'center',
+        alignItems: 'flex-end',
         gap: 8,
       },
       actions: {
