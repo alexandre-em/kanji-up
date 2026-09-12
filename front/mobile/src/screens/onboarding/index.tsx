@@ -12,7 +12,6 @@ import { useAppDispatch, useAppSelector } from '../../hooks/useStore';
 import { useToaster } from '../../providers/toaster';
 import { fileServiceInstance } from '../../services/file';
 import { createUser, getUser, selectCreateStatus, selectGetUserStatus, selectUserName } from '../../store/slices/user';
-import GoogleSignInOption from './components/googleSignInOption';
 import Step1 from './components/step1';
 import Step2 from './components/step2';
 import Step3 from './components/step3';
@@ -89,7 +88,6 @@ export default function Onboarding() {
           (step === 2 && userName.trim().length === 0) || (step === 3 && userName.length === 0 && createUserStatus === 'pending')
         }
       />
-      <GoogleSignInOption step={step} />
     </View>
   );
 }
