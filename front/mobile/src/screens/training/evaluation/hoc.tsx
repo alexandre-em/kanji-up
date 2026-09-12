@@ -7,6 +7,7 @@ import Spacing from '../../../components/spacing';
 import { hasNewlyMasteredKanji } from '../../../constants/progression';
 import { useRecognitionModel } from '../../../hooks/useRecognitionModel';
 import { useAppDispatch, useAppSelector } from '../../../hooks/useStore';
+import { useIsOffline } from '../../../providers/network';
 import { useToaster } from '../../../providers/toaster';
 import { fileNames, fileServiceInstance } from '../../../services/file';
 import { core } from '../../../services/http';
@@ -43,6 +44,7 @@ export default function EvaluationHoc() {
   const userId = useAppSelector((state) => state.user.userId);
   const progressionState = useAppSelector((state) => state.user.progression);
   const dispatch = useAppDispatch();
+  const isOffline = useIsOffline();
   const { isLoaded: isModelLoaded, hasError: modelLoadError } = useRecognitionModel();
   const [isChecking, setIsChecking] = useState(true);
   const [pendingResume, setPendingResume] = useState<PendingResume | null>(null);
@@ -171,7 +173,7 @@ export default function EvaluationHoc() {
       localPending && localPending.items.length > 0 ? { source: 'local', session: localPending } : null;
 
     if (!pending) {
-      const action = await dispatch(checkActiveSession());
+      const action = await dispatch(checkActiveSession(isOffline));
       const session = checkActiveSession.fulfilled.match(action) ? action.payload : null;
       if (session) pending = { source: 'server', session };
     }
@@ -186,9 +188,9 @@ export default function EvaluationHoc() {
       await finalizeAsIncomplete(pending);
     }
 
-    void dispatch(startFreshSession({ kanjis: kanjiQueue() }));
+    void dispatch(startFreshSession({ kanjis: kanjiQueue(), isOffline }));
     setIsChecking(false);
-  }, [dispatch, kanjiQueue, isPremium, finalizeAsIncomplete]);
+  }, [dispatch, kanjiQueue, isPremium, isOffline, finalizeAsIncomplete]);
 
   useEffect(() => {
     if (!isKanjiPoolReady) return;
@@ -206,9 +208,9 @@ export default function EvaluationHoc() {
 
   const handleStartOver = useCallback(() => {
     const abandonSessionId = pendingResume?.session.sessionId ?? undefined;
-    void dispatch(startFreshSession({ kanjis: kanjiQueue(), abandonSessionId }));
+    void dispatch(startFreshSession({ kanjis: kanjiQueue(), abandonSessionId, isOffline }));
     setPendingResume(null);
-  }, [dispatch, kanjiQueue, pendingResume]);
+  }, [dispatch, kanjiQueue, pendingResume, isOffline]);
 
   if (!isModelLoaded || !isKanjiPoolReady || isChecking) {
     return <Layout screen="evaluation" loadingMessage={t('evaluation.loadingModel')} />;

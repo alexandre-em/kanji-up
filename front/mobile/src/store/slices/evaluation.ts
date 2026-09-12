@@ -94,10 +94,12 @@ export const persistLocalSession = (session: PendingLocalSession) =>
 
 export const clearLocalSession = () => fileServiceInstance.remove(fileNames.PENDING_KANJI_SESSION).catch(() => undefined);
 
-export const checkActiveSession = createAsyncThunk('evaluation/checkActiveSession', async (_: void, { getState }) => {
+export const checkActiveSession = createAsyncThunk('evaluation/checkActiveSession', async (isOffline: boolean, { getState }) => {
   const userId = (getState() as RootState).user.userId;
-  // No identity yet (e.g. getUser hasn't resolved): nothing to resume, degrade to local-only
-  if (!userId) return null;
+  // No identity yet (e.g. getUser hasn't resolved), or no connection to check with: nothing to
+  // resume, degrade to local-only — offline, this would otherwise wait out a full request
+  // timeout just to fail the same way
+  if (!userId || isOffline) return null;
 
   const response = await core.sessionsService!.findActive(userId, 'kanji');
 
@@ -106,7 +108,7 @@ export const checkActiveSession = createAsyncThunk('evaluation/checkActiveSessio
 
 export const startFreshSession = createAsyncThunk(
   'evaluation/startFreshSession',
-  async (payload: { kanjis: Partial<KanjiType>[]; abandonSessionId?: string }, { getState }) => {
+  async (payload: { kanjis: Partial<KanjiType>[]; abandonSessionId?: string; isOffline?: boolean }, { getState }) => {
     const userId = (getState() as RootState).user.userId;
     let sessionId: string | null = null;
 
@@ -120,8 +122,9 @@ export const startFreshSession = createAsyncThunk(
     }));
 
     // Offline, unreachable server, or no identity yet: the run still starts, just local-only —
-    // it becomes a real session later, at finish time, if a connection is available by then
-    if (userId) {
+    // it becomes a real session later, at finish time, if a connection is available by then.
+    // Known offline skips the attempt outright instead of waiting out a request timeout first.
+    if (userId && !payload.isOffline) {
       try {
         if (payload.abandonSessionId) {
           await core.sessionsService!.abandon(payload.abandonSessionId).catch(() => undefined);
