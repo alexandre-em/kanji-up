@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Image, View as RNView } from 'react-native';
 import { Text } from 'react-native-ui-lib';
@@ -5,8 +6,8 @@ import { Text } from 'react-native-ui-lib';
 import Layout from '../../components/layout';
 import RecognizedTokens from '../../components/recognizedTokens';
 import Spacing from '../../components/spacing';
-import { useAppSelector } from '../../hooks/useStore';
-import { selectGetOne as selectWordEntities } from '../../store/slices/word';
+import { useAppDispatch, useAppSelector } from '../../hooks/useStore';
+import { getOne as getOneWord, selectGetOne as selectWordEntities } from '../../store/slices/word';
 import { useScanDetailStyles } from './useScanDetailStyles';
 
 type ScanDetailProps = RouteParamsProps<{ scan: ScanSummaryType }>;
@@ -15,10 +16,17 @@ export default function ScanDetail(props: ScanDetailProps) {
   const { t } = useTranslation();
   const { scan } = props.route.params;
   const styles = useScanDetailStyles();
+  const dispatch = useAppDispatch();
   const wordEntities = useAppSelector(selectWordEntities);
 
-  // RecognizedTokens below fetches whatever word isn't cached yet — reused here for its meaning,
-  // not just its reading, so the translation list can lag behind by a render until that resolves
+  // The token only carries reading (for RecognizedTokens' furigana) — the translation section
+  // below needs the full word for its English meaning, fetched here instead
+  useEffect(() => {
+    scan.tokens.forEach((token) => {
+      if (token.wordId && !wordEntities[token.wordId]) dispatch(getOneWord(token.wordId));
+    });
+  }, [scan.tokens, wordEntities, dispatch]);
+
   const translations = scan.tokens
     .filter((token): token is ScanTokenType & { wordId: string } => !!token.wordId && !!wordEntities[token.wordId])
     .map((token) => ({

@@ -169,6 +169,8 @@ type ScanTokenType = {
   text: string;
   // null when this stretch of text isn't a known word (kana, punctuation, unrecognized)
   wordId: string | null;
+  // Furigana for a matched token, resolved server-side — null when unmatched
+  reading: string | null;
 };
 
 type ScanResultType = {
