@@ -136,10 +136,12 @@ export class WordService {
           should: [
             { text: { query, path: ['word', 'reading', 'definition.meaning'] } },
             // A verbatim match on the un-analyzed spelling/reading (e.g. querying "そば" and a
-            // document's word/reading being exactly "そば") massively outranks any compound that
-            // merely contains it (塩そば, そば屋, ...) — this is what fixes short common words
-            // getting buried under their own compounds in the results
-            { text: { query, path: ['word.exact', 'reading.exact'], score: { boost: { value: 5 } } } },
+            // document's word/reading being exactly "そば") should always outrank a compound
+            // that merely contains it (塩そば, そば屋, ...) — a flat score instead of a boost
+            // multiplier, since a multiplier only helps proportionally to the base match's own
+            // score, and that base score already gets diluted by length normalization on a
+            // reading array with several entries (そば's own word has 3, 辞書's has 1)
+            { text: { query, path: ['word.exact', 'reading.exact'], score: { constant: { value: 100 } } } },
           ],
           minimumShouldMatch: 1,
         },

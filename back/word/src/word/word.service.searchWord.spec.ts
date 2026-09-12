@@ -22,15 +22,17 @@ describe('WordService.searchWord', () => {
     return { service: new WordService(model, sentenceService), search: () => chain.search };
   }
 
-  it('boosts an exact, un-analyzed match on word/reading above the general CJK match', async () => {
+  it('gives an exact, un-analyzed match on word/reading a flat score above the general CJK match', async () => {
     const { service, search } = buildService();
 
     await service.searchWord('そば');
 
+    // A flat score, not a boost multiplier — a multiplier only scales the base match's own
+    // score, which field-length normalization already dilutes for a word with several readings
     expect(search()).toHaveBeenCalledWith({
       index: 'default',
       compound: {
-        should: [{ text: { query: 'そば', path: ['word', 'reading', 'definition.meaning'] } }, { text: { query: 'そば', path: ['word.exact', 'reading.exact'], score: { boost: { value: 5 } } } }],
+        should: [{ text: { query: 'そば', path: ['word', 'reading', 'definition.meaning'] } }, { text: { query: 'そば', path: ['word.exact', 'reading.exact'], score: { constant: { value: 100 } } } }],
         minimumShouldMatch: 1,
       },
     });
