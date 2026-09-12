@@ -47,6 +47,12 @@ export function useOcrStyles() {
         borderRadius: 8,
         backgroundColor: Colors.$backgroundNeutralLight,
       },
+      resultImage: {
+        width: '100%',
+        height: 220,
+        borderRadius: 12,
+        backgroundColor: Colors.$backgroundNeutralLight,
+      },
       historyContent: {
         flex: 1,
         justifyContent: 'center',

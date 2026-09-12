@@ -258,6 +258,8 @@ export default function Ocr() {
 
           {status === 'idle' && result && (
             <RNView>
+              <Image source={{ uri: result.imageUrl }} style={styles.resultImage} resizeMode="cover" />
+              <Spacing y={16} />
               <Text text70BO>{t('ocr.result.title')}</Text>
               <Spacing y={12} />
               {renderTokens(result.tokens, result.recognizedText)}
