@@ -19,6 +19,13 @@ import { useOcrStyles } from './hooks/useOcrStyles';
 
 const PICKER_OPTIONS = { mediaType: 'photo' as const, quality: 0.8 as const, maxWidth: 1600, maxHeight: 1600 };
 const HISTORY_LIMIT = 20;
+// Kana, kanji, and Japanese punctuation only — the recognition model sometimes picks up stray
+// roman letters/digits from a photo's background or watermark, which don't belong in the reading
+const JAPANESE_CHARACTER_PATTERN = /[^　-〿぀-ヿ一-鿿]/g;
+
+function filterJapaneseText(text: string) {
+  return text.replace(JAPANESE_CHARACTER_PATTERN, '');
+}
 
 type ScreenStatus = 'idle' | 'uploading' | 'error';
 type OcrTab = 'scan' | 'history';
@@ -160,8 +167,9 @@ export default function Ocr() {
       );
     }
 
-    if (recognizedText.trim().length > 0) {
-      return <Text text80M>{recognizedText}</Text>;
+    const filteredText = filterJapaneseText(recognizedText);
+    if (filteredText.trim().length > 0) {
+      return <Text text80M>{filteredText}</Text>;
     }
 
     return (
