@@ -8,7 +8,6 @@ import AppBannerAd from '../../components/bannerAd';
 import { TAB_BAR_TOTAL_HEIGHT } from '../../components/bottomNavBar';
 import SearchIcon from '../../components/svg/search';
 import { useAppDispatch, useAppSelector } from '../../hooks/useStore';
-import { useToaster } from '../../providers/toaster';
 import {
   search as searchKanji,
   selectSearchResult as selectKanjiSearchResult,
@@ -30,7 +29,6 @@ const WORD_SEGMENT = 1;
 export default function Search() {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
-  const toast = useToaster();
   const insets = useSafeAreaInsets();
   // Now a tab screen: the floating tab bar overlays the bottom of the list, so the last results
   // need clearance the same way Layout reserves it for its own screens
@@ -48,28 +46,19 @@ export default function Search() {
   const trimmedQuery = query.trim();
 
   // Only fetches a segment the user actually looks at: switching tabs re-uses the other
-  // segment's cache-by-query if it's already there, and only dispatches when it isn't.
-  // Toasts straight off this specific dispatch's outcome (.unwrap().catch()) rather than
-  // watching the slice's shared status flag — that flag isn't scoped to a query, so a failure
-  // from an unrelated request (an old query, a background pagination fetch) would falsely toast
-  // for a search that actually succeeded.
+  // segment's cache-by-query if it's already there, and only dispatches when it isn't. A
+  // failure surfaces through activeStatus === 'failed' below, not a toast.
   const runSearch = useCallback(
     (q: string, segment: number) => {
       if (q === '') return;
 
       if (segment === KANJI_SEGMENT) {
-        if (!kanjiResults[q]) {
-          dispatch(searchKanji({ query: q }))
-            .unwrap()
-            .catch(() => toast?.show({ message: t('search.error'), type: 'failure' }));
-        }
+        if (!kanjiResults[q]) dispatch(searchKanji({ query: q }));
       } else if (!wordResults[q]) {
-        dispatch(searchWord({ query: q }))
-          .unwrap()
-          .catch(() => toast?.show({ message: t('search.error'), type: 'failure' }));
+        dispatch(searchWord({ query: q }));
       }
     },
-    [dispatch, kanjiResults, wordResults, toast, t],
+    [dispatch, kanjiResults, wordResults],
   );
 
   const handleChangeText = useCallback(
