@@ -4,7 +4,7 @@ import { Button, Text, View } from 'react-native-ui-lib';
 
 import Layout from '../../../components/layout';
 import Spacing from '../../../components/spacing';
-import { hasNewlyMasteredKanji } from '../../../constants/progression';
+import { hasNewlyMasteredKanji, selectSessionKanji } from '../../../constants/progression';
 import { useRecognitionModel } from '../../../hooks/useRecognitionModel';
 import { useAppDispatch, useAppSelector } from '../../../hooks/useStore';
 import { useIsOffline } from '../../../providers/network';
@@ -43,6 +43,7 @@ export default function EvaluationHoc() {
   const isPremium = useAppSelector((state) => state.user.subscriptionPlan === 'premium');
   const userId = useAppSelector((state) => state.user.userId);
   const progressionState = useAppSelector((state) => state.user.progression);
+  const questionCount = useAppSelector((state) => state.user.questionCount);
   const dispatch = useAppDispatch();
   const isOffline = useIsOffline();
   const { isLoaded: isModelLoaded, hasError: modelLoadError } = useRecognitionModel();
@@ -65,11 +66,8 @@ export default function EvaluationHoc() {
     const kanjiValues =
       activeList?.kanjiIds.map((id) => kanjiEntities[id]).filter((entity): entity is KanjiType => !!entity) ?? [];
 
-    if (kanjiValues.length > 0) {
-      return Array.from(Array(numberKanji).keys()).map(() => kanjiValues[Math.floor(Math.random() * kanjiValues.length)]);
-    }
-    return [];
-  }, [activeList, kanjiEntities]);
+    return selectSessionKanji(kanjiValues, progressionState, numberKanji, questionCount);
+  }, [activeList, kanjiEntities, progressionState, questionCount]);
 
   useEffect(() => {
     if (modelLoadError) toast?.show({ message: 'An error occurred when loading the recognition model', type: 'failure' });
