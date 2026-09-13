@@ -1,12 +1,15 @@
 import {
   getAccuracyPercent,
+  getKanjiReviewDelay,
   hasNewlyMasteredKanji,
   hasNewlyMasteredWord,
+  isKanjiDue,
   isKanjiMastered,
   isWordMastered,
   normalizeProgressionEntry,
   PROGRESSION_MASTERY_THRESHOLD_PERCENT,
   PROGRESSION_MIN_ATTEMPTS,
+  selectSessionKanji,
 } from './progression';
 
 describe('normalizeProgressionEntry', () => {
@@ -150,4 +153,93 @@ describe.each([
 it('exposes the tuning constants used across kanji and word progression', () => {
   expect(PROGRESSION_MASTERY_THRESHOLD_PERCENT).toBe(90);
   expect(PROGRESSION_MIN_ATTEMPTS).toBe(20);
+});
+
+describe('getKanjiReviewDelay', () => {
+  it('is 0 for a kanji never attempted', () => {
+    expect(getKanjiReviewDelay(undefined)).toBe(0);
+  });
+
+  it('grows with accuracy at a fixed volume', () => {
+    const low = getKanjiReviewDelay({ correct: 10, total: 20 }); // 50%
+    const high = getKanjiReviewDelay({ correct: 19, total: 20 }); // 95%
+
+    expect(high).toBeGreaterThan(low);
+  });
+
+  it('grows with volume at a fixed accuracy', () => {
+    const few = getKanjiReviewDelay({ correct: 19, total: 20 }); // 95%
+    const many = getKanjiReviewDelay({ correct: 190, total: 200 }); // 95%
+
+    expect(many).toBeGreaterThan(few);
+  });
+
+  it('collapses back down after a wrong answer drags accuracy down', () => {
+    const beforeMiss = getKanjiReviewDelay({ correct: 19, total: 20 });
+    const afterMiss = getKanjiReviewDelay({ correct: 19, total: 21 });
+
+    expect(afterMiss).toBeLessThan(beforeMiss);
+  });
+});
+
+describe('isKanjiDue', () => {
+  it('is due when never seen before', () => {
+    expect(isKanjiDue(undefined, 100)).toBe(true);
+  });
+
+  it('is not due right after being seen, given a non-zero delay', () => {
+    const entry = { correct: 19, total: 20, lastSeenAtCount: 100 };
+
+    expect(isKanjiDue(entry, 100)).toBe(false);
+  });
+
+  it('becomes due again once enough other questions have passed', () => {
+    const entry = { correct: 19, total: 20, lastSeenAtCount: 100 };
+    const delay = getKanjiReviewDelay(entry);
+
+    expect(isKanjiDue(entry, 100 + delay)).toBe(true);
+  });
+});
+
+describe('selectSessionKanji', () => {
+  const kanji = (id: string): KanjiType => ({ kanji_id: id }) as unknown as KanjiType;
+  const pool = Array.from({ length: 6 }, (_, i) => kanji(`k${i}`));
+
+  it('returns nothing for an empty pool', () => {
+    expect(selectSessionKanji([], {}, 10, 0)).toEqual([]);
+  });
+
+  it('returns exactly the requested count', () => {
+    const result = selectSessionKanji(pool, {}, 20, 0);
+
+    expect(result).toHaveLength(20);
+  });
+
+  it('never repeats the same kanji on two consecutive draws', () => {
+    const result = selectSessionKanji(pool, {}, 200, 0);
+
+    for (let i = 1; i < result.length; i++) {
+      expect(result[i].kanji_id).not.toBe(result[i - 1].kanji_id);
+    }
+  });
+
+  it('excludes a kanji that is not due yet when enough others are due', () => {
+    const notDueId = 'k0';
+    const progression = { [notDueId]: { correct: 19, total: 20, lastSeenAtCount: 100 } };
+
+    const result = selectSessionKanji(pool, progression, 20, 100);
+
+    expect(result.some((k) => k.kanji_id === notDueId)).toBe(false);
+  });
+
+  it('falls back to the whole pool when too few kanji are due', () => {
+    // Every kanji but one just seen and not yet due — below MIN_LIST_SIZE_FOR_GAME due kanji
+    const progression = Object.fromEntries(
+      pool.slice(1).map((k) => [k.kanji_id, { correct: 19, total: 20, lastSeenAtCount: 100 }]),
+    );
+
+    const result = selectSessionKanji(pool, progression, 20, 100);
+
+    expect(new Set(result.map((k) => k.kanji_id)).size).toBe(pool.length);
+  });
 });

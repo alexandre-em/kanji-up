@@ -111,8 +111,9 @@ type RegisteredUser = {
 type KanjiProgressionType = {
   totalScore: number;
   dailyScores: Record<string, number>;
-  progression: Record<string, { correct: number; total: number } | number>;
+  progression: Record<string, { correct: number; total: number; lastSeenAtCount?: number } | number>;
   wordProgression: Record<string, { correct: number; total: number }>;
+  questionCount: number;
 };
 
 type UserType = UnregisteredUser & RegisteredUser & KanjiProgressionType;

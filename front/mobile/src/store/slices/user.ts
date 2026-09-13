@@ -33,6 +33,7 @@ const initialState: UserState = {
   dailyScores: {},
   progression: {},
   wordProgression: {},
+  questionCount: 0,
 
   getUserStatus: 'idle',
   createUserStatus: 'idle',
@@ -67,6 +68,7 @@ export const getUser = createAsyncThunk<UserType, GetUserInput, { rejectValue: {
           dailyScores: state.user.dailyScores,
           progression: state.user.progression,
           wordProgression: state.user.wordProgression,
+          questionCount: state.user.questionCount,
         };
       }
 
@@ -150,11 +152,17 @@ export const updateTrainingConsent = createAsyncThunk<{ trainingConsent: boolean
 // Best-effort, fire-and-forget: a network hiccup here shouldn't block or surface an error to the
 // user, the local state (already incremented live per answer) is what actually matters
 export const syncKanjiProgression = createAsyncThunk('user/syncKanjiProgression', async (_: void, { getState, dispatch }) => {
-  const { userId, totalScore, dailyScores, progression, wordProgression } = (getState() as RootState).user;
+  const { userId, totalScore, dailyScores, progression, wordProgression, questionCount } = (getState() as RootState).user;
   if (!userId) return;
 
   try {
-    await core.authService!.updateKanjiProgression(userId, { totalScore, dailyScores, progression, wordProgression });
+    await core.authService!.updateKanjiProgression(userId, {
+      totalScore,
+      dailyScores,
+      progression,
+      wordProgression,
+      questionCount,
+    });
   } catch {
     // Queued instead of just dropped — flushed on the next reconnect or app launch, see
     // syncQueue.ts. Still resolves fulfilled either way: the local state (already updated live
@@ -173,7 +181,12 @@ export const user = createSlice({
       const { id, correct } = action.payload;
       const current = normalizeProgressionEntry(state.progression[id]);
 
-      state.progression[id] = { correct: current.correct + (correct ? 1 : 0), total: current.total + 1 };
+      state.questionCount += 1;
+      state.progression[id] = {
+        correct: current.correct + (correct ? 1 : 0),
+        total: current.total + 1,
+        lastSeenAtCount: state.questionCount,
+      };
     },
     updateWordProgression: (state, action: PayloadAction<{ id: string; correct: boolean }>) => {
       const { id, correct } = action.payload;
@@ -224,6 +237,7 @@ export const user = createSlice({
         state.dailyScores = action.payload.dailyScores ?? {};
         state.progression = action.payload.progression ?? {};
         state.wordProgression = action.payload.wordProgression ?? {};
+        state.questionCount = action.payload.questionCount ?? 0;
       })
       .addCase(getUser.rejected, (state) => {
         state.getUserStatus = 'failed';

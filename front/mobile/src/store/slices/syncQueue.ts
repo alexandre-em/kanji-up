@@ -90,9 +90,15 @@ export const flush = createAsyncThunk<SyncQueueItem[]>('syncQueue/flush', async 
   for (const item of items) {
     try {
       if (item.type === 'syncProgression') {
-        const { userId, totalScore, dailyScores, progression, wordProgression } = (getState() as RootState).user;
+        const { userId, totalScore, dailyScores, progression, wordProgression, questionCount } = (getState() as RootState).user;
         if (!userId) throw new Error('No user id yet');
-        await core.authService!.updateKanjiProgression(userId, { totalScore, dailyScores, progression, wordProgression });
+        await core.authService!.updateKanjiProgression(userId, {
+          totalScore,
+          dailyScores,
+          progression,
+          wordProgression,
+          questionCount,
+        });
       } else if (item.type === 'finishSession') {
         await core.sessionsService!.finish(item.sessionId, item.score);
       } else {

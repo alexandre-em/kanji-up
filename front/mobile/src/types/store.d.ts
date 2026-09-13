@@ -93,8 +93,11 @@ type UserState = {
   unlockedKanji: string[];
   totalScore: number;
   dailyScores: Record<string, number>;
-  progression: Record<string, { correct: number; total: number } | number>;
+  progression: Record<string, { correct: number; total: number; lastSeenAtCount?: number } | number>;
   wordProgression: Record<string, { correct: number; total: number }>;
+  // Total kanji questions ever answered, across every session — see constants/progression.ts's
+  // getKanjiReviewDelay for how it spaces reviews out
+  questionCount: number;
 
   getUserStatus: StatusType;
   createUserStatus: StatusType;
