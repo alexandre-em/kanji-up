@@ -22,7 +22,7 @@ export default function ResultItemRow({ item, onPress }: ResultItemRowProps) {
   const content = (
     <>
       <RNView style={styles.wordBox}>
-        <Text text40BL $textDefault>
+        <Text text40BL $textDefault numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.4}>
           {wordText}
         </Text>
       </RNView>

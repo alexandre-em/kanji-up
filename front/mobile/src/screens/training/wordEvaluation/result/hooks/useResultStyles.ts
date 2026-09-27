@@ -32,8 +32,10 @@ export function useResultStyles() {
         borderBottomColor: Colors.$outlineNeutral,
       },
       wordBox: {
-        width: 56,
+        minWidth: 56,
+        maxWidth: 96,
         height: 56,
+        paddingHorizontal: 6,
         borderRadius: 8,
         alignItems: 'center',
         justifyContent: 'center',
