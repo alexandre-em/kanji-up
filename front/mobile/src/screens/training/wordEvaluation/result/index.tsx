@@ -89,6 +89,14 @@ export default function WordEvaluationResult() {
       // Best-effort, same as the per-answer PATCH: a network hiccup here shouldn't block the
       // user from moving on — queued for retry instead of dropped, see syncQueue.ts
       if (sessionId) {
+        // A 'review' item's final verdict only lands in Redux when the user picks it in the modal
+        // above — resynced here so the stored session reflects it too, not just the idle/initial
+        // per-answer PATCH from updateItemSlots
+        items.forEach((item) => {
+          if (!item.word.word_id) return;
+          core.sessionsService!.updateQuestion(sessionId, toWordQuestion(item)).catch(() => undefined);
+        });
+
         core.sessionsService!.finish(sessionId, correctCount).catch(() => {
           dispatch(enqueueSessionFinish({ sessionId, score: correctCount }));
         });

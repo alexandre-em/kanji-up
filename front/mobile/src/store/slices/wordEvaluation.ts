@@ -242,7 +242,8 @@ export const updateItemSlots = createAsyncThunk(
   async (payload: { slots: WordSlotType[] }, { getState }) => {
     const state = getState() as RootState;
     const currentIndex = state.wordEvaluation.currentIndex;
-    const expected = state.wordEvaluation.items[currentIndex].word.word?.[0] ?? '';
+    const currentItem = state.wordEvaluation.items[currentIndex];
+    const expected = currentItem.word.word?.[0] ?? '';
     const expectedCharacters = getKanjiCharacters(expected);
 
     // Resolved per character actually in the word being practiced, via the kanji search cache —
@@ -255,6 +256,24 @@ export const updateItemSlots = createAsyncThunk(
     });
 
     const status = computeSlotStatus(payload.slots, expectedCharacters, strokesByCharacter);
+
+    // Best-effort: a network hiccup here shouldn't block scoring a drawing the user already made.
+    // The local mirror below is what actually guarantees resume, not this — same split as the
+    // kanji evaluation slice's own updateItemScore.
+    if (state.wordEvaluation.sessionId && currentItem.word.word_id) {
+      core
+        .sessionsService!.updateQuestion(state.wordEvaluation.sessionId, {
+          wordId: currentItem.word.word_id,
+          slots: payload.slots,
+          status,
+          userConfirmation: null,
+        })
+        .catch(() => undefined);
+    }
+
+    const nextItems = [...state.wordEvaluation.items];
+    nextItems[currentIndex] = { ...currentItem, slots: payload.slots, status };
+    await persistLocalSession({ items: nextItems, currentIndex: currentIndex + 1, sessionId: state.wordEvaluation.sessionId });
 
     return { slots: payload.slots, status };
   },

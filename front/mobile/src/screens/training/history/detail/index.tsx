@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { View as RNView } from 'react-native';
 import { Text } from 'react-native-ui-lib';
@@ -13,6 +13,7 @@ import { getOne as getOneWord, selectGetOne as selectWordEntities } from '../../
 import { WordEvaluationItemType } from '../../../../store/slices/wordEvaluation';
 import ResultItemRow from '../../components/resultItemRow';
 import WordResultItemRow from '../../wordEvaluation/result/components/resultItemRow';
+import WordReviewModal from '../../wordEvaluation/result/components/reviewModal';
 import { useHistoryDetailStyles } from './hooks/useHistoryDetailStyles';
 
 type HistoryDetailProps = RouteParamsProps<{ sessionId: string; type: SessionKind }>;
@@ -25,6 +26,7 @@ export default function HistoryDetail(props: HistoryDetailProps) {
   const itemsByType = useAppSelector(selectSessionHistoryItems);
   const kanjiEntities = useAppSelector(selectEntities);
   const wordEntities = useAppSelector(selectWordEntities);
+  const [activeWordIndex, setActiveWordIndex] = useState<number | null>(null);
 
   // Already fetched by the history list screen — no need to hit the server again for one session
   const session = useMemo(() => itemsByType[type].find((s) => s.sessionId === sessionId), [itemsByType, type, sessionId]);
@@ -105,8 +107,17 @@ export default function HistoryDetail(props: HistoryDetailProps) {
       <RNView style={styles.divider}>
         {type === 'kanji'
           ? kanjiItems.map((item, index) => <ResultItemRow key={`${item.kanji.kanji_id}-${index}`} item={item} />)
-          : wordItems.map((item, index) => <WordResultItemRow key={`${item.word.word_id}-${index}`} item={item} />)}
+          : wordItems.map((item, index) => (
+              <WordResultItemRow key={`${item.word.word_id}-${index}`} item={item} onPress={() => setActiveWordIndex(index)} />
+            ))}
       </RNView>
+      <WordReviewModal
+        item={activeWordIndex !== null ? wordItems[activeWordIndex] : undefined}
+        position={0}
+        total={0}
+        onChoose={() => undefined}
+        onClose={() => setActiveWordIndex(null)}
+      />
     </Layout>
   );
 }
