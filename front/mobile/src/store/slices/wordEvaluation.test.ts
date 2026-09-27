@@ -2,10 +2,30 @@ import {
   computeSlotStatus,
   computeWordProgressionDeltas,
   filterWordsWithKanji,
+  getKanjiCharacters,
   sampleWords,
   WordEvaluationItemType,
   WordSlotType,
 } from './wordEvaluation';
+
+describe('getKanjiCharacters', () => {
+  it('extracts every kanji from a word', () => {
+    expect(getKanjiCharacters('辞書')).toEqual(['辞', '書']);
+  });
+
+  it('drops kana, keeping only kanji', () => {
+    expect(getKanjiCharacters('お寿司')).toEqual(['寿', '司']);
+  });
+
+  // 々 isn't a real kanji — it repeats whichever one came right before it
+  it('resolves the iteration mark to a repeat of the preceding kanji', () => {
+    expect(getKanjiCharacters('前々')).toEqual(['前', '前']);
+  });
+
+  it('ignores a leading iteration mark with nothing to repeat', () => {
+    expect(getKanjiCharacters('々')).toEqual([]);
+  });
+});
 
 const word = (id: string, spelling = id): WordType =>
   ({ word_id: id, word: [spelling], reading: [], definition: [] }) as unknown as WordType;

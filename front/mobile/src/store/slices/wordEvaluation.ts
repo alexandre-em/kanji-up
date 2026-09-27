@@ -67,8 +67,25 @@ export function getEffectiveStatus(item: WordEvaluationItemType): AnswerStatusTy
 
 export const KANJI_REGEX = /[一-鿿㐀-䶿]/;
 
+// The iteration mark (々) isn't a kanji itself — it stands in for a repeat of whichever kanji
+// came right before it (e.g. 々 in 前々 means "前 again"), so it resolves to that character
+// rather than being dropped, which would silently skip a drawing slot for it.
+const ITERATION_MARK = '々';
+
 export function getKanjiCharacters(word: string): string[] {
-  return Array.from(word).filter((character) => KANJI_REGEX.test(character));
+  const characters: string[] = [];
+
+  Array.from(word).forEach((character) => {
+    if (character === ITERATION_MARK) {
+      const previous = characters[characters.length - 1];
+      if (previous) characters.push(previous);
+      return;
+    }
+
+    if (KANJI_REGEX.test(character)) characters.push(character);
+  });
+
+  return characters;
 }
 
 // Word mode practices drawing a word's kanji — a kana-only word has nothing to draw, so it's
