@@ -54,6 +54,20 @@ export function useWordEvaluationStyles() {
         height: 8,
         borderRadius: 4,
       },
+      canvasWrapper: {
+        alignItems: 'center',
+      },
+      canvasEmptyState: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: 180,
+        borderRadius: 16,
+        borderWidth: 1,
+        borderStyle: 'dashed',
+        borderColor: Colors.$outlineNeutral,
+        backgroundColor: Colors.$backgroundNeutralLight,
+        paddingHorizontal: 20,
+      },
     }),
   );
 }

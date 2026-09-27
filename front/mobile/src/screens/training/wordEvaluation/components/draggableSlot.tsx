@@ -10,6 +10,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Text } from 'react-native-ui-lib';
 
+import Close from '../../../../components/svg/close';
+
 export type DraggableSlotItem = {
   id: number;
   image: string;
@@ -25,8 +27,10 @@ export const BADGE_OVERFLOW = 8;
 type DraggableSlotStyles = {
   slotWrapper: ViewStyle;
   slot: ViewStyle;
+  slotActive: ViewStyle;
   slotImage: ImageStyle;
   slotBadge: ViewStyle;
+  deleteBadge: ViewStyle;
 };
 
 type DraggableSlotProps = {
@@ -42,10 +46,15 @@ type DraggableSlotProps = {
   dragContentX: SharedValue<number>;
   scrollX: SharedValue<number>;
   styles: DraggableSlotStyles;
+  /** This is the slot the on-screen canvas is currently bound to — distinct from `activeId` above,
+   * which only tracks an in-progress drag gesture */
+  isTargeted: boolean;
   onPress: () => void;
   onDrop: (order: number[]) => void;
+  onDelete: () => void;
   accessibilityLabel: string;
   accessibilityHint: string;
+  deleteAccessibilityLabel: string;
 };
 
 export default function DraggableSlot({
@@ -58,10 +67,13 @@ export default function DraggableSlot({
   dragContentX,
   scrollX,
   styles,
+  isTargeted,
   onPress,
   onDrop,
+  onDelete,
   accessibilityLabel,
   accessibilityHint,
+  deleteAccessibilityLabel,
 }: DraggableSlotProps) {
   const dragStartOrderIndex = useSharedValue(index);
   const dragStartScrollX = useSharedValue(0);
@@ -118,6 +130,10 @@ export default function DraggableSlot({
 
   const composed = Gesture.Simultaneous(longPress, pan, tap);
 
+  const deleteTap = Gesture.Tap().onEnd(() => {
+    runOnJS(onDelete)();
+  });
+
   const animatedStyle = useAnimatedStyle(() => {
     const isActive = activeId.value === slot.id;
     const currentIndex = order.value.indexOf(slot.id);
@@ -143,7 +159,7 @@ export default function DraggableSlot({
         accessibilityRole="button"
         accessibilityLabel={accessibilityLabel}
         accessibilityHint={accessibilityHint}>
-        <RNView style={[styles.slot, { width: slotSize, height: slotSize }]}>
+        <RNView style={[styles.slot, { width: slotSize, height: slotSize }, isTargeted && styles.slotActive]}>
           <Image
             source={{ uri: `data:image/png;base64,${slot.image}` }}
             style={[styles.slotImage, { width: slotSize, height: slotSize }]}
@@ -154,6 +170,19 @@ export default function DraggableSlot({
             {index + 1}
           </Text>
         </RNView>
+        {/* A separate, nested GestureDetector: the outer one's long-press+pan+tap composition
+            would otherwise contend with a plain Touchable for the same touch, since both run on
+            the gesture-handler root. Wrapping just this hit area in its own Tap gesture lets it
+            claim taps that land inside it first, before they ever reach the outer gesture. */}
+        <GestureDetector gesture={deleteTap}>
+          <RNView
+            style={styles.deleteBadge}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            accessibilityRole="button"
+            accessibilityLabel={deleteAccessibilityLabel}>
+            <Close size={14} color="#fff" />
+          </RNView>
+        </GestureDetector>
       </Animated.View>
     </GestureDetector>
   );

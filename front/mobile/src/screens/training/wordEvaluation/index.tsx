@@ -8,6 +8,7 @@ import { Button, Colors, ProgressBar, Text, View } from 'react-native-ui-lib';
 import Layout from '../../../components/layout';
 import Spacing from '../../../components/spacing';
 import { RECOGNITION_MODEL_LABELS } from '../../../constants/recognitionLabels';
+import { CANVAS_WIDTH } from '../../../constants/styles';
 import { useAppDispatch, useAppSelector } from '../../../hooks/useStore';
 import { useToaster } from '../../../providers/toaster';
 import {
@@ -20,19 +21,14 @@ import {
   WordSlotType,
 } from '../../../store/slices/wordEvaluation';
 import DraggableSlotRow from './components/draggableSlotRow';
-import DrawSlotModal from './components/drawSlotModal';
+import WordSlotCanvas, { WordSlotCanvasHandle } from './components/wordSlotCanvas';
 import { findMaskedExampleHint } from './exampleHint';
 import { useWordEvaluationStyles } from './hooks/useWordEvaluationStyles';
 import WordEvaluationResult from './result';
+import { FilledSlot, LocalSlot, resolveSlotOnLeave } from './slotDrawing';
 
 const SLOT_SIZE = 160;
 const SLOT_SIZE_COMPACT = 110;
-
-type LocalSlot = {
-  id: number;
-  image: string | null;
-  strokesCount: number;
-};
 
 export default function WordEvaluationScreen() {
   const navigation = useNavigation();
@@ -44,20 +40,18 @@ export default function WordEvaluationScreen() {
   const { t } = useTranslation();
   const styles = useWordEvaluationStyles();
 
-  // Cards only ever show a completed drawing — an empty slot exists in state only while its
-  // modal is open (see handleAddSlot/handleModalClose), never rendered as a placeholder card
+  // Cards only ever show a completed drawing — a fresh, not-yet-drawn slot exists in state (so it
+  // has an id the canvas can target) but stays out of every filled-slots view until it actually
+  // has a drawing; the "+" tile itself stands in for it visually, highlighted while it's active
   const [slots, setSlots] = useState<LocalSlot[]>([]);
   const [activeSlotId, setActiveSlotId] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const nextSlotId = useRef(0);
+  const canvasRef = useRef<WordSlotCanvasHandle>(null);
 
   const currentItem = items[currentIndex];
   const isSessionOver = currentIndex >= items.length;
-  const activeSlot = useMemo(() => slots.find((slot) => slot.id === activeSlotId), [slots, activeSlotId]);
-  // Only a fresh, never-drawn slot can chain into another one — editing an existing drawing has
-  // nothing to "add" after it
-  const canAddAnother = activeSlot?.image === null;
-  const filledSlots = useMemo(() => slots.filter((slot): slot is LocalSlot & { image: string } => slot.image !== null), [slots]);
+  const filledSlots = useMemo(() => slots.filter((slot): slot is FilledSlot => slot.image !== null), [slots]);
   // A single-kanji word gets the full-size slot; a multi-kanji word shrinks each one so more of
   // the word fits on screen at once instead of scrolling through full-size tiles
   const slotSize = filledSlots.length > 1 ? SLOT_SIZE_COMPACT : SLOT_SIZE;
@@ -71,63 +65,76 @@ export default function WordEvaluationScreen() {
 
   useEffect(() => {
     setSlots([]);
+    setActiveSlotId(null);
     nextSlotId.current = 0;
+    canvasRef.current?.clear();
   }, [currentIndex]);
 
   useEffect(() => {
     if (isSessionOver) navigation.setOptions({ headerShown: false });
   }, [isSessionOver, navigation]);
 
-  // The "+" input is the only way to add a drawing: it creates the slot and opens its modal in
-  // the same action, so no empty card is ever visible in between
-  const handleAddSlot = useCallback(() => {
+  // Captures whatever's currently on the shared canvas and folds it into `slots` for whichever
+  // slot is active, then clears the canvas so it's blank for the next target. Every handler that's
+  // about to point the canvas at a different slot (or none) awaits this first — capture itself is
+  // async, since the forced capture colors need a render tick to actually commit before a snapshot
+  // reflects them (see WordSlotCanvas). Returns the resolved array directly rather than relying on
+  // the `slots` state updating in time: a caller like handleValidate needs it in the same tick.
+  const flushActiveSlot = useCallback(async (): Promise<LocalSlot[]> => {
+    if (activeSlotId === null || !canvasRef.current) return slots;
+
+    const strokesCount = canvasRef.current.getStrokesCount();
+    const image = strokesCount > 0 ? await canvasRef.current.capture() : null;
+    canvasRef.current.clear();
+
+    const resolved = resolveSlotOnLeave(slots, activeSlotId, { image, strokesCount });
+    setSlots(resolved);
+    return resolved;
+  }, [activeSlotId, slots]);
+
+  const handleSelectSlot = useCallback(
+    async (id: number) => {
+      if (id === activeSlotId) return;
+      await flushActiveSlot();
+      setActiveSlotId(id);
+    },
+    [activeSlotId, flushActiveSlot],
+  );
+
+  const handleAddSlot = useCallback(async () => {
+    await flushActiveSlot();
     const id = nextSlotId.current++;
     setSlots((prev) => [...prev, { id, image: null, strokesCount: 0 }]);
     setActiveSlotId(id);
+  }, [flushActiveSlot]);
+
+  const handleDeleteSlot = useCallback(
+    (id: number) => {
+      if (id === activeSlotId) {
+        canvasRef.current?.clear();
+        setActiveSlotId(null);
+      }
+      setSlots((prev) => prev.filter((slot) => slot.id !== id));
+    },
+    [activeSlotId],
+  );
+
+  // Reordering only ever touches the filled slots the row actually renders — a fresh, not-yet-drawn
+  // slot isn't part of that view (see the `slots` state comment above), so it's preserved as-is
+  // rather than dropped by replacing the whole array with just the reordered filled ones
+  const handleReorder = useCallback((reordered: FilledSlot[]) => {
+    setSlots((prev) => [...reordered, ...prev.filter((slot) => slot.image === null)]);
   }, []);
-
-  // Deleting from inside the modal (editing an existing drawing) also closes it — there is
-  // nothing left to show once the drawing it was showing is gone
-  const handleModalDelete = useCallback(() => {
-    setSlots((prev) => prev.filter((slot) => slot.id !== activeSlotId));
-    setActiveSlotId(null);
-  }, [activeSlotId]);
-
-  const handleModalDone = useCallback(
-    (image: string | null, strokesCount: number) => {
-      setSlots((prev) => prev.map((slot) => (slot.id === activeSlotId ? { ...slot, image, strokesCount } : slot)));
-      setActiveSlotId(null);
-    },
-    [activeSlotId],
-  );
-
-  // Same as handleModalDone, but chains straight into a fresh slot instead of closing the modal
-  const handleModalDoneAndContinue = useCallback(
-    (image: string | null, strokesCount: number) => {
-      const newId = nextSlotId.current++;
-      setSlots((prev) => [
-        ...prev.map((slot) => (slot.id === activeSlotId ? { ...slot, image, strokesCount } : slot)),
-        { id: newId, image: null, strokesCount: 0 },
-      ]);
-      setActiveSlotId(newId);
-    },
-    [activeSlotId],
-  );
-
-  // Cancelling a slot that was just added (never drawn) removes it rather than leaving an empty
-  // one behind; cancelling an edit on an already-drawn slot just closes the modal, unchanged
-  const handleModalClose = useCallback(() => {
-    setSlots((prev) => prev.filter((slot) => slot.id !== activeSlotId || slot.image !== null));
-    setActiveSlotId(null);
-  }, [activeSlotId]);
 
   const handleValidate = useCallback(async () => {
     setIsSubmitting(true);
+    const latestSlots = await flushActiveSlot();
+    const currentFilledSlots = latestSlots.filter((slot): slot is FilledSlot => slot.image !== null);
     const expectedCharacterOptions = currentItem ? getExpectedCharacterOptions(currentItem.word) : [];
 
     try {
       const resolvedSlots: WordSlotType[] = await Promise.all(
-        filledSlots.map(async (slot, index) => {
+        currentFilledSlots.map(async (slot, index) => {
           // The model only classifies into the fixed set it was trained on — calling predict() is
           // pointless when NONE of this slot's accepted characters (every spelling variant, not
           // just the primary one) are in that set, since it could only ever misclassify. No
@@ -152,7 +159,7 @@ export default function WordEvaluationScreen() {
     } finally {
       setIsSubmitting(false);
     }
-  }, [filledSlots, dispatch, toast, t, currentItem]);
+  }, [flushActiveSlot, dispatch, toast, t, currentItem]);
 
   if (items.length === 0 && (status === 'idle' || status === 'pending')) {
     return <Layout screen="wordEvaluation" loadingMessage={t('loading.title')} />;
@@ -273,25 +280,32 @@ export default function WordEvaluationScreen() {
           <DraggableSlotRow
             slots={filledSlots}
             slotSize={slotSize}
-            onReorder={setSlots}
-            onSlotPress={(id) => setActiveSlotId(id)}
+            activeSlotId={activeSlotId}
+            onReorder={handleReorder}
+            onSlotPress={handleSelectSlot}
             onAddSlot={handleAddSlot}
+            onDeleteSlot={handleDeleteSlot}
             addSlotAccessibilityLabel={t('wordEvaluation.addSlot.accessibilityLabel')}
             slotAccessibilityLabel={t('wordEvaluation.slot.accessibilityLabel')}
             slotAccessibilityHint={t('wordEvaluation.slot.accessibilityHint')}
+            deleteAccessibilityLabel={t('wordEvaluation.slot.deleteAccessibilityLabel')}
           />
+          <Spacing y={20} />
+          {activeSlotId !== null ? (
+            <RNView style={styles.canvasWrapper}>
+              <WordSlotCanvas ref={canvasRef} size={CANVAS_WIDTH} />
+            </RNView>
+          ) : (
+            <RNView style={styles.canvasEmptyState}>
+              <Text text80M $textGeneral center>
+                {t('wordEvaluation.canvas.empty')}
+              </Text>
+            </RNView>
+          )}
           <Spacing y={20} />
           <Button label={t('wordEvaluation.validate')} onPress={handleValidate} disabled={isSubmitting} />
         </RNView>
       </RNView>
-      <DrawSlotModal
-        visible={activeSlotId !== null}
-        canAddAnother={canAddAnother}
-        onClose={handleModalClose}
-        onDone={handleModalDone}
-        onDoneAndContinue={handleModalDoneAndContinue}
-        onDelete={canAddAnother ? undefined : handleModalDelete}
-      />
     </Layout>
   );
 }

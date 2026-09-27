@@ -19,23 +19,31 @@ const AUTO_SCROLL_SPEED = 8;
 type DraggableSlotRowProps<T extends DraggableSlotItem> = {
   slots: T[];
   slotSize: number;
+  /** The slot the on-screen canvas is currently bound to, or null while it's bound to a fresh,
+   * not-yet-drawn slot — in which case the "+" tile itself is what gets highlighted below */
+  activeSlotId: number | null;
   onReorder: (slots: T[]) => void;
   onSlotPress: (id: number) => void;
   onAddSlot: () => void;
+  onDeleteSlot: (id: number) => void;
   addSlotAccessibilityLabel: string;
   slotAccessibilityLabel: string;
   slotAccessibilityHint: string;
+  deleteAccessibilityLabel: string;
 };
 
 export default function DraggableSlotRow<T extends DraggableSlotItem>({
   slots,
   slotSize,
+  activeSlotId,
   onReorder,
   onSlotPress,
   onAddSlot,
+  onDeleteSlot,
   addSlotAccessibilityLabel,
   slotAccessibilityLabel,
   slotAccessibilityHint,
+  deleteAccessibilityLabel,
 }: DraggableSlotRowProps<T>) {
   const styles = useDraggableSlotRowStyles();
 
@@ -109,14 +117,24 @@ export default function DraggableSlotRow<T extends DraggableSlotItem>({
           dragContentX={dragContentX}
           scrollX={scrollX}
           styles={styles}
+          isTargeted={slot.id === activeSlotId}
           onPress={() => onSlotPress(slot.id)}
           onDrop={handleDrop}
+          onDelete={() => onDeleteSlot(slot.id)}
           accessibilityLabel={slotAccessibilityLabel}
           accessibilityHint={slotAccessibilityHint}
+          deleteAccessibilityLabel={deleteAccessibilityLabel}
         />
       ))}
       <TouchableOpacity
-        style={[styles.addSlot, { width: slotSize, height: slotSize, top: BADGE_OVERFLOW, left: slots.length * pitch }]}
+        style={[
+          styles.addSlot,
+          { width: slotSize, height: slotSize, top: BADGE_OVERFLOW, left: slots.length * pitch },
+          // A fresh slot in progress has no id of its own here yet (it only joins `slots` once a
+          // drawing is actually committed to it) — anything not matching an existing slot's id
+          // means the canvas is bound to that not-yet-filled one
+          activeSlotId !== null && !slots.some((slot) => slot.id === activeSlotId) && styles.addSlotActive,
+        ]}
         onPress={onAddSlot}
         accessibilityRole="button"
         accessibilityLabel={addSlotAccessibilityLabel}>
