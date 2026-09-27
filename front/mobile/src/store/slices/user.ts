@@ -56,12 +56,17 @@ export const getUser = createAsyncThunk<UserType, GetUserInput, { rejectValue: {
 
       const state = getState() as RootState;
       const hasPendingProgressionSync = state.syncQueue.items.some((item) => item.type === 'syncProgression');
+      // A cold-launch call has nothing local worth protecting yet — state.user is still untouched
+      // initialState at this point, so honoring a leftover queue marker here would keep zeros
+      // instead of the server's real values until the next test happens to overwrite them
+      // locally. userId already set is what tells the two cases apart.
+      const hasLiveLocalProgression = !!state.user.userId;
 
       // A queued-but-not-yet-synced local change hasn't reached the server yet — accepting the
       // server's response here as-is would silently overwrite it (not just delay it), since
       // nothing else re-applies a local change once getUser has run. Keeping the local values
       // until the queue actually flushes is what makes the retry queue meaningful at all.
-      if (hasPendingProgressionSync) {
+      if (hasPendingProgressionSync && hasLiveLocalProgression) {
         return {
           ...response.data,
           totalScore: state.user.totalScore,
