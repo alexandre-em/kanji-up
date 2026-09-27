@@ -357,6 +357,9 @@
   "premium.active.title": "你已经是高级版会员",
   "premium.active.message": "感谢你对 KanjiUp 的支持！你的账号已解锁所有高级功能。",
   "premium.active.cancel": "取消订阅",
+  "premium.restore.button": "恢复购买",
+  "premium.restore.empty": "在此Google账号上未找到之前的购买记录",
+  "premium.restore.error": "恢复购买失败，请重试",
 
   "missions.title": "每日任务",
   "missions.subtitle": "每天都是相同的 3 个任务 — 全部完成即可获得积分",

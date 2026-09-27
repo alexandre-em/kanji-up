@@ -254,6 +254,9 @@
   "premium.active.title": "Tu es déjà Premium",
   "premium.active.message": "Merci de soutenir KanjiUp ! Toutes les fonctionnalités premium sont débloquées sur ton compte.",
   "premium.active.cancel": "Annuler l'abonnement",
+  "premium.restore.button": "Restaurer mes achats",
+  "premium.restore.empty": "Aucun achat trouvé sur ce compte Google",
+  "premium.restore.error": "Impossible de restaurer les achats, réessaie",
 
   "missions.title": "Missions du jour",
   "missions.subtitle": "Toujours les 3 mêmes missions — termine-les toutes pour gagner des credits",

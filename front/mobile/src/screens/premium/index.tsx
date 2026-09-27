@@ -47,6 +47,7 @@ export default function Premium() {
     products: [],
   });
   const [purchasingPlan, setPurchasingPlan] = useState<PurchasablePlan | null>(null);
+  const [isRestoring, setIsRestoring] = useState(false);
 
   const getSubscriptionPrice = (sku: string) => {
     const subscription = offers.subscriptions.find((item) => item.id === sku);
@@ -139,6 +140,32 @@ export default function Premium() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Manual fallback to the automatic restore-on-mount above: that one runs silently and only once,
+  // so a user who dismissed the screen too fast or hit a transient network error otherwise has no
+  // way back in short of reinstalling. Google Play ties the purchase to the signed-in Google
+  // account, not to our own backend user, so this also covers "same purchase, new device".
+  const handleRestore = useCallback(async () => {
+    setIsRestoring(true);
+
+    try {
+      const pastPurchases = await restorePurchases();
+      const restoredPurchase = pastPurchases.find((purchase) => planFromProductId(purchase.productId) !== null);
+
+      if (!restoredPurchase) {
+        toast?.show({ message: t('premium.restore.empty'), type: 'failure' });
+        return;
+      }
+
+      const plan = planFromProductId(restoredPurchase.productId)!;
+      await applyServerVerification(plan, restoredPurchase);
+      toast?.show({ message: t('premium.purchase.success'), type: 'success' });
+    } catch {
+      toast?.show({ message: t('premium.restore.error'), type: 'failure' });
+    } finally {
+      setIsRestoring(false);
+    }
+  }, [applyServerVerification, toast, t]);
 
   const handleSelectPlan = useCallback(
     async (plan: PurchasablePlan) => {
@@ -238,6 +265,8 @@ export default function Premium() {
           <Spacing y={16} />
         </RNView>
       ))}
+      <Button label={t('premium.restore.button')} onPress={handleRestore} disabled={isRestoring} outline />
+      <Spacing y={20} />
       <Text text90M $textNeutral center>
         {t('premium.subscriptionDisclosure')}
       </Text>

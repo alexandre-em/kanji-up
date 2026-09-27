@@ -357,6 +357,9 @@
   "premium.active.title": "すでにプレミアムかいいんです",
   "premium.active.message": "KanjiUpをおうえんいただきありがとうございます！すべてのプレミアムきのうがりようかのうです。",
   "premium.active.cancel": "サブスクリプションをかいやく",
+  "premium.restore.button": "こうにゅうをふくげん",
+  "premium.restore.empty": "このGoogleアカウントでかこのこうにゅうはみつかりませんでした",
+  "premium.restore.error": "こうにゅうのふくげんにしっぱいしました。もういちどおためしください",
 
   "missions.title": "デイリーミッション",
   "missions.subtitle": "まいにちおなじ3つのミッション — すべてたっせいしてクレジットをかくとくしよう",

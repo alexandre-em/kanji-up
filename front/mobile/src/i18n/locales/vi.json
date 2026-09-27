@@ -357,6 +357,9 @@
   "premium.active.title": "Bạn đã là thành viên Premium",
   "premium.active.message": "Cảm ơn bạn đã ủng hộ KanjiUp! Tất cả tính năng Premium đã được mở khóa trên tài khoản của bạn.",
   "premium.active.cancel": "Hủy gói đăng ký",
+  "premium.restore.button": "Khôi phục giao dịch mua",
+  "premium.restore.empty": "Không tìm thấy giao dịch mua trước đó trên tài khoản Google này",
+  "premium.restore.error": "Không thể khôi phục giao dịch mua, vui lòng thử lại",
 
   "missions.title": "Nhiệm vụ hằng ngày",
   "missions.subtitle": "3 nhiệm vụ giống nhau mỗi ngày — hoàn thành tất cả để nhận điểm",

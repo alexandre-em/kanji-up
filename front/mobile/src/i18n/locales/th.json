@@ -357,6 +357,9 @@
   "premium.active.title": "คุณเป็นสมาชิกพรีเมียมอยู่แล้ว",
   "premium.active.message": "ขอบคุณที่สนับสนุน KanjiUp! ฟีเจอร์พรีเมียมทั้งหมดถูกปลดล็อกในบัญชีของคุณแล้ว",
   "premium.active.cancel": "ยกเลิกการสมัครสมาชิก",
+  "premium.restore.button": "กู้คืนการซื้อ",
+  "premium.restore.empty": "ไม่พบการซื้อก่อนหน้านี้ในบัญชี Google นี้",
+  "premium.restore.error": "กู้คืนการซื้อไม่สำเร็จ กรุณาลองใหม่อีกครั้ง",
 
   "missions.title": "ภารกิจประจำวัน",
   "missions.subtitle": "ภารกิจ 3 อย่างเดิมทุกวัน — ทำครบทุกอย่างเพื่อรับเครดิต",

@@ -357,6 +357,9 @@
   "premium.active.title": "すでにプレミアム会員です",
   "premium.active.message": "KanjiUpを応援いただきありがとうございます！すべてのプレミアム機能が利用可能です。",
   "premium.active.cancel": "サブスクリプションを解約",
+  "premium.restore.button": "購入を復元",
+  "premium.restore.empty": "このGoogleアカウントで過去の購入は見つかりませんでした",
+  "premium.restore.error": "購入の復元に失敗しました。もう一度お試しください",
 
   "missions.title": "デイリーミッション",
   "missions.subtitle": "毎日同じ3つのミッション — すべて達成してクレジットを獲得しよう",

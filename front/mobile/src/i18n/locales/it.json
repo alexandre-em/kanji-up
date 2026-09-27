@@ -357,6 +357,9 @@
   "premium.active.title": "Sei già Premium",
   "premium.active.message": "Grazie per il tuo supporto a KanjiUp! Tutte le funzioni premium sono sbloccate sul tuo account.",
   "premium.active.cancel": "Disdici abbonamento",
+  "premium.restore.button": "Ripristina acquisti",
+  "premium.restore.empty": "Nessun acquisto precedente trovato su questo account Google",
+  "premium.restore.error": "Impossibile ripristinare gli acquisti, riprova",
 
   "missions.title": "Missioni giornaliere",
   "missions.subtitle": "Le stesse 3 missioni ogni giorno — completale tutte per guadagnare crediti",
