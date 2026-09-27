@@ -24,7 +24,7 @@ import {
   clearLocalSession,
   computeWordProgressionDeltas,
   filterWordsWithKanji,
-  getKanjiCharacters,
+  getExpectedCharacterOptions,
   hydrateItems,
   init,
   PendingLocalWordSession,
@@ -245,7 +245,7 @@ export default function WordEvaluationHoc() {
   }, [isKanji, activeWordList, wordEntities]);
 
   const practiceCharacters = useMemo(
-    () => Array.from(new Set(items.flatMap((item) => getKanjiCharacters(item.word.word?.[0] ?? '')))),
+    () => Array.from(new Set(items.flatMap((item) => getExpectedCharacterOptions(item.word).flat()))),
     [items],
   );
 

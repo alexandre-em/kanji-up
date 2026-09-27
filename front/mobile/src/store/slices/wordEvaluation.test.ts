@@ -2,6 +2,7 @@ import {
   computeSlotStatus,
   computeWordProgressionDeltas,
   filterWordsWithKanji,
+  getExpectedCharacterOptions,
   getKanjiCharacters,
   sampleWords,
   WordEvaluationItemType,
@@ -77,19 +78,19 @@ const slot = (overrides: Partial<WordSlotType> = {}): WordSlotType => ({
 
 describe('computeSlotStatus', () => {
   it('is correct when every slot matches its expected character and stroke count', () => {
-    const status = computeSlotStatus([slot()], ['力'], { 力: 2 });
+    const status = computeSlotStatus([slot()], [['力']], { 力: 2 });
 
     expect(status).toBe('correct');
   });
 
   it('is incorrect when a slot was left empty', () => {
-    const status = computeSlotStatus([slot({ image: null, strokesCount: 0 })], ['力'], { 力: 2 });
+    const status = computeSlotStatus([slot({ image: null, strokesCount: 0 })], [['力']], { 力: 2 });
 
     expect(status).toBe('incorrect');
   });
 
   it('is incorrect on a wrong stroke count when the expected count is known', () => {
-    const status = computeSlotStatus([slot({ strokesCount: 5 })], ['力'], { 力: 2 });
+    const status = computeSlotStatus([slot({ strokesCount: 5 })], [['力']], { 力: 2 });
 
     expect(status).toBe('incorrect');
   });
@@ -97,21 +98,61 @@ describe('computeSlotStatus', () => {
   // The bug this whole function was extracted to fix: a character whose stroke count couldn't be
   // resolved (not in strokesByCharacter) must not be treated as wrong — it's unknown, not invalid
   it('does not fail the stroke check for a character with no known expected count', () => {
-    const status = computeSlotStatus([slot({ strokesCount: 999 })], ['力'], {});
+    const status = computeSlotStatus([slot({ strokesCount: 999 })], [['力']], {});
 
     expect(status).toBe('correct');
   });
 
   it('is review when the drawing does not match the expected character, everything else fine', () => {
-    const status = computeSlotStatus([slot({ predictions: [{ label: '人', confidence: 0.9 }] })], ['力'], { 力: 2 });
+    const status = computeSlotStatus([slot({ predictions: [{ label: '人', confidence: 0.9 }] })], [['力']], { 力: 2 });
 
     expect(status).toBe('review');
   });
 
   it('is incorrect when the slot count does not match the expected character count', () => {
-    const status = computeSlotStatus([slot(), slot()], ['力'], { 力: 2 });
+    const status = computeSlotStatus([slot(), slot()], [['力']], { 力: 2 });
 
     expect(status).toBe('incorrect');
+  });
+
+  // A word with multiple valid spellings accepts a drawing of any of them at that position
+  it('is correct when the drawing matches an alternate accepted character, not just the primary one', () => {
+    const status = computeSlotStatus(
+      [slot({ predictions: [{ label: '辭', confidence: 0.9 }], strokesCount: 17 })],
+      [['辞', '辭']],
+      {
+        辞: 13,
+        辭: 17,
+      },
+    );
+
+    expect(status).toBe('correct');
+  });
+
+  it('is incorrect when the stroke count matches none of the accepted characters', () => {
+    const status = computeSlotStatus([slot({ strokesCount: 1 })], [['辞', '辭']], { 辞: 13, 辭: 17 });
+
+    expect(status).toBe('incorrect');
+  });
+});
+
+describe('getExpectedCharacterOptions', () => {
+  const word = (spellings: string[]): Partial<WordType> => ({ word: spellings });
+
+  it('accepts only the primary spelling when there is just one', () => {
+    expect(getExpectedCharacterOptions(word(['辞書']))).toEqual([['辞'], ['書']]);
+  });
+
+  it('adds an equal-length alternate spelling as an extra option per position', () => {
+    expect(getExpectedCharacterOptions(word(['辞書', '辭書']))).toEqual([['辞', '辭'], ['書']]);
+  });
+
+  it('ignores an alternate spelling of a different length — it cannot align position by position', () => {
+    expect(getExpectedCharacterOptions(word(['本', '書物']))).toEqual([['本']]);
+  });
+
+  it('skips a kana position in the primary spelling for every spelling', () => {
+    expect(getExpectedCharacterOptions(word(['お寿司', 'お鮨司']))).toEqual([['寿', '鮨'], ['司']]);
   });
 });
 

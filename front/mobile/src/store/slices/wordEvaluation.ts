@@ -94,6 +94,43 @@ export function filterWordsWithKanji(words: WordType[]): WordType[] {
   return words.filter((word) => getKanjiCharacters(word.word[0] ?? '').length > 0);
 }
 
+function resolveKanjiAt(characters: string[], index: number): string | null {
+  const character = characters[index];
+  if (character === ITERATION_MARK) {
+    return index > 0 ? resolveKanjiAt(characters, index - 1) : null;
+  }
+  return KANJI_REGEX.test(character) ? character : null;
+}
+
+// A word can have several valid spellings (e.g. 辞書/辭書 for the same じしょ) — the drawing
+// exercise is built from the primary one, but a variant kanji at the same position is just as
+// correct an answer. Only spellings the same length as the primary one are usable here: a
+// different length can't be aligned position-by-position against the drawing slots at all.
+export function getExpectedCharacterOptions(word: Partial<WordType>): string[][] {
+  const spellings = word.word ?? [];
+  const primaryCharacters = Array.from(spellings[0] ?? '');
+  const alternateCharacters = spellings
+    .slice(1)
+    .map((spelling) => Array.from(spelling))
+    .filter((characters) => characters.length === primaryCharacters.length);
+
+  const options: string[][] = [];
+  primaryCharacters.forEach((_, index) => {
+    const primaryCharacter = resolveKanjiAt(primaryCharacters, index);
+    if (primaryCharacter === null) return;
+
+    const slotOptions = new Set<string>([primaryCharacter]);
+    alternateCharacters.forEach((characters) => {
+      const alternateCharacter = resolveKanjiAt(characters, index);
+      if (alternateCharacter !== null) slotOptions.add(alternateCharacter);
+    });
+
+    options.push(Array.from(slotOptions));
+  });
+
+  return options;
+}
+
 /** Progression deltas for a finished (or abandoned) word-evaluation run, recomputed from the
  * items themselves — same resilience reasoning as the kanji evaluation's own
  * computeProgressionDeltas: items survive an app kill, in-memory Redux state doesn't. */
@@ -217,24 +254,36 @@ export const init = createAsyncThunk(
 
 // Pure so it's testable without mocking Redux state — the thunk below only assembles
 // strokesByCharacter from state, this decides the actual verdict from that plus the drawing.
+// Each slot can have more than one accepted character (see getExpectedCharacterOptions) — a
+// drawing matches if it matches ANY option at its position, stroke count included, since variant
+// spellings can genuinely have different stroke counts for the same position.
 export function computeSlotStatus(
   slots: WordSlotType[],
-  expectedCharacters: string[],
+  expectedCharacterOptions: string[][],
   strokesByCharacter: Record<string, number>,
 ): AnswerStatusType {
   const hasEmptySlot = slots.some((slot) => !slot.image || slot.strokesCount === 0);
+
   const hasWrongStrokeCount = slots.some((slot, index) => {
-    const expectedStrokes = strokesByCharacter[expectedCharacters[index]];
-    return expectedStrokes !== undefined && slot.strokesCount !== expectedStrokes;
+    const options = expectedCharacterOptions[index] ?? [];
+    const knownStrokeCounts = options
+      .map((character) => strokesByCharacter[character])
+      .filter((count): count is number => count !== undefined);
+
+    // No known expected count for any accepted character here: can't rule the drawing out on
+    // this basis, same as the single-option case before
+    if (knownStrokeCounts.length === 0) return false;
+    return !knownStrokeCounts.includes(slot.strokesCount);
   });
 
-  if (slots.length !== expectedCharacters.length || hasEmptySlot || hasWrongStrokeCount) return 'incorrect';
+  if (slots.length !== expectedCharacterOptions.length || hasEmptySlot || hasWrongStrokeCount) return 'incorrect';
 
-  if (slots.every((slot, index) => slot.predictions.some((prediction) => prediction.label === expectedCharacters[index]))) {
-    return 'correct';
-  }
+  const isFullyCorrect = slots.every((slot, index) => {
+    const options = expectedCharacterOptions[index] ?? [];
+    return slot.predictions.some((prediction) => options.includes(prediction.label));
+  });
 
-  return 'review';
+  return isFullyCorrect ? 'correct' : 'review';
 }
 
 export const updateItemSlots = createAsyncThunk(
@@ -243,19 +292,19 @@ export const updateItemSlots = createAsyncThunk(
     const state = getState() as RootState;
     const currentIndex = state.wordEvaluation.currentIndex;
     const currentItem = state.wordEvaluation.items[currentIndex];
-    const expected = currentItem.word.word?.[0] ?? '';
-    const expectedCharacters = getKanjiCharacters(expected);
+    const expectedCharacterOptions = getExpectedCharacterOptions(currentItem.word);
 
-    // Resolved per character actually in the word being practiced, via the kanji search cache —
-    // not from any active list. A practiced word can (and often does) contain kanji outside
-    // whichever list seeded or selected it, kanji-mode included.
+    // Resolved per character actually accepted for the word being practiced (every spelling
+    // variant, not just the primary one), via the kanji search cache — not from any active list.
+    // A practiced word can (and often does) contain kanji outside whichever list seeded or
+    // selected it, kanji-mode included.
     const strokesByCharacter: Record<string, number> = {};
-    expectedCharacters.forEach((character) => {
+    expectedCharacterOptions.flat().forEach((character) => {
       const match = state.kanji.search[character]?.results.find((entry) => entry.kanji?.character === character);
       if (match?.kanji?.strokes !== undefined) strokesByCharacter[character] = match.kanji.strokes;
     });
 
-    const status = computeSlotStatus(payload.slots, expectedCharacters, strokesByCharacter);
+    const status = computeSlotStatus(payload.slots, expectedCharacterOptions, strokesByCharacter);
 
     // Best-effort: a network hiccup here shouldn't block scoring a drawing the user already made.
     // The local mirror below is what actually guarantees resume, not this — same split as the

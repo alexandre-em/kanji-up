@@ -11,7 +11,7 @@ import { RECOGNITION_MODEL_LABELS } from '../../../constants/recognitionLabels';
 import { useAppDispatch, useAppSelector } from '../../../hooks/useStore';
 import { useToaster } from '../../../providers/toaster';
 import {
-  getKanjiCharacters,
+  getExpectedCharacterOptions,
   init,
   selectWordCurrentIndex,
   selectWordEvaluationItems,
@@ -123,16 +123,21 @@ export default function WordEvaluationScreen() {
 
   const handleValidate = useCallback(async () => {
     setIsSubmitting(true);
-    const expectedCharacters = getKanjiCharacters(currentItem?.word.word?.[0] ?? '');
+    const expectedCharacterOptions = currentItem ? getExpectedCharacterOptions(currentItem.word) : [];
 
     try {
       const resolvedSlots: WordSlotType[] = await Promise.all(
         filledSlots.map(async (slot, index) => {
-          // The model only classifies into the fixed set it was trained on — calling predict()
-          // for a character outside that set can only ever misclassify. No predictions routes
-          // this slot's word to 'review' (updateItemSlots), for the user to arbitrate themselves.
-          const expectedCharacter = expectedCharacters[index];
-          if (expectedCharacter && !RECOGNITION_MODEL_LABELS.has(expectedCharacter)) {
+          // The model only classifies into the fixed set it was trained on — calling predict() is
+          // pointless when NONE of this slot's accepted characters (every spelling variant, not
+          // just the primary one) are in that set, since it could only ever misclassify. No
+          // predictions routes this slot's word to 'review' (updateItemSlots), for the user to
+          // arbitrate themselves. If at least one accepted variant is recognizable, predict() still
+          // runs — computeSlotStatus already checks a prediction against every accepted option.
+          const options = expectedCharacterOptions[index] ?? [];
+          const noOptionRecognizable =
+            options.length > 0 && options.every((character) => !RECOGNITION_MODEL_LABELS.has(character));
+          if (noOptionRecognizable) {
             return { image: slot.image, predictions: [], strokesCount: slot.strokesCount };
           }
 
