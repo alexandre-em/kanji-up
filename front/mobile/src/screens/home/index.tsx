@@ -20,8 +20,8 @@ import { useRewardedCreditsAd } from '../../hooks/useRewardedCreditsAd';
 import { useAppDispatch } from '../../hooks/useStore';
 import { useIsOffline } from '../../providers/network';
 import { useToaster } from '../../providers/toaster';
+import { selectActiveList } from '../../store/slices/lists';
 import { fetchTodayMissions, selectTodayMissions } from '../../store/slices/missions';
-import { selectSelectedKanji } from '../../store/slices/selectedKanji';
 import { selectUserName, selectUserPicture, selectUserState } from '../../store/slices/user';
 import MissionsModal from './components/missionsModal';
 
@@ -36,7 +36,7 @@ export default function Home() {
   const userName = useSelector(selectUserName);
   const userPicture = useSelector(selectUserPicture);
   const userState = useSelector(selectUserState);
-  const selectedKanjiState = useSelector(selectSelectedKanji);
+  const activeList = useSelector(selectActiveList);
   const todayMissions = useSelector(selectTodayMissions);
   const rewardedAd = useRewardedCreditsAd();
   const isOffline = useIsOffline();
@@ -48,13 +48,13 @@ export default function Home() {
   // currently selected, not the whole joyo corpus, so this tracks what the user actually set out
   // to learn rather than showing a near-zero, demotivating global percentage
   const masteryPercent = useMemo(() => {
-    const selectedCount = selectedKanjiState ? Object.keys(selectedKanjiState).length : 0;
+    const selectedCount = activeList?.kanjiIds.length ?? 0;
     if (selectedCount === 0) return 0;
 
     const masteredCount = Object.values(userState.progression ?? {}).filter(isKanjiMastered).length;
 
     return Math.min(100, Math.round((masteredCount / selectedCount) * 100));
-  }, [userState.progression, selectedKanjiState]);
+  }, [userState.progression, activeList]);
 
   useEffect(() => {
     if (userState.userId) dispatch(fetchTodayMissions(userState.userId));
@@ -153,7 +153,7 @@ export default function Home() {
       <Spacing y={GENERAL_MARGIN} />
       <View>
         <Text text40BL $textDefault>
-          {selectedKanjiState ? Object.keys(selectedKanjiState).length : 0}
+          {activeList?.kanjiIds.length ?? 0}
         </Text>
         <Text $textNeutral>{t('home.selection.unit')}</Text>
       </View>
