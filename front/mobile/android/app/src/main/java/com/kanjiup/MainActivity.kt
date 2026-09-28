@@ -1,6 +1,7 @@
 package com.kanjiup
 
 import android.os.Bundle
+import androidx.activity.enableEdgeToEdge
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.fabricEnabled
@@ -10,9 +11,13 @@ class MainActivity : ReactActivity() {
 
   // The manifest points this Activity at SplashTheme so the brand splash paints instantly on
   // cold start, before the RN bridge is even up — swap back to the real theme right before
-  // super.onCreate() inflates the window, same pattern RN splash setups use without a library
+  // super.onCreate() inflates the window, same pattern RN splash setups use without a library.
+  // enableEdgeToEdge() belongs in this same pre-super.onCreate() slot per Android's own guidance —
+  // Android 15+ (targetSdk 35+) draws edge-to-edge regardless, this just makes it consistent on
+  // older OS versions too. The JS side is already inset-aware via App.tsx's SafeAreaProvider.
   override fun onCreate(savedInstanceState: Bundle?) {
     setTheme(R.style.AppTheme)
+    enableEdgeToEdge()
     super.onCreate(savedInstanceState)
   }
 
