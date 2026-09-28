@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { HeroVideo } from "@/components/heroVideo";
 
 const features = [
   {
@@ -101,16 +102,7 @@ export default function Home() {
               aria-hidden
               className="pointer-events-none absolute inset-0 -z-10 translate-y-6 scale-95 rounded-3xl bg-brand/25 blur-2xl dark:bg-brand/15"
             />
-            <div className="relative aspect-[1376/768] w-full overflow-hidden rounded-3xl shadow-2xl shadow-black/10 ring-1 ring-black/5 dark:shadow-black/40 dark:ring-white/10">
-              <Image
-                src="/images/banner.png"
-                alt="Kanji Up app screens: kanji selection, drawing practice, and evaluation results"
-                fill
-                className="object-cover"
-                sizes="(min-width: 768px) 672px, 100vw"
-                priority
-              />
-            </div>
+            <HeroVideo />
           </div>
         </section>
 
